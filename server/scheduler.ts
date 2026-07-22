@@ -26,9 +26,10 @@ export function getLocalDayOfWeek(date: Date): number {
 }
 
 // Helper function to check if appointment would exceed capacity
-async function checkAppointmentCapacity(
+export async function checkAppointmentCapacity(
   appointmentDate: Date, 
-  pets: Array<{ serviceType: string }>
+  pets: Array<{ serviceType: string }>,
+  tenantId?: number
 ): Promise<{ withinCapacity: boolean; reason?: string }> {
   // Get day of week in America/Chicago timezone (not UTC)
   const dayOfWeek = getLocalDayOfWeek(appointmentDate); // 0=Sunday, 1=Monday, ..., 6=Saturday
@@ -42,7 +43,7 @@ async function checkAppointmentCapacity(
   
   // Check weekly limits for Monday-Saturday (1-6)
   if (dayOfWeek >= 1 && dayOfWeek <= 6) {
-    const weeklyLimit = await storage.getWeeklyAppointmentLimit(dayOfWeek);
+    const weeklyLimit = await storage.getWeeklyAppointmentLimit(dayOfWeek, tenantId);
     
     if (!weeklyLimit) {
       return { withinCapacity: true }; // No limits configured
@@ -50,7 +51,7 @@ async function checkAppointmentCapacity(
     
     // Count existing appointments for this date by service type
     // Use stored date for matching (consistent with SQL atomic check)
-    const allAppointments = await storage.getAppointments();
+    const allAppointments = await storage.getAppointments(undefined, tenantId);
     const appointmentsOnDate = allAppointments.filter((apt: any) => {
       const aptDateStr = new Date(apt.appointmentDate).toISOString().split('T')[0];
       return aptDateStr === appointmentDateStr && 
@@ -97,92 +98,162 @@ async function checkAppointmentCapacity(
   return { withinCapacity: true };
 }
 
+// Per-tenant nightly appointment cleanup
+async function runDailyAppointmentCleanup(tenantId: number): Promise<void> {
+  const allAppointments = await storage.getAppointments(undefined, tenantId);
+
+  // Get today's date at start of day for comparison
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // First, reset isHere flag for ALL appointments (regardless of date or status)
+  const appointmentsWithHere = allAppointments.filter((apt: any) => apt.isHere === true);
+  
+  console.log(`[Tenant ${tenantId}] Resetting "Here" status for ${appointmentsWithHere.length} appointments`);
+  
+  for (const appointment of appointmentsWithHere) {
+    await storage.updateAppointmentIsHere(appointment.id, false, tenantId);
+  }
+  
+  // Second, reset isPaid flag only for today's or future appointments that were marked paid in-store.
+  const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' }); // YYYY-MM-DD
+  const appointmentsWithPaid = allAppointments.filter((apt: any) =>
+    apt.isPaid === true &&
+    !apt.paidOnline &&
+    apt.appointmentDate >= todayStr
+  );
+  
+  console.log(`[Tenant ${tenantId}] Resetting "Paid" status for ${appointmentsWithPaid.length} upcoming in-store-paid appointments`);
+  
+  for (const appointment of appointmentsWithPaid) {
+    await storage.updateAppointmentIsPaid(appointment.id, false, tenantId);
+  }
+  
+  // Then, delete approved appointments (confirmed or completed) that are 2+ days old
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+
+  const pastApprovedAppointments = allAppointments.filter((apt: any) => {
+    if (apt.status !== 'confirmed' && apt.status !== 'completed') return false;
+    if (!apt.isPaid && !apt.paidOnline && apt.checkedIn) return false;
+    const appointmentDate = new Date(apt.appointmentDate);
+    appointmentDate.setHours(0, 0, 0, 0);
+    return appointmentDate < yesterday;
+  });
+  
+  console.log(`[Tenant ${tenantId}] Saving ${pastApprovedAppointments.length} past approved appointments to history`);
+  
+  for (const appointment of pastApprovedAppointments) {
+    try {
+      const history = await storage.saveAppointmentToHistory(appointment, { tenantId });
+      console.log(`[Tenant ${tenantId}] Saved appointment ${appointment.id} to history (history ID: ${history.id})`);
+    } catch (error) {
+      console.error(`[Tenant ${tenantId}] Failed to save appointment ${appointment.id} to history:`, error);
+    }
+    await storage.deleteAppointment(appointment.id, tenantId);
+    console.log(`[Tenant ${tenantId}] Deleted past appointment: ${appointment.id}`);
+  }
+}
+
+// Per-tenant daily sales report
+async function runDailyReportForTenant(tenantId: number): Promise<void> {
+  const settings = await storage.getGroomingSettings(tenantId);
+  const enabledSetting = settings.find((s: any) => s.setting === 'daily_report_enabled');
+  const emailsSetting = settings.find((s: any) => s.setting === 'daily_report_emails');
+  const timeSetting = settings.find((s: any) => s.setting === 'daily_report_time');
+
+  if (enabledSetting?.value !== 'true' || !emailsSetting?.value) {
+    return; // Report not enabled or no emails configured
+  }
+
+  const configuredTime = timeSetting?.value || '21:00';
+  const [configHour] = configuredTime.split(':').map(Number);
+  
+  const now = new Date();
+  const currentHour = parseInt(now.toLocaleTimeString('en-US', { 
+    timeZone: 'America/Chicago', 
+    hour: '2-digit', 
+    hour12: false 
+  }));
+
+  if (currentHour === configHour) {
+    console.log(`[Tenant ${tenantId}] Running scheduled Daily Sales Report at ${configuredTime} CST`);
+    const { sendDailySalesReport } = await import('./dailySalesReport');
+    const emails = emailsSetting.value.split(',').map((e: string) => e.trim()).filter((e: string) => e);
+    if (emails.length > 0) {
+      await sendDailySalesReport(emails, undefined, tenantId);
+      console.log(`[Tenant ${tenantId}] Daily sales report sent successfully`);
+    }
+  }
+}
+
+// Per-tenant monthly sales report
+async function runMonthlyReportForTenant(tenantId: number): Promise<void> {
+  const settings = await storage.getGroomingSettings(tenantId);
+  const enabled = settings.find((s: any) => s.setting === 'monthly_report_enabled')?.value === 'true';
+  const emails  = settings.find((s: any) => s.setting === 'monthly_report_emails')?.value || '';
+  const day     = parseInt(settings.find((s: any) => s.setting === 'monthly_report_day')?.value  || '1');
+  const time    = settings.find((s: any) => s.setting === 'monthly_report_time')?.value || '08:00';
+  if (!enabled || !emails) return;
+
+  const now = new Date();
+  const cstParts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Chicago', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false,
+  }).formatToParts(now);
+  const cstDay    = parseInt(cstParts.find(p => p.type === 'day')?.value    || '0');
+  const cstHour   = parseInt(cstParts.find(p => p.type === 'hour')?.value   || '0');
+  const [cfgHour] = time.split(':').map(Number);
+
+  if (cstDay === day && cstHour === cfgHour) {
+    console.log(`[Tenant ${tenantId}] Running monthly sales report`);
+    const { sendMonthlySalesReport } = await import('./periodicSalesReport');
+    await sendMonthlySalesReport(emails.split(',').map((e: string) => e.trim()).filter(Boolean), tenantId);
+    console.log(`[Tenant ${tenantId}] Monthly sales report sent`);
+  }
+}
+
+// Per-tenant yearly sales report
+async function runYearlyReportForTenant(tenantId: number): Promise<void> {
+  const settings = await storage.getGroomingSettings(tenantId);
+  const enabled = settings.find((s: any) => s.setting === 'yearly_report_enabled')?.value === 'true';
+  const emails  = settings.find((s: any) => s.setting === 'yearly_report_emails')?.value || '';
+  const time    = settings.find((s: any) => s.setting === 'yearly_report_time')?.value || '08:00';
+  if (!enabled || !emails) return;
+
+  const now = new Date();
+  const cstParts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Chicago', month: 'numeric', day: 'numeric', hour: 'numeric', hour12: false,
+  }).formatToParts(now);
+  const cstMonth  = parseInt(cstParts.find(p => p.type === 'month')?.value ?? '0');
+  const cstDay    = parseInt(cstParts.find(p => p.type === 'day')?.value   ?? '0');
+  const cstHour   = parseInt(cstParts.find(p => p.type === 'hour')?.value  ?? '0');
+  const [cfgHour] = time.split(':').map(Number);
+
+  if (cstMonth === 1 && cstDay === 1 && cstHour === cfgHour) {
+    const prevYear = now.getFullYear() - 1;
+    console.log(`[Tenant ${tenantId}] Running yearly sales report for ${prevYear}`);
+    const { sendYearlySalesReport } = await import('./periodicSalesReport');
+    await sendYearlySalesReport(emails.split(',').map((e: string) => e.trim()).filter(Boolean), prevYear, tenantId);
+    console.log(`[Tenant ${tenantId}] Yearly sales report sent`);
+  }
+}
+
 export function initializeScheduledTasks() {
-  // Clear approved appointments and reset "Here" status every day at 1:00 AM CST (6:00 AM UTC)
+  // Clear approved appointments and reset "Here" status every day at 6:00 AM UTC (1:00 AM CST)
   // Must run at 6 AM UTC so that at fire-time the Chicago clock has already rolled to the new day —
   // midnight UTC is only 7 PM CST, which would still see "today" as the previous CST date and
   // incorrectly reset isPaid on appointments from that day.
   cron.schedule('0 6 * * *', async () => {
     try {
-      console.log('Running scheduled task: Clearing past approved appointments and resetting ALL "Here" and "Paid" statuses at midnight');
-      
-      const allAppointments = await storage.getAppointments();
-      
-      // Get today's date at start of day for comparison
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      // First, reset isHere flag for ALL appointments (regardless of date or status)
-      const appointmentsWithHere = allAppointments.filter((apt: any) => apt.isHere === true);
-      
-      console.log(`Resetting "Here" status for ${appointmentsWithHere.length} appointments (all appointments, not just past ones)`);
-      
-      for (const appointment of appointmentsWithHere) {
-        await storage.updateAppointmentIsHere(appointment.id, false);
-        console.log(`Reset "Here" status for appointment: ${appointment.id} (${appointment.ownerLastName}) from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
+      console.log('Running scheduled task: Clearing past approved appointments and resetting "Here"/"Paid" statuses');
+      // Iterate per tenant so we never mix data across businesses
+      const allTenants = await storage.getAllTenants();
+      for (const tenant of allTenants) {
+        await runDailyAppointmentCleanup(tenant.id);
       }
-      
-      // Second, reset isPaid flag only for today's or future appointments that were marked paid in-store.
-      // Past appointments keep their paid status as a permanent historical record — customers make new
-      // appointments for new visits, so there is nothing to reset on old records.
-      // Online-paid (Stripe) appointments are never reset regardless of date.
-      // Compute today's date in CST/CDT directly from the live clock — NOT from the UTC-midnight
-      // `today` object above, which when converted to Chicago time resolves to yesterday evening
-      // and causes the prior day's paid appointments to get incorrectly wiped every night.
-      const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' }); // YYYY-MM-DD
-      const appointmentsWithPaid = allAppointments.filter((apt: any) =>
-        apt.isPaid === true &&
-        !apt.paidOnline &&
-        apt.appointmentDate >= todayStr
-      );
-      
-      console.log(`Resetting "Paid" status for ${appointmentsWithPaid.length} upcoming in-store-paid appointments (past records preserved)`);
-      
-      for (const appointment of appointmentsWithPaid) {
-        await storage.updateAppointmentIsPaid(appointment.id, false);
-        console.log(`Reset "Paid" status for appointment: ${appointment.id} (${appointment.ownerLastName}) from ${new Date(appointment.appointmentDate + 'T12:00:00').toLocaleDateString()}`);
-      }
-      
-      // Then, delete approved appointments (confirmed or completed) that are 2+ days old
-      // Yesterday's appointments are retained so admins can reference them the next morning
-      const yesterday = new Date(today);
-      yesterday.setDate(today.getDate() - 1);
-
-      const pastApprovedAppointments = allAppointments.filter((apt: any) => {
-        // Include both confirmed and completed as "approved" statuses
-        if (apt.status !== 'confirmed' && apt.status !== 'completed') return false;
-        
-        // Never delete unpaid appointments where the customer actually checked in —
-        // they stay in the Non-Payment queue until marked paid.
-        // No-shows (checkedIn=false) are cleaned up normally.
-        if (!apt.isPaid && !apt.paidOnline && apt.checkedIn) return false;
-        
-        const appointmentDate = new Date(apt.appointmentDate);
-        appointmentDate.setHours(0, 0, 0, 0);
-        
-        // Only delete appointments older than yesterday (2+ days ago)
-        return appointmentDate < yesterday;
-      });
-      
-      console.log(`Saving ${pastApprovedAppointments.length} past approved appointments to history before deletion`);
-      
-      for (const appointment of pastApprovedAppointments) {
-        try {
-          // Save to history before deleting
-          const history = await storage.saveAppointmentToHistory(appointment);
-          console.log(`Saved appointment ${appointment.id} to history (history ID: ${history.id})`);
-        } catch (error) {
-          console.error(`Failed to save appointment ${appointment.id} to history:`, error);
-          // Continue with deletion even if history save fails
-        }
-        
-        await storage.deleteAppointment(appointment.id);
-        console.log(`Deleted past appointment: ${appointment.id} from ${new Date(appointment.appointmentDate).toLocaleDateString()}`);
-      }
-      
-      console.log('Successfully cleared past approved appointments and reset "Here" and "Paid" statuses');
+      console.log('Successfully completed nightly appointment cleanup for all tenants');
     } catch (error) {
-      console.error('Error clearing past approved appointments:', error);
+      console.error('Error in nightly appointment cleanup:', error);
     }
   }, {
     timezone: "America/Chicago"
@@ -193,36 +264,9 @@ export function initializeScheduledTasks() {
   // Daily Sales Report - runs every hour to check if it's time to send
   cron.schedule('0 * * * *', async () => {
     try {
-      const settings = await storage.getGroomingSettings();
-      const enabledSetting = settings.find((s: any) => s.setting === 'daily_report_enabled');
-      const emailsSetting = settings.find((s: any) => s.setting === 'daily_report_emails');
-      const timeSetting = settings.find((s: any) => s.setting === 'daily_report_time');
-
-      if (enabledSetting?.value !== 'true' || !emailsSetting?.value) {
-        return; // Report not enabled or no emails configured
-      }
-
-      const configuredTime = timeSetting?.value || '21:00';
-      const [configHour] = configuredTime.split(':').map(Number);
-      
-      // Get current hour in America/Chicago timezone
-      const now = new Date();
-      const currentHour = parseInt(now.toLocaleTimeString('en-US', { 
-        timeZone: 'America/Chicago', 
-        hour: '2-digit', 
-        hour12: false 
-      }));
-
-      if (currentHour === configHour) {
-        console.log(`Running scheduled Daily Sales Report at ${configuredTime} CST`);
-        
-        const { sendDailySalesReport } = await import('./dailySalesReport');
-        const emails = emailsSetting.value.split(',').map((e: string) => e.trim()).filter((e: string) => e);
-        
-        if (emails.length > 0) {
-          await sendDailySalesReport(emails);
-          console.log('Daily sales report sent successfully');
-        }
+      const allTenants = await storage.getAllTenants();
+      for (const tenant of allTenants) {
+        await runDailyReportForTenant(tenant.id);
       }
     } catch (error) {
       console.error('Error running daily sales report:', error);
@@ -231,105 +275,71 @@ export function initializeScheduledTasks() {
     timezone: "America/Chicago"
   });
 
-  // Monthly Sales Report — runs daily at midnight, fires on configured day+hour
+  // Monthly Sales Report — runs hourly, fires on configured day+hour per tenant
   cron.schedule('0 * * * *', async () => {
     try {
-      const settings = await storage.getGroomingSettings();
-      const enabled = settings.find((s: any) => s.setting === 'monthly_report_enabled')?.value === 'true';
-      const emails  = settings.find((s: any) => s.setting === 'monthly_report_emails')?.value || '';
-      const day     = parseInt(settings.find((s: any) => s.setting === 'monthly_report_day')?.value  || '1');
-      const time    = settings.find((s: any) => s.setting === 'monthly_report_time')?.value || '08:00';
-      if (!enabled || !emails) return;
-
-      const now = new Date();
-      const cstParts = new Intl.DateTimeFormat('en-US', {
-        timeZone: 'America/Chicago', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false,
-      }).formatToParts(now);
-      const cstDay    = parseInt(cstParts.find(p => p.type === 'day')?.value    || '0');
-      const cstHour   = parseInt(cstParts.find(p => p.type === 'hour')?.value   || '0');
-      const [cfgHour] = time.split(':').map(Number);
-
-      if (cstDay === day && cstHour === cfgHour) {
-        console.log('[Scheduler] Running monthly sales report');
-        const { sendMonthlySalesReport } = await import('./periodicSalesReport');
-        await sendMonthlySalesReport(emails.split(',').map((e: string) => e.trim()).filter(Boolean));
-        console.log('[Scheduler] Monthly sales report sent');
+      const allTenants = await storage.getAllTenants();
+      for (const tenant of allTenants) {
+        await runMonthlyReportForTenant(tenant.id);
       }
     } catch (err) { console.error('[Scheduler] Monthly report error:', err); }
   }, { timezone: 'America/Chicago' });
 
-  // Yearly Sales Report — runs hourly on Jan 1, fires at configured hour
+  // Yearly Sales Report — runs hourly on Jan 1, fires at configured hour per tenant
   cron.schedule('0 * * * *', async () => {
     try {
-      const settings = await storage.getGroomingSettings();
-      const enabled = settings.find((s: any) => s.setting === 'yearly_report_enabled')?.value === 'true';
-      const emails  = settings.find((s: any) => s.setting === 'yearly_report_emails')?.value || '';
-      const time    = settings.find((s: any) => s.setting === 'yearly_report_time')?.value || '08:00';
-      if (!enabled || !emails) return;
-
-      const now = new Date();
-      const cstParts = new Intl.DateTimeFormat('en-US', {
-        timeZone: 'America/Chicago', month: 'numeric', day: 'numeric', hour: 'numeric', hour12: false,
-      }).formatToParts(now);
-      const cstMonth  = parseInt(cstParts.find(p => p.type === 'month')?.value ?? '0');
-      const cstDay    = parseInt(cstParts.find(p => p.type === 'day')?.value   ?? '0');
-      const cstHour   = parseInt(cstParts.find(p => p.type === 'hour')?.value  ?? '0');
-      const [cfgHour] = time.split(':').map(Number);
-
-      if (cstMonth === 1 && cstDay === 1 && cstHour === cfgHour) {
-        const prevYear = now.getFullYear() - 1;
-        console.log(`[Scheduler] Running yearly sales report for ${prevYear}`);
-        const { sendYearlySalesReport } = await import('./periodicSalesReport');
-        await sendYearlySalesReport(emails.split(',').map((e: string) => e.trim()).filter(Boolean), prevYear);
-        console.log('[Scheduler] Yearly sales report sent');
+      const allTenants = await storage.getAllTenants();
+      for (const tenant of allTenants) {
+        await runYearlyReportForTenant(tenant.id);
       }
     } catch (err) { console.error('[Scheduler] Yearly report error:', err); }
   }, { timezone: 'America/Chicago' });
 
   // Abandoned cart recovery - runs every 6 hours, sends email for carts idle 24+ hours
+  // Iterates per tenant so each business's cart notification uses its own settings
   cron.schedule('0 */6 * * *', async () => {
     try {
       console.log('Running abandoned cart recovery check...');
-      const abandonedCarts = await storage.getAbandonedCarts(24);
-      
-      if (abandonedCarts.length === 0) {
-        console.log('No abandoned carts found');
-        return;
-      }
-
-      console.log(`Found ${abandonedCarts.length} abandoned carts to notify`);
-      
+      const allTenants = await storage.getAllTenants();
       const { notificationService } = await import('./notifications');
 
-      for (const cart of abandonedCarts) {
-        try {
-          // Resolve item names from supply IDs
-          const enrichedItems: Array<{name: string; price: string; quantity: number}> = [];
-          for (const item of cart.items) {
-            let name = 'Item';
-            let price = '0';
-            if (item.supplyId) {
-              const supply = await storage.getSupply(item.supplyId);
-              if (supply) {
-                name = supply.name;
-                price = supply.price?.toString() || '0';
+      for (const tenant of allTenants) {
+        const abandonedCarts = await storage.getAbandonedCarts(24, tenant.id);
+        if (abandonedCarts.length === 0) continue;
+
+        console.log(`[Tenant ${tenant.id}] Found ${abandonedCarts.length} abandoned carts to notify`);
+
+        for (const cart of abandonedCarts) {
+          try {
+            // Resolve item names from supply IDs
+            const enrichedItems: Array<{name: string; price: string; quantity: number}> = [];
+            for (const item of cart.items) {
+              let name = 'Item';
+              let price = '0';
+              if (item.supplyId) {
+                const supply = await storage.getSupply(item.supplyId, tenant.id);
+                if (supply) {
+                  name = supply.name;
+                  price = supply.price?.toString() || '0';
+                }
               }
+              enrichedItems.push({ name, price, quantity: item.quantity || 1 });
             }
-            enrichedItems.push({ name, price, quantity: item.quantity || 1 });
-          }
 
-          const sent = await notificationService.sendAbandonedCartNotification(
-            cart.email,
-            cart.firstName,
-            enrichedItems
-          );
+            const sent = await notificationService.sendAbandonedCartNotification(
+              cart.email,
+              cart.firstName,
+              enrichedItems,
+              tenant.id
+            );
 
-          if (sent) {
-            await storage.updateAbandonedCartEmailSent(cart.userId);
-            console.log(`Abandoned cart email sent to ${cart.email}`);
+            if (sent) {
+              await storage.updateAbandonedCartEmailSent(cart.userId);
+              console.log(`[Tenant ${tenant.id}] Abandoned cart email sent to ${cart.email}`);
+            }
+          } catch (err) {
+            console.error(`[Tenant ${tenant.id}] Failed to send abandoned cart email to ${cart.email}:`, err);
           }
-        } catch (err) {
-          console.error(`Failed to send abandoned cart email to ${cart.email}:`, err);
         }
       }
     } catch (error) {
@@ -340,9 +350,9 @@ export function initializeScheduledTasks() {
   });
 
   console.log('Scheduled tasks initialized:');
-  console.log('- Clear approved appointments and reset "Here"/"Paid" flags: Daily at 12:00 AM (CST)');
-  console.log('- Daily Sales Report: Hourly check (sends at configured time if enabled)');
-  console.log('- Monthly Sales Report: Hourly check (sends on configured day/time if enabled)');
-  console.log('- Yearly Sales Report: Hourly check on Jan 1 (sends at configured time if enabled)');
+  console.log('- Clear approved appointments and reset "Here"/"Paid" flags: Daily at 6:00 AM UTC (1 AM CST) per tenant');
+  console.log('- Daily Sales Report: Hourly check per tenant (sends at configured time if enabled)');
+  console.log('- Monthly Sales Report: Hourly check per tenant (sends on configured day/time if enabled)');
+  console.log('- Yearly Sales Report: Hourly check on Jan 1 per tenant (sends at configured time if enabled)');
   console.log('- Abandoned Cart Recovery: Every 6 hours (24+ hour idle carts)');
 }

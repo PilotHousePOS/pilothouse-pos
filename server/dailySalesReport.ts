@@ -71,12 +71,12 @@ function formatPercent(amount: number, total: number): string {
   return ((amount / total) * 100).toFixed(2) + '%';
 }
 
-export async function sendDailySalesReport(recipientEmails: string[], specificDate?: string): Promise<void> {
+export async function sendDailySalesReport(recipientEmails: string[], specificDate?: string, tenantId?: number): Promise<void> {
   if (!recipientEmails || recipientEmails.length === 0) {
     throw new Error('No recipient emails provided');
   }
 
-  const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
+  const { client, fromEmail, replyTo } = await getUncachableSendGridClient(tenantId);
 
   const now = new Date();
   const cstOptions = { timeZone: 'America/Chicago' };
@@ -134,12 +134,12 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
   const todayDateStr = reportDateStr;
   const yesterdayDateStr = reportDateStr; // same day — no cross-day fetch needed
 
-  const allOrders = await storage.getOrders();
+  const allOrders = await storage.getOrders(undefined, tenantId);
   
   // Fetch appointment items for the report date only
   let todaysApptItems: any[] = [];
   try {
-    const todayItems = await storage.getAppointmentItemsByDate(todayDateStr);
+    const todayItems = await storage.getAppointmentItemsByDate(todayDateStr, tenantId);
     todaysApptItems = todayItems || [];
   } catch (e) {
     // Table may not exist yet
@@ -194,7 +194,7 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
 
   // Process active orders (non-cancelled) for gross sales
   for (const order of activeOrders) {
-    const orderWithItems = await storage.getOrderWithItems(order.id);
+    const orderWithItems = await storage.getOrderWithItems(order.id, tenantId);
     if (!orderWithItems) continue;
     processedOrders.push({ order, items: orderWithItems.items, customerName: orderWithItems.customerName || 'Unknown' });
 
@@ -419,7 +419,7 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
   let groomingServiceTotal = 0;
   let groomingServiceCount = 0;
   try {
-    const allAppts = await storage.getAppointments();
+    const allAppts = await storage.getAppointments(undefined, tenantId);
     const windowAppts = allAppts.filter((apt: any) =>
       apt.isPaid && apt.paidOnline && apt.finalAmount &&
       apt.appointmentDate >= yesterdayDateStr && apt.appointmentDate <= todayDateStr
@@ -483,7 +483,7 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
 
   let todaysRefunds: any[] = [];
   try {
-    todaysRefunds = await storage.getRefundsByDateRange(todayStartUTC, todayEndUTC);
+    todaysRefunds = await storage.getRefundsByDateRange(todayStartUTC, todayEndUTC, tenantId);
   } catch (e) {
     // Fallback if method not available
   }
@@ -545,7 +545,7 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
   for (const refund of todaysRefunds) {
     if (refund.orderId) {
       try {
-        const refundOrder = await storage.getOrder(refund.orderId);
+        const refundOrder = await storage.getOrder(refund.orderId, tenantId);
         if (refundOrder) {
           if (refund.refundType === 'full' && refundOrder.convenienceFee) {
             convenienceFeesRefunded += parseFloat(refundOrder.convenienceFee) || 0;

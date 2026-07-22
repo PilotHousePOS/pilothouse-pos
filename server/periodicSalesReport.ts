@@ -17,64 +17,128 @@ function periodLabel(type: 'monthly' | 'yearly', startDate: string, endDate: str
   return startDate.slice(0, 4);
 }
 
-async function querySalesData(startDate: string, endDate: string) {
+async function querySalesData(startDate: string, endDate: string, tenantId?: number) {
   const [totals, byChannel, byMethod, byCategory] = await Promise.all([
-    db.execute(sql`
-      WITH all_sales AS (
-        SELECT subtotal::numeric, tax::numeric, total::numeric, payment_method, created_at, 'pos' AS channel
-        FROM pos_orders
-        WHERE created_at::date >= ${startDate}::date AND created_at::date <= ${endDate}::date
-        UNION ALL
-        SELECT COALESCE(subtotal::numeric,0), COALESCE(tax_amount::numeric,0),
-               COALESCE(total_amount::numeric,0), 'online', order_date
-        FROM orders
-        WHERE payment_status = 'paid'
-          AND order_date::date >= ${startDate}::date AND order_date::date <= ${endDate}::date
-      )
-      SELECT COUNT(*) AS order_count,
-             COALESCE(SUM(subtotal),0) AS subtotal,
-             COALESCE(SUM(tax),0) AS tax,
-             COALESCE(SUM(total),0) AS total
-      FROM all_sales
-    `),
-    db.execute(sql`
-      WITH all_sales AS (
-        SELECT total::numeric, 'pos' AS channel
-        FROM pos_orders
-        WHERE created_at::date >= ${startDate}::date AND created_at::date <= ${endDate}::date
-        UNION ALL
-        SELECT COALESCE(total_amount::numeric,0), 'online'
-        FROM orders
-        WHERE payment_status = 'paid'
-          AND order_date::date >= ${startDate}::date AND order_date::date <= ${endDate}::date
-      )
-      SELECT channel, COUNT(*) AS order_count, COALESCE(SUM(total),0) AS total
-      FROM all_sales GROUP BY channel ORDER BY channel
-    `),
-    db.execute(sql`
-      WITH all_sales AS (
-        SELECT total::numeric, payment_method
-        FROM pos_orders
-        WHERE created_at::date >= ${startDate}::date AND created_at::date <= ${endDate}::date
-        UNION ALL
-        SELECT COALESCE(total_amount::numeric,0), 'online'
-        FROM orders
-        WHERE payment_status = 'paid'
-          AND order_date::date >= ${startDate}::date AND order_date::date <= ${endDate}::date
-      )
-      SELECT payment_method, COUNT(*) AS order_count, COALESCE(SUM(total),0) AS total
-      FROM all_sales GROUP BY payment_method ORDER BY total DESC
-    `),
-    db.execute(sql`
-      SELECT
-        item->>'category' AS category,
-        COUNT(*) AS item_count,
-        SUM((item->>'price')::numeric * (item->>'quantity')::numeric)::numeric AS total
-      FROM pos_orders o
-      CROSS JOIN LATERAL jsonb_array_elements(o.items) AS item
-      WHERE o.created_at::date >= ${startDate}::date AND o.created_at::date <= ${endDate}::date
-      GROUP BY category ORDER BY total DESC LIMIT 15
-    `),
+    tenantId
+      ? db.execute(sql`
+          WITH all_sales AS (
+            SELECT subtotal::numeric, tax::numeric, total::numeric, payment_method, created_at, 'pos' AS channel
+            FROM pos_orders
+            WHERE tenant_id = ${tenantId}
+              AND created_at::date >= ${startDate}::date AND created_at::date <= ${endDate}::date
+            UNION ALL
+            SELECT COALESCE(subtotal::numeric,0), COALESCE(tax_amount::numeric,0),
+                   COALESCE(total_amount::numeric,0), 'online', order_date
+            FROM orders
+            WHERE tenant_id = ${tenantId} AND payment_status = 'paid'
+              AND order_date::date >= ${startDate}::date AND order_date::date <= ${endDate}::date
+          )
+          SELECT COUNT(*) AS order_count,
+                 COALESCE(SUM(subtotal),0) AS subtotal,
+                 COALESCE(SUM(tax),0) AS tax,
+                 COALESCE(SUM(total),0) AS total
+          FROM all_sales
+        `)
+      : db.execute(sql`
+          WITH all_sales AS (
+            SELECT subtotal::numeric, tax::numeric, total::numeric, payment_method, created_at, 'pos' AS channel
+            FROM pos_orders
+            WHERE created_at::date >= ${startDate}::date AND created_at::date <= ${endDate}::date
+            UNION ALL
+            SELECT COALESCE(subtotal::numeric,0), COALESCE(tax_amount::numeric,0),
+                   COALESCE(total_amount::numeric,0), 'online', order_date
+            FROM orders
+            WHERE payment_status = 'paid'
+              AND order_date::date >= ${startDate}::date AND order_date::date <= ${endDate}::date
+          )
+          SELECT COUNT(*) AS order_count,
+                 COALESCE(SUM(subtotal),0) AS subtotal,
+                 COALESCE(SUM(tax),0) AS tax,
+                 COALESCE(SUM(total),0) AS total
+          FROM all_sales
+        `),
+    tenantId
+      ? db.execute(sql`
+          WITH all_sales AS (
+            SELECT total::numeric, 'pos' AS channel
+            FROM pos_orders
+            WHERE tenant_id = ${tenantId}
+              AND created_at::date >= ${startDate}::date AND created_at::date <= ${endDate}::date
+            UNION ALL
+            SELECT COALESCE(total_amount::numeric,0), 'online'
+            FROM orders
+            WHERE tenant_id = ${tenantId} AND payment_status = 'paid'
+              AND order_date::date >= ${startDate}::date AND order_date::date <= ${endDate}::date
+          )
+          SELECT channel, COUNT(*) AS order_count, COALESCE(SUM(total),0) AS total
+          FROM all_sales GROUP BY channel ORDER BY channel
+        `)
+      : db.execute(sql`
+          WITH all_sales AS (
+            SELECT total::numeric, 'pos' AS channel
+            FROM pos_orders
+            WHERE created_at::date >= ${startDate}::date AND created_at::date <= ${endDate}::date
+            UNION ALL
+            SELECT COALESCE(total_amount::numeric,0), 'online'
+            FROM orders
+            WHERE payment_status = 'paid'
+              AND order_date::date >= ${startDate}::date AND order_date::date <= ${endDate}::date
+          )
+          SELECT channel, COUNT(*) AS order_count, COALESCE(SUM(total),0) AS total
+          FROM all_sales GROUP BY channel ORDER BY channel
+        `),
+    tenantId
+      ? db.execute(sql`
+          WITH all_sales AS (
+            SELECT total::numeric, payment_method
+            FROM pos_orders
+            WHERE tenant_id = ${tenantId}
+              AND created_at::date >= ${startDate}::date AND created_at::date <= ${endDate}::date
+            UNION ALL
+            SELECT COALESCE(total_amount::numeric,0), 'online'
+            FROM orders
+            WHERE tenant_id = ${tenantId} AND payment_status = 'paid'
+              AND order_date::date >= ${startDate}::date AND order_date::date <= ${endDate}::date
+          )
+          SELECT payment_method, COUNT(*) AS order_count, COALESCE(SUM(total),0) AS total
+          FROM all_sales GROUP BY payment_method ORDER BY total DESC
+        `)
+      : db.execute(sql`
+          WITH all_sales AS (
+            SELECT total::numeric, payment_method
+            FROM pos_orders
+            WHERE created_at::date >= ${startDate}::date AND created_at::date <= ${endDate}::date
+            UNION ALL
+            SELECT COALESCE(total_amount::numeric,0), 'online'
+            FROM orders
+            WHERE payment_status = 'paid'
+              AND order_date::date >= ${startDate}::date AND order_date::date <= ${endDate}::date
+          )
+          SELECT payment_method, COUNT(*) AS order_count, COALESCE(SUM(total),0) AS total
+          FROM all_sales GROUP BY payment_method ORDER BY total DESC
+        `),
+    tenantId
+      ? db.execute(sql`
+          SELECT
+            item->>'category' AS category,
+            COUNT(*) AS item_count,
+            SUM((item->>'price')::numeric * (item->>'quantity')::numeric)::numeric AS total
+          FROM pos_orders o
+          CROSS JOIN LATERAL jsonb_array_elements(o.items) AS item
+          WHERE o.tenant_id = ${tenantId}
+            AND o.created_at::date >= ${startDate}::date AND o.created_at::date <= ${endDate}::date
+          GROUP BY category ORDER BY total DESC LIMIT 15
+        `)
+      : db.execute(sql`
+          SELECT
+            item->>'category' AS category,
+            COUNT(*) AS item_count,
+            SUM((item->>'price')::numeric * (item->>'quantity')::numeric)::numeric AS total
+          FROM pos_orders o
+          CROSS JOIN LATERAL jsonb_array_elements(o.items) AS item
+          WHERE o.created_at::date >= ${startDate}::date AND o.created_at::date <= ${endDate}::date
+          GROUP BY category ORDER BY total DESC LIMIT 15
+        `),
   ]);
   return {
     totals: totals.rows[0] as any,
@@ -167,11 +231,19 @@ function buildEmailHtml(
 
 export async function sendMonthlySalesReport(
   recipientEmails: string[],
-  specificMonth?: string, // YYYY-MM format
+  tenantIdOrMonth?: string | number, // tenantId (number) or YYYY-MM (string)
+  tenantId?: number,
 ): Promise<void> {
+  // Handle old call signature: sendMonthlySalesReport(emails, 'YYYY-MM')
+  let specificMonth: string | undefined;
+  if (typeof tenantIdOrMonth === 'string') {
+    specificMonth = tenantIdOrMonth;
+  } else if (typeof tenantIdOrMonth === 'number') {
+    tenantId = tenantIdOrMonth;
+  }
   if (!recipientEmails.length) throw new Error('No recipient emails provided');
 
-  const { client, fromEmail } = await getUncachableSendGridClient();
+  const { client, fromEmail } = await getUncachableSendGridClient(tenantId);
 
   const now = new Date();
   let year: number, month: number;
@@ -187,7 +259,7 @@ export async function sendMonthlySalesReport(
   const lastDay   = new Date(year, month, 0).getDate();
   const endDate   = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
-  const data  = await querySalesData(startDate, endDate);
+  const data  = await querySalesData(startDate, endDate, tenantId);
   const label = periodLabel('monthly', startDate, endDate);
   const html  = buildEmailHtml('Monthly', label, data);
 
@@ -206,16 +278,17 @@ export async function sendMonthlySalesReport(
 export async function sendYearlySalesReport(
   recipientEmails: string[],
   specificYear?: number,
+  tenantId?: number,
 ): Promise<void> {
   if (!recipientEmails.length) throw new Error('No recipient emails provided');
 
-  const { client, fromEmail } = await getUncachableSendGridClient();
+  const { client, fromEmail } = await getUncachableSendGridClient(tenantId);
 
   const year = specificYear ?? (new Date().getFullYear() - 1);
   const startDate = `${year}-01-01`;
   const endDate   = `${year}-12-31`;
 
-  const data  = await querySalesData(startDate, endDate);
+  const data  = await querySalesData(startDate, endDate, tenantId);
   const label = String(year);
   const html  = buildEmailHtml('Yearly', label, data);
 

@@ -23,9 +23,9 @@ export const EMAIL_TOGGLE_KEYS = {
   abandoned_cart_customer:     'email_toggle_abandoned_cart_customer',
 } as const;
 
-async function isEmailEnabled(key: string): Promise<boolean> {
+async function isEmailEnabled(key: string, tenantId?: number): Promise<boolean> {
   try {
-    const setting = await storage.getGroomingSetting(key);
+    const setting = await storage.getGroomingSetting(key, tenantId);
     if (!setting) return true; // not configured → enabled by default
     return setting.value !== 'false';
   } catch {
@@ -559,11 +559,11 @@ class PushNotificationService {
 
 // SMS notification service with logging and opt-out checking
 class SMSService {
-  // Helper to check if contact has opted out
-  private async isOptedOut(phoneNumber: string): Promise<{ optedOut: boolean; contactId?: number }> {
+  // Helper to check if contact has opted out — tenant-scoped to prevent cross-tenant opt-out bleed
+  private async isOptedOut(phoneNumber: string, tenantId?: number): Promise<{ optedOut: boolean; contactId?: number }> {
     try {
       const normalizedPhone = normalizePhoneNumber(phoneNumber);
-      const contact = await storage.getContactByPhoneNumber(normalizedPhone);
+      const contact = await storage.getContactByPhoneNumber(normalizedPhone, tenantId);
       if (contact) {
         return { optedOut: contact.smsOptOut === true, contactId: contact.id };
       }
@@ -642,7 +642,7 @@ class SMSService {
     }
   }
 
-  async sendOrderStatusSMS(phoneNumber: string, firstName: string, orderId: number, status: string): Promise<boolean> {
+  async sendOrderStatusSMS(phoneNumber: string, firstName: string, orderId: number, status: string, tenantId?: number): Promise<boolean> {
     const messages = {
       'approved': `Hi ${firstName}! Your PilotHouse order #${orderId} has been approved. We'll text you when it's ready for pickup! Reply STOP to opt out.`,
       'in_progress': `Hi ${firstName}! Your PilotHouse order #${orderId} is being prepared. We'll text you when it's ready for pickup! Reply STOP to opt out.`,
@@ -652,8 +652,8 @@ class SMSService {
     const message = messages[status as keyof typeof messages];
     if (!message) return false;
 
-    // Check opt-out status
-    const { optedOut, contactId } = await this.isOptedOut(phoneNumber);
+    // Check opt-out status — tenant-scoped
+    const { optedOut, contactId } = await this.isOptedOut(phoneNumber, tenantId);
     if (optedOut) {
       console.log(`SMS skipped for ${phoneNumber} - contact opted out`);
       await this.logSms({ contactId, phoneNumber, message, status: 'skipped', errorMessage: 'Contact opted out of SMS' });
@@ -690,7 +690,7 @@ class SMSService {
     return await this.sendGenericSMS(phoneNumber, message, appointmentId);
   }
 
-  async sendGenericSMS(phoneNumber: string, message: string, appointmentId?: number): Promise<boolean> {
+  async sendGenericSMS(phoneNumber: string, message: string, appointmentId?: number, tenantId?: number): Promise<boolean> {
     // Normalize to E.164 so Twilio always accepts it
     const toNumber = this.toE164(phoneNumber);
     if (!toNumber.match(/^\+1\d{10}$/)) {
@@ -714,8 +714,8 @@ class SMSService {
       }
     }
 
-    // Check opt-out status
-    const { optedOut, contactId } = await this.isOptedOut(toNumber);
+    // Check opt-out status — tenant-scoped to prevent cross-tenant suppression
+    const { optedOut, contactId } = await this.isOptedOut(toNumber, tenantId);
     if (optedOut) {
       console.log(`SMS skipped for ${toNumber} - contact opted out`);
       await this.logSms({ contactId, phoneNumber: toNumber, message, status: 'skipped', errorMessage: 'Contact opted out of SMS', appointmentId });
@@ -764,12 +764,13 @@ export class NotificationService {
     orderId: number,
     customerName: string,
     totalAmount: string,
-    adminPhones?: string[]
+    adminPhones?: string[],
+    tenantId?: number
   ): Promise<void> {
     console.log(`Sending admin notifications for new order ${orderId}`);
 
     // Send email notifications to all admin users (respects toggle)
-    if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.new_order_admin)) {
+    if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.new_order_admin, tenantId)) {
       for (const adminEmail of adminEmails) {
         await this.emailService.sendAdminNewOrderEmail(adminEmail, orderId, customerName, totalAmount);
       }
@@ -797,12 +798,13 @@ export class NotificationService {
     appointmentTime: string,
     groomerEmails?: string[],
     customerEmail?: string,
-    customerFirstName?: string
+    customerFirstName?: string,
+    tenantId?: number
   ): Promise<void> {
     console.log(`Sending admin notifications for new appointment ${appointmentId}`);
 
     // Send email notifications to all admin users (respects toggle)
-    if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.new_appointment_admin)) {
+    if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.new_appointment_admin, tenantId)) {
       for (const adminEmail of adminEmails) {
         await this.emailService.sendAdminNewAppointmentEmail(
           adminEmail,
@@ -819,7 +821,7 @@ export class NotificationService {
 
     // Send email notifications to groomers (respects toggle)
     if (groomerEmails && groomerEmails.length > 0) {
-      if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.new_appointment_groomer)) {
+      if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.new_appointment_groomer, tenantId)) {
         for (const groomerEmail of groomerEmails) {
           await this.emailService.sendAdminNewAppointmentEmail(
             groomerEmail,
@@ -837,7 +839,7 @@ export class NotificationService {
 
     // Send "booking received" email to the customer (respects toggle)
     if (customerEmail && customerFirstName) {
-      if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.new_appointment_customer)) {
+      if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.new_appointment_customer, tenantId)) {
         await this.emailService.sendAppointmentBookedCustomerEmail(
           customerEmail,
           customerFirstName,
@@ -861,7 +863,8 @@ export class NotificationService {
     userPhoneNumber: string | null,
     userId: string,
     orderId: number,
-    status: string
+    status: string,
+    tenantId?: number
   ): Promise<void> {
     // Only send notifications for specific status changes
     if (!['in_progress', 'ready'].includes(status)) {
@@ -871,7 +874,7 @@ export class NotificationService {
     console.log(`Sending notifications for order ${orderId} status change to: ${status}`);
 
     // Send email notification (respects toggle)
-    if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.order_status_customer)) {
+    if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.order_status_customer, tenantId)) {
       await this.emailService.sendOrderStatusEmail(userEmail, userFirstName, orderId, status);
     } else {
       console.log(`[EMAIL TOGGLE] Order status customer email suppressed for order ${orderId}`);
@@ -882,7 +885,7 @@ export class NotificationService {
 
     // Send SMS if phone number is available
     if (userPhoneNumber) {
-      await this.smsService.sendOrderStatusSMS(userPhoneNumber, userFirstName, orderId, status);
+      await this.smsService.sendOrderStatusSMS(userPhoneNumber, userFirstName, orderId, status, tenantId);
     }
   }
 
@@ -894,12 +897,13 @@ export class NotificationService {
     appointmentDate: string,
     appointmentTime: string,
     groomerEmails?: string[],
-    customerName?: string
+    customerName?: string,
+    tenantId?: number
   ): Promise<void> {
     console.log(`Sending appointment confirmation notification for appointment ${appointmentId}`);
 
     // Customer email
-    if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.appt_confirmed_customer)) {
+    if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.appt_confirmed_customer, tenantId)) {
       await this.emailService.sendAppointmentConfirmedEmail(
         userEmail,
         userFirstName,
@@ -914,7 +918,7 @@ export class NotificationService {
 
     // Groomer email (reuses admin appointment template so groomers see the full details)
     if (groomerEmails && groomerEmails.length > 0) {
-      if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.appt_confirmed_groomer)) {
+      if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.appt_confirmed_groomer, tenantId)) {
         for (const groomerEmail of groomerEmails) {
           await this.emailService.sendAdminNewAppointmentEmail(
             groomerEmail,
@@ -939,12 +943,13 @@ export class NotificationService {
     appointmentDate: string,
     appointmentTime: string,
     groomerEmails?: string[],
-    customerName?: string
+    customerName?: string,
+    tenantId?: number
   ): Promise<void> {
     console.log(`Sending appointment rejection notification for appointment ${appointmentId}`);
 
     // Customer email
-    if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.appt_rejected_customer)) {
+    if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.appt_rejected_customer, tenantId)) {
       await this.emailService.sendAppointmentRejectedEmail(
         userEmail,
         userFirstName,
@@ -959,7 +964,7 @@ export class NotificationService {
 
     // Groomer email
     if (groomerEmails && groomerEmails.length > 0) {
-      if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.appt_rejected_groomer)) {
+      if (await isEmailEnabled(EMAIL_TOGGLE_KEYS.appt_rejected_groomer, tenantId)) {
         for (const groomerEmail of groomerEmails) {
           await this.emailService.sendAdminNewAppointmentEmail(
             groomerEmail,
@@ -987,10 +992,11 @@ export class NotificationService {
     loyaltyCreditsApplied: string,
     totalAmount: string,
     discountAmount?: string,
-    customerNotes?: string
+    customerNotes?: string,
+    tenantId?: number
   ): Promise<void> {
     console.log(`Sending order received confirmation to ${userEmail} for order ${orderId}`);
-    if (!(await isEmailEnabled(EMAIL_TOGGLE_KEYS.order_received_customer))) {
+    if (!(await isEmailEnabled(EMAIL_TOGGLE_KEYS.order_received_customer, tenantId))) {
       console.log(`[EMAIL TOGGLE] Order received customer email suppressed for order ${orderId}`);
       return;
     }
@@ -1003,10 +1009,11 @@ export class NotificationService {
   async sendAbandonedCartNotification(
     userEmail: string,
     userFirstName: string,
-    items: Array<{name: string; price: string; quantity: number}>
+    items: Array<{name: string; price: string; quantity: number}>,
+    tenantId?: number
   ): Promise<boolean> {
     console.log(`Sending abandoned cart email to ${userEmail}`);
-    if (!(await isEmailEnabled(EMAIL_TOGGLE_KEYS.abandoned_cart_customer))) {
+    if (!(await isEmailEnabled(EMAIL_TOGGLE_KEYS.abandoned_cart_customer, tenantId))) {
       console.log(`[EMAIL TOGGLE] Abandoned cart customer email suppressed`);
       return false;
     }
@@ -1016,27 +1023,30 @@ export class NotificationService {
   async sendPetReadyNotification(
     phoneNumber: string,
     firstName: string,
-    petName: string
+    petName: string,
+    tenantId?: number
   ): Promise<boolean> {
     console.log(`Sending pet ready SMS notification for ${petName} to ${phoneNumber}`);
-    return await this.smsService.sendPetReadySMS(phoneNumber, firstName, petName);
+    return await this.smsService.sendGenericSMS(phoneNumber, `Your Fur Baby is ready for pick-up, unless you've already spoken to a groomer, please give us a call to let us know you're on your way. PilotHouse 318-323-6090. Reply STOP to opt out.`, undefined, tenantId);
   }
 
   async sendGenericSMS(
     phoneNumber: string,
-    message: string
+    message: string,
+    tenantId?: number
   ): Promise<boolean> {
     console.log(`Sending generic SMS to ${phoneNumber}`);
-    return await this.smsService.sendGenericSMS(phoneNumber, message);
+    return await this.smsService.sendGenericSMS(phoneNumber, message, undefined, tenantId);
   }
 
   async sendCustomSMS(
     phoneNumber: string,
     message: string,
-    appointmentId?: number
+    appointmentId?: number,
+    tenantId?: number
   ): Promise<boolean> {
     console.log(`Sending custom SMS to ${phoneNumber}: ${message.substring(0, 50)}...`);
-    return await this.smsService.sendGenericSMS(phoneNumber, message, appointmentId);
+    return await this.smsService.sendGenericSMS(phoneNumber, message, appointmentId, tenantId);
   }
 
   async sendTestSMS(phoneNumber: string): Promise<{ success: boolean; sid?: string; error?: string }> {

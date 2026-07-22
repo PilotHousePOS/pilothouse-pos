@@ -1,4 +1,5 @@
 import {
+  tenants,
   users,
   pets,
   brandCatalog,
@@ -29,6 +30,8 @@ import {
   orderPhotos,
   extractedOrderItems,
   loyaltySettings,
+  type Tenant,
+  type InsertTenant,
   type User,
   type UpsertUser,
   type Pet,
@@ -126,6 +129,14 @@ import {
 } from "./duplicateDetection";
 
 export interface IStorage {
+  // Tenant operations
+  getAllTenants(): Promise<Tenant[]>;
+  getTenant(id: number): Promise<Tenant | undefined>;
+  getTenantBySlug(slug: string): Promise<Tenant | undefined>;
+  createTenant(tenant: InsertTenant): Promise<Tenant>;
+  updateTenant(id: number, tenant: Partial<InsertTenant>): Promise<Tenant>;
+  getTenantRowCounts(tenantId: number): Promise<Record<string, number>>;
+
   // User operations
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
@@ -135,20 +146,22 @@ export interface IStorage {
   updateUserGroomer(id: string, isGroomer: boolean): Promise<User>;
   updateUserChargeAccount(id: string, isChargeAccount: boolean): Promise<User>;
   updateUserSuperiorManager(id: string, isSuperiorManager: boolean): Promise<User>;
+  updateUserSuperAdmin(id: string, isSuperAdmin: boolean): Promise<User>;
+  updateUserTenant(id: string, tenantId: number): Promise<User>;
   updateAppointmentHistoryRecord(id: number, data: Partial<{ appointmentDate: string; appointmentTime: string; petName: string; petType: string; breed: string; serviceType: string; groomerName: string; status: string; notes: string }>): Promise<AppointmentHistory>;
   deleteAppointmentHistoryRecord(id: number): Promise<void>;
-  getAllUsers(): Promise<User[]>;
+  getAllUsers(tenantId?: number): Promise<User[]>;
   deleteUser(id: string): Promise<void>;
   incrementTokenVersion(id: string): Promise<void>;
 
   // Pet operations
-  getAllPets(): Promise<Pet[]>;
-  getAllPetsAdmin(): Promise<Pet[]>;
-  getPetsBySpecies(species: string): Promise<Pet[]>;
-  getPet(id: number): Promise<Pet | undefined>;
+  getAllPets(tenantId?: number): Promise<Pet[]>;
+  getAllPetsAdmin(tenantId?: number): Promise<Pet[]>;
+  getPetsBySpecies(species: string, tenantId?: number): Promise<Pet[]>;
+  getPet(id: number, tenantId?: number): Promise<Pet | undefined>;
   createPet(pet: InsertPet): Promise<Pet>;
-  updatePet(id: number, pet: Partial<InsertPet>): Promise<Pet>;
-  deletePet(id: number): Promise<void>;
+  updatePet(id: number, pet: Partial<InsertPet>, tenantId?: number): Promise<Pet>;
+  deletePet(id: number, tenantId?: number): Promise<void>;
   hasPetReferences(id: number): Promise<boolean>;
 
   // Brand Catalog operations
@@ -161,8 +174,8 @@ export interface IStorage {
   deleteBrandCatalogEntry(id: number): Promise<void>;
 
   // Supply operations
-  getAllSupplies(): Promise<Supply[]>;
-  getSuppliesByCategory(category: string): Promise<Supply[]>;
+  getAllSupplies(tenantId?: number): Promise<Supply[]>;
+  getSuppliesByCategory(category: string, tenantId?: number): Promise<Supply[]>;
   getReptileSupplies(): Promise<Supply[]>;
   searchSupplies(query: string): Promise<Supply[]>;
   getPaginatedSupplies(params: { 
@@ -179,13 +192,15 @@ export interface IStorage {
     toyType?: string;
     healthcareType?: string;
     accessoryType?: string;
+    tenantId?: number;
   }): Promise<{ items: Supply[]; total: number }>;
-  getSupply(id: number): Promise<Supply | undefined>;
+  getSupply(id: number, tenantId?: number): Promise<Supply | undefined>;
+  getSupplyByUpc(upc: string, tenantId?: number): Promise<Supply | undefined>;
   getSuppliesByIds(ids: number[]): Promise<Supply[]>;
   getRelatedSupplies(excludeId: number, category: string, brand: string | null, limit?: number, productName?: string): Promise<Supply[]>;
   createSupply(supply: InsertSupply): Promise<Supply>;
-  updateSupply(id: number, supply: Partial<InsertSupply>): Promise<Supply>;
-  deleteSupply(id: number): Promise<void>;
+  updateSupply(id: number, supply: Partial<InsertSupply>, tenantId?: number): Promise<Supply>;
+  deleteSupply(id: number, tenantId?: number): Promise<void>;
   autoCategorizeAllSupplies(): Promise<{
     aquatic: number;
     reptile: number;
@@ -251,41 +266,53 @@ export interface IStorage {
   updateCartItem(id: number, quantity: number, userId: string): Promise<CartItem | null>;
   removeFromCart(id: number, userId: string): Promise<boolean>;
   clearCart(userId: string): Promise<void>;
-  getAbandonedCarts(hoursOld: number): Promise<Array<{userId: string; email: string; firstName: string; items: CartItem[]; oldestItemAt: Date}>>;
+  getAbandonedCarts(hoursOld: number, tenantId?: number): Promise<Array<{userId: string; email: string; firstName: string; items: CartItem[]; oldestItemAt: Date}>>;
   updateAbandonedCartEmailSent(userId: string): Promise<void>;
 
   // Order operations
   createOrder(order: InsertOrder, items: InsertOrderItem[]): Promise<Order>;
-  getOrders(userId?: string): Promise<Order[]>;
-  getOrder(id: number): Promise<Order | undefined>;
-  getOrderWithItems(id: number): Promise<{ order: Order; items: OrderItem[] } | undefined>;
-  updateOrderStatus(id: number, status: string): Promise<Order>;
-  updateOrderApprovalStatus(id: number, approvalStatus: string): Promise<Order>;
-  applyOrderDiscount(id: number, discountAmount: string, discountReason: string): Promise<Order>;
+  getOrders(userId?: string, tenantId?: number): Promise<Order[]>;
+  getOrder(id: number, tenantId?: number): Promise<Order | undefined>;
+  getOrderWithItems(id: number, tenantId?: number): Promise<{ order: Order; items: OrderItem[] } | undefined>;
+  getAllOrdersWithItems(tenantId?: number): Promise<any[]>;
+  searchOrders(searchQuery: string, tenantId?: number): Promise<Order[]>;
+  updateOrderStatus(id: number, status: string, tenantId?: number): Promise<Order>;
+  updateOrderApprovalStatus(id: number, approvalStatus: string, tenantId?: number): Promise<Order>;
+  applyOrderDiscount(id: number, discountAmount: string, discountReason: string, tenantId?: number): Promise<Order>;
   updateOrderStripePayment(id: number, data: { stripeCheckoutSessionId?: string; stripePaymentIntentId?: string; stripePaymentUrl?: string; paymentStatus?: string; paidAt?: Date }): Promise<Order>;
   getOrderByStripeCheckoutSession(sessionId: string): Promise<Order | undefined>;
   getOrderByStripePaymentIntent(paymentIntentId: string): Promise<Order | undefined>;
-  getChargeAccountOrdersByUser(): Promise<Array<{ user: any; orders: Array<{ order: Order; items: any[] }> }>>;
+  getChargeAccountOrdersByUser(tenantId?: number): Promise<Array<{ user: any; orders: Array<{ order: Order; items: any[] }> }>>;
   hideOrderFromAdmin(id: number): Promise<Order>;
-  deleteOrder(id: number): Promise<void>;
+  deleteOrder(id: number, tenantId?: number): Promise<void>;
 
-  // Appointment operations
+  // Refund operations
+  getRefunds(tenantId?: number): Promise<Refund[]>;
+  getRefundsByOrderId(orderId: number): Promise<Refund[]>;
+  getRefundsByDateRange(startDate: Date, endDate: Date, tenantId?: number): Promise<Refund[]>;
+  createRefund(refund: InsertRefund): Promise<Refund>;
+  updateOrderItemRefund(orderItemId: number, refundedQuantity: number, refundedAmount: string): Promise<void>;
+  getRefundReportEmails(tenantId?: number): Promise<RefundReportSetting[]>;
+  addRefundReportEmail(email: string, tenantId?: number): Promise<RefundReportSetting>;
+  removeRefundReportEmail(id: number, tenantId?: number): Promise<void>;
+
+  // Appointment operations (tenantId used for admin queries that span all users)
   createAppointment(appointment: InsertAppointment): Promise<Appointment>;
   createAppointmentPets(appointmentId: number, pets: Array<{petName: string; petType: string; serviceType: string; price: string; specialNotes?: string; groomerId?: number | null; addOns?: string}>): Promise<void>;
   getAppointmentPets(appointmentId: number): Promise<any[]>;
   getAppointmentPetsByAppointmentIds(appointmentIds: number[]): Promise<Map<number, any[]>>;
   deleteAppointmentPets(appointmentId: number): Promise<void>;
-  getAppointments(userId?: string): Promise<Appointment[]>;
-  getAppointment(id: number): Promise<Appointment | undefined>;
-  getAppointmentsByPhoneNumber(phoneNumber: string): Promise<Appointment[]>;
-  linkAppointmentsToUser(phoneNumber: string, userId: string): Promise<number>;
-  updateAppointmentStatus(id: number, status: string): Promise<Appointment>;
-  updateAppointmentIsHere(id: number, isHere: boolean): Promise<Appointment>;
-  updateAppointmentIsPaid(id: number, isPaid: boolean): Promise<Appointment>;
+  getAppointments(userId?: string, tenantId?: number): Promise<Appointment[]>;
+  getAppointment(id: number, tenantId?: number): Promise<Appointment | undefined>;
+  getAppointmentsByPhoneNumber(phoneNumber: string, tenantId?: number): Promise<Appointment[]>;
+  linkAppointmentsToUser(phoneNumber: string, userId: string, tenantId?: number): Promise<number>;
+  updateAppointmentStatus(id: number, status: string, tenantId?: number): Promise<Appointment>;
+  updateAppointmentIsHere(id: number, isHere: boolean, tenantId?: number): Promise<Appointment>;
+  updateAppointmentIsPaid(id: number, isPaid: boolean, tenantId?: number): Promise<Appointment>;
   updateAppointmentTip(id: number, tipAmount: string, tipPaymentIntentId: string): Promise<Appointment>;
-  updateAppointmentReadyForPayment(id: number, finalAmount: string, readyForPayment: boolean): Promise<Appointment>;
-  updateAppointmentPaidOnline(id: number, sessionId: string): Promise<Appointment>;
-  updateAppointmentGroomingCompleted(id: number, groomingCompleted: boolean): Promise<Appointment>;
+  updateAppointmentReadyForPayment(id: number, finalAmount: string, readyForPayment: boolean, tenantId?: number): Promise<Appointment>;
+  updateAppointmentPaidOnline(id: number, sessionId: string, tenantId?: number): Promise<Appointment>;
+  updateAppointmentGroomingCompleted(id: number, groomingCompleted: boolean, tenantId?: number): Promise<Appointment>;
   updateAppointmentDetails(id: number, updates: { 
     ownerFirstName?: string; 
     ownerLastName?: string; 
@@ -309,12 +336,12 @@ export interface IStorage {
   addAppointmentItem(data: { appointmentId: number; supplyId?: number | null; name: string; sku?: string | null; brand?: string | null; category?: string | null; price: string; quantity: number }): Promise<any>;
   removeAppointmentItem(id: number): Promise<void>;
   updateAppointmentItemPrice(id: number, price: string): Promise<any>;
-  getAppointmentItemsByDate(date: string): Promise<any[]>;
+  getAppointmentItemsByDate(date: string, tenantId?: number): Promise<any[]>;
   
   // Appointment history operations
-  saveAppointmentToHistory(appointment: Appointment, options?: { groomerName?: string }): Promise<AppointmentHistory>;
+  saveAppointmentToHistory(appointment: Appointment, options?: { groomerName?: string; tenantId?: number }): Promise<AppointmentHistory>;
   getAppointmentHistoryByContactId(contactId: number): Promise<AppointmentHistory[]>;
-  getAppointmentHistoryForPhone(phoneNumber: string): Promise<AppointmentHistory[]>;
+  getAppointmentHistoryForPhone(phoneNumber: string, tenantId?: number): Promise<AppointmentHistory[]>;
 
   // Customer pet operations
   getCustomerPets(userId: string): Promise<CustomerPet[]>;
@@ -323,32 +350,32 @@ export interface IStorage {
   deleteCustomerPet(id: number): Promise<void>;
 
   // Grooming settings operations
-  getGroomingSettings(): Promise<GroomingSetting[]>;
-  getGroomingSetting(setting: string): Promise<GroomingSetting | undefined>;
+  getGroomingSettings(tenantId?: number): Promise<GroomingSetting[]>;
+  getGroomingSetting(setting: string, tenantId?: number): Promise<GroomingSetting | undefined>;
   upsertGroomingSetting(setting: InsertGroomingSetting): Promise<GroomingSetting>;
 
   // Groomer operations
-  getAllGroomers(): Promise<Groomer[]>;
-  getActiveGroomers(): Promise<Groomer[]>;
+  getAllGroomers(tenantId?: number): Promise<Groomer[]>;
+  getActiveGroomers(tenantId?: number): Promise<Groomer[]>;
   getGroomer(id: number): Promise<Groomer | undefined>;
   createGroomer(groomer: InsertGroomer): Promise<Groomer>;
-  updateGroomer(id: number, groomer: Partial<InsertGroomer>): Promise<Groomer>;
-  deleteGroomer(id: number): Promise<void>;
+  updateGroomer(id: number, groomer: Partial<InsertGroomer>, tenantId?: number): Promise<Groomer>;
+  deleteGroomer(id: number, tenantId?: number): Promise<void>;
 
   // Groomer availability operations
   getGroomerAvailability(groomerId: number): Promise<GroomerAvailability[]>;
-  getAvailableGroomersForDay(dayOfWeek: number): Promise<Groomer[]>;
-  getAvailableGroomersForDate(date: string): Promise<Groomer[]>;
+  getAvailableGroomersForDay(dayOfWeek: number, tenantId?: number): Promise<Groomer[]>;
+  getAvailableGroomersForDate(date: string, tenantId?: number): Promise<Groomer[]>;
   setGroomerAvailability(availability: InsertGroomerAvailability): Promise<GroomerAvailability>;
-  updateGroomerAvailability(id: number, availability: Partial<InsertGroomerAvailability>): Promise<GroomerAvailability>;
-  deleteGroomerAvailability(id: number): Promise<void>;
+  updateGroomerAvailability(id: number, availability: Partial<InsertGroomerAvailability>, tenantId?: number): Promise<GroomerAvailability>;
+  deleteGroomerAvailability(id: number, tenantId?: number): Promise<void>;
 
   // Groomer blocked days operations (sick days, vacation, etc.)
   getGroomerBlockedDays(groomerId: number): Promise<GroomerBlockedDay[]>;
   getAllGroomerBlockedDays(): Promise<GroomerBlockedDay[]>;
   getGroomerBlockedDaysForDate(date: string): Promise<GroomerBlockedDay[]>;
   createGroomerBlockedDay(blockedDay: InsertGroomerBlockedDay): Promise<GroomerBlockedDay>;
-  deleteGroomerBlockedDay(id: number): Promise<void>;
+  deleteGroomerBlockedDay(id: number, tenantId?: number): Promise<void>;
 
   // Password reset token operations
   createPasswordResetToken(token: string, userId: string, expiresAt: Date): Promise<PasswordResetToken>;
@@ -362,15 +389,15 @@ export interface IStorage {
   removeFromWishlist(id: number, userId: string): Promise<boolean>;
 
   // Contact operations
-  getAllContacts(): Promise<Contact[]>;
-  getContact(id: number): Promise<Contact | undefined>;
-  getContactByPhoneNumber(phoneNumber: string): Promise<Contact | undefined>;
+  getAllContacts(tenantId?: number): Promise<Contact[]>;
+  getContact(id: number, tenantId?: number): Promise<Contact | undefined>;
+  getContactByPhoneNumber(phoneNumber: string, tenantId?: number): Promise<Contact | undefined>;
   createContact(contact: InsertContact): Promise<Contact>;
-  updateContact(id: number, contact: Partial<InsertContact>): Promise<Contact>;
-  deleteContact(id: number): Promise<void>;
+  updateContact(id: number, contact: Partial<InsertContact>, tenantId?: number): Promise<Contact>;
+  deleteContact(id: number, tenantId?: number): Promise<void>;
   linkContactToUser(contactId: number, userId: string): Promise<void>;
   findUnlinkedContactsByPhoneNumber(phoneNumber: string): Promise<Contact[]>;
-  updateContactSmsOptOut(contactId: number, optOut: boolean): Promise<Contact>;
+  updateContactSmsOptOut(contactId: number, optOut: boolean, tenantId?: number): Promise<Contact>;
 
   // SMS log operations
   createSmsLog(log: { contactId?: number; phoneNumber: string; message: string; status: string; errorMessage?: string; twilioSid?: string; appointmentId?: number }): Promise<any>;
@@ -378,16 +405,16 @@ export interface IStorage {
   getFailedSmsLogs(): Promise<any[]>;
 
   // Daily appointment limit operations (deprecated, use weekly limits)
-  getDailyAppointmentLimit(date: string): Promise<DailyAppointmentLimit | undefined>;
-  getAllDailyAppointmentLimits(): Promise<DailyAppointmentLimit[]>;
+  getDailyAppointmentLimit(date: string, tenantId?: number): Promise<DailyAppointmentLimit | undefined>;
+  getAllDailyAppointmentLimits(tenantId?: number): Promise<DailyAppointmentLimit[]>;
   upsertDailyAppointmentLimit(limit: InsertDailyAppointmentLimit): Promise<DailyAppointmentLimit>;
-  deleteDailyAppointmentLimit(id: number): Promise<void>;
+  deleteDailyAppointmentLimit(id: number, tenantId?: number): Promise<void>;
 
   // Weekly appointment limit operations (day of week based)
-  getWeeklyAppointmentLimit(dayOfWeek: number): Promise<WeeklyAppointmentLimit | undefined>;
-  getAllWeeklyAppointmentLimits(): Promise<WeeklyAppointmentLimit[]>;
+  getWeeklyAppointmentLimit(dayOfWeek: number, tenantId?: number): Promise<WeeklyAppointmentLimit | undefined>;
+  getAllWeeklyAppointmentLimits(tenantId?: number): Promise<WeeklyAppointmentLimit[]>;
   upsertWeeklyAppointmentLimit(limit: InsertWeeklyAppointmentLimit): Promise<WeeklyAppointmentLimit>;
-  deleteWeeklyAppointmentLimit(id: number): Promise<void>;
+  deleteWeeklyAppointmentLimit(id: number, tenantId?: number): Promise<void>;
   
   // Atomic capacity check - prevents race conditions by counting in the same transaction as creation
   acquireBookingLock(dateStr: string): Promise<void>;
@@ -396,19 +423,20 @@ export interface IStorage {
     dateStr: string, 
     dayOfWeek: number,
     requestedBaths: number,
-    requestedGrooms: number
+    requestedGrooms: number,
+    tenantId?: number
   ): Promise<{ withinCapacity: boolean; bathCount: number; groomCount: number; bathLimit: number; groomLimit: number; reason?: string }>;
 
   // Special date settings operations
-  getSpecialDateSetting(date: string): Promise<SpecialDateSetting | undefined>;
-  getAllSpecialDateSettings(): Promise<SpecialDateSetting[]>;
+  getSpecialDateSetting(date: string, tenantId?: number): Promise<SpecialDateSetting | undefined>;
+  getAllSpecialDateSettings(tenantId?: number): Promise<SpecialDateSetting[]>;
   createSpecialDateSetting(setting: InsertSpecialDateSetting): Promise<SpecialDateSetting>;
   updateSpecialDateSetting(id: number, setting: Partial<InsertSpecialDateSetting>): Promise<SpecialDateSetting>;
-  deleteSpecialDateSetting(id: number): Promise<void>;
+  deleteSpecialDateSetting(id: number, tenantId?: number): Promise<void>;
   getSpecialDateAllowedTimes(specialDateId: number): Promise<SpecialDateAllowedTime[]>;
   addSpecialDateAllowedTime(allowedTime: InsertSpecialDateAllowedTime): Promise<SpecialDateAllowedTime>;
   deleteSpecialDateAllowedTime(id: number): Promise<void>;
-  getSpecialDateWithTimes(date: string): Promise<{ setting: SpecialDateSetting; times: SpecialDateAllowedTime[] } | null>;
+  getSpecialDateWithTimes(date: string, tenantId?: number): Promise<{ setting: SpecialDateSetting; times: SpecialDateAllowedTime[] } | null>;
 
   // Supply import staging operations
   stageSupplyImports(sessionId: string, supplies: any[]): Promise<{ sessionId: string; staged: number; duplicates: number; updates: number }>;
@@ -418,19 +446,22 @@ export interface IStorage {
   clearOldStagingData(daysOld: number): Promise<void>;
 
   // Boarding operations
-  getAllBoardingRecords(): Promise<BoardingRecord[]>;
-  getBoardingRecord(id: number): Promise<BoardingRecord | undefined>;
+  getAllBoardingRecords(tenantId?: number): Promise<BoardingRecord[]>;
+  getBoardingRecord(id: number, tenantId?: number): Promise<BoardingRecord | undefined>;
   createBoardingRecord(record: InsertBoardingRecord): Promise<BoardingRecord>;
-  updateBoardingRecord(id: number, record: Partial<InsertBoardingRecord>): Promise<BoardingRecord>;
-  checkInBoardingRecord(id: number): Promise<BoardingRecord>;
-  checkOutBoardingRecord(id: number): Promise<BoardingRecord>;
-  deleteBoardingRecord(id: number): Promise<void>;
+  updateBoardingRecord(id: number, record: Partial<InsertBoardingRecord>, tenantId?: number): Promise<BoardingRecord>;
+  checkInBoardingRecord(id: number, tenantId?: number): Promise<BoardingRecord>;
+  checkOutBoardingRecord(id: number, tenantId?: number): Promise<BoardingRecord>;
+  deleteBoardingRecord(id: number, tenantId?: number): Promise<void>;
   
   // Schedule operations
-  getAllScheduleEntries(): Promise<ScheduleEntry[]>;
-  batchUpdateScheduleEntries(entries: InsertScheduleEntry[]): Promise<ScheduleEntry[]>;
-  updateScheduleEntry(id: number, entry: Partial<InsertScheduleEntry>): Promise<ScheduleEntry>;
-  deleteScheduleEntry(id: number): Promise<void>;
+  getAllScheduleEntries(tenantId?: number): Promise<ScheduleEntry[]>;
+  batchUpdateScheduleEntries(entries: InsertScheduleEntry[], tenantId?: number): Promise<ScheduleEntry[]>;
+  batchUpdateGroomingScheduleEntries(entries: InsertGroomingScheduleEntry[], tenantId?: number): Promise<GroomingScheduleEntry[]>;
+  updateScheduleEntry(id: number, entry: Partial<InsertScheduleEntry>, tenantId?: number): Promise<ScheduleEntry>;
+  updateGroomingScheduleEntry(id: number, entry: Partial<InsertGroomingScheduleEntry>, tenantId?: number): Promise<GroomingScheduleEntry>;
+  deleteGroomingScheduleEntry(id: number, tenantId?: number): Promise<void>;
+  deleteScheduleEntry(id: number, tenantId?: number): Promise<void>;
 
   // Order Photo operations
   getAllOrderPhotos(userId?: string): Promise<OrderPhoto[]>;
@@ -461,8 +492,8 @@ export interface IStorage {
   createPurchaseSyncLog(log: InsertAstroPurchaseSyncLog): Promise<AstroPurchaseSyncLog>;
 
   // Loyalty program operations
-  getLoyaltySettings(): Promise<{ spendingThreshold: string; rewardAmount: string; isActive: boolean }>;
-  updateLoyaltySettings(settings: { spendingThreshold?: string; rewardAmount?: string; isActive?: boolean }): Promise<{ spendingThreshold: string; rewardAmount: string; isActive: boolean }>;
+  getLoyaltySettings(tenantId?: number): Promise<{ spendingThreshold: string; rewardAmount: string; isActive: boolean }>;
+  updateLoyaltySettings(settings: { spendingThreshold?: string; rewardAmount?: string; isActive?: boolean }, tenantId?: number): Promise<{ spendingThreshold: string; rewardAmount: string; isActive: boolean }>;
   getUserLoyaltyStatus(userId: string): Promise<{ totalSpent: string; loyaltyCredits: string; progressToNextReward: number; spendingThreshold: string; rewardAmount: string }>;
   applyLoyaltyCredit(userId: string, amount: number): Promise<{ success: boolean; remainingCredits: string }>;
   updateUserLoyalty(userId: string, data: { loyaltyCredits?: string; totalSpent?: string }): Promise<User>;
@@ -551,70 +582,57 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Pet operations
-  async getAllPets(): Promise<Pet[]> {
+  async getAllPets(tenantId?: number): Promise<Pet[]> {
     try {
-      return await db.select().from(pets).where(eq(pets.isAvailable, true)).orderBy(desc(pets.createdAt));
+      const where = tenantId
+        ? and(eq(pets.isAvailable, true), eq(pets.tenantId, tenantId))
+        : eq(pets.isAvailable, true);
+      return await db.select().from(pets).where(where).orderBy(desc(pets.createdAt));
     } catch (error) {
       console.error('Database error in getAllPets:', error);
       // Return demo data when database fails
       return [
         {
-          id: 1,
-          name: "Bella",
-          species: "dog",
-          breed: "Golden Retriever", 
-          age: "2 years",
-          price: "800",
-          description: "Friendly and energetic golden retriever",
-          imageUrl: "https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
-          isAvailable: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          id: 1, tenantId: null, name: "Bella", species: "dog", breed: "Golden Retriever",
+          age: "2 years", price: "800", description: "Friendly and energetic golden retriever",
+          imageUrl: null, imageUrls: null, quantity: null, priceSource: null, posItemId: null,
+          posLastSyncedAt: null, isAvailable: true, createdAt: new Date(), updatedAt: new Date()
         },
         {
-          id: 2,
-          name: "Max",
-          species: "cat",
-          breed: "Maine Coon",
-          age: "3 years", 
-          price: "600",
-          description: "Gentle giant with beautiful fur",
-          imageUrl: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
-          isAvailable: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          id: 2, tenantId: null, name: "Max", species: "cat", breed: "Maine Coon",
+          age: "3 years", price: "600", description: "Gentle giant with beautiful fur",
+          imageUrl: null, imageUrls: null, quantity: null, priceSource: null, posItemId: null,
+          posLastSyncedAt: null, isAvailable: true, createdAt: new Date(), updatedAt: new Date()
         },
         {
-          id: 3,
-          name: "Charlie",
-          species: "reptile",
-          breed: "Bearded Dragon",
-          age: "1 year",
-          price: "150",
-          description: "Our specialty exotic reptile - calm and friendly",
-          imageUrl: "https://images.unsplash.com/photo-1516814765986-4d2b2a7b6ec8?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
-          isAvailable: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          id: 3, tenantId: null, name: "Charlie", species: "reptile", breed: "Bearded Dragon",
+          age: "1 year", price: "150", description: "Our specialty exotic reptile - calm and friendly",
+          imageUrl: null, imageUrls: null, quantity: null, priceSource: null, posItemId: null,
+          posLastSyncedAt: null, isAvailable: true, createdAt: new Date(), updatedAt: new Date()
         }
-      ];
+      ] as unknown as Pet[];
     }
   }
 
-  async getAllPetsAdmin(): Promise<Pet[]> {
+  async getAllPetsAdmin(tenantId?: number): Promise<Pet[]> {
+    if (tenantId) {
+      return await db.select().from(pets).where(eq(pets.tenantId, tenantId)).orderBy(desc(pets.createdAt));
+    }
     return await db.select().from(pets).orderBy(desc(pets.createdAt));
   }
 
-  async getPetsBySpecies(species: string): Promise<Pet[]> {
-    return await db
-      .select()
-      .from(pets)
-      .where(and(ilike(pets.species, species), eq(pets.isAvailable, true)))
-      .orderBy(desc(pets.createdAt));
+  async getPetsBySpecies(species: string, tenantId?: number): Promise<Pet[]> {
+    const where = tenantId
+      ? and(ilike(pets.species, species), eq(pets.isAvailable, true), eq(pets.tenantId, tenantId))
+      : and(ilike(pets.species, species), eq(pets.isAvailable, true));
+    return await db.select().from(pets).where(where).orderBy(desc(pets.createdAt));
   }
 
-  async getPet(id: number): Promise<Pet | undefined> {
-    const [pet] = await db.select().from(pets).where(eq(pets.id, id));
+  async getPet(id: number, tenantId?: number): Promise<Pet | undefined> {
+    const where = tenantId
+      ? and(eq(pets.id, id), eq(pets.tenantId, tenantId))
+      : eq(pets.id, id);
+    const [pet] = await db.select().from(pets).where(where);
     return pet;
   }
 
@@ -623,17 +641,24 @@ export class DatabaseStorage implements IStorage {
     return newPet;
   }
 
-  async updatePet(id: number, pet: Partial<InsertPet>): Promise<Pet> {
+  async updatePet(id: number, pet: Partial<InsertPet>, tenantId?: number): Promise<Pet> {
+    const condition = tenantId
+      ? and(eq(pets.id, id), eq(pets.tenantId, tenantId))
+      : eq(pets.id, id);
     const [updatedPet] = await db
       .update(pets)
       .set({ ...pet, updatedAt: new Date() })
-      .where(eq(pets.id, id))
+      .where(condition)
       .returning();
+    if (!updatedPet) throw new Error("Pet not found or access denied");
     return updatedPet;
   }
 
-  async deletePet(id: number): Promise<void> {
-    await db.delete(pets).where(eq(pets.id, id));
+  async deletePet(id: number, tenantId?: number): Promise<void> {
+    const condition = tenantId
+      ? and(eq(pets.id, id), eq(pets.tenantId, tenantId))
+      : eq(pets.id, id);
+    await db.delete(pets).where(condition);
   }
 
   async hasPetReferences(id: number): Promise<boolean> {
@@ -721,67 +746,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Supply operations
-  async getAllSupplies(): Promise<Supply[]> {
+  async getAllSupplies(tenantId?: number): Promise<Supply[]> {
     try {
+      if (tenantId) {
+        return await db.select().from(supplies).where(eq(supplies.tenantId, tenantId)).orderBy(desc(supplies.createdAt));
+      }
       return await db.select().from(supplies).orderBy(desc(supplies.createdAt));
     } catch (error) {
       console.error('Database error in getAllSupplies:', error);
-      // Return demo data when database fails
-      return [
-        {
-          id: 1,
-          name: "Premium Dog Food",
-          brand: "Royal Canin",
-          category: "food",
-          price: "49.99",
-          description: "High-quality nutrition for adult dogs",
-          imageUrl: "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
-          stockQuantity: 25,
-          isActive: true,
-          weight: null,
-          size: null,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        {
-          id: 2,
-          name: "Cat Litter",
-          brand: "Fresh Step", 
-          category: "hygiene",
-          price: "12.99",
-          description: "Odor control cat litter",
-          imageUrl: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
-          stockQuantity: 15,
-          isActive: true,
-          weight: null,
-          size: null,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        {
-          id: 3,
-          name: "Reptile Heat Lamp",
-          brand: "Zoo Med",
-          category: "equipment", 
-          price: "29.99",
-          description: "Essential heating for reptile habitats",
-          imageUrl: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200",
-          stockQuantity: 8,
-          isActive: true,
-          weight: null,
-          size: null,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      ];
+      // Return demo data when database fails (cast to bypass strict type-check on fallback shape)
+      return [] as Supply[];
     }
   }
 
-  async getSuppliesByCategory(category: string): Promise<Supply[]> {
+  async getSuppliesByCategory(category: string, tenantId?: number): Promise<Supply[]> {
+    const conditions: any[] = [eq(supplies.category, category), eq(supplies.isActive, true)];
+    if (tenantId) conditions.push(eq(supplies.tenantId, tenantId));
     return await db
       .select()
       .from(supplies)
-      .where(and(eq(supplies.category, category), eq(supplies.isActive, true)))
+      .where(and(...conditions))
       .orderBy(desc(supplies.createdAt));
   }
 
@@ -864,8 +848,9 @@ export class DatabaseStorage implements IStorage {
     petFoodAnimalType?: string;
     treatAnimalType?: string;
     accessoryType?: string;
+    tenantId?: number;
   }): Promise<{ items: Supply[]; total: number }> {
-    const { limit, offset, category, search, filterType, animalType, foodType, toyType, healthcareType, aquaticType, reptileType, birdType, smallAnimalProductType, petFoodAnimalType, treatAnimalType, accessoryType } = params;
+    const { limit, offset, category, search, filterType, animalType, foodType, toyType, healthcareType, aquaticType, reptileType, birdType, smallAnimalProductType, petFoodAnimalType, treatAnimalType, accessoryType, tenantId } = params;
 
     // Small animal food/treat products live in the 'smallanimal' category (not 'smallAnimalFood'/'smallAnimalTreats').
     // When petFood → smallAnimal or treats → smallAnimal is requested, redirect to 'smallanimal' category
@@ -879,6 +864,11 @@ export class DatabaseStorage implements IStorage {
     // Build WHERE conditions based on filters
     const { requireSku } = params;
     let whereConditions: any[] = [eq(supplies.isActive, true)];
+
+    // Tenant scoping — always filter by tenantId when provided
+    if (tenantId) {
+      whereConditions.push(eq(supplies.tenantId, tenantId));
+    }
 
     // For customer-facing requests, hide products with no SKU (UPC)
     if (requireSku) {
@@ -1370,12 +1360,15 @@ export class DatabaseStorage implements IStorage {
     return { items, total };
   }
 
-  async getSupply(id: number): Promise<Supply | undefined> {
-    const [supply] = await db.select().from(supplies).where(eq(supplies.id, id));
+  async getSupply(id: number, tenantId?: number): Promise<Supply | undefined> {
+    const condition = tenantId
+      ? and(eq(supplies.id, id), eq(supplies.tenantId, tenantId))
+      : eq(supplies.id, id);
+    const [supply] = await db.select().from(supplies).where(condition);
     return supply;
   }
 
-  async getSupplyByUpc(upc: string): Promise<Supply | undefined> {
+  async getSupplyByUpc(upc: string, tenantId?: number): Promise<Supply | undefined> {
     const padded = upc.padStart(12, '0');
     const unpadded = upc.replace(/^0+/, '') || upc;
     // For 12-digit UPC-A, also try the middle 10 digits (positions 1-10, i.e. strip
@@ -1394,9 +1387,9 @@ export class DatabaseStorage implements IStorage {
       ] : []),
     ];
 
-    const [supply] = await db.select().from(supplies).where(
-      and(eq(supplies.isActive, true), or(...matchClauses))
-    ).limit(1);
+    const baseCondition = and(eq(supplies.isActive, true), or(...matchClauses));
+    const condition = tenantId ? and(baseCondition, eq(supplies.tenantId, tenantId)) : baseCondition;
+    const [supply] = await db.select().from(supplies).where(condition).limit(1);
     return supply;
   }
 
@@ -1791,7 +1784,7 @@ export class DatabaseStorage implements IStorage {
     return newSupply;
   }
 
-  async updateSupply(id: number, supply: Partial<InsertSupply>): Promise<Supply> {
+  async updateSupply(id: number, supply: Partial<InsertSupply>, tenantId?: number): Promise<Supply> {
     // Keep UPC and SKU fields in sync - they should always have the same value
     const syncedSupply = { ...supply };
     if (syncedSupply.upc !== undefined && syncedSupply.sku === undefined) {
@@ -1803,15 +1796,19 @@ export class DatabaseStorage implements IStorage {
       syncedSupply.sku = syncedSupply.upc;
     }
     
+    const condition = tenantId
+      ? and(eq(supplies.id, id), eq(supplies.tenantId, tenantId))
+      : eq(supplies.id, id);
     const [updatedSupply] = await db
       .update(supplies)
       .set({ ...syncedSupply, updatedAt: new Date() })
-      .where(eq(supplies.id, id))
+      .where(condition)
       .returning();
+    if (!updatedSupply) throw new Error("Supply not found or access denied");
     return updatedSupply;
   }
 
-  async deleteSupply(id: number): Promise<void> {
+  async deleteSupply(id: number, tenantId?: number): Promise<void> {
     // Check if supply is referenced in any order items
     const orderItemsWithSupply = await db
       .select()
@@ -1826,8 +1823,11 @@ export class DatabaseStorage implements IStorage {
     // Delete any cart items referencing this supply first
     await db.delete(cartItems).where(eq(cartItems.supplyId, id));
     
-    // Now delete the supply
-    await db.delete(supplies).where(eq(supplies.id, id));
+    // Now delete the supply (with tenant check if provided)
+    const condition = tenantId
+      ? and(eq(supplies.id, id), eq(supplies.tenantId, tenantId))
+      : eq(supplies.id, id);
+    await db.delete(supplies).where(condition);
   }
 
   async fixKongReptiles(): Promise<{ count: number }> {
@@ -2413,10 +2413,12 @@ export class DatabaseStorage implements IStorage {
     await db.update(users).set({ abandonedCartEmailSentAt: null }).where(eq(users.id, userId));
   }
 
-  async getAbandonedCarts(hoursOld: number): Promise<Array<{userId: string; email: string; firstName: string; items: CartItem[]; oldestItemAt: Date}>> {
+  async getAbandonedCarts(hoursOld: number, tenantId?: number): Promise<Array<{userId: string; email: string; firstName: string; items: CartItem[]; oldestItemAt: Date}>> {
     const cutoff = new Date(Date.now() - hoursOld * 60 * 60 * 1000);
     
-    const allCartItems = await db.select().from(cartItems);
+    const allCartItems = tenantId
+      ? await db.select().from(cartItems).where(eq(cartItems.tenantId, tenantId))
+      : await db.select().from(cartItems);
     
     if (allCartItems.length === 0) return [];
     
@@ -2478,21 +2480,29 @@ export class DatabaseStorage implements IStorage {
     return newOrder;
   }
 
-  async getOrders(userId?: string): Promise<Order[]> {
+  async getOrders(userId?: string, tenantId?: number): Promise<Order[]> {
     if (userId) {
       return await db.select().from(orders).where(eq(orders.userId, userId)).orderBy(desc(orders.orderDate));
+    } else if (tenantId) {
+      return await db.select().from(orders).where(eq(orders.tenantId, tenantId)).orderBy(desc(orders.orderDate));
     } else {
       return await db.select().from(orders).orderBy(desc(orders.orderDate));
     }
   }
 
-  async getOrder(id: number): Promise<Order | undefined> {
-    const [order] = await db.select().from(orders).where(eq(orders.id, id));
+  async getOrder(id: number, tenantId?: number): Promise<Order | undefined> {
+    const where = tenantId
+      ? and(eq(orders.id, id), eq(orders.tenantId, tenantId))
+      : eq(orders.id, id);
+    const [order] = await db.select().from(orders).where(where);
     return order;
   }
 
-  async getOrderWithItems(id: number): Promise<{ order: Order; items: any[]; customerName?: string; customerEmail?: string; customerPhone?: string } | undefined> {
-    const [order] = await db.select().from(orders).where(eq(orders.id, id));
+  async getOrderWithItems(id: number, tenantId?: number): Promise<{ order: Order; items: any[]; customerName?: string; customerEmail?: string; customerPhone?: string } | undefined> {
+    const orderCondition = tenantId
+      ? and(eq(orders.id, id), eq(orders.tenantId, tenantId))
+      : eq(orders.id, id);
+    const [order] = await db.select().from(orders).where(orderCondition);
     if (!order) return undefined;
     
     // Get customer information
@@ -2527,16 +2537,17 @@ export class DatabaseStorage implements IStorage {
     return { order, items: enrichedItems, customerName, customerEmail, customerPhone };
   }
 
-  async updateOrderStatus(id: number, status: string): Promise<Order> {
+  async updateOrderStatus(id: number, status: string, tenantId?: number): Promise<Order> {
+    const where = tenantId ? and(eq(orders.id, id), eq(orders.tenantId, tenantId)) : eq(orders.id, id);
     const [updated] = await db
       .update(orders)
       .set({ status, updatedAt: new Date() })
-      .where(eq(orders.id, id))
+      .where(where)
       .returning();
     return updated;
   }
   
-  async updateOrderApprovalStatus(id: number, approvalStatus: string): Promise<Order> {
+  async updateOrderApprovalStatus(id: number, approvalStatus: string, tenantId?: number): Promise<Order> {
     const updateData: any = { approvalStatus, updatedAt: new Date() };
     
     // Set timestamps based on approval status
@@ -2550,23 +2561,24 @@ export class DatabaseStorage implements IStorage {
       updateData.status = 'completed';
     }
     
+    const where = tenantId ? and(eq(orders.id, id), eq(orders.tenantId, tenantId)) : eq(orders.id, id);
     const [updated] = await db
       .update(orders)
       .set(updateData)
-      .where(eq(orders.id, id))
+      .where(where)
       .returning();
     return updated;
   }
 
-  async applyOrderDiscount(id: number, discountAmount: string, discountReason: string): Promise<Order> {
-    const [order] = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+  async applyOrderDiscount(id: number, discountAmount: string, discountReason: string, tenantId?: number): Promise<Order> {
+    const orderWhere = tenantId ? and(eq(orders.id, id), eq(orders.tenantId, tenantId)) : eq(orders.id, id);
+    const [order] = await db.select().from(orders).where(orderWhere).limit(1);
     if (!order) throw new Error("Order not found");
 
     const discount = parseFloat(discountAmount);
     const subtotal = parseFloat(order.subtotal || "0");
     const convenienceFee = parseFloat(order.convenienceFee || "0");
     const loyaltyCredits = parseFloat(order.loyaltyCreditsApplied || "0");
-    const existingDiscount = parseFloat(order.discountAmount || "0");
     const taxRate = parseFloat(order.taxRate || "0") || 10.99;
     const discountedSubtotal = Math.max(0, subtotal - loyaltyCredits - discount);
     const newTaxAmount = Math.round(discountedSubtotal * (taxRate / 100) * 100) / 100;
@@ -2583,7 +2595,7 @@ export class DatabaseStorage implements IStorage {
         totalAmount: newTotal.toFixed(2),
         updatedAt: new Date(),
       })
-      .where(eq(orders.id, id))
+      .where(orderWhere)
       .returning();
     return updated;
   }
@@ -2615,11 +2627,14 @@ export class DatabaseStorage implements IStorage {
     return order;
   }
 
-  async getChargeAccountOrdersByUser(): Promise<Array<{ user: any; orders: Array<{ order: Order; items: any[] }> }>> {
+  async getChargeAccountOrdersByUser(tenantId?: number): Promise<Array<{ user: any; orders: Array<{ order: Order; items: any[] }> }>> {
+    const where = tenantId
+      ? and(eq(orders.paymentStatus, 'charge_account'), eq(orders.tenantId, tenantId))
+      : eq(orders.paymentStatus, 'charge_account');
     const chargeOrders = await db
       .select()
       .from(orders)
-      .where(eq(orders.paymentStatus, 'charge_account'))
+      .where(where)
       .orderBy(desc(orders.orderDate));
 
     if (chargeOrders.length === 0) return [];
@@ -2661,28 +2676,43 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
-  async deleteOrder(id: number): Promise<void> {
+  async deleteOrder(id: number, tenantId?: number): Promise<void> {
+    // Verify tenant ownership before deletion
+    if (tenantId) {
+      const [existing] = await db.select({ id: orders.id }).from(orders)
+        .where(and(eq(orders.id, id), eq(orders.tenantId, tenantId)));
+      if (!existing) throw new Error('Order not found');
+    }
     // Delete order items first
     await db.delete(orderItems).where(eq(orderItems.orderId, id));
     // Then delete the order
-    const result = await db.delete(orders).where(eq(orders.id, id));
+    const condition = tenantId
+      ? and(eq(orders.id, id), eq(orders.tenantId, tenantId))
+      : eq(orders.id, id);
+    const result = await db.delete(orders).where(condition);
     if (!result.rowCount || result.rowCount === 0) {
       throw new Error('Order not found');
     }
   }
 
   // Search orders by customer name
-  async searchOrders(searchQuery: string): Promise<Order[]> {
+  async searchOrders(searchQuery: string, tenantId?: number): Promise<Order[]> {
     const searchPattern = `%${searchQuery.toLowerCase()}%`;
+    const where = tenantId
+      ? and(sql`LOWER(${orders.customerName}) LIKE ${searchPattern}`, eq(orders.tenantId, tenantId))
+      : sql`LOWER(${orders.customerName}) LIKE ${searchPattern}`;
     return await db.select().from(orders)
-      .where(sql`LOWER(${orders.customerName}) LIKE ${searchPattern}`)
+      .where(where)
       .orderBy(desc(orders.orderDate));
   }
 
   // Get all orders with items for admin (excludes hidden orders)
-  async getAllOrdersWithItems(): Promise<any[]> {
+  async getAllOrdersWithItems(tenantId?: number): Promise<any[]> {
+    const where = tenantId
+      ? and(sql`${orders.hiddenFromAdmin} IS NOT TRUE`, eq(orders.tenantId, tenantId))
+      : sql`${orders.hiddenFromAdmin} IS NOT TRUE`;
     const allOrders = await db.select().from(orders)
-      .where(sql`${orders.hiddenFromAdmin} IS NOT TRUE`)
+      .where(where)
       .orderBy(desc(orders.orderDate));
     
     const ordersWithItems = await Promise.all(allOrders.map(async (order) => {
@@ -2724,7 +2754,15 @@ export class DatabaseStorage implements IStorage {
     return newRefund;
   }
 
-  async getRefunds(): Promise<Refund[]> {
+  async getRefunds(tenantId?: number): Promise<Refund[]> {
+    if (tenantId) {
+      return await db.select({ refunds })
+        .from(refunds)
+        .innerJoin(orders, eq(refunds.orderId, orders.id))
+        .where(eq(orders.tenantId, tenantId))
+        .orderBy(desc(refunds.createdAt))
+        .then(rows => rows.map(r => r.refunds));
+    }
     return await db.select().from(refunds).orderBy(desc(refunds.createdAt));
   }
 
@@ -2732,7 +2770,19 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(refunds).where(eq(refunds.orderId, orderId)).orderBy(desc(refunds.createdAt));
   }
 
-  async getRefundsByDateRange(startDate: Date, endDate: Date): Promise<Refund[]> {
+  async getRefundsByDateRange(startDate: Date, endDate: Date, tenantId?: number): Promise<Refund[]> {
+    if (tenantId) {
+      return await db.select({ refunds })
+        .from(refunds)
+        .innerJoin(orders, eq(refunds.orderId, orders.id))
+        .where(and(
+          gte(refunds.createdAt, startDate),
+          lte(refunds.createdAt, endDate),
+          eq(orders.tenantId, tenantId)
+        ))
+        .orderBy(desc(refunds.createdAt))
+        .then(rows => rows.map(r => r.refunds));
+    }
     return await db.select().from(refunds)
       .where(and(
         gte(refunds.createdAt, startDate),
@@ -2748,17 +2798,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Refund report settings
-  async getRefundReportEmails(): Promise<RefundReportSetting[]> {
-    return await db.select().from(refundReportSettings).where(eq(refundReportSettings.isActive, true));
+  async getRefundReportEmails(tenantId?: number): Promise<RefundReportSetting[]> {
+    const where = tenantId
+      ? and(eq(refundReportSettings.isActive, true), eq(refundReportSettings.tenantId, tenantId))
+      : eq(refundReportSettings.isActive, true);
+    return await db.select().from(refundReportSettings).where(where);
   }
 
-  async addRefundReportEmail(email: string): Promise<RefundReportSetting> {
-    const [setting] = await db.insert(refundReportSettings).values({ email, isActive: true }).returning();
+  async addRefundReportEmail(email: string, tenantId?: number): Promise<RefundReportSetting> {
+    const [setting] = await db.insert(refundReportSettings).values({ email, isActive: true, tenantId: tenantId ?? null }).returning();
     return setting;
   }
 
-  async removeRefundReportEmail(id: number): Promise<void> {
-    await db.delete(refundReportSettings).where(eq(refundReportSettings.id, id));
+  async removeRefundReportEmail(id: number, tenantId?: number): Promise<void> {
+    const condition = tenantId
+      ? and(eq(refundReportSettings.id, id), eq(refundReportSettings.tenantId, tenantId))
+      : eq(refundReportSettings.id, id);
+    await db.delete(refundReportSettings).where(condition);
   }
 
   // Appointment operations
@@ -2829,37 +2885,57 @@ export class DatabaseStorage implements IStorage {
     await db.delete(appointmentPets).where(eq(appointmentPets.appointmentId, appointmentId));
   }
 
-  async getAppointments(userId?: string): Promise<Appointment[]> {
-    if (userId) {
+  async getAppointments(userId?: string, tenantId?: number): Promise<Appointment[]> {
+    if (userId && tenantId) {
+      // Both filters: tenant-scoped user appointments
+      return await db.select().from(appointments)
+        .where(and(eq(appointments.userId, userId), eq(appointments.tenantId, tenantId)))
+        .orderBy(asc(appointments.appointmentDate));
+    } else if (userId) {
+      // Legacy: userId only (no tenant — still scoped by user so limited cross-tenant exposure)
       return await db.select().from(appointments)
         .where(eq(appointments.userId, userId))
+        .orderBy(asc(appointments.appointmentDate));
+    } else if (tenantId) {
+      return await db.select().from(appointments)
+        .where(eq(appointments.tenantId, tenantId))
         .orderBy(asc(appointments.appointmentDate));
     } else {
       return await db.select().from(appointments).orderBy(asc(appointments.appointmentDate));
     }
   }
 
-  async getAppointment(id: number): Promise<Appointment | undefined> {
-    const [appointment] = await db.select().from(appointments).where(eq(appointments.id, id));
+  async getAppointment(id: number, tenantId?: number): Promise<Appointment | undefined> {
+    const where = tenantId
+      ? and(eq(appointments.id, id), eq(appointments.tenantId, tenantId))
+      : eq(appointments.id, id);
+    const [appointment] = await db.select().from(appointments).where(where);
     return appointment;
   }
 
-  async getAppointmentsByPhoneNumber(phoneNumber: string): Promise<Appointment[]> {
+  async getAppointmentsByPhoneNumber(phoneNumber: string, tenantId?: number): Promise<Appointment[]> {
     // Normalize to last 10 digits so country-code variants (+1 xxx) match plain 10-digit stored numbers
     const normalizedPhone = normalizePhoneNumber(phoneNumber);
     if (!normalizedPhone) return [];
 
-    const allAppointments = await db.select().from(appointments);
+    const query = tenantId
+      ? db.select().from(appointments).where(eq(appointments.tenantId, tenantId))
+      : db.select().from(appointments);
+    const allAppointments = await query;
     return allAppointments.filter(apt => {
       return normalizePhoneNumber(apt.ownerPhoneNumber) === normalizedPhone;
     }).sort((a, b) => new Date(b.appointmentDate).getTime() - new Date(a.appointmentDate).getTime());
   }
 
-  async linkAppointmentsToUser(phoneNumber: string, userId: string): Promise<number> {
-    // Permanently link all unlinked appointments matching this phone number to the user account
+  async linkAppointmentsToUser(phoneNumber: string, userId: string, tenantId?: number): Promise<number> {
+    // Permanently link all unlinked appointments matching this phone number to the user account.
+    // Scoped to the tenant so users from different tenants with the same phone can't cross-link.
     const normalizedPhone = normalizePhoneNumber(phoneNumber);
     if (!normalizedPhone) return 0;
-    const allAppointments = await db.select().from(appointments);
+    const query = tenantId
+      ? db.select().from(appointments).where(eq(appointments.tenantId, tenantId))
+      : db.select().from(appointments);
+    const allAppointments = await query;
     const toLink = allAppointments.filter(apt => {
       if (apt.userId) return false; // already linked to someone
       return normalizePhoneNumber(apt.ownerPhoneNumber) === normalizedPhone;
@@ -2870,35 +2946,38 @@ export class DatabaseStorage implements IStorage {
     return toLink.length;
   }
 
-  async updateAppointmentStatus(id: number, status: string): Promise<Appointment> {
+  async updateAppointmentStatus(id: number, status: string, tenantId?: number): Promise<Appointment> {
+    const where = tenantId ? and(eq(appointments.id, id), eq(appointments.tenantId, tenantId)) : eq(appointments.id, id);
     const [updated] = await db
       .update(appointments)
       .set({ status, updatedAt: new Date() })
-      .where(eq(appointments.id, id))
+      .where(where)
       .returning();
     return updated;
   }
 
-  async updateAppointmentIsHere(id: number, isHere: boolean): Promise<Appointment> {
+  async updateAppointmentIsHere(id: number, isHere: boolean, tenantId?: number): Promise<Appointment> {
     // checkedIn is a permanent record — set to true when they arrive, never reset
     const setFields: any = { isHere, updatedAt: new Date() };
     if (isHere) setFields.checkedIn = true;
+    const where = tenantId ? and(eq(appointments.id, id), eq(appointments.tenantId, tenantId)) : eq(appointments.id, id);
     const [updated] = await db
       .update(appointments)
       .set(setFields)
-      .where(eq(appointments.id, id))
+      .where(where)
       .returning();
     return updated;
   }
 
-  async updateAppointmentIsPaid(id: number, isPaid: boolean): Promise<Appointment> {
+  async updateAppointmentIsPaid(id: number, isPaid: boolean, tenantId?: number): Promise<Appointment> {
     // Do NOT clear readyForPayment here — online double-payment is already blocked by isPaid=true check.
     // Clearing it caused the "Mark Ready" button to reappear after payment when groomer had already marked ready.
     const setFields: any = { isPaid, updatedAt: new Date() };
+    const where = tenantId ? and(eq(appointments.id, id), eq(appointments.tenantId, tenantId)) : eq(appointments.id, id);
     const [updated] = await db
       .update(appointments)
       .set(setFields)
-      .where(eq(appointments.id, id))
+      .where(where)
       .returning();
     return updated;
   }
@@ -2912,29 +2991,32 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
-  async updateAppointmentReadyForPayment(id: number, finalAmount: string, readyForPayment: boolean): Promise<Appointment> {
+  async updateAppointmentReadyForPayment(id: number, finalAmount: string, readyForPayment: boolean, tenantId?: number): Promise<Appointment> {
+    const where = tenantId ? and(eq(appointments.id, id), eq(appointments.tenantId, tenantId)) : eq(appointments.id, id);
     const [updated] = await db
       .update(appointments)
       .set({ finalAmount, readyForPayment, updatedAt: new Date() })
-      .where(eq(appointments.id, id))
+      .where(where)
       .returning();
     return updated;
   }
 
-  async updateAppointmentPaidOnline(id: number, sessionId: string): Promise<Appointment> {
+  async updateAppointmentPaidOnline(id: number, sessionId: string, tenantId?: number): Promise<Appointment> {
+    const where = tenantId ? and(eq(appointments.id, id), eq(appointments.tenantId, tenantId)) : eq(appointments.id, id);
     const [updated] = await db
       .update(appointments)
       .set({ isPaid: true, paidOnline: true, readyForPayment: false, groomingStripeSessionId: sessionId, updatedAt: new Date() })
-      .where(eq(appointments.id, id))
+      .where(where)
       .returning();
     return updated;
   }
 
-  async updateAppointmentGroomingCompleted(id: number, groomingCompleted: boolean): Promise<Appointment> {
+  async updateAppointmentGroomingCompleted(id: number, groomingCompleted: boolean, tenantId?: number): Promise<Appointment> {
+    const where = tenantId ? and(eq(appointments.id, id), eq(appointments.tenantId, tenantId)) : eq(appointments.id, id);
     const [updated] = await db
       .update(appointments)
       .set({ groomingCompleted, updatedAt: new Date() })
-      .where(eq(appointments.id, id))
+      .where(where)
       .returning();
     return updated;
   }
@@ -2986,10 +3068,21 @@ export class DatabaseStorage implements IStorage {
     return item;
   }
 
-  async getAppointmentItemsByDate(date: string): Promise<any[]> {
+  async getAppointmentItemsByDate(date: string, tenantId?: number): Promise<any[]> {
     // date is YYYY-MM-DD in CST
     const dayStart = new Date(date + 'T00:00:00-06:00');
     const dayEnd = new Date(date + 'T23:59:59-06:00');
+    const conditions = [
+      sql`${appointmentItems.createdAt} >= ${dayStart}`,
+      sql`${appointmentItems.createdAt} <= ${dayEnd}`,
+      or(
+        eq(appointments.isPaid, true),
+        eq(appointments.paidOnline, true)
+      ),
+    ];
+    if (tenantId) {
+      conditions.push(eq(appointments.tenantId, tenantId));
+    }
     const items = await db.select({
       id: appointmentItems.id,
       appointmentId: appointmentItems.appointmentId,
@@ -3003,27 +3096,22 @@ export class DatabaseStorage implements IStorage {
       createdAt: appointmentItems.createdAt,
     }).from(appointmentItems)
       .innerJoin(appointments, eq(appointmentItems.appointmentId, appointments.id))
-      .where(and(
-        sql`${appointmentItems.createdAt} >= ${dayStart}`,
-        sql`${appointmentItems.createdAt} <= ${dayEnd}`,
-        or(
-          eq(appointments.isPaid, true),
-          eq(appointments.paidOnline, true)
-        )
-      ));
+      .where(and(...conditions));
     return items;
   }
 
   // Appointment history operations
-  async saveAppointmentToHistory(appointment: Appointment, options?: { groomerName?: string }): Promise<AppointmentHistory> {
+  async saveAppointmentToHistory(appointment: Appointment, options?: { groomerName?: string; tenantId?: number }): Promise<AppointmentHistory> {
     // Skip if no phone number (cannot link to contact)
     if (!appointment.ownerPhoneNumber) {
       console.log(`Skipping history for appointment ${appointment.id}: no phone number`);
       throw new Error('Cannot save appointment history: missing phone number');
     }
 
-    // Find or create contact by phone number
-    let contact = await this.getContactByPhoneNumber(appointment.ownerPhoneNumber);
+    const tenantId = options?.tenantId ?? appointment.tenantId ?? undefined;
+
+    // Find or create contact by phone number — scoped to tenant to prevent cross-tenant linking
+    let contact = await this.getContactByPhoneNumber(appointment.ownerPhoneNumber, tenantId);
     
     if (!contact) {
       // Create a new contact for this phone number
@@ -3038,6 +3126,7 @@ export class DatabaseStorage implements IStorage {
         source: appointment.source || 'manual',
         notes: null,
         linkedUserId: null,
+        tenantId: tenantId ?? null,
       });
       console.log(`Created new contact ${contact.id} for appointment ${appointment.id}`);
     }
@@ -3064,6 +3153,7 @@ export class DatabaseStorage implements IStorage {
 
     // Create appointment history record
     const historyData: InsertAppointmentHistory = {
+      tenantId: tenantId ?? null,
       contactId: contact.id,
       ownerPhoneNumber: appointment.ownerPhoneNumber,
       ownerEmail: appointment.ownerEmail || null,
@@ -3095,11 +3185,14 @@ export class DatabaseStorage implements IStorage {
     return history;
   }
 
-  async getAppointmentHistoryForPhone(phoneNumber: string): Promise<AppointmentHistory[]> {
+  async getAppointmentHistoryForPhone(phoneNumber: string, tenantId?: number): Promise<AppointmentHistory[]> {
     const normalizedPhone = normalizePhoneNumber(phoneNumber);
     if (!normalizedPhone) return [];
 
-    const allHistory = await db.select().from(appointmentHistory);
+    const historyQuery = tenantId
+      ? db.select().from(appointmentHistory).where(eq(appointmentHistory.tenantId, tenantId))
+      : db.select().from(appointmentHistory);
+    const allHistory = await historyQuery;
 
     // Method 1: direct match on denormalized ownerPhoneNumber field
     const byPhone = allHistory.filter(h =>
@@ -3107,7 +3200,7 @@ export class DatabaseStorage implements IStorage {
     );
 
     // Method 2: via contact lookup — catches records where ownerPhoneNumber is null/missing
-    const contact = await this.getContactByPhoneNumber(phoneNumber);
+    const contact = await this.getContactByPhoneNumber(phoneNumber, tenantId);
     if (contact) {
       const seen = new Set(byPhone.map(h => h.id));
       const byContact = allHistory.filter(h => h.contactId === contact.id);
@@ -3121,11 +3214,14 @@ export class DatabaseStorage implements IStorage {
     );
   }
 
-  async getUnapprovedAppointments(): Promise<Appointment[]> {
+  async getUnapprovedAppointments(tenantId?: number): Promise<Appointment[]> {
+    const where = tenantId
+      ? and(eq(appointments.isApproved, false), eq(appointments.tenantId, tenantId))
+      : eq(appointments.isApproved, false);
     const allUnapproved = await db
       .select()
       .from(appointments)
-      .where(eq(appointments.isApproved, false))
+      .where(where)
       .orderBy(desc(appointments.createdAt));
     
     // Filter out past dates (only show today and future appointments)
@@ -3157,8 +3253,11 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
-  async deleteAppointment(id: number): Promise<void> {
-    await db.delete(appointments).where(eq(appointments.id, id));
+  async deleteAppointment(id: number, tenantId?: number): Promise<void> {
+    const condition = tenantId
+      ? and(eq(appointments.id, id), eq(appointments.tenantId, tenantId))
+      : eq(appointments.id, id);
+    await db.delete(appointments).where(condition);
   }
 
   async updateAppointmentDetails(id: number, updates: { 
@@ -3289,8 +3388,31 @@ export class DatabaseStorage implements IStorage {
     await db.delete(appointmentHistory).where(eq(appointmentHistory.id, id));
   }
 
-  async getAllUsers(): Promise<User[]> {
+  async getAllUsers(tenantId?: number): Promise<User[]> {
+    if (tenantId) {
+      return await db.select().from(users).where(eq(users.tenantId, tenantId));
+    }
     return await db.select().from(users);
+  }
+
+  async updateUserSuperAdmin(id: string, isSuperAdmin: boolean): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ isSuperAdmin, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    if (!user) throw new Error('User not found');
+    return user;
+  }
+
+  async updateUserTenant(id: string, tenantId: number): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ tenantId, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    if (!user) throw new Error('User not found');
+    return user;
   }
 
   async deleteUser(id: string): Promise<void> {
@@ -3344,37 +3466,52 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Grooming settings operations
-  async getGroomingSettings(): Promise<GroomingSetting[]> {
+  async getGroomingSettings(tenantId?: number): Promise<GroomingSetting[]> {
+    if (tenantId) {
+      return await db.select().from(groomingSettings).where(eq(groomingSettings.tenantId, tenantId));
+    }
     return await db.select().from(groomingSettings);
   }
 
-  async getGroomingSetting(setting: string): Promise<GroomingSetting | undefined> {
-    const [result] = await db.select().from(groomingSettings).where(eq(groomingSettings.setting, setting));
+  async getGroomingSetting(setting: string, tenantId?: number): Promise<GroomingSetting | undefined> {
+    const where = tenantId
+      ? and(eq(groomingSettings.setting, setting), eq(groomingSettings.tenantId, tenantId))
+      : eq(groomingSettings.setting, setting);
+    const [result] = await db.select().from(groomingSettings).where(where);
     return result;
   }
 
   async upsertGroomingSetting(settingData: InsertGroomingSetting): Promise<GroomingSetting> {
-    const [result] = await db
-      .insert(groomingSettings)
-      .values(settingData)
-      .onConflictDoUpdate({
-        target: groomingSettings.setting,
-        set: {
-          value: settingData.value,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return result;
+    // Use SELECT + UPDATE/INSERT to handle composite unique (tenantId, setting)
+    const where = settingData.tenantId != null
+      ? and(eq(groomingSettings.setting, settingData.setting), eq(groomingSettings.tenantId, settingData.tenantId))
+      : eq(groomingSettings.setting, settingData.setting);
+    const [existing] = await db.select().from(groomingSettings).where(where).limit(1);
+    if (existing) {
+      const [updated] = await db
+        .update(groomingSettings)
+        .set({ value: settingData.value, updatedAt: new Date() })
+        .where(eq(groomingSettings.id, existing.id))
+        .returning();
+      return updated;
+    }
+    const [created] = await db.insert(groomingSettings).values(settingData).returning();
+    return created;
   }
 
   // Groomer operations
-  async getAllGroomers(): Promise<Groomer[]> {
+  async getAllGroomers(tenantId?: number): Promise<Groomer[]> {
+    if (tenantId) {
+      return await db.select().from(groomers).where(eq(groomers.tenantId, tenantId)).orderBy(groomers.name);
+    }
     return await db.select().from(groomers).orderBy(groomers.name);
   }
 
-  async getActiveGroomers(): Promise<Groomer[]> {
-    return await db.select().from(groomers).where(eq(groomers.isActive, true)).orderBy(groomers.name);
+  async getActiveGroomers(tenantId?: number): Promise<Groomer[]> {
+    const where = tenantId
+      ? and(eq(groomers.isActive, true), eq(groomers.tenantId, tenantId))
+      : eq(groomers.isActive, true);
+    return await db.select().from(groomers).where(where).orderBy(groomers.name);
   }
 
   async getGroomer(id: number): Promise<Groomer | undefined> {
@@ -3387,17 +3524,19 @@ export class DatabaseStorage implements IStorage {
     return groomer;
   }
 
-  async updateGroomer(id: number, groomerData: Partial<InsertGroomer>): Promise<Groomer> {
+  async updateGroomer(id: number, groomerData: Partial<InsertGroomer>, tenantId?: number): Promise<Groomer> {
+    const where = tenantId ? and(eq(groomers.id, id), eq(groomers.tenantId, tenantId)) : eq(groomers.id, id);
     const [groomer] = await db
       .update(groomers)
       .set({ ...groomerData, updatedAt: new Date() })
-      .where(eq(groomers.id, id))
+      .where(where)
       .returning();
     return groomer;
   }
 
-  async deleteGroomer(id: number): Promise<void> {
-    await db.delete(groomers).where(eq(groomers.id, id));
+  async deleteGroomer(id: number, tenantId?: number): Promise<void> {
+    const where = tenantId ? and(eq(groomers.id, id), eq(groomers.tenantId, tenantId)) : eq(groomers.id, id);
+    await db.delete(groomers).where(where);
   }
 
   // Groomer availability operations
@@ -3409,12 +3548,15 @@ export class DatabaseStorage implements IStorage {
       .orderBy(groomerAvailability.dayOfWeek);
   }
 
-  async getAvailableGroomersForDay(dayOfWeek: number): Promise<Groomer[]> {
+  async getAvailableGroomersForDay(dayOfWeek: number, tenantId?: number): Promise<Groomer[]> {
     // All active groomers are available by default, filtered by their weekly off-days
+    const where = tenantId
+      ? and(eq(groomers.isActive, true), eq(groomers.tenantId, tenantId))
+      : eq(groomers.isActive, true);
     const allActiveGroomers = await db
       .select()
       .from(groomers)
-      .where(eq(groomers.isActive, true))
+      .where(where)
       .orderBy(groomers.name);
     
     // Filter out groomers who have this day as an off-day
@@ -3424,15 +3566,18 @@ export class DatabaseStorage implements IStorage {
     });
   }
 
-  async getAvailableGroomersForDate(date: string): Promise<Groomer[]> {
+  async getAvailableGroomersForDate(date: string, tenantId?: number): Promise<Groomer[]> {
     // All active groomers are available by default, minus those blocked on this specific date or weekly off-day
     const dateObj = new Date(date + 'T00:00:00');
     const dayOfWeek = dateObj.getDay();
     
+    const where = tenantId
+      ? and(eq(groomers.isActive, true), eq(groomers.tenantId, tenantId))
+      : eq(groomers.isActive, true);
     const allActiveGroomers = await db
       .select()
       .from(groomers)
-      .where(eq(groomers.isActive, true))
+      .where(where)
       .orderBy(groomers.name);
     
     // Filter out groomers who have this day as a weekly off-day
@@ -3453,7 +3598,14 @@ export class DatabaseStorage implements IStorage {
     return availability;
   }
 
-  async updateGroomerAvailability(id: number, availabilityData: Partial<InsertGroomerAvailability>): Promise<GroomerAvailability> {
+  async updateGroomerAvailability(id: number, availabilityData: Partial<InsertGroomerAvailability>, tenantId?: number): Promise<GroomerAvailability> {
+    // Verify ownership via parent groomer if tenantId is provided
+    if (tenantId) {
+      const [existing] = await db.select().from(groomerAvailability)
+        .leftJoin(groomers, eq(groomerAvailability.groomerId, groomers.id))
+        .where(and(eq(groomerAvailability.id, id), eq(groomers.tenantId, tenantId)));
+      if (!existing) throw new Error('Not found or access denied');
+    }
     const [availability] = await db
       .update(groomerAvailability)
       .set({ ...availabilityData, updatedAt: new Date() })
@@ -3462,7 +3614,13 @@ export class DatabaseStorage implements IStorage {
     return availability;
   }
 
-  async deleteGroomerAvailability(id: number): Promise<void> {
+  async deleteGroomerAvailability(id: number, tenantId?: number): Promise<void> {
+    if (tenantId) {
+      const [existing] = await db.select().from(groomerAvailability)
+        .leftJoin(groomers, eq(groomerAvailability.groomerId, groomers.id))
+        .where(and(eq(groomerAvailability.id, id), eq(groomers.tenantId, tenantId)));
+      if (!existing) return; // not found for this tenant — silently ignore (no cross-tenant leakage)
+    }
     await db.delete(groomerAvailability).where(eq(groomerAvailability.id, id));
   }
 
@@ -3494,7 +3652,13 @@ export class DatabaseStorage implements IStorage {
     return blockedDay;
   }
 
-  async deleteGroomerBlockedDay(id: number): Promise<void> {
+  async deleteGroomerBlockedDay(id: number, tenantId?: number): Promise<void> {
+    if (tenantId) {
+      const [existing] = await db.select().from(groomerBlockedDays)
+        .leftJoin(groomers, eq(groomerBlockedDays.groomerId, groomers.id))
+        .where(and(eq(groomerBlockedDays.id, id), eq(groomers.tenantId, tenantId)));
+      if (!existing) return; // not found for this tenant — silently ignore
+    }
     await db.delete(groomerBlockedDays).where(eq(groomerBlockedDays.id, id));
   }
 
@@ -3551,12 +3715,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Contact operations
-  async getAllContacts(): Promise<Contact[]> {
+  async getAllContacts(tenantId?: number): Promise<Contact[]> {
+    if (tenantId) {
+      return await db.select().from(contacts).where(eq(contacts.tenantId, tenantId)).orderBy(desc(contacts.createdAt));
+    }
     return await db.select().from(contacts).orderBy(desc(contacts.createdAt));
   }
 
-  async getContact(id: number): Promise<Contact | undefined> {
-    const [contact] = await db.select().from(contacts).where(eq(contacts.id, id));
+  async getContact(id: number, tenantId?: number): Promise<Contact | undefined> {
+    const where = tenantId
+      ? and(eq(contacts.id, id), eq(contacts.tenantId, tenantId))
+      : eq(contacts.id, id);
+    const [contact] = await db.select().from(contacts).where(where);
     return contact;
   }
 
@@ -3565,25 +3735,31 @@ export class DatabaseStorage implements IStorage {
     return newContact;
   }
 
-  async updateContact(id: number, contact: Partial<InsertContact>): Promise<Contact> {
+  async updateContact(id: number, contact: Partial<InsertContact>, tenantId?: number): Promise<Contact> {
+    const where = tenantId ? and(eq(contacts.id, id), eq(contacts.tenantId, tenantId)) : eq(contacts.id, id);
     const [updatedContact] = await db
       .update(contacts)
       .set({ ...contact, updatedAt: new Date() })
-      .where(eq(contacts.id, id))
+      .where(where)
       .returning();
     return updatedContact;
   }
 
-  async deleteContact(id: number): Promise<void> {
-    await db.delete(contacts).where(eq(contacts.id, id));
+  async deleteContact(id: number, tenantId?: number): Promise<void> {
+    const where = tenantId ? and(eq(contacts.id, id), eq(contacts.tenantId, tenantId)) : eq(contacts.id, id);
+    await db.delete(contacts).where(where);
   }
 
-  async getContactByPhoneNumber(phoneNumber: string): Promise<Contact | undefined> {
-    // Get all contacts with phone numbers and compare using normalization
+  async getContactByPhoneNumber(phoneNumber: string, tenantId?: number): Promise<Contact | undefined> {
+    // Get contacts with phone numbers and compare using normalization
     const { normalizePhoneNumber } = await import("./phoneUtils");
     const normalizedSearch = normalizePhoneNumber(phoneNumber);
     
-    const allContacts = await db.select().from(contacts);
+    // Always filter by tenant when provided to prevent cross-tenant contact interference
+    const query = tenantId
+      ? db.select().from(contacts).where(eq(contacts.tenantId, tenantId))
+      : db.select().from(contacts);
+    const allContacts = await query;
     return allContacts.find(c => 
       c.phoneNumber && normalizePhoneNumber(c.phoneNumber) === normalizedSearch
     );
@@ -3628,12 +3804,16 @@ export class DatabaseStorage implements IStorage {
     );
   }
 
-  async updateContactSmsOptOut(contactId: number, optOut: boolean): Promise<Contact> {
+  async updateContactSmsOptOut(contactId: number, optOut: boolean, tenantId?: number): Promise<Contact> {
+    const where = tenantId
+      ? and(eq(contacts.id, contactId), eq(contacts.tenantId, tenantId))
+      : eq(contacts.id, contactId);
     const [updated] = await db
       .update(contacts)
       .set({ smsOptOut: optOut, updatedAt: new Date() })
-      .where(eq(contacts.id, contactId))
+      .where(where)
       .returning();
+    if (!updated) throw new Error("Contact not found or does not belong to this tenant");
     return updated;
   }
 
@@ -3660,63 +3840,81 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Daily appointment limit operations
-  async getDailyAppointmentLimit(date: string): Promise<DailyAppointmentLimit | undefined> {
-    const [limit] = await db.select().from(dailyAppointmentLimits).where(eq(dailyAppointmentLimits.date, date));
+  async getDailyAppointmentLimit(date: string, tenantId?: number): Promise<DailyAppointmentLimit | undefined> {
+    const where = tenantId
+      ? and(eq(dailyAppointmentLimits.date, date), eq(dailyAppointmentLimits.tenantId, tenantId))
+      : eq(dailyAppointmentLimits.date, date);
+    const [limit] = await db.select().from(dailyAppointmentLimits).where(where);
     return limit;
   }
 
-  async getAllDailyAppointmentLimits(): Promise<DailyAppointmentLimit[]> {
+  async getAllDailyAppointmentLimits(tenantId?: number): Promise<DailyAppointmentLimit[]> {
+    if (tenantId) {
+      return await db.select().from(dailyAppointmentLimits).where(eq(dailyAppointmentLimits.tenantId, tenantId)).orderBy(dailyAppointmentLimits.date);
+    }
     return await db.select().from(dailyAppointmentLimits).orderBy(dailyAppointmentLimits.date);
   }
 
   async upsertDailyAppointmentLimit(limitData: InsertDailyAppointmentLimit): Promise<DailyAppointmentLimit> {
-    const [result] = await db
-      .insert(dailyAppointmentLimits)
-      .values(limitData)
-      .onConflictDoUpdate({
-        target: dailyAppointmentLimits.date,
-        set: {
-          maxBathAppointments: limitData.maxBathAppointments,
-          maxGroomAppointments: limitData.maxGroomAppointments,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return result;
+    // Use SELECT + UPDATE/INSERT to handle composite unique (tenantId, date)
+    const where = limitData.tenantId != null
+      ? and(eq(dailyAppointmentLimits.date, limitData.date), eq(dailyAppointmentLimits.tenantId, limitData.tenantId))
+      : eq(dailyAppointmentLimits.date, limitData.date);
+    const [existing] = await db.select().from(dailyAppointmentLimits).where(where).limit(1);
+    if (existing) {
+      const [updated] = await db
+        .update(dailyAppointmentLimits)
+        .set({ maxBathAppointments: limitData.maxBathAppointments, maxGroomAppointments: limitData.maxGroomAppointments, updatedAt: new Date() })
+        .where(eq(dailyAppointmentLimits.id, existing.id))
+        .returning();
+      return updated;
+    }
+    const [created] = await db.insert(dailyAppointmentLimits).values(limitData).returning();
+    return created;
   }
 
-  async deleteDailyAppointmentLimit(id: number): Promise<void> {
-    await db.delete(dailyAppointmentLimits).where(eq(dailyAppointmentLimits.id, id));
+  async deleteDailyAppointmentLimit(id: number, tenantId?: number): Promise<void> {
+    const where = tenantId ? and(eq(dailyAppointmentLimits.id, id), eq(dailyAppointmentLimits.tenantId, tenantId)) : eq(dailyAppointmentLimits.id, id);
+    await db.delete(dailyAppointmentLimits).where(where);
   }
 
   // Weekly appointment limit operations
-  async getWeeklyAppointmentLimit(dayOfWeek: number): Promise<WeeklyAppointmentLimit | undefined> {
-    const [limit] = await db.select().from(weeklyAppointmentLimits).where(eq(weeklyAppointmentLimits.dayOfWeek, dayOfWeek));
+  async getWeeklyAppointmentLimit(dayOfWeek: number, tenantId?: number): Promise<WeeklyAppointmentLimit | undefined> {
+    const where = tenantId
+      ? and(eq(weeklyAppointmentLimits.dayOfWeek, dayOfWeek), eq(weeklyAppointmentLimits.tenantId, tenantId))
+      : eq(weeklyAppointmentLimits.dayOfWeek, dayOfWeek);
+    const [limit] = await db.select().from(weeklyAppointmentLimits).where(where);
     return limit;
   }
 
-  async getAllWeeklyAppointmentLimits(): Promise<WeeklyAppointmentLimit[]> {
+  async getAllWeeklyAppointmentLimits(tenantId?: number): Promise<WeeklyAppointmentLimit[]> {
+    if (tenantId) {
+      return await db.select().from(weeklyAppointmentLimits).where(eq(weeklyAppointmentLimits.tenantId, tenantId)).orderBy(weeklyAppointmentLimits.dayOfWeek);
+    }
     return await db.select().from(weeklyAppointmentLimits).orderBy(weeklyAppointmentLimits.dayOfWeek);
   }
 
   async upsertWeeklyAppointmentLimit(limitData: InsertWeeklyAppointmentLimit): Promise<WeeklyAppointmentLimit> {
-    const [result] = await db
-      .insert(weeklyAppointmentLimits)
-      .values(limitData)
-      .onConflictDoUpdate({
-        target: weeklyAppointmentLimits.dayOfWeek,
-        set: {
-          maxBathAppointments: limitData.maxBathAppointments,
-          maxGroomAppointments: limitData.maxGroomAppointments,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return result;
+    // Use SELECT + UPDATE/INSERT to handle composite unique (tenantId, dayOfWeek)
+    const where = limitData.tenantId != null
+      ? and(eq(weeklyAppointmentLimits.dayOfWeek, limitData.dayOfWeek), eq(weeklyAppointmentLimits.tenantId, limitData.tenantId))
+      : eq(weeklyAppointmentLimits.dayOfWeek, limitData.dayOfWeek);
+    const [existing] = await db.select().from(weeklyAppointmentLimits).where(where).limit(1);
+    if (existing) {
+      const [updated] = await db
+        .update(weeklyAppointmentLimits)
+        .set({ maxBathAppointments: limitData.maxBathAppointments, maxGroomAppointments: limitData.maxGroomAppointments, updatedAt: new Date() })
+        .where(eq(weeklyAppointmentLimits.id, existing.id))
+        .returning();
+      return updated;
+    }
+    const [created] = await db.insert(weeklyAppointmentLimits).values(limitData).returning();
+    return created;
   }
 
-  async deleteWeeklyAppointmentLimit(id: number): Promise<void> {
-    await db.delete(weeklyAppointmentLimits).where(eq(weeklyAppointmentLimits.id, id));
+  async deleteWeeklyAppointmentLimit(id: number, tenantId?: number): Promise<void> {
+    const where = tenantId ? and(eq(weeklyAppointmentLimits.id, id), eq(weeklyAppointmentLimits.tenantId, tenantId)) : eq(weeklyAppointmentLimits.id, id);
+    await db.delete(weeklyAppointmentLimits).where(where);
   }
 
   async acquireBookingLock(dateStr: string): Promise<void> {
@@ -3735,9 +3933,13 @@ export class DatabaseStorage implements IStorage {
     dateStr: string, 
     dayOfWeek: number,
     requestedBaths: number,
-    requestedGrooms: number
+    requestedGrooms: number,
+    tenantId?: number
   ): Promise<{ withinCapacity: boolean; bathCount: number; groomCount: number; bathLimit: number; groomLimit: number; reason?: string }> {
-    const [limit] = await db.select().from(weeklyAppointmentLimits).where(eq(weeklyAppointmentLimits.dayOfWeek, dayOfWeek));
+    const limitCondition = tenantId
+      ? and(eq(weeklyAppointmentLimits.dayOfWeek, dayOfWeek), eq(weeklyAppointmentLimits.tenantId, tenantId))
+      : eq(weeklyAppointmentLimits.dayOfWeek, dayOfWeek);
+    const [limit] = await db.select().from(weeklyAppointmentLimits).where(limitCondition);
     
     if (!limit) {
       return {
@@ -3750,12 +3952,14 @@ export class DatabaseStorage implements IStorage {
       };
     }
     
+    const tenantFilter = tenantId ? sql` AND a.tenant_id = ${tenantId}` : sql``;
     const countResult = await db.execute(sql`
       WITH date_appointments AS (
         SELECT a.id, a.service_type as legacy_service_type
         FROM appointments a
         WHERE DATE(a.appointment_date) = ${dateStr}::date
           AND a.status NOT IN ('cancelled', 'rejected')
+          ${tenantFilter}
       ),
       pet_counts AS (
         SELECT 
@@ -3817,12 +4021,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Special date settings operations
-  async getSpecialDateSetting(date: string): Promise<SpecialDateSetting | undefined> {
-    const [setting] = await db.select().from(specialDateSettings).where(eq(specialDateSettings.date, date));
+  async getSpecialDateSetting(date: string, tenantId?: number): Promise<SpecialDateSetting | undefined> {
+    const where = tenantId
+      ? and(eq(specialDateSettings.date, date), eq(specialDateSettings.tenantId, tenantId))
+      : eq(specialDateSettings.date, date);
+    const [setting] = await db.select().from(specialDateSettings).where(where);
     return setting;
   }
 
-  async getAllSpecialDateSettings(): Promise<SpecialDateSetting[]> {
+  async getAllSpecialDateSettings(tenantId?: number): Promise<SpecialDateSetting[]> {
+    if (tenantId) {
+      return await db.select().from(specialDateSettings).where(eq(specialDateSettings.tenantId, tenantId)).orderBy(specialDateSettings.date);
+    }
     return await db.select().from(specialDateSettings).orderBy(specialDateSettings.date);
   }
 
@@ -3840,8 +4050,9 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
-  async deleteSpecialDateSetting(id: number): Promise<void> {
-    await db.delete(specialDateSettings).where(eq(specialDateSettings.id, id));
+  async deleteSpecialDateSetting(id: number, tenantId?: number): Promise<void> {
+    const where = tenantId ? and(eq(specialDateSettings.id, id), eq(specialDateSettings.tenantId, tenantId)) : eq(specialDateSettings.id, id);
+    await db.delete(specialDateSettings).where(where);
   }
 
   async getSpecialDateAllowedTimes(specialDateId: number): Promise<SpecialDateAllowedTime[]> {
@@ -3857,39 +4068,82 @@ export class DatabaseStorage implements IStorage {
     await db.delete(specialDateAllowedTimes).where(eq(specialDateAllowedTimes.id, id));
   }
 
-  async getSpecialDateWithTimes(date: string): Promise<{ setting: SpecialDateSetting; times: SpecialDateAllowedTime[] } | null> {
-    const setting = await this.getSpecialDateSetting(date);
+  async getSpecialDateWithTimes(date: string, tenantId?: number): Promise<{ setting: SpecialDateSetting; times: SpecialDateAllowedTime[] } | null> {
+    const setting = await this.getSpecialDateSetting(date, tenantId);
     if (!setting) return null;
     const times = await this.getSpecialDateAllowedTimes(setting.id);
     return { setting, times };
   }
 
-  // Get all methods for database export
-  async getAllOrderItems(): Promise<any[]> {
+  // Get all methods for database export — tenant-scoped where possible
+  async getAllOrderItems(tenantId?: number): Promise<any[]> {
+    if (tenantId) {
+      // Join to orders to scope by tenant
+      return await db
+        .select({ orderItems })
+        .from(orderItems)
+        .innerJoin(orders, eq(orderItems.orderId, orders.id))
+        .where(eq(orders.tenantId, tenantId))
+        .then(rows => rows.map(r => r.orderItems));
+    }
     return await db.select().from(orderItems);
   }
 
-  async getAllWishlistItems(): Promise<any[]> {
+  async getAllWishlistItems(tenantId?: number): Promise<any[]> {
+    if (tenantId) {
+      // Scope via users.tenantId join
+      return await db
+        .select({ wishlistItems })
+        .from(wishlistItems)
+        .innerJoin(users, eq(wishlistItems.userId, users.id))
+        .where(eq(users.tenantId, tenantId))
+        .then(rows => rows.map(r => r.wishlistItems));
+    }
     return await db.select().from(wishlistItems);
   }
 
-  async getAllCustomerPets(): Promise<any[]> {
+  async getAllCustomerPets(tenantId?: number): Promise<any[]> {
+    if (tenantId) {
+      return await db.select().from(customerPets).where(eq(customerPets.tenantId, tenantId));
+    }
     return await db.select().from(customerPets);
   }
 
-  async getAllGroomerAvailability(): Promise<any[]> {
+  async getAllGroomerAvailability(tenantId?: number): Promise<any[]> {
+    if (tenantId) {
+      return await db
+        .select({ groomerAvailability })
+        .from(groomerAvailability)
+        .innerJoin(groomers, eq(groomerAvailability.groomerId, groomers.id))
+        .where(eq(groomers.tenantId, tenantId))
+        .then(rows => rows.map(r => r.groomerAvailability));
+    }
     return await db.select().from(groomerAvailability);
   }
 
-  async getAllWeeklyLimits(): Promise<any[]> {
+  async getAllWeeklyLimits(tenantId?: number): Promise<any[]> {
+    if (tenantId) {
+      return await db.select().from(weeklyAppointmentLimits).where(eq(weeklyAppointmentLimits.tenantId, tenantId));
+    }
     return await db.select().from(weeklyAppointmentLimits);
   }
 
-  async getAllDailyLimits(): Promise<any[]> {
+  async getAllDailyLimits(tenantId?: number): Promise<any[]> {
+    if (tenantId) {
+      return await db.select().from(dailyAppointmentLimits).where(eq(dailyAppointmentLimits.tenantId, tenantId));
+    }
     return await db.select().from(dailyAppointmentLimits);
   }
 
-  async getAllSpecialDateTimes(): Promise<any[]> {
+  async getAllSpecialDateTimes(tenantId?: number): Promise<any[]> {
+    if (tenantId) {
+      return await db
+        .select({ specialDateAllowedTimes })
+        .from(specialDateAllowedTimes)
+        .innerJoin(specialDateSettings, eq(specialDateAllowedTimes.specialDateId, specialDateSettings.id))
+        .where(eq(specialDateSettings.tenantId, tenantId))
+        .then(rows => rows.map(r => r.specialDateAllowedTimes));
+    }
     return await db.select().from(specialDateAllowedTimes);
   }
 
@@ -4274,12 +4528,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Boarding operations
-  async getAllBoardingRecords(): Promise<BoardingRecord[]> {
+  async getAllBoardingRecords(tenantId?: number): Promise<BoardingRecord[]> {
+    if (tenantId) {
+      return await db.select().from(boardingRecords).where(eq(boardingRecords.tenantId, tenantId)).orderBy(desc(boardingRecords.createdAt));
+    }
     return await db.select().from(boardingRecords).orderBy(desc(boardingRecords.createdAt));
   }
 
-  async getBoardingRecord(id: number): Promise<BoardingRecord | undefined> {
-    const [record] = await db.select().from(boardingRecords).where(eq(boardingRecords.id, id));
+  async getBoardingRecord(id: number, tenantId?: number): Promise<BoardingRecord | undefined> {
+    const where = tenantId
+      ? and(eq(boardingRecords.id, id), eq(boardingRecords.tenantId, tenantId))
+      : eq(boardingRecords.id, id);
+    const [record] = await db.select().from(boardingRecords).where(where);
     return record;
   }
 
@@ -4288,27 +4548,30 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
-  async updateBoardingRecord(id: number, record: Partial<InsertBoardingRecord>): Promise<BoardingRecord> {
+  async updateBoardingRecord(id: number, record: Partial<InsertBoardingRecord>, tenantId?: number): Promise<BoardingRecord> {
+    const where = tenantId ? and(eq(boardingRecords.id, id), eq(boardingRecords.tenantId, tenantId)) : eq(boardingRecords.id, id);
     const [updated] = await db
       .update(boardingRecords)
       .set({ ...record, updatedAt: new Date() })
-      .where(eq(boardingRecords.id, id))
+      .where(where)
       .returning();
     return updated;
   }
 
-  async checkInBoardingRecord(id: number): Promise<BoardingRecord> {
+  async checkInBoardingRecord(id: number, tenantId?: number): Promise<BoardingRecord> {
     const today = new Date().toISOString().split('T')[0];
+    const where = tenantId ? and(eq(boardingRecords.id, id), eq(boardingRecords.tenantId, tenantId)) : eq(boardingRecords.id, id);
     const [updated] = await db
       .update(boardingRecords)
       .set({ actualDropOffDate: today, updatedAt: new Date() })
-      .where(eq(boardingRecords.id, id))
+      .where(where)
       .returning();
     return updated;
   }
 
-  async checkOutBoardingRecord(id: number): Promise<BoardingRecord> {
+  async checkOutBoardingRecord(id: number, tenantId?: number): Promise<BoardingRecord> {
     const today = new Date().toISOString().split('T')[0];
+    const where = tenantId ? and(eq(boardingRecords.id, id), eq(boardingRecords.tenantId, tenantId)) : eq(boardingRecords.id, id);
     const [updated] = await db
       .update(boardingRecords)
       .set({ 
@@ -4316,75 +4579,94 @@ export class DatabaseStorage implements IStorage {
         status: 'completed',
         updatedAt: new Date() 
       })
-      .where(eq(boardingRecords.id, id))
+      .where(where)
       .returning();
     return updated;
   }
 
-  async deleteBoardingRecord(id: number): Promise<void> {
-    await db.delete(boardingRecords).where(eq(boardingRecords.id, id));
+  async deleteBoardingRecord(id: number, tenantId?: number): Promise<void> {
+    const where = tenantId ? and(eq(boardingRecords.id, id), eq(boardingRecords.tenantId, tenantId)) : eq(boardingRecords.id, id);
+    await db.delete(boardingRecords).where(where);
   }
 
   // Schedule operations
-  async getAllScheduleEntries(): Promise<ScheduleEntry[]> {
+  async getAllScheduleEntries(tenantId?: number): Promise<ScheduleEntry[]> {
+    if (tenantId) {
+      return await db.select().from(scheduleEntries)
+        .where(eq(scheduleEntries.tenantId, tenantId))
+        .orderBy(asc(scheduleEntries.section), asc(scheduleEntries.displayOrder), asc(scheduleEntries.employeeName));
+    }
     return await db.select().from(scheduleEntries)
       .orderBy(asc(scheduleEntries.section), asc(scheduleEntries.displayOrder), asc(scheduleEntries.employeeName));
   }
 
-  async batchUpdateScheduleEntries(entries: InsertScheduleEntry[]): Promise<ScheduleEntry[]> {
-    // Delete all existing entries first, then insert the new ones
-    await db.delete(scheduleEntries);
-    
+  async batchUpdateScheduleEntries(entries: InsertScheduleEntry[], tenantId?: number): Promise<ScheduleEntry[]> {
+    // Delete existing entries for this tenant only, then insert new ones
+    if (tenantId) {
+      await db.delete(scheduleEntries).where(eq(scheduleEntries.tenantId, tenantId));
+    } else {
+      await db.delete(scheduleEntries);
+    }
     if (entries.length === 0) {
       return [];
     }
-    
     const inserted = await db.insert(scheduleEntries).values(entries).returning();
     return inserted;
   }
 
-  async updateScheduleEntry(id: number, entry: Partial<InsertScheduleEntry>): Promise<ScheduleEntry> {
+  async updateScheduleEntry(id: number, entry: Partial<InsertScheduleEntry>, tenantId?: number): Promise<ScheduleEntry> {
+    const where = tenantId ? and(eq(scheduleEntries.id, id), eq(scheduleEntries.tenantId, tenantId)) : eq(scheduleEntries.id, id);
     const [updated] = await db
       .update(scheduleEntries)
       .set({ ...entry, updatedAt: new Date() })
-      .where(eq(scheduleEntries.id, id))
+      .where(where)
       .returning();
     return updated;
   }
 
-  async deleteScheduleEntry(id: number): Promise<void> {
-    await db.delete(scheduleEntries).where(eq(scheduleEntries.id, id));
+  async deleteScheduleEntry(id: number, tenantId?: number): Promise<void> {
+    const where = tenantId ? and(eq(scheduleEntries.id, id), eq(scheduleEntries.tenantId, tenantId)) : eq(scheduleEntries.id, id);
+    await db.delete(scheduleEntries).where(where);
   }
 
   // Grooming Schedule operations
-  async getAllGroomingScheduleEntries(): Promise<GroomingScheduleEntry[]> {
+  async getAllGroomingScheduleEntries(tenantId?: number): Promise<GroomingScheduleEntry[]> {
+    if (tenantId) {
+      return await db.select().from(groomingScheduleEntries)
+        .where(eq(groomingScheduleEntries.tenantId, tenantId))
+        .orderBy(asc(groomingScheduleEntries.section), asc(groomingScheduleEntries.displayOrder), asc(groomingScheduleEntries.groomerName));
+    }
     return await db.select().from(groomingScheduleEntries)
       .orderBy(asc(groomingScheduleEntries.section), asc(groomingScheduleEntries.displayOrder), asc(groomingScheduleEntries.groomerName));
   }
 
-  async batchUpdateGroomingScheduleEntries(entries: InsertGroomingScheduleEntry[]): Promise<GroomingScheduleEntry[]> {
-    // Delete all existing entries first, then insert the new ones
-    await db.delete(groomingScheduleEntries);
-    
+  async batchUpdateGroomingScheduleEntries(entries: InsertGroomingScheduleEntry[], tenantId?: number): Promise<GroomingScheduleEntry[]> {
+    // Delete existing entries for this tenant only, then insert new ones
+    if (tenantId) {
+      await db.delete(groomingScheduleEntries).where(eq(groomingScheduleEntries.tenantId, tenantId));
+    } else {
+      await db.delete(groomingScheduleEntries);
+    }
     if (entries.length === 0) {
       return [];
     }
-    
     const inserted = await db.insert(groomingScheduleEntries).values(entries).returning();
     return inserted;
   }
 
-  async updateGroomingScheduleEntry(id: number, entry: Partial<InsertGroomingScheduleEntry>): Promise<GroomingScheduleEntry> {
+  async updateGroomingScheduleEntry(id: number, entry: Partial<InsertGroomingScheduleEntry>, tenantId?: number): Promise<GroomingScheduleEntry> {
+    const where = tenantId ? and(eq(groomingScheduleEntries.id, id), eq(groomingScheduleEntries.tenantId, tenantId)) : eq(groomingScheduleEntries.id, id);
     const [updated] = await db
       .update(groomingScheduleEntries)
       .set({ ...entry, updatedAt: new Date() })
-      .where(eq(groomingScheduleEntries.id, id))
+      .where(where)
       .returning();
     return updated;
   }
 
-  async deleteGroomingScheduleEntry(id: number): Promise<void> {
-    await db.delete(groomingScheduleEntries).where(eq(groomingScheduleEntries.id, id));
+  async deleteGroomingScheduleEntry(id: number, tenantId?: number): Promise<void> {
+    const where = tenantId ? and(eq(groomingScheduleEntries.id, id), eq(groomingScheduleEntries.tenantId, tenantId)) : eq(groomingScheduleEntries.id, id);
+    await db.delete(groomingScheduleEntries).where(where);
   }
 
   // Order Photo operations
@@ -4589,9 +4871,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Loyalty program operations
-  async getLoyaltySettings(): Promise<{ spendingThreshold: string; rewardAmount: string; isActive: boolean }> {
+  async getLoyaltySettings(tenantId?: number): Promise<{ spendingThreshold: string; rewardAmount: string; isActive: boolean }> {
     try {
-      const [settings] = await db.select().from(loyaltySettings).limit(1);
+      const query = db.select().from(loyaltySettings);
+      const [settings] = tenantId
+        ? await query.where(eq(loyaltySettings.tenantId, tenantId)).limit(1)
+        : await query.limit(1);
       if (settings) {
         return {
           spendingThreshold: settings.spendingThreshold,
@@ -4616,20 +4901,24 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async updateLoyaltySettings(settings: { spendingThreshold?: string; rewardAmount?: string; isActive?: boolean }): Promise<{ spendingThreshold: string; rewardAmount: string; isActive: boolean }> {
+  async updateLoyaltySettings(settings: { spendingThreshold?: string; rewardAmount?: string; isActive?: boolean }, tenantId?: number): Promise<{ spendingThreshold: string; rewardAmount: string; isActive: boolean }> {
     try {
-      const existing = await this.getLoyaltySettings();
-      const [updated] = await db.update(loyaltySettings)
+      const existing = await this.getLoyaltySettings(tenantId);
+      const whereClause = tenantId ? eq(loyaltySettings.tenantId, tenantId) : undefined;
+      const updateQuery = db.update(loyaltySettings)
         .set({
           spendingThreshold: settings.spendingThreshold ?? existing.spendingThreshold,
           rewardAmount: settings.rewardAmount ?? existing.rewardAmount,
           isActive: settings.isActive ?? existing.isActive,
           updatedAt: new Date()
-        })
-        .returning();
+        });
+      const [updated] = whereClause
+        ? await updateQuery.where(whereClause).returning()
+        : await updateQuery.returning();
       if (!updated) {
         // Insert if no rows updated
         const [newSettings] = await db.insert(loyaltySettings).values({
+          tenantId: tenantId ?? null,
           spendingThreshold: settings.spendingThreshold ?? "250",
           rewardAmount: settings.rewardAmount ?? "20",
           isActive: settings.isActive ?? true
@@ -4852,6 +5141,63 @@ export class DatabaseStorage implements IStorage {
     if (adminNotes !== undefined) updates.adminNotes = adminNotes;
     const [updated] = await db.update(jobApplications).set(updates).where(eq(jobApplications.id, id)).returning();
     return updated;
+  }
+
+  // ─── Tenant operations ───────────────────────────────────────────────────────
+
+  async getAllTenants(): Promise<Tenant[]> {
+    return await db.select().from(tenants).orderBy(tenants.id);
+  }
+
+  async getTenant(id: number): Promise<Tenant | undefined> {
+    const [tenant] = await db.select().from(tenants).where(eq(tenants.id, id));
+    return tenant;
+  }
+
+  async getTenantBySlug(slug: string): Promise<Tenant | undefined> {
+    const [tenant] = await db.select().from(tenants).where(eq(tenants.slug, slug));
+    return tenant;
+  }
+
+  async createTenant(tenantData: InsertTenant): Promise<Tenant> {
+    const [tenant] = await db.insert(tenants).values(tenantData).returning();
+    return tenant;
+  }
+
+  async updateTenant(id: number, tenantData: Partial<InsertTenant>): Promise<Tenant> {
+    const [tenant] = await db.update(tenants)
+      .set(tenantData)
+      .where(eq(tenants.id, id))
+      .returning();
+    if (!tenant) throw new Error('Tenant not found');
+    return tenant;
+  }
+
+  /**
+   * Returns row counts for each tenant-scoped table for the given tenant.
+   * Used by the super-admin isolation verification route.
+   */
+  async getTenantRowCounts(tenantId: number): Promise<Record<string, number>> {
+    const tables = [
+      { name: 'users',                     table: users,                    col: users.tenantId },
+      { name: 'supplies',                  table: supplies,                 col: supplies.tenantId },
+      { name: 'pets',                      table: pets,                     col: pets.tenantId },
+      { name: 'orders',                    table: orders,                   col: orders.tenantId },
+      { name: 'appointments',              table: appointments,             col: appointments.tenantId },
+      { name: 'contacts',                  table: contacts,                 col: contacts.tenantId },
+      { name: 'groomers',                  table: groomers,                 col: groomers.tenantId },
+      { name: 'boarding_records',          table: boardingRecords,          col: boardingRecords.tenantId },
+    ] as const;
+
+    const result: Record<string, number> = {};
+    for (const { name, table, col } of tables) {
+      const [row] = await db
+        .select({ cnt: count() })
+        .from(table)
+        .where(eq(col as any, tenantId));
+      result[name] = Number(row?.cnt ?? 0);
+    }
+    return result;
   }
 }
 

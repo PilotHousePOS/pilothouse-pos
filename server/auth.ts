@@ -17,7 +17,9 @@ export interface JWTUser {
   lastName: string | null;
   profileImageUrl: string | null;
   isAdmin: boolean | null;
+  isSuperAdmin: boolean | null;
   isGroomer: boolean | null;
+  tenantId: number | null;
   createdAt: Date | null;
   updatedAt: Date | null;
   tokenVersion: number;

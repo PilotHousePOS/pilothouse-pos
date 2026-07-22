@@ -569,6 +569,8 @@ async function runAppMigrations() {
     await migPool.query(`DELETE FROM pos_pending_new_items WHERE pos_stock <= 0`);
 
     await migPool.query(`ALTER TABLE supplies ADD COLUMN IF NOT EXISTS reorder_point INTEGER DEFAULT 1`);
+    await migPool.query(`ALTER TABLE appointment_history ADD COLUMN IF NOT EXISTS tenant_id integer REFERENCES tenants(id)`);
+    await migPool.query(`UPDATE appointment_history SET tenant_id = 1 WHERE tenant_id IS NULL`);
 
     await migPool.query(`CREATE TABLE IF NOT EXISTS pos_orders (
       id SERIAL PRIMARY KEY,
@@ -582,8 +584,10 @@ async function runAppMigrations() {
       change_due NUMERIC(10,2),
       cashier_id VARCHAR(100),
       notes TEXT,
+      tenant_id INTEGER,
       created_at TIMESTAMP DEFAULT NOW()
     )`);
+    await migPool.query(`ALTER TABLE pos_orders ADD COLUMN IF NOT EXISTS tenant_id INTEGER`);
 
     await migPool.end();
     log('App migrations complete');

@@ -5,6 +5,7 @@ import {
   timestamp,
   jsonb,
   index,
+  uniqueIndex,
   serial,
   integer,
   decimal,
@@ -14,6 +15,25 @@ import {
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { relations } from "drizzle-orm";
+
+// ─── Tenants ──────────────────────────────────────────────────────────────────
+// Each tenant is a business using the PilotHouse platform.
+// ownerId is nullable to avoid circular FK with users (set after first admin user is created).
+export const tenants = pgTable("tenants", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 100 }).notNull().unique(),
+  // ownerId FK is omitted here to avoid circular dependency; it's tracked separately
+  ownerId: varchar("owner_id", { length: 255 }), // References users.id (no FK constraint to avoid circularity)
+  subscriptionStatus: varchar("subscription_status", { length: 50 }).default("trial").notNull(), // trial, active, past_due, cancelled
+  subscriptionTier: varchar("subscription_tier", { length: 50 }).default("starter").notNull(), // starter, pro, enterprise
+  trialEndsAt: timestamp("trial_ends_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertTenantSchema = createInsertSchema(tenants).omit({ id: true, createdAt: true });
+export type Tenant = typeof tenants.$inferSelect;
+export type InsertTenant = z.infer<typeof insertTenantSchema>;
 
 // Session storage table for Replit Auth
 export const sessions = pgTable(
@@ -35,7 +55,9 @@ export const users = pgTable("users", {
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   phoneNumber: varchar("phone_number", { length: 100 }),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   isAdmin: boolean("is_admin").default(false),
+  isSuperAdmin: boolean("is_super_admin").default(false), // Platform-level, not tenant-scoped
   isGroomer: boolean("is_groomer").default(false),
   isSuperiorManager: boolean("is_superior_manager").default(false),
   isChargeAccount: boolean("is_charge_account").default(false),
@@ -58,6 +80,7 @@ export const users = pgTable("users", {
 // Loyalty program settings (admin-configurable)
 export const loyaltySettings = pgTable("loyalty_settings", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   spendingThreshold: decimal("spending_threshold", { precision: 10, scale: 2 }).default("250").notNull(),
   rewardAmount: decimal("reward_amount", { precision: 10, scale: 2 }).default("20").notNull(),
   isActive: boolean("is_active").default(true),
@@ -99,6 +122,7 @@ export const passwordResetTokens = pgTable("password_reset_tokens", {
 // Pet animals for sale
 export const pets = pgTable("pets", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   name: varchar("name", { length: 255 }).notNull(),
   species: varchar("species", { length: 100 }).notNull(), // mammals, bird, fish, reptile
   breed: varchar("breed", { length: 255 }), // Optional - may not have breed info from AI detection
@@ -139,6 +163,7 @@ export const brandCatalog = pgTable("brand_catalog", {
 // Pet supplies inventory
 export const supplies = pgTable("supplies", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   name: varchar("name", { length: 255 }).notNull(),
   category: varchar("category", { length: 100 }).notNull(), // food, toys, beds, leashes, healthcare, accessories, aquatics, reptiles, birdSupplies, dogCages, smallAnimalSupplies
   brand: varchar("brand", { length: 255 }),
@@ -180,6 +205,7 @@ export const supplies = pgTable("supplies", {
 // Shopping cart items
 export const cartItems = pgTable("cart_items", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   userId: varchar("user_id").notNull().references(() => users.id),
   supplyId: integer("supply_id").references(() => supplies.id),
   petId: integer("pet_id").references(() => pets.id),
@@ -190,6 +216,7 @@ export const cartItems = pgTable("cart_items", {
 // Orders
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   userId: varchar("user_id").notNull().references(() => users.id),
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }), // Base price before tax
   taxRate: decimal("tax_rate", { precision: 5, scale: 3 }), // Tax rate applied (e.g., 8.250)
@@ -227,6 +254,7 @@ export const orders = pgTable("orders", {
 // Order items
 export const orderItems = pgTable("order_items", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   orderId: integer("order_id").notNull().references(() => orders.id),
   supplyId: integer("supply_id").references(() => supplies.id),
   petId: integer("pet_id").references(() => pets.id),
@@ -257,6 +285,7 @@ export const refunds = pgTable("refunds", {
 // Refund report settings (email recipients)
 export const refundReportSettings = pgTable("refund_report_settings", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   email: varchar("email", { length: 255 }).notNull(),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
@@ -265,6 +294,7 @@ export const refundReportSettings = pgTable("refund_report_settings", {
 // Appointments
 export const appointments = pgTable("appointments", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   userId: varchar("user_id").notNull().references(() => users.id),
   groomerId: integer("groomer_id").references(() => groomers.id, { onDelete: "set null" }),
   serviceType: varchar("service_type", { length: 100 }).notNull(), // grooming (kept for backward compatibility)
@@ -320,6 +350,7 @@ export const appointmentPets = pgTable("appointment_pets", {
 // Items sold/used during a grooming appointment (for inventory tracking + sales reports)
 export const appointmentItems = pgTable("appointment_items", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   appointmentId: integer("appointment_id").notNull().references(() => appointments.id, { onDelete: "cascade" }),
   supplyId: integer("supply_id").references(() => supplies.id, { onDelete: "set null" }),
   name: varchar("name", { length: 255 }).notNull(),
@@ -334,6 +365,7 @@ export const appointmentItems = pgTable("appointment_items", {
 // Customer pets (pets owned by users)
 export const customerPets = pgTable("customer_pets", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   userId: varchar("user_id").notNull().references(() => users.id),
   name: varchar("name", { length: 255 }).notNull(),
   species: varchar("species", { length: 100 }).notNull(),
@@ -356,39 +388,52 @@ export const wishlistItems = pgTable("wishlist_items", {
 // Grooming settings for admin control
 export const groomingSettings = pgTable("grooming_settings", {
   id: serial("id").primaryKey(),
-  setting: varchar("setting", { length: 100 }).notNull().unique(), // 'available_days', 'start_time', 'end_time', 'max_appointments_per_day'
+  tenantId: integer("tenant_id").references(() => tenants.id),
+  setting: varchar("setting", { length: 100 }).notNull(), // 'available_days', 'start_time', 'end_time', 'max_appointments_per_day'
   value: text("value").notNull(), // JSON string for complex values
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => ({
+  // Composite unique: one setting key per tenant (allows same key across tenants)
+  tenantSettingUnique: uniqueIndex("grooming_settings_tenant_setting_unique").on(table.tenantId, table.setting),
+}));
 
 // Weekly appointment limits (by day of week)
 export const weeklyAppointmentLimits = pgTable("weekly_appointment_limits", {
   id: serial("id").primaryKey(),
-  dayOfWeek: integer("day_of_week").notNull().unique(), // 1=Monday, 2=Tuesday, ..., 6=Saturday (0=Sunday not used)
+  tenantId: integer("tenant_id").references(() => tenants.id),
+  dayOfWeek: integer("day_of_week").notNull(), // 1=Monday, 2=Tuesday, ..., 6=Saturday (0=Sunday not used)
   maxBathAppointments: integer("max_bath_appointments").notNull().default(5),
   maxGroomAppointments: integer("max_groom_appointments").notNull().default(5),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => ({
+  tenantDayUnique: uniqueIndex("weekly_appointment_limits_tenant_day_unique").on(table.tenantId, table.dayOfWeek),
+}));
 
 // Keep old table for backward compatibility during migration
 export const dailyAppointmentLimits = pgTable("daily_appointment_limits", {
   id: serial("id").primaryKey(),
-  date: date("date").notNull().unique(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
+  date: date("date").notNull(),
   maxBathAppointments: integer("max_bath_appointments").notNull().default(5),
   maxGroomAppointments: integer("max_groom_appointments").notNull().default(5),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => ({
+  tenantDateUnique: uniqueIndex("daily_appointment_limits_tenant_date_unique").on(table.tenantId, table.date),
+}));
 
 // Special date settings (holidays/special days with custom time slots)
 export const specialDateSettings = pgTable("special_date_settings", {
   id: serial("id").primaryKey(),
-  date: date("date").notNull().unique(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
+  date: date("date").notNull(),
   name: varchar("name", { length: 255 }).notNull(), // e.g., "Thanksgiving", "Christmas Eve"
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => ({
+  tenantDateUnique: uniqueIndex("special_date_settings_tenant_date_unique").on(table.tenantId, table.date),
+}));
 
 // Allowed times for special dates (normalized child table)
 export const specialDateAllowedTimes = pgTable("special_date_allowed_times", {
@@ -401,6 +446,7 @@ export const specialDateAllowedTimes = pgTable("special_date_allowed_times", {
 // Groomers
 export const groomers = pgTable("groomers", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }),
   phone: varchar("phone", { length: 20 }),
@@ -414,6 +460,7 @@ export const groomers = pgTable("groomers", {
 // Groomer availability by day
 export const groomerAvailability = pgTable("groomer_availability", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   groomerId: integer("groomer_id").notNull().references(() => groomers.id, { onDelete: "cascade" }),
   dayOfWeek: integer("day_of_week").notNull(), // 0=Sunday, 1=Monday, etc.
   isAvailable: boolean("is_available").default(true),
@@ -426,6 +473,7 @@ export const groomerAvailability = pgTable("groomer_availability", {
 // Groomer blocked days (sick days, vacation, etc.)
 export const groomerBlockedDays = pgTable("groomer_blocked_days", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   groomerId: integer("groomer_id").notNull().references(() => groomers.id, { onDelete: "cascade" }),
   date: date("date").notNull(), // The specific date when groomer is blocked
   reason: varchar("reason", { length: 100 }).notNull(), // "sick", "vacation", "personal", "other"
@@ -438,6 +486,7 @@ export const groomerBlockedDays = pgTable("groomer_blocked_days", {
 // Manual contacts for admin
 export const contacts = pgTable("contacts", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }), // Optional - use phone as placeholder if not provided
   phoneNumber: varchar("phone_number", { length: 100 }),
@@ -468,6 +517,7 @@ export const smsLogs = pgTable("sms_logs", {
 // Appointment history - preserves completed appointments for contact records
 export const appointmentHistory = pgTable("appointment_history", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   contactId: integer("contact_id").notNull().references(() => contacts.id, { onDelete: "cascade" }),
   // Denormalized contact info for display (preserved even if contact changes)
   ownerPhoneNumber: varchar("owner_phone_number", { length: 20 }),
@@ -494,6 +544,7 @@ export const appointmentHistory = pgTable("appointment_history", {
 // Push notification subscriptions
 export const pushSubscriptions = pgTable("push_subscriptions", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   userId: varchar("user_id").notNull().references(() => users.id),
   endpoint: text("endpoint").notNull(),
   p256dh: text("p256dh").notNull(),
@@ -764,6 +815,7 @@ export type InsertPushSubscription = z.infer<typeof insertPushSubscriptionSchema
 // Pet Boarding/Babysitting records
 export const boardingRecords = pgTable("boarding_records", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   
   // Customer information
   customerName: varchar("customer_name", { length: 255 }).notNull(),
@@ -833,6 +885,7 @@ export const supplyImportStaging = pgTable("supply_import_staging", {
 // Employee Schedule
 export const scheduleEntries = pgTable("schedule_entries", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   section: varchar("section", { length: 10 }).notNull(), // A, B, C, etc.
   employeeName: varchar("employee_name", { length: 255 }).notNull(),
   dayOfWeek: varchar("day_of_week", { length: 20 }).notNull(), // Monday, Tuesday, etc.
@@ -845,6 +898,7 @@ export const scheduleEntries = pgTable("schedule_entries", {
 // Grooming Schedule
 export const groomingScheduleEntries = pgTable("grooming_schedule_entries", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   section: varchar("section", { length: 10 }).notNull(), // A, B, C, etc.
   groomerName: varchar("groomer_name", { length: 255 }).notNull(),
   dayOfWeek: varchar("day_of_week", { length: 20 }).notNull(), // Monday, Tuesday, etc.

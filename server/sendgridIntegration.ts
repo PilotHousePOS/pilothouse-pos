@@ -37,10 +37,10 @@ async function getCredentials() {
   throw new Error('SendGrid not configured: set SENDGRID_API_KEY and SENDGRID_FROM_EMAIL environment variables');
 }
 
-async function getAlternateReplyToEmail(): Promise<string | null> {
+async function getAlternateReplyToEmail(tenantId?: number): Promise<string | null> {
   try {
     const { storage } = await import('./storage');
-    const settings = await storage.getGroomingSettings();
+    const settings = await storage.getGroomingSettings(tenantId);
     const setting = settings.find((s: any) => s.setting === 'alternate_reply_email');
     return setting?.value || null;
   } catch {
@@ -48,10 +48,10 @@ async function getAlternateReplyToEmail(): Promise<string | null> {
   }
 }
 
-export async function getUncachableSendGridClient() {
+export async function getUncachableSendGridClient(tenantId?: number) {
   const {apiKey, email} = await getCredentials();
   sgMail.setApiKey(apiKey);
-  const alternateEmail = await getAlternateReplyToEmail();
+  const alternateEmail = await getAlternateReplyToEmail(tenantId);
   const replyTo: {email: string} = alternateEmail 
     ? {email: alternateEmail}
     : {email};
