@@ -400,6 +400,89 @@ describe("DELETE /api/contacts/:id — cross-tenant delete rejected", () => {
   });
 });
 
+// ─── Admin order action routes ────────────────────────────────────────────────
+//
+// Each admin action pre-fetches the order scoped to req.tenantId. Cross-tenant
+// IDs must be rejected with HTTP 404 before any mutation occurs.
+
+describe("POST /api/admin/orders/:id/approve — cross-tenant action rejected", () => {
+  it("returns 404 when Tenant A targets Tenant B's order", async () => {
+    const res = await agent
+      .post(`/api/admin/orders/${orderBId}/approve`)
+      .set("Authorization", `Bearer ${tokenA}`);
+
+    expect(res.status).toBe(404);
+  });
+});
+
+describe("POST /api/admin/orders/:id/ready — cross-tenant action rejected", () => {
+  it("returns 404 when Tenant A targets Tenant B's order", async () => {
+    const res = await agent
+      .post(`/api/admin/orders/${orderBId}/ready`)
+      .set("Authorization", `Bearer ${tokenA}`);
+
+    expect(res.status).toBe(404);
+  });
+});
+
+describe("POST /api/admin/orders/:id/picked-up — cross-tenant action rejected", () => {
+  it("returns 404 when Tenant A targets Tenant B's order", async () => {
+    const res = await agent
+      .post(`/api/admin/orders/${orderBId}/picked-up`)
+      .set("Authorization", `Bearer ${tokenA}`);
+
+    expect(res.status).toBe(404);
+  });
+
+  it("Tenant B's order status is unchanged after Tenant A's rejected picked-up", async () => {
+    const [row] = await db
+      .select({ status: orders.status })
+      .from(orders)
+      .where(eq(orders.id, orderBId));
+    expect(row?.status).toBe("pending");
+  });
+});
+
+describe("POST /api/admin/orders/:id/hide — cross-tenant action rejected", () => {
+  it("returns 404 when Tenant A targets Tenant B's order", async () => {
+    const res = await agent
+      .post(`/api/admin/orders/${orderBId}/hide`)
+      .set("Authorization", `Bearer ${tokenA}`);
+
+    expect(res.status).toBe(404);
+  });
+
+  it("Tenant B's order is not hidden after Tenant A's rejected hide", async () => {
+    const [row] = await db
+      .select({ hiddenFromAdmin: orders.hiddenFromAdmin })
+      .from(orders)
+      .where(eq(orders.id, orderBId));
+    expect(row?.hiddenFromAdmin).not.toBe(true);
+  });
+});
+
+describe("POST /api/admin/orders/:id/discount — cross-tenant action rejected", () => {
+  it("returns 404 when Tenant A targets Tenant B's order", async () => {
+    const res = await agent
+      .post(`/api/admin/orders/${orderBId}/discount`)
+      .set("Authorization", `Bearer ${tokenA}`)
+      .send({ discountAmount: "5.00", discountReason: "HACKED" });
+
+    expect(res.status).toBe(404);
+  });
+});
+
+describe("PUT /api/admin/orders/:id/items — cross-tenant action rejected", () => {
+  it("returns 404 when Tenant A targets Tenant B's order", async () => {
+    const res = await agent
+      .put(`/api/admin/orders/${orderBId}/items`)
+      .set("Authorization", `Bearer ${tokenA}`)
+      .send({ items: [] });
+
+    expect(res.status).toBe(404);
+  });
+});
+
 // ─── PUT /api/appointments/:id ────────────────────────────────────────────────
 //
 // The route pre-fetches the appointment scoped to req.tenantId before touching

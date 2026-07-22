@@ -4593,7 +4593,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (tenantId === undefined) return;
       const orderId = parseInt(req.params.id);
       const orderWithItems = await storage.getOrderWithItems(orderId, tenantId);
-      
+
+      if (!orderWithItems) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+
       await storage.updateOrderApprovalStatus(orderId, 'picked_up', tenantId);
       // Also mark the order status as completed when picked up
       await storage.updateOrderStatus(orderId, 'completed', tenantId);
@@ -4939,8 +4943,17 @@ West Monroe LA 71291
       if (!user?.isAdmin) {
         return res.status(403).json({ message: "Access denied. Admin only." });
       }
-      
+
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const orderId = parseInt(req.params.id);
+
+      // Verify the order belongs to this tenant before mutating
+      const orderToHide = await storage.getOrder(orderId, tenantId);
+      if (!orderToHide) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+
       await storage.hideOrderFromAdmin(orderId);
       
       res.json({ success: true, message: "Order hidden from admin view" });
