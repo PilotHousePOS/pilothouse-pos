@@ -1,6 +1,9 @@
 /**
- * Applies missing tenant_id and related columns that exist in the Drizzle
- * schema but may not yet be present in the database.
+ * Canonical list of idempotent ALTER TABLE migrations shared by both the
+ * server startup path (runAppMigrations → applyMissingColumns) and the
+ * standalone script (tsx server/scripts/apply-missing-columns.ts).
+ *
+ * Add every new column here — do NOT add ALTER TABLE statements elsewhere.
  * Safe to run multiple times — uses ALTER TABLE ... ADD COLUMN IF NOT EXISTS.
  *
  * Connection errors are retried once (with a 3-second delay) before the error
@@ -11,22 +14,51 @@ import { db } from "../db";
 import { sql } from "drizzle-orm";
 
 const STATEMENTS = [
-  // tenants table
-  `ALTER TABLE tenants ADD COLUMN IF NOT EXISTS trial_warning_email_sent_at TIMESTAMPTZ`,
-  // pets table
-  `ALTER TABLE pets ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
-  // groomers table
-  `ALTER TABLE groomers ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
-  // supplies — tenant_id (confirm exists)
-  `ALTER TABLE supplies ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
-  // contacts — tenant_id (confirm exists)
-  `ALTER TABLE contacts ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
-  // appointments — tenant_id (confirm exists)
-  `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
-  // orders — tenant_id (confirm exists)
+  // ── users ──────────────────────────────────────────────────────────────────
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS is_charge_account BOOLEAN DEFAULT false`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS is_super_admin BOOLEAN DEFAULT false`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS is_groomer BOOLEAN DEFAULT false`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS is_superior_manager BOOLEAN DEFAULT false`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS total_spent NUMERIC(10,2) DEFAULT 0`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS loyalty_credits NUMERIC(10,2) DEFAULT 0`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id VARCHAR(255)`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_default_payment_method VARCHAR(255)`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS notifications_enabled BOOLEAN DEFAULT false`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS marketing_emails_opt_in BOOLEAN DEFAULT true`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS appointment_emails_opt_in BOOLEAN DEFAULT true`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS abandoned_cart_email_sent_at TIMESTAMP`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT true`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_token VARCHAR(255)`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_expiry TIMESTAMP`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW()`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS phone_number VARCHAR(100)`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS token_version INTEGER DEFAULT 0`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS stranded_alert_sent_at TIMESTAMP`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
+  // ── orders ─────────────────────────────────────────────────────────────────
+  `ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_notes TEXT`,
   `ALTER TABLE orders ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
-  // order_items — tenant_id
+  // ── tenants ────────────────────────────────────────────────────────────────
+  `ALTER TABLE tenants ADD COLUMN IF NOT EXISTS trial_warning_email_sent_at TIMESTAMPTZ`,
+  // ── pets ───────────────────────────────────────────────────────────────────
+  `ALTER TABLE pets ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
+  // ── groomers ───────────────────────────────────────────────────────────────
+  `ALTER TABLE groomers ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
+  // ── supplies ───────────────────────────────────────────────────────────────
+  `ALTER TABLE supplies ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
+  `ALTER TABLE supplies ADD COLUMN IF NOT EXISTS reorder_point INTEGER DEFAULT 1`,
+  // ── contacts ───────────────────────────────────────────────────────────────
+  `ALTER TABLE contacts ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
+  // ── appointments ───────────────────────────────────────────────────────────
+  `ALTER TABLE appointments ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
+  // ── order_items ────────────────────────────────────────────────────────────
   `ALTER TABLE order_items ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
+  // ── pos_zero_stock_tracker ─────────────────────────────────────────────────
+  `ALTER TABLE pos_zero_stock_tracker ADD COLUMN IF NOT EXISTS threshold INTEGER DEFAULT 16`,
+  // ── pos_orders ─────────────────────────────────────────────────────────────
+  `ALTER TABLE pos_orders ADD COLUMN IF NOT EXISTS tenant_id INTEGER`,
+  // ── appointment_history ────────────────────────────────────────────────────
+  `ALTER TABLE appointment_history ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
 ];
 
 /**

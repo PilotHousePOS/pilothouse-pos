@@ -523,27 +523,10 @@ async function runAppMigrations() {
     neonConfig.webSocketConstructor = ws;
     const migPool = new Pool({ connectionString: databaseUrl });
 
-    // Schema additions (idempotent — safe to run every startup)
-    await migPool.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_notes TEXT`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_charge_account BOOLEAN DEFAULT false`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_super_admin BOOLEAN DEFAULT false`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_groomer BOOLEAN DEFAULT false`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_superior_manager BOOLEAN DEFAULT false`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS total_spent NUMERIC(10,2) DEFAULT 0`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS loyalty_credits NUMERIC(10,2) DEFAULT 0`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id VARCHAR(255)`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_default_payment_method VARCHAR(255)`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS notifications_enabled BOOLEAN DEFAULT false`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS marketing_emails_opt_in BOOLEAN DEFAULT true`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS appointment_emails_opt_in BOOLEAN DEFAULT true`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS abandoned_cart_email_sent_at TIMESTAMP`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT true`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_token VARCHAR(255)`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_expiry TIMESTAMP`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW()`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS phone_number VARCHAR(100)`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS token_version INTEGER DEFAULT 0`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS stranded_alert_sent_at TIMESTAMP`);
+    // ── Phase 1: CREATE TABLE (idempotent) ──────────────────────────────────
+    // All tables must exist before applyMissingColumns() adds columns to them.
+    // NOTE: ALTER TABLE ADD COLUMN statements live exclusively in
+    // server/scripts/apply-missing-columns.ts.  Do NOT add new ALTER TABLE here.
     await migPool.query(`CREATE TABLE IF NOT EXISTS specials (
       id SERIAL PRIMARY KEY,
       title VARCHAR(255) NOT NULL,
@@ -573,13 +556,6 @@ async function runAppMigrations() {
       stripe_current_period_end TIMESTAMP,
       created_at TIMESTAMP DEFAULT NOW()
     )`);
-    // Ensure default tenant exists (id=1) for existing single-tenant data
-    await migPool.query(`INSERT INTO tenants (id, name, slug, subscription_status, subscription_tier)
-      VALUES (1, 'Animal House', 'animal-house', 'active', 'pro')
-      ON CONFLICT (id) DO NOTHING`);
-    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`);
-    await migPool.query(`UPDATE users SET tenant_id = 1 WHERE tenant_id IS NULL`);
-
     await migPool.query(`CREATE TABLE IF NOT EXISTS data_migrations (key VARCHAR(100) PRIMARY KEY, applied_at TIMESTAMP DEFAULT NOW())`);
     await migPool.query(`CREATE TABLE IF NOT EXISTS audit_keep_list (supply_id INTEGER PRIMARY KEY, saved_at TIMESTAMP DEFAULT NOW(), item_name TEXT, scanned_barcode TEXT)`);
     await migPool.query(`CREATE TABLE IF NOT EXISTS pos_zero_stock_tracker (
@@ -593,7 +569,6 @@ async function runAppMigrations() {
       protected BOOLEAN DEFAULT FALSE,
       threshold INTEGER DEFAULT 16
     )`);
-    await migPool.query(`ALTER TABLE pos_zero_stock_tracker ADD COLUMN IF NOT EXISTS threshold INTEGER DEFAULT 16`);
     await migPool.query(`CREATE TABLE IF NOT EXISTS pos_pending_new_items (
       sku VARCHAR(50) PRIMARY KEY,
       item_name TEXT,
@@ -603,13 +578,6 @@ async function runAppMigrations() {
       pos_stock INTEGER,
       found_at TIMESTAMP DEFAULT NOW()
     )`);
-    // Startup cleanup: remove zero-stock items from pending queue (POS tracker)
-    await migPool.query(`DELETE FROM pos_pending_new_items WHERE pos_stock <= 0`);
-
-    await migPool.query(`ALTER TABLE supplies ADD COLUMN IF NOT EXISTS reorder_point INTEGER DEFAULT 1`);
-    await migPool.query(`ALTER TABLE appointment_history ADD COLUMN IF NOT EXISTS tenant_id integer REFERENCES tenants(id)`);
-    await migPool.query(`UPDATE appointment_history SET tenant_id = 1 WHERE tenant_id IS NULL`);
-
     await migPool.query(`CREATE TABLE IF NOT EXISTS pos_orders (
       id SERIAL PRIMARY KEY,
       order_number VARCHAR(50),
@@ -625,9 +593,6 @@ async function runAppMigrations() {
       tenant_id INTEGER,
       created_at TIMESTAMP DEFAULT NOW()
     )`);
-    await migPool.query(`ALTER TABLE pos_orders ADD COLUMN IF NOT EXISTS tenant_id INTEGER`);
-    await migPool.query(`ALTER TABLE tenants ADD COLUMN IF NOT EXISTS trial_warning_email_sent_at TIMESTAMP`);
-
     // Super-admin audit log — records every cross-tenant write made by a super-admin
     await migPool.query(`CREATE TABLE IF NOT EXISTS audit_log (
       id SERIAL PRIMARY KEY,
@@ -645,9 +610,23 @@ async function runAppMigrations() {
 
     await migPool.end();
 
-    // Apply any Drizzle-schema columns that may be missing on a fresh environment
+    // ── Phase 2: ALTER TABLE (idempotent, canonical source of truth) ─────────
+    // Must run after all CREATE TABLEs so every table the ALTERs reference
+    // already exists.  DML that depends on new columns (Phase 3) runs after.
     const { applyMissingColumns } = await import('./scripts/apply-missing-columns');
     await applyMissingColumns();
+
+    // ── Phase 3: DML — safe now that all columns are guaranteed present ───────
+    // Ensure default tenant exists (id=1) for existing single-tenant data
+    const { db: migDb } = await import('./db');
+    const { sql: migSql } = await import('drizzle-orm');
+    await migDb.execute(migSql.raw(`INSERT INTO tenants (id, name, slug, subscription_status, subscription_tier)
+      VALUES (1, 'Animal House', 'animal-house', 'active', 'pro')
+      ON CONFLICT (id) DO NOTHING`));
+    await migDb.execute(migSql.raw(`UPDATE users SET tenant_id = 1 WHERE tenant_id IS NULL`));
+    await migDb.execute(migSql.raw(`UPDATE appointment_history SET tenant_id = 1 WHERE tenant_id IS NULL`));
+    // Startup cleanup: remove zero-stock items from pending queue (POS tracker)
+    await migDb.execute(migSql.raw(`DELETE FROM pos_pending_new_items WHERE pos_stock <= 0`));
 
     log('App migrations complete');
   } catch (err: any) {
