@@ -1,5 +1,5 @@
 // Banner shown to tenant owners who haven't completed onboarding (no active subscription)
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -11,33 +11,85 @@ interface BillingStatus {
   trialEndsAt: string | null;
 }
 
-const DISMISSED_KEY = "onboarding_banner_permanently_dismissed";
+// v2 key stores JSON:
+//   { dismissed: true, seenActive: boolean }
+//
+// The lifecycle tracked here:
+//   1. Owner dismisses banner while on trial/past_due → { dismissed: true, seenActive: false }
+//   2. Owner subscribes (status becomes "active") → we update to { dismissed: true, seenActive: true }
+//   3. Subscription lapses (status reverts to non-active) → we clear dismiss; banner re-appears
+//
+// The old "permanently_dismissed" v1 key is intentionally ignored — it had no status awareness.
+const DISMISSED_KEY = "onboarding_banner_dismissed_v2";
 
-function isDismissed(): boolean {
+interface DismissState {
+  dismissed: boolean;
+  /** true once we have observed subscriptionStatus === "active" since the banner was dismissed */
+  seenActive: boolean;
+}
+
+function loadDismissState(): DismissState | null {
   try {
-    return localStorage.getItem(DISMISSED_KEY) === "true";
+    const raw = localStorage.getItem(DISMISSED_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as DismissState;
   } catch {
-    return false;
+    return null;
   }
 }
 
-function persistDismiss(): void {
+function saveDismissState(state: DismissState): void {
   try {
-    localStorage.setItem(DISMISSED_KEY, "true");
+    localStorage.setItem(DISMISSED_KEY, JSON.stringify(state));
   } catch {}
+}
+
+function clearDismissLocally(): void {
+  try {
+    localStorage.removeItem(DISMISSED_KEY);
+  } catch {}
+}
+
+function isDismissedLocally(): boolean {
+  return loadDismissState()?.dismissed === true;
 }
 
 export default function OnboardingBanner() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
-  const [dismissed, setDismissed] = useState(isDismissed);
+  const [dismissed, setDismissed] = useState(isDismissedLocally);
 
   const { data: billing } = useQuery<BillingStatus>({
     queryKey: ["/api/billing/status"],
     staleTime: 5 * 60 * 1000,
-    // Only fetch if user is an admin (tenant owner) and not already dismissed
-    enabled: !dismissed && !!(user as any)?.isAdmin,
+    // Always fetch for admins so we can detect subscription regressions
+    enabled: !!(user as any)?.isAdmin,
   });
+
+  // Subscription lifecycle tracker:
+  // - While dismissed and seenActive is false: watch for an "active" status and record it.
+  // - Once seenActive is true: if status is no longer "active", the subscription has lapsed →
+  //   clear the dismiss so the banner re-appears.
+  useEffect(() => {
+    if (!billing) return;
+    const state = loadDismissState();
+    if (!state?.dismissed) return;
+
+    const { subscriptionStatus } = billing;
+
+    if (!state.seenActive) {
+      // Step 2: subscription became active after the dismiss — record that
+      if (subscriptionStatus === "active") {
+        saveDismissState({ dismissed: true, seenActive: true });
+      }
+    } else {
+      // Step 3: subscription has lapsed after being active — clear dismiss
+      if (subscriptionStatus !== "active") {
+        clearDismissLocally();
+        setDismissed(false);
+      }
+    }
+  }, [billing?.subscriptionStatus]);
 
   // Only show to admin users (tenant owners)
   if (!(user as any)?.isAdmin) return null;
@@ -50,7 +102,8 @@ export default function OnboardingBanner() {
 
   const handleDismiss = (e: React.MouseEvent) => {
     e.stopPropagation();
-    persistDismiss();
+    // seenActive starts false; it will be flipped to true if/when billing becomes active
+    saveDismissState({ dismissed: true, seenActive: false });
     setDismissed(true);
   };
 
