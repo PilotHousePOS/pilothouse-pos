@@ -267,7 +267,15 @@ export default function BillingPage() {
             <Button
               variant="outline"
               className="w-full mt-2"
-              onClick={() => sendTrialReminderMutation.mutate()}
+              onClick={() => {
+                if (
+                  window.confirm(
+                    "Send a trial reminder email to the account owner? Only one reminder can be sent per day."
+                  )
+                ) {
+                  sendTrialReminderMutation.mutate();
+                }
+              }}
               disabled={sendTrialReminderMutation.isPending}
             >
               {sendTrialReminderMutation.isPending ? (

@@ -318,6 +318,23 @@ export function registerBillingRoutes(app: Express): void {
         return res.status(400).json({ message: 'Tenant owner email not found — cannot send reminder' });
       }
 
+      // Idempotency guard: reject if a reminder was already sent today (UTC calendar day).
+      // This prevents duplicate emails whether the admin double-clicks or the scheduled job
+      // and the manual trigger overlap on the same day.
+      if (tenant.trialWarningEmailSentAt) {
+        const sentAt = new Date(tenant.trialWarningEmailSentAt);
+        const now = new Date();
+        const sentDay = sentAt.toISOString().slice(0, 10); // "YYYY-MM-DD" UTC
+        const today = now.toISOString().slice(0, 10);
+        if (sentDay === today) {
+          const sentAtLocal = sentAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC', hour12: true });
+          return res.status(429).json({
+            message: `A trial reminder was already sent today at ${sentAtLocal} UTC. Only one reminder can be sent per day.`,
+            sentAt: sentAt.toISOString(),
+          });
+        }
+      }
+
       // Calculate days left (default to 0 if trial has already expired)
       let daysLeft = 0;
       if (tenant.trialEndsAt) {
