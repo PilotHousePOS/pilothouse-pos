@@ -72,10 +72,24 @@ export async function tenantMiddleware(
               return next();
             }
           }
-          // Authenticated user with no tenant and no slug:
+          // Authenticated user with no tenant and no slug.
           // Super-admins proceed (they have platform-wide access).
-          // Regular users get 403 — fail closed prevents leaking cross-tenant data.
           if (user.isSuperAdmin) {
+            return next();
+          }
+          // Stranded regular users: allow only a narrow allowlist of account-management
+          // endpoints that are safe to serve without tenant context — specifically the
+          // /api/auth/user endpoint so the client can detect the stranded state and
+          // render NoTenantScreen instead of a blank app.
+          // All other routes remain fail-closed with 403.
+          // Note: this middleware is mounted as app.use('/api', ...) so req.path
+          // is relative to /api — "/api/auth/user" arrives as "/auth/user".
+          const NO_TENANT_ALLOWLIST = new Set([
+            "/auth/user",
+            "/auth/logout",
+            "/auth/delete-account",
+          ]);
+          if (NO_TENANT_ALLOWLIST.has(req.path)) {
             return next();
           }
           res.status(403).json({ message: "Tenant not configured for this account. Contact support." });
