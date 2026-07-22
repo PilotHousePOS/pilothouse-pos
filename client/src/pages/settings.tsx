@@ -196,6 +196,9 @@ export default function Settings() {
   const [isCheckingSlug, setIsCheckingSlug] = useState(false);
   const slugDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Business name state
+  const [newBusinessName, setNewBusinessName] = useState("");
+
   const { data: currentUser, isLoading: userLoading, error: userError } = useQuery<User>({
     queryKey: ["/api/auth/user"],
     enabled: hasToken,
@@ -236,6 +239,32 @@ export default function Settings() {
       toast({
         title: "Update failed",
         description: error.message || "Failed to update store URL. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateBusinessNameMutation = useMutation({
+    mutationFn: async (name: string) => {
+      const response = await apiRequest("PATCH", "/api/tenants/current", { name });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to update business name");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tenants/current"] });
+      setNewBusinessName("");
+      toast({
+        title: "Business name updated",
+        description: `Your business name is now: ${data.name}`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update failed",
+        description: error.message || "Failed to update business name. Please try again.",
         variant: "destructive",
       });
     },
@@ -922,6 +951,40 @@ export default function Settings() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
+              <Label className="text-sm text-gray-500">Current Business Name</Label>
+              <p className="text-gray-900 font-medium" data-testid="text-current-business-name">
+                {currentTenant?.name || "—"}
+              </p>
+            </div>
+
+            <div>
+              <Label htmlFor="new-business-name">New Business Name</Label>
+              <Input
+                id="new-business-name"
+                type="text"
+                placeholder={currentTenant?.name || "Your Business Name"}
+                value={newBusinessName}
+                onChange={(e) => setNewBusinessName(e.target.value)}
+                className="mt-1"
+                data-testid="input-new-business-name"
+              />
+            </div>
+
+            <Button
+              onClick={() => updateBusinessNameMutation.mutate(newBusinessName.trim())}
+              disabled={
+                updateBusinessNameMutation.isPending ||
+                !newBusinessName.trim() ||
+                newBusinessName.trim() === currentTenant?.name
+              }
+              className="w-full bg-brand-blue hover:bg-blue-600"
+              data-testid="button-update-business-name"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {updateBusinessNameMutation.isPending ? "Updating..." : "Update Business Name"}
+            </Button>
+
+            <div className="border-t pt-4">
               <Label className="text-sm text-gray-500">Current Store URL</Label>
               <p className="text-gray-900 font-medium font-mono" data-testid="text-current-slug">
                 {currentTenant?.slug ? `/${currentTenant.slug}` : "—"}
