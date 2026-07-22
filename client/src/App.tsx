@@ -1,6 +1,6 @@
-import { lazy, Suspense, Component, ReactNode } from "react";
+import { lazy, Suspense, Component, ReactNode, useEffect } from "react";
 import { Switch, Route, useLocation } from "wouter";
-import { queryClient } from "./lib/queryClient";
+import { queryClient, setActiveTenantSlug } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -182,6 +182,35 @@ function NoTenantScreen() {
   );
 }
 
+/**
+ * Keeps the active tenant slug in localStorage in sync with the authenticated
+ * user's tenant.  This lets apiRequest() and getQueryFn() automatically inject
+ * the X-Tenant-Slug header on every request — including unauthenticated ones
+ * that happen after the slug is first known — without any per-call wiring.
+ */
+function TenantSlugSync() {
+  const { user, isAuthenticated } = useAuth();
+  const { data: tenant } = useQuery<{ id: number; name: string; slug: string }>({
+    queryKey: ["/api/tenants/current"],
+    enabled: isAuthenticated,
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (tenant?.slug) {
+      setActiveTenantSlug(tenant.slug);
+    } else if (!isAuthenticated) {
+      // Clear stored slug on logout so a subsequent unauthenticated session
+      // doesn't accidentally send a stale slug.
+      setActiveTenantSlug(null);
+    }
+  }, [tenant?.slug, isAuthenticated]);
+
+  // Rendering nothing — this is a side-effect-only component.
+  return null;
+}
+
 function Router() {
   const { user, isLoading } = useAuth();
   const isAuthenticated = !!user;
@@ -201,6 +230,8 @@ function Router() {
 
   return (
     <div className={`${isWideRoute ? "w-full" : "max-w-md mx-auto lg:max-w-full"} bg-white min-h-screen relative`}>
+      {/* Keeps X-Tenant-Slug header in sync with the active store slug */}
+      <TenantSlugSync />
       {/* Trial countdown banner — only shown when authenticated and in trial */}
       {isAuthenticated && <TrialBanner />}
 

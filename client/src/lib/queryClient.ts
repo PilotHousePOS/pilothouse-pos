@@ -1,11 +1,76 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
+// ---------------------------------------------------------------------------
+// Active tenant slug helpers
+//
+// The server requires an X-Tenant-Slug header (or ?tenant= query parameter)
+// for any unauthenticated request that targets a specific store.  For
+// authenticated requests the server can fall back to the JWT-derived tenantId,
+// but sending the header anyway is harmless and defensive.
+//
+// Call setActiveTenantSlug() as soon as the slug is known (e.g. after fetching
+// /api/tenants/current).  Both apiRequest() and getQueryFn() read it
+// automatically so all call sites get the header for free.
+// ---------------------------------------------------------------------------
+
+const TENANT_SLUG_KEY = "active_tenant_slug";
+
+export function setActiveTenantSlug(slug: string | null): void {
+  try {
+    if (slug) {
+      localStorage.setItem(TENANT_SLUG_KEY, slug);
+    } else {
+      localStorage.removeItem(TENANT_SLUG_KEY);
+    }
+  } catch {
+    // localStorage unavailable (e.g. private browsing restrictions) — ignore.
+  }
+}
+
+export function getActiveTenantSlug(): string | null {
+  try {
+    return localStorage.getItem(TENANT_SLUG_KEY);
+  } catch {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Internal helpers
+// ---------------------------------------------------------------------------
+
 function safeGetToken(): string | null {
   try {
     return localStorage.getItem('token');
   } catch {
     return null;
   }
+}
+
+/**
+ * Build the standard request headers, including:
+ *  - Authorization (if a JWT is present)
+ *  - X-Tenant-Slug (if a slug has been stored via setActiveTenantSlug)
+ *  - Content-Type (when a body is being sent)
+ */
+function buildHeaders(includeContentType = false): Record<string, string> {
+  const headers: Record<string, string> = {};
+
+  const token = safeGetToken();
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const slug = getActiveTenantSlug();
+  if (slug) {
+    headers["X-Tenant-Slug"] = slug;
+  }
+
+  if (includeContentType) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  return headers;
 }
 
 async function throwIfResNotOk(res: Response) {
@@ -32,12 +97,7 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const token = safeGetToken();
-  const headers: HeadersInit = data ? { "Content-Type": "application/json" } : {};
-  
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  const headers = buildHeaders(!!data);
   
   const res = await fetch(url, {
     method,
@@ -56,12 +116,7 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const token = safeGetToken();
-    const headers: HeadersInit = {};
-    
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
+    const headers = buildHeaders();
     
     // Construct URL with query parameters
     let url = queryKey[0] as string;
