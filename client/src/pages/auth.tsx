@@ -16,6 +16,10 @@ export default function Auth() {
   const [resendingVerification, setResendingVerification] = useState(false);
   const { toast } = useToast();
 
+  // Detect missing tenant slug — sign-up requires it, sign-in does not.
+  const tenantSlugFromUrl = new URLSearchParams(window.location.search).get('tenant');
+  const missingTenantForSignup = !tenantSlugFromUrl;
+
   const handleResendVerification = async (email: string) => {
     setResendingVerification(true);
     try {
@@ -274,6 +278,18 @@ export default function Auth() {
               </TabsContent>
               
               <TabsContent value="signup" className="space-y-4 mt-6">
+                {missingTenantForSignup ? (
+                  <div className="text-center space-y-4 py-4">
+                    <div className="w-14 h-14 bg-amber-500/20 rounded-full flex items-center justify-center text-2xl mx-auto">🔗</div>
+                    <p className="text-white font-medium">Store link required</p>
+                    <p className="text-gray-300 text-sm leading-relaxed">
+                      To create an account, please open the sign-up link you received from your store. Direct sign-up isn't available without a store link.
+                    </p>
+                    <p className="text-gray-400 text-xs">
+                      If you need help, contact the store that sent you the link.
+                    </p>
+                  </div>
+                ) : (
                 <form onSubmit={handleSignUpSubmit} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -335,6 +351,7 @@ export default function Auth() {
                     {isLoading ? "Creating Account..." : "Create Account"}
                   </Button>
                 </form>
+                )}
               </TabsContent>
             </Tabs>
 
