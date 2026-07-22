@@ -240,6 +240,54 @@ describe("runTrialExpiryWarnings — trialWarningEmailSentAt deduplication", () 
   });
 });
 
+describe("runTrialExpiryWarnings — retry after failed delivery", () => {
+  it("does NOT mark trialWarningEmailSentAt after a SendGrid failure, and re-sends on next run", async () => {
+    resetTenants({
+      id: 70,
+      name: "Retry Store",
+      ownerId: "owner-1",
+      subscriptionStatus: "trial",
+      trialEndsAt: daysFromNow(2),
+      trialWarningEmailSentAt: null,
+    });
+
+    // First run — SendGrid throws
+    mockSendTrialWarningEmail.mockRejectedValueOnce(new Error("SendGrid 503"));
+
+    await runTrialExpiryWarnings();
+
+    // Email was attempted but failed — trialWarningEmailSentAt must NOT be set
+    expect(mockSendTrialWarningEmail).toHaveBeenCalledOnce();
+    const tenant = mockTenants.find((t) => t.id === 70);
+    expect(tenant?.trialWarningEmailSentAt).toBeNull();
+    expect(mockStorage.updateTenant).not.toHaveBeenCalled();
+
+    // Reset call counts but keep tenant state (trialWarningEmailSentAt still null)
+    vi.clearAllMocks();
+    mockStorage.getAllTenants.mockImplementation(async () => mockTenants);
+    mockStorage.getUser.mockImplementation(async (_id: string) => ({
+      id: "owner-1",
+      email: "owner@example.com",
+      firstName: "Alice",
+    }));
+    mockStorage.updateTenant.mockImplementation(async (id: number, updates: Partial<MockTenant>) => {
+      const t = mockTenants.find((x) => x.id === id);
+      if (t) Object.assign(t, updates);
+    });
+    mockSendTrialWarningEmail.mockResolvedValueOnce(undefined);
+
+    // Second run — SendGrid succeeds
+    await runTrialExpiryWarnings();
+
+    expect(mockSendTrialWarningEmail).toHaveBeenCalledOnce();
+    expect(mockStorage.updateTenant).toHaveBeenCalledWith(
+      70,
+      expect.objectContaining({ trialWarningEmailSentAt: expect.any(Date) }),
+    );
+    expect(mockTenants.find((t) => t.id === 70)?.trialWarningEmailSentAt).toBeInstanceOf(Date);
+  });
+});
+
 describe("runTrialExpiryWarnings — edge cases", () => {
   it("skips a tenant with no ownerId", async () => {
     resetTenants({
