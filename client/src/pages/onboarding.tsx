@@ -326,6 +326,16 @@ function Step3({ onFinish }: { onFinish: () => void }) {
   );
 }
 
+const ONBOARDING_VISITED_KEY = "onboarding_visited";
+
+function markOnboardingVisited() {
+  try { localStorage.setItem(ONBOARDING_VISITED_KEY, "true"); } catch {}
+}
+
+function hasVisitedOnboardingBefore(): boolean {
+  try { return localStorage.getItem(ONBOARDING_VISITED_KEY) === "true"; } catch { return false; }
+}
+
 export default function Onboarding() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
@@ -335,6 +345,12 @@ export default function Onboarding() {
   const initialStep = Math.min(Math.max(parseInt(urlParams.get('step') || '0'), 0), 2);
   const [step, setStep] = useState(initialStep);
 
+  // Detect "returning" user — someone who's been here before but didn't finish
+  const isResuming = hasVisitedOnboardingBefore();
+
+  // Mark as visited so next time we show "Resume" state
+  markOnboardingVisited();
+
   if (!user) {
     // Not logged in — redirect to signup
     setLocation('/signup');
@@ -342,6 +358,8 @@ export default function Onboarding() {
   }
 
   const handleFinish = () => {
+    // Clear the visited flag so the banner and resume state reset
+    try { localStorage.removeItem(ONBOARDING_VISITED_KEY); } catch {}
     window.location.replace('/');
   };
 
@@ -362,10 +380,17 @@ export default function Onboarding() {
             </div>
             <span className="font-black text-white text-lg">PILOTHOUSE</span>
           </div>
-          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1 text-xs font-semibold text-white/70 mb-2">
-            <Sparkles className="w-3 h-3 text-brand-orange" />
-            Let's get you set up
-          </div>
+          {isResuming ? (
+            <div className="inline-flex items-center gap-2 bg-yellow-500/20 border border-yellow-400/40 rounded-full px-4 py-1 text-xs font-semibold text-yellow-300 mb-2">
+              <Sparkles className="w-3 h-3 text-yellow-400" />
+              Resume your setup — you're almost there!
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1 text-xs font-semibold text-white/70 mb-2">
+              <Sparkles className="w-3 h-3 text-brand-orange" />
+              Let's get you set up
+            </div>
+          )}
         </div>
 
         <StepIndicator current={step} />

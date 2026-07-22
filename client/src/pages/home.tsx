@@ -14,6 +14,7 @@ import { pushNotificationManager } from "@/lib/pushNotifications";
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import StoreFooter from "@/components/store-footer";
+import OnboardingBanner from "@/components/onboarding-banner";
 
 const BADGE_COLORS: Record<string, string> = {
   red: 'bg-red-500', orange: 'bg-orange-500', green: 'bg-green-500',
@@ -345,6 +346,9 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      {/* Onboarding completion banner — visible to tenant owners without an active subscription */}
+      <OnboardingBanner />
 
       {/* Search Bar */}
       <div className="px-4 pt-4">
