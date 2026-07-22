@@ -905,6 +905,16 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   });
 
   // Customer login
+  // POST /api/auth/login
+  // The client may forward X-Tenant-Slug (read from ?tenant=<slug> in the URL)
+  // but this route intentionally does NOT use it to resolve tenant context.
+  // Tenant scoping for a returning user is already stored in their user record
+  // (set at signup time) and is encoded in the JWT that is issued here.
+  // Using the slug from the URL would open a class of bugs where a customer
+  // arriving via the wrong store link gets their session incorrectly scoped.
+  // The stored tenantId is always authoritative for login — do not add slug
+  // resolution here.  If the slug context is needed for analytics or logging
+  // in the future, read req.headers['x-tenant-slug'] but do NOT override tenantId.
   app.post('/api/auth/login', async (req, res) => {
     try {
       const { email, password } = req.body;

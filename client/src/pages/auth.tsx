@@ -36,12 +36,21 @@ export default function Auth() {
   const handleLogin = async (email: string, password: string) => {
     setIsLoading(true);
     try {
+      // Forward the tenant slug from the URL (?tenant=<slug>) so the server
+      // knows which store this login originated from.  The login route resolves
+      // the user's tenant from their stored record (set at signup), so the header
+      // does not override that — but sending it keeps the request consistent with
+      // the signup form and allows the server to log or validate the originating
+      // store context if needed in the future.
+      const tenantSlug = new URLSearchParams(window.location.search).get('tenant') || '';
+      const loginHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (tenantSlug) {
+        loginHeaders['X-Tenant-Slug'] = tenantSlug;
+      }
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: loginHeaders,
         body: JSON.stringify({ email, password }),
       });
       
