@@ -36,13 +36,13 @@ export default function Support() {
             </div>
           </a>
 
-          <a href="mailto:theanimalhouse@comcast.net" className="flex items-center gap-3 text-gray-700 hover:text-purple-600">
+          <a href="mailto:support@pilothouse.app" className="flex items-center gap-3 text-gray-700 hover:text-purple-600">
             <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center shadow-sm flex-shrink-0">
               <Mail className="w-4 h-4 text-purple-600" />
             </div>
             <div>
               <div className="font-medium text-sm">Email</div>
-              <div className="text-sm text-gray-600">theanimalhouse@comcast.net</div>
+              <div className="text-sm text-gray-600">Contact via email</div>
             </div>
           </a>
 
@@ -106,7 +106,7 @@ export default function Support() {
         </div>
 
         <p className="text-xs text-gray-400 text-center pb-4">
-          Animal House Pet Store · 2934 Cypress St, West Monroe, LA 71291
+          PilotHouse
         </p>
       </div>
     </div>

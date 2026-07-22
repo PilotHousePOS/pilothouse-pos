@@ -51,7 +51,7 @@ function SpecialDetailModal({ special, onClose }: { special: any; onClose: () =>
 
   const handleCTA = () => {
     if (special.linkType === 'supplies') { setLocation('/supplies'); onClose(); }
-    else if (special.linkType === 'pets') { setLocation('/pets'); onClose(); }
+    else if (special.linkType === 'pets') { setLocation('/supplies'); onClose(); }
     else if (special.linkType === 'external' && special.externalUrl) window.open(special.externalUrl, '_blank');
   };
 
@@ -261,11 +261,6 @@ export default function Home() {
     .map(id => ((recentlyViewedData as any)?.items || []).find((s: any) => s.id === id))
     .filter(Boolean);
 
-  const { data: petsData } = useQuery({
-    queryKey: ["/api/pets"],
-    retry: false,
-  });
-
   const { data: suppliesData } = useQuery({
     queryKey: ["/api/supplies", { limit: 3 }],
     retry: false,
@@ -281,14 +276,11 @@ export default function Home() {
   });
   const hiringOpen = hiringData?.open ?? true;
 
-  const pets = (petsData as any)?.pets || [];
   const supplies = (suppliesData as any)?.items || [];
-  const featuredPets = pets.slice(0, 2);
   const featuredSupplies = supplies.slice(0, 3);
   const cartCount = (cartItems as any[]).length;
 
   // Calculate stats
-  const totalPets = pets.filter((p: any) => p.isAvailable).length;
   const totalSupplies = (suppliesData as any)?.total || 0;
 
   return (
@@ -301,7 +293,7 @@ export default function Home() {
               <div className="w-12 h-12 bg-gradient-to-br from-brand-red to-brand-orange rounded-2xl flex items-center justify-center shadow-lg">
                 <img 
                   src={animalHouseLogoPath} 
-                  alt="Animal House" 
+                  alt="PilotHouse" 
                   className="w-8 h-8 rounded-xl object-cover" 
                 />
               </div>
@@ -309,12 +301,12 @@ export default function Home() {
             </div>
             <div className="min-w-0 flex-1">
               <h1 className="text-xl font-bold text-brand-red whitespace-nowrap">
-                Animal House
+                PilotHouse
               </h1>
               <p className="text-xs text-gray-500 font-medium truncate">
                 {isLoading ? 'Loading...' : 
                  user && (user as any).firstName ? `Welcome, ${(user as any).firstName}${(user as any).isAdmin ? ' (Admin)' : ''}` : 
-                 'Where pets find families'}
+                 'Your business, fully equipped'}
               </p>
             </div>
           </div>
@@ -366,7 +358,7 @@ export default function Home() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
               type="text"
-              placeholder="Search pets, supplies, food..."
+              placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 pr-4 py-3 w-full rounded-full border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-blue/20"
@@ -378,95 +370,18 @@ export default function Home() {
       {/* Specials & Deals Strip */}
       <SpecialsStrip />
 
-      {/* Hero Section with Modern Cards */}
+      {/* Hero Section */}
       <section className="px-6 py-6">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
             <Sparkles className="w-6 h-6 text-brand-orange mr-2" />
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Find Your Perfect</h2>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome to</h2>
           </div>
           <h3 className="text-4xl font-bold bg-gradient-to-r from-blue-500 via-red-500 to-orange-500 bg-clip-text text-transparent mb-4">
-            Furry Friend
+            PilotHouse
           </h3>
-          <p className="text-gray-600 dark:text-gray-300 text-lg">Discover loving companions waiting for their forever home</p>
+          <p className="text-gray-600 dark:text-gray-300 text-lg">Your business, fully equipped</p>
         </div>
-      </section>
-
-      {/* Featured Pets - Modern Carousel Style */}
-      <section className="px-6 pb-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-              <Star className="w-6 h-6 text-brand-orange mr-2" />
-              Featured Pets
-            </h3>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">Ready to find their forever home</p>
-          </div>
-          <Button 
-            variant="ghost" 
-            className="text-brand-blue font-semibold hover:bg-brand-blue/10 rounded-full px-4"
-            onClick={() => setLocation('/pets')}
-          >
-            View All
-            <ArrowRight className="w-4 h-4 ml-1" />
-          </Button>
-        </div>
-
-        {featuredPets.length === 0 ? (
-          <Card className="bg-gradient-to-br from-gray-50 to-gray-100 border-dashed border-2 border-gray-300">
-            <CardContent className="p-8 text-center">
-              <div className="text-6xl mb-4">🐾</div>
-              <h4 className="font-semibold text-gray-900 mb-2">New Friends Coming Soon!</h4>
-              <p className="text-gray-500">We're preparing amazing pets for adoption</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-4">
-            {featuredPets.map((pet: any) => (
-              <Card key={pet.id} className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm">
-                <CardContent className="p-0">
-                  <div className="flex">
-                    <div className="relative w-32 h-32">
-                      <img 
-                        src={pet.imageUrl || pet.imageUrls?.[0] || `https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200`}
-                        alt={pet.name}
-                        className="w-full h-full object-cover" 
-                        loading="lazy"
-                        decoding="async"
-                      />
-                      <div className="absolute top-2 left-2">
-                        <Badge className="bg-green-500 text-white text-xs border-0">Available</Badge>
-                      </div>
-                      <button className="absolute top-2 right-2 p-1 bg-white/80 rounded-full hover:bg-white transition-colors">
-                        <Heart className="w-4 h-4 text-gray-600 hover:text-brand-red" />
-                      </button>
-                    </div>
-                    <div className="p-4 flex-1 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center space-x-2 mb-1">
-                          <h4 className="font-bold text-lg text-gray-900">{pet.name}</h4>
-                          <div className="text-lg">
-                            {pet.species === 'dog' ? '🐕' : 
-                             pet.species === 'cat' ? '🐱' : 
-                             pet.species === 'bird' ? '🦜' : 
-                             pet.species === 'fish' ? '🐟' : '🦎'}
-                          </div>
-                        </div>
-                        <p className="text-sm text-gray-600 font-medium">{pet.breed}</p>
-                        <p className="text-xs text-gray-500">{pet.age} old</p>
-                      </div>
-                      <div className="flex items-center justify-between mt-3">
-                        <div className="text-right">
-                          <p className="text-2xl font-bold text-brand-red">${pet.price}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
       </section>
 
       {/* Recently Viewed */}
@@ -503,65 +418,65 @@ export default function Home() {
         </section>
       )}
 
-      {/* Services Grid - Modern Design */}
+      {/* Services Grid */}
       <section className="px-6 pb-8">
         <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-          Complete Pet Care Services
+          What We Offer
         </h3>
         <div className="grid grid-cols-2 gap-4">
           <Card 
+            className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
+            onClick={() => setLocation('/supplies')}
+          >
+            <CardContent className="p-6 text-center">
+              <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
+                <span className="text-2xl">🛍️</span>
+              </div>
+              <h4 className="font-bold text-gray-900 mb-1">Products</h4>
+              <p className="text-blue-700 text-sm font-medium">Shop Now</p>
+              <p className="text-gray-600 text-xs mt-1">Browse our catalog</p>
+            </CardContent>
+          </Card>
+
+          <Card 
             className="bg-gradient-to-br from-green-50 to-emerald-100 border border-green-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
-            onClick={() => setLocation('/aquatics')}
+            onClick={() => setLocation('/booking')}
           >
             <CardContent className="p-6 text-center">
               <div className="w-12 h-12 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                <span className="text-2xl">🐠</span>
+                <span className="text-2xl">📅</span>
               </div>
-              <h4 className="font-bold text-gray-900 mb-1">Aquatics</h4>
-              <p className="text-green-700 text-sm font-medium">Prices Vary</p>
-              <p className="text-gray-600 text-xs mt-1">Fish & Aquarium Care</p>
+              <h4 className="font-bold text-gray-900 mb-1">Book Service</h4>
+              <p className="text-green-700 text-sm font-medium">Schedule Now</p>
+              <p className="text-gray-600 text-xs mt-1">Appointments</p>
             </CardContent>
           </Card>
 
           <Card 
             className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
-            onClick={() => setLocation('/reptiles')}
+            onClick={() => setLocation('/profile')}
           >
             <CardContent className="p-6 text-center">
               <div className="w-12 h-12 bg-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                <span className="text-2xl">🦎</span>
+                <span className="text-2xl">⭐</span>
               </div>
-              <h4 className="font-bold text-gray-900 mb-1">Exotic Reptiles</h4>
-              <p className="text-purple-700 text-sm font-medium">Specialty Pets</p>
-              <p className="text-gray-600 text-xs mt-1">Rare & Common Species</p>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
-            onClick={() => setLocation('/booking')}
-          >
-            <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                <span className="text-2xl">📅</span>
-              </div>
-              <h4 className="font-bold text-gray-900 mb-1">Book Grooming</h4>
-              <p className="text-blue-700 text-sm font-medium">Schedule Now</p>
-              <p className="text-gray-600 text-xs mt-1">Bath & Full Service</p>
+              <h4 className="font-bold text-gray-900 mb-1">Loyalty</h4>
+              <p className="text-purple-700 text-sm font-medium">Earn Points</p>
+              <p className="text-gray-600 text-xs mt-1">Rewards & Discounts</p>
             </CardContent>
           </Card>
 
           <Card 
             className="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
-            onClick={() => setLocation('/supplies')}
+            onClick={() => setLocation('/orders')}
           >
             <CardContent className="p-6 text-center">
               <div className="w-12 h-12 bg-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-                <span className="text-2xl">🎁</span>
+                <span className="text-2xl">📦</span>
               </div>
-              <h4 className="font-bold text-gray-900 mb-1">Supplies</h4>
-              <p className="text-orange-700 text-sm font-medium">Best Prices</p>
-              <p className="text-gray-600 text-xs mt-1">All Your Pets Needs</p>
+              <h4 className="font-bold text-gray-900 mb-1">Orders</h4>
+              <p className="text-orange-700 text-sm font-medium">View History</p>
+              <p className="text-gray-600 text-xs mt-1">Track your orders</p>
             </CardContent>
           </Card>
         </div>
@@ -582,7 +497,7 @@ export default function Home() {
                 <span className="text-white font-bold text-base">Now Hiring!</span>
                 <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">Apply Now</span>
               </div>
-              <p className="text-gray-400 text-sm leading-snug">Join the Animal House team — tap to fill out an application.</p>
+              <p className="text-gray-400 text-sm leading-snug">Join the PilotHouse team — tap to fill out an application.</p>
             </div>
             <ArrowRight className="w-5 h-5 text-red-500 flex-shrink-0" />
           </div>

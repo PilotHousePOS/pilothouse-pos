@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 const DEFAULT_CONTENT = `<p class="text-xs text-gray-500">Last Updated: February 10, 2026</p>
 
 <h2>1. Introduction</h2>
-<p>Animal House Pet Store ("we," "us," or "our"), located at 2934 Cypress St, West Monroe, LA 71291, is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and mobile application (the "Service").</p>
+<p>PilotHouse ("we," "us," or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and mobile application (the "Service").</p>
 
 <h2>2. Information We Collect</h2>
 <p><strong>Personal Information:</strong></p>
@@ -70,8 +70,7 @@ const DEFAULT_CONTENT = `<p class="text-xs text-gray-500">Last Updated: February
 <p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page and updating the "Last Updated" date.</p>
 
 <h2>11. Contact Us</h2>
-<p>If you have questions about this Privacy Policy, please contact us:</p>
-<p><strong>Animal House Pet Store</strong><br/>2934 Cypress St<br/>West Monroe, LA 71291<br/>Phone: (318) 322-3023</p>`;
+<p>If you have questions about this Privacy Policy, please contact us through the Support page within the app.</p>`;
 
 export default function PrivacyPolicy() {
   const [, navigate] = useLocation();

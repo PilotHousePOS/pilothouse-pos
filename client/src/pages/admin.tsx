@@ -5056,7 +5056,7 @@ function SettingsPanel() {
             Alternate Reply-To Email
           </h3>
           <p className="text-sm text-gray-500">
-            When customers, groomers, or admins reply to any email from Animal House, the reply will go to both the main sending email and this alternate address. Useful as a fallback if your primary email has delivery issues.
+            When customers, groomers, or admins reply to any email from PilotHouse, the reply will go to both the main sending email and this alternate address. Useful as a fallback if your primary email has delivery issues.
           </p>
           <div className="flex gap-2 items-end">
             <div className="flex-1">
@@ -6962,10 +6962,10 @@ export default function Admin() {
     appointmentId: null,
     customerName: '',
     customerPhone: '',
-    message: "Your Fur Baby is ready for pick-up, unless you've already spoken to a groomer, please give us a call to let us know you're on your way. The Animal House 318-323-6090."
+    message: "Your Fur Baby is ready for pick-up, unless you've already spoken to a groomer, please give us a call to let us know you're on your way. The PilotHouse 318-323-6090."
   });
   
-  const defaultSmsMessage = "Your Fur Baby is ready for pick-up, unless you've already spoken to a groomer, please give us a call to let us know you're on your way. The Animal House 318-323-6090.";
+  const defaultSmsMessage = "Your Fur Baby is ready for pick-up, unless you've already spoken to a groomer, please give us a call to let us know you're on your way. The PilotHouse 318-323-6090.";
   
   const openSmsConfirmDialog = (appointmentId: number, customerName: string, customerPhone: string) => {
     setSmsConfirmDialog({

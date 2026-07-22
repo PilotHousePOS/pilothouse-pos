@@ -697,9 +697,9 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
     <div style="${receiptStyle}">
       <!-- Header -->
       <div style="text-align: center; margin-bottom: 16px;">
-        <div style="font-size: 24px; font-weight: bold; margin-bottom: 8px;">&#128062; Animal House</div>
+        <div style="font-size: 24px; font-weight: bold; margin-bottom: 8px;">&#128062; PilotHouse</div>
         <div style="font-size: 12px;">
-          <strong>ANIMAL HOUSE LLC</strong><br>
+          <strong>PILOTHOUSE</strong><br>
           2934 Cypress St<br>
           West Monroe LA 71291<br>
           318 322-3023
@@ -977,7 +977,7 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
       <div style="border-top: 2px solid #000; margin-top: 16px;"></div>
       
       <div style="text-align: center; margin-top: 16px; font-size: 11px; color: #666;">
-        <p style="margin: 4px 0;"><strong>Online Sales Report</strong> - Animal House Pet Store</p>
+        <p style="margin: 4px 0;"><strong>Online Sales Report</strong> - PilotHouse</p>
         <p style="margin: 4px 0;">This report shows online orders only.</p>
         <p style="margin: 4px 0;">Combine with POS daily report for full reconciliation.</p>
         <p style="margin: 4px 0;">${hasStripeBalanceData ? 'Stripe fees pulled from Stripe API.' : 'Stripe fees are estimated (2.9% + $0.30). Verify in Stripe Dashboard.'}</p>
@@ -987,7 +987,7 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
 
   const textBody = transactionCount === 0 && paidGroomingAppts.length === 0
     ? `
-ANIMAL HOUSE LLC
+PILOTHOUSE
 2934 Cypress St
 West Monroe LA 71291
 318 322-3023
@@ -999,10 +999,10 @@ Period: ${periodStartStr} - ${periodEndStr}
 No online orders placed today.
 
 ---
-Animal House Pet Store - Daily Online Sales Report
+PilotHouse - Daily Online Sales Report
     `
     : `
-ANIMAL HOUSE LLC
+PILOTHOUSE
 2934 Cypress St
 West Monroe LA 71291
 318 322-3023
@@ -1200,7 +1200,7 @@ Parish Tax (5.99%)     ${formatCurrency(totalTax * 0.5451).padStart(10)}  -${for
 Net Tax Due            ${formatCurrency(totalTax - refundedTaxTotal).padStart(10)}
 
 ---
-Animal House Pet Store - Daily Online Sales Report
+PilotHouse - Daily Online Sales Report
 This report shows online orders only.
 Combine with POS daily report for full reconciliation.
 ${hasStripeBalanceData ? 'Stripe fees pulled from Stripe API.' : 'Stripe fees are estimated (2.9% + $0.30). Verify in Stripe Dashboard.'}

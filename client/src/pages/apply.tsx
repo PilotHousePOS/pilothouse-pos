@@ -167,7 +167,7 @@ export default function Apply() {
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Application Submitted!</h1>
           <p className="text-gray-600 mb-6">
-            Thank you for applying to The Animal House. We review all applications and will be in touch if your qualifications match our needs.
+            Thank you for applying to The PilotHouse. We review all applications and will be in touch if your qualifications match our needs.
           </p>
           <Link href="/">
             <Button className="bg-gray-800 hover:bg-gray-700">Back to Home</Button>
@@ -186,14 +186,14 @@ export default function Apply() {
             <ChevronLeft className="w-4 h-4 mr-1" /> Back
           </Link>
           <h1 className="text-2xl font-bold">Employment Application</h1>
-          <p className="text-gray-300 text-sm mt-1">The Animal House — West Monroe, Louisiana</p>
+          <p className="text-gray-300 text-sm mt-1">The PilotHouse — West Monroe, Louisiana</p>
         </div>
       </div>
 
       <div className="max-w-3xl mx-auto py-8 px-4 pb-28">
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200 text-sm text-gray-600">
           <p>
-            The Animal House is an equal opportunity employer. All applicants are considered for
+            The PilotHouse is an equal opportunity employer. All applicants are considered for
             employment without regard to race, color, religion, sex, national origin, age, disability,
             or veteran status. Please fill out this application completely and accurately.
           </p>
@@ -342,7 +342,7 @@ export default function Apply() {
                   <FormControl>
                     <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
-                  <FormLabel className="!mt-0 cursor-pointer">Have you previously worked at The Animal House?</FormLabel>
+                  <FormLabel className="!mt-0 cursor-pointer">Have you previously worked at The PilotHouse?</FormLabel>
                 </FormItem>
               )} />
               {form.watch("workedHereBefore") && (
@@ -642,7 +642,7 @@ export default function Apply() {
                   consideration for employment and may result in my dismissal if discovered at a later date.
                 </p>
                 <p className="mt-2">
-                  I authorize The Animal House to contact my former employers and references and to verify all
+                  I authorize The PilotHouse to contact my former employers and references and to verify all
                   information provided in this application. I understand that employment is contingent upon
                   satisfactory results from any background or reference checks required.
                 </p>

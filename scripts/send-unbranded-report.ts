@@ -14,7 +14,7 @@ async function sendUnbrandedReport() {
     const msg = {
       to: 'tgskipbusiness@gmail.com',
       from: fromEmail,
-      subject: 'Animal House - Unbranded Products Report (989 items)',
+      subject: 'PilotHouse - Unbranded Products Report (989 items)',
       text: `Attached is the TRULY-UNBRANDED-PRODUCTS.csv report containing 989 products that could not be automatically assigned brands.
 
 Summary:
@@ -27,7 +27,7 @@ Most remaining products are generic items (accessories, aquarium decorations, et
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #1e40af; color: white; padding: 20px; text-align: center;">
-            <h1 style="margin: 0;">Animal House Pet Store</h1>
+            <h1 style="margin: 0;">PilotHouse</h1>
           </div>
           <div style="padding: 30px; background-color: #f9fafb;">
             <h2 style="color: #1f2937;">Unbranded Products Report</h2>
@@ -62,7 +62,7 @@ Most remaining products are generic items (accessories, aquarium decorations, et
             
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
             <p style="color: #9ca3af; font-size: 12px; text-align: center;">
-              Animal House Pet Store - Brand Verification System
+              PilotHouse - Brand Verification System
             </p>
           </div>
         </div>

@@ -20,11 +20,11 @@ export default function DeleteAccount() {
         <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800 space-y-6">
           <div>
             <h1 className="text-2xl font-bold text-white mb-1">Delete Your Account</h1>
-            <p className="text-gray-400 text-sm">Animal House Pet Store</p>
+            <p className="text-gray-400 text-sm">PilotHouse</p>
           </div>
 
           <p className="text-gray-300">
-            You can permanently delete your Animal House account and all associated data directly from within the app at any time.
+            You can permanently delete your PilotHouse account and all associated data directly from within the app at any time.
           </p>
 
           <div>
@@ -32,7 +32,7 @@ export default function DeleteAccount() {
             <ol className="space-y-3 text-gray-300">
               <li className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-sm font-bold">1</span>
-                <span>Sign in to your Animal House account at <a href="https://animalhousepetstore.com" className="text-red-400 underline">animalhousepetstore.com</a></span>
+                <span>Sign in to your PilotHouse account at <a href="https://pilothouse.app" className="text-red-400 underline">pilothouse.app</a></span>
               </li>
               <li className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-sm font-bold">2</span>

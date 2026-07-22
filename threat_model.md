@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Animal House Pet Store is a React/Vite frontend with an Express/TypeScript backend and PostgreSQL accessed through Drizzle ORM. Production features include public catalog browsing, customer accounts, appointments, e-commerce orders, Stripe-based payments, admin dashboards, email/SMS notifications, push notifications, job applications, and admin-side invoice/order-photo processing. The application integrates with Stripe, SendGrid, Twilio, Google services/object storage, Astro loyalty services, and OpenAI-powered document/image processing.
+PilotHouse is a React/Vite frontend with an Express/TypeScript backend and PostgreSQL accessed through Drizzle ORM. Production features include public catalog browsing, customer accounts, appointments, e-commerce orders, Stripe-based payments, admin dashboards, email/SMS notifications, push notifications, job applications, and admin-side invoice/order-photo processing. The application integrates with Stripe, SendGrid, Twilio, Google services/object storage, Astro loyalty services, and OpenAI-powered document/image processing.
 
 Production assumptions for this scan:
 - Production runs with `NODE_ENV=production`.

@@ -1908,7 +1908,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
       // Create workbook
       const workbook = new ExcelJS.Workbook();
-      workbook.creator = 'Animal House Pet Store';
+      workbook.creator = 'PilotHouse';
       workbook.created = new Date();
 
       // Supplies Sheet
@@ -3829,7 +3829,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
             payment_method: orderOwner.stripeDefaultPaymentMethod,
             off_session: true, // Charging without customer present
             confirm: true, // Charge immediately
-            description: `Order #${orderId} - Animal House Pet Store`,
+            description: `Order #${orderId} - PilotHouse`,
             metadata: {
               orderId: orderId.toString(),
               customerId: order.userId,
@@ -3890,7 +3890,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           // Use the SMSService directly to send approved status
           const twilio = await import('twilio');
           const client = twilio.default(process.env.TWILIO_ACCOUNT_SID!, process.env.TWILIO_AUTH_TOKEN!);
-          const smsMsg = `Hi ${orderOwner.firstName || 'there'}! Your Animal House order #${orderId} has been approved. We'll text you when it's ready for pickup!`;
+          const smsMsg = `Hi ${orderOwner.firstName || 'there'}! Your PilotHouse order #${orderId} has been approved. We'll text you when it's ready for pickup!`;
           await client.messages.create({ body: smsMsg, from: process.env.TWILIO_PHONE_NUMBER!, to: orderOwner.phoneNumber });
           console.log(`Approval SMS sent to ${orderOwner.phoneNumber} for order ${orderId}`);
         } catch (smsErr) {
@@ -3907,8 +3907,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           ).join('\n');
           
           const emailSubject = paymentSuccessful 
-            ? 'Payment Received - Your Animal House Order Has Been Approved!'
-            : 'Your Animal House Order Has Been Approved';
+            ? 'Payment Received - Your PilotHouse Order Has Been Approved!'
+            : 'Your PilotHouse Order Has Been Approved';
           
           const statusMessage = paymentSuccessful
             ? `<h2 style="color: #16a34a;">✓ Payment Received!</h2>
@@ -3925,7 +3925,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
-                  <h1 style="margin: 0;">🐾 Animal House Pet Store</h1>
+                  <h1 style="margin: 0;">PilotHouse</h1>
                 </div>
                 <div style="padding: 20px; background-color: #f9fafb;">
                   ${statusMessage}
@@ -3943,7 +3943,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                   <p>Thank you for shopping with us!</p>
                 </div>
                 <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
-                  <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+                  <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
                   <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
                   <p style="margin: 0;">Phone: (318) 322-3023</p>
                 </div>
@@ -4010,7 +4010,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         payment_method: orderOwner.stripeDefaultPaymentMethod,
         off_session: true,
         confirm: true,
-        description: `Order #${orderId} - Animal House Pet Store (Retry)`,
+        description: `Order #${orderId} - PilotHouse (Retry)`,
         metadata: {
           orderId: orderId.toString(),
           customerId: order.userId,
@@ -4080,7 +4080,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           if (customer?.phoneNumber && process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER) {
             const twilio = await import('twilio');
             const twilioClient = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-            const smsMsg = `${customer.firstName || 'Hi'}, your Animal House order #${orderId} is ready for pickup! Come grab it anytime during store hours. 🐾`;
+            const smsMsg = `${customer.firstName || 'Hi'}, your PilotHouse order #${orderId} is ready for pickup! Come grab it anytime during store hours. 🐾`;
             await twilioClient.messages.create({ body: smsMsg, from: process.env.TWILIO_PHONE_NUMBER, to: customer.phoneNumber });
             console.log(`Ready SMS sent to ${customer.phoneNumber} for order ${orderId}`);
           }
@@ -4098,11 +4098,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
             to: customerEmail,
             from: fromEmail,
             replyTo,
-            subject: 'Your Animal House Order Is Ready for Pickup!',
+            subject: 'Your PilotHouse Order Is Ready for Pickup!',
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
-                  <h1 style="margin: 0;">🐾 Animal House Pet Store</h1>
+                  <h1 style="margin: 0;">PilotHouse</h1>
                 </div>
                 <div style="padding: 20px; background-color: #f9fafb;">
                   <h2 style="color: #16a34a;">Your Order is Ready!</h2>
@@ -4114,10 +4114,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                     <p style="font-size: 24px; font-weight: bold; margin: 10px 0;">Order Total: $${order.totalAmount}</p>
                   </div>
                   
-                  <p>Thank you for shopping with Animal House Pet Store!</p>
+                  <p>Thank you for shopping with PilotHouse!</p>
                 </div>
                 <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
-                  <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+                  <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
                   <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
                   <p style="margin: 0;">Phone: (318) 322-3023</p>
                 </div>
@@ -4159,7 +4159,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           if (pickedUpCustomer?.phoneNumber && process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER) {
             const twilio = await import('twilio');
             const twilioClient = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-            const smsMsg = `Hi ${pickedUpCustomer.firstName || 'there'}! Your Animal House order #${orderId} has been picked up. Thank you for shopping with us! 🐾`;
+            const smsMsg = `Hi ${pickedUpCustomer.firstName || 'there'}! Your PilotHouse order #${orderId} has been picked up. Thank you for shopping with us! 🐾`;
             await twilioClient.messages.create({ body: smsMsg, from: process.env.TWILIO_PHONE_NUMBER, to: pickedUpCustomer.phoneNumber });
             console.log(`Picked-up SMS sent to ${pickedUpCustomer.phoneNumber} for order ${orderId}`);
           }
@@ -4335,30 +4335,30 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
               to: customerEmail,
               from: fromEmail,
               replyTo,
-              subject: 'Thank You for Shopping at Animal House!',
+              subject: 'Thank You for Shopping at PilotHouse!',
               text: `Hi ${orderWithItems.customerName || 'Valued Customer'},
 
 Your order #${orderId} has been picked up and completed!
 
-Thank you for shopping with Animal House Pet Store. We appreciate your business!
+Thank you for shopping with PilotHouse. We appreciate your business!
 
 If you have any questions, please don't hesitate to contact us.
 
 See you again soon!
 
-Animal House Pet Store
+PilotHouse
 2934 Cypress St
 West Monroe LA 71291
 318 322-3023`,
               html: `
-                <h2>Thank You for Shopping at Animal House!</h2>
+                <h2>Thank You for Shopping at PilotHouse!</h2>
                 <p>Hi ${orderWithItems.customerName || 'Valued Customer'},</p>
                 <p>Your order #${orderId} has been picked up and completed!</p>
-                <p>Thank you for shopping with Animal House Pet Store. We appreciate your business!</p>
+                <p>Thank you for shopping with PilotHouse. We appreciate your business!</p>
                 <p>If you have any questions, please don't hesitate to contact us.</p>
                 <p>See you again soon!</p>
                 <br>
-                <p><strong>Animal House Pet Store</strong><br>
+                <p><strong>PilotHouse</strong><br>
                 2934 Cypress St<br>
                 West Monroe LA 71291<br>
                 318 322-3023</p>
@@ -6371,7 +6371,7 @@ West Monroe LA 71291
       if (groomingCompleted && !wasAlreadyCompleted && appointment.ownerPhoneNumber) {
         try {
           // Use custom message if provided, otherwise use default
-          const smsMessage = customMessage || "Your Fur Baby is ready for pick-up, unless you've already spoken to a groomer, please give us a call to let us know you're on your way. The Animal House 318-323-6090. Reply STOP to opt out.";
+          const smsMessage = customMessage || "Your Fur Baby is ready for pick-up, unless you've already spoken to a groomer, please give us a call to let us know you're on your way. PilotHouse 318-323-6090. Reply STOP to opt out.";
           
           const smsSent = await notificationService.sendCustomSMS(
             appointment.ownerPhoneNumber,
@@ -7525,13 +7525,13 @@ West Monroe LA 71291
       const html = `
         <div style="font-family: Arial, sans-serif; max-width: 680px; margin: 0 auto;">
           <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 28px 24px; text-align: center;">
-            <h1 style="color: #f59e0b; margin: 0 0 6px 0; font-size: 26px;">Animal House Pet Store</h1>
+            <h1 style="color: #f59e0b; margin: 0 0 6px 0; font-size: 26px;">PilotHouse</h1>
             <p style="color: #cbd5e1; margin: 0; font-size: 14px;">Charge Account Statement</p>
           </div>
           <div style="padding: 32px 24px; background: #ffffff;">
             <p style="color: #374151; margin: 0 0 8px 0;">Hello <strong>${user.firstName || 'Valued Customer'} ${user.lastName || ''}</strong>,</p>
             <p style="color: #374151; margin: 0 0 24px 0;">
-              Please find below the statement of items charged to your account at Animal House Pet Store.
+              Please find below the statement of items charged to your account at PilotHouse.
               Payment is due in-store at your earliest convenience.
             </p>
             ${ordersHtml}
@@ -7559,7 +7559,7 @@ West Monroe LA 71291
             </p>
           </div>
           <div style="background-color: #1f2937; color: #d1d5db; padding: 18px 24px; text-align: center; font-size: 12px;">
-            <p style="margin: 0 0 4px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 4px 0;"><strong>PilotHouse</strong></p>
             <p style="margin: 0 0 4px 0;">${storeAddress}</p>
             <p style="margin: 0;">Phone: ${storePhone}</p>
           </div>
@@ -7569,7 +7569,7 @@ West Monroe LA 71291
         to: toEmail,
         from: fromEmail,
         replyTo,
-        subject: `Your Charge Account Statement — Animal House Pet Store`,
+        subject: `Your Charge Account Statement — PilotHouse`,
         html,
       });
 
@@ -7808,7 +7808,7 @@ West Monroe LA 71291
             html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 20px; text-align: center;">
-                  <h1 style="color: #f59e0b; margin: 0;">Animal House Pet Store</h1>
+                  <h1 style="color: #f59e0b; margin: 0;">PilotHouse</h1>
                 </div>
                 <div style="padding: 30px; background: #ffffff;">
                   <p style="color: #374151;">Hello ${user.firstName || 'Valued Customer'},</p>
@@ -7817,10 +7817,10 @@ West Monroe LA 71291
                   </div>
                 </div>
                 <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
-                  <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+                  <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
                   <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
                   <p style="margin: 0 0 10px 0;">Phone: (318) 322-3023</p>
-                  ${isMarketing ? `<p style="margin: 0 0 5px 0;">You are receiving this email because you have an account with Animal House Pet Store.</p>
+                  ${isMarketing ? `<p style="margin: 0 0 5px 0;">You are receiving this email because you have an account with PilotHouse.</p>
                   <p style="margin: 0;"><a href="${emailBaseUrl}/profile" style="color: #93c5fd; text-decoration: underline;">Unsubscribe from marketing emails</a></p>` : `<p style="margin: 0;">If you have any questions, please contact us.</p>`}
                 </div>
               </div>
@@ -7892,7 +7892,7 @@ West Monroe LA 71291
         return res.send(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`);
       }
 
-      const autoReply = "Thanks for reaching out to Animal House Pet Store! We're unable to monitor replies to this number. Please call us at (318) 322-3023 for assistance. Reply STOP to opt out of texts.";
+      const autoReply = "Thanks for reaching out to PilotHouse! We're unable to monitor replies to this number. Please call us at (318) 322-3023 for assistance. Reply STOP to opt out of texts.";
 
       res.set('Content-Type', 'text/xml');
       return res.send(`<?xml version="1.0" encoding="UTF-8"?><Response><Message>${autoReply}</Message></Response>`);
@@ -8268,7 +8268,7 @@ West Monroe LA 71291
 
       const emailHtml = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #1e3a8a;">Animal House Pet Store - Refund Report</h2>
+          <h2 style="color: #1e3a8a;">PilotHouse - Refund Report</h2>
           <p style="color: #666;">Date Range: ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}</p>
           
           <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
@@ -8312,7 +8312,7 @@ West Monroe LA 71291
       const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
       await client.send({
         to: email,
-        from: { email: fromEmail, name: 'Animal House Pet Store' },
+        from: { email: fromEmail, name: 'PilotHouse' },
         replyTo,
         subject: `Refund Report: ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}`,
         html: emailHtml
@@ -13388,11 +13388,11 @@ West Monroe LA 71291
       const toEmail = req.body.email || req.user.email;
       await sgMail.send({
         to: toEmail,
-        from: { email: fromEmail, name: 'Animal House Pet Store' },
+        from: { email: fromEmail, name: 'PilotHouse' },
         replyTo,
-        subject: 'Animal House - Test Email',
+        subject: 'PilotHouse - Test Email',
         html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;">
-          <h2 style="color:#b45309;">Animal House Pet Store</h2>
+          <h2 style="color:#b45309;">PilotHouse</h2>
           <p>This is a test email confirming that your SendGrid email system is working correctly.</p>
           <p style="color:#666;font-size:12px;">Sent at: ${new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })} CST</p>
         </div>`,

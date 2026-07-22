@@ -1,7 +1,7 @@
-# Animal House Pet Store
+# PilotHouse
 
 ## Overview
-The Animal House Pet Store is a mobile-first e-commerce platform specializing in exotic reptiles, pet supplies, and grooming services. Its core purpose is to establish itself as the premier online destination for exotic pet owners, driving market expansion, fostering customer loyalty, and enhancing the overall online shopping experience to ensure continuous business growth.
+PilotHouse is a mobile-first small business management platform. Its core purpose is to provide an all-in-one solution for POS, inventory management, loyalty rewards, appointment booking, and automated reporting — helping small businesses run efficiently and grow.
 
 ## Agent Rules (Non-Negotiable)
 - **NEVER guess at a fix.** Before changing any code, read the actual logs, error output, or data that describes the problem. Every fix must be justified by evidence from the logs or code — not by assumption.

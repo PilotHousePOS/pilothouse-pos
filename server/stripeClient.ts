@@ -1,4 +1,4 @@
-// Stripe client for Animal House Pet Store
+// Stripe client for PilotHouse
 // Uses user-provided API keys, falls back to Replit connector
 
 import Stripe from 'stripe';

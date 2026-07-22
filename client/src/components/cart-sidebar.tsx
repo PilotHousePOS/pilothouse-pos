@@ -398,7 +398,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
         totalAmount: totalAmount.toFixed(2),
         astroRewardDiscount: totalAstroDiscountForOrder > 0 ? totalAstroDiscountForOrder.toFixed(2) : "0.00",
         astroRewardInfo: astroRewardInfo ? JSON.stringify(astroRewardInfo) : null,
-        shippingAddress: "In-Store Pickup - Animal House Pet Store",
+        shippingAddress: "In-Store Pickup - PilotHouse",
         outOfStockPreference,
         customerNotes: customerNotes.trim() || null,
         isRecurring,
@@ -978,7 +978,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                   <span className="font-medium">In-Store Pickup</span>
                 </div>
                 <p className="text-sm text-gray-600 mt-1">
-                  Available for pickup at Animal House Pet Store
+                  Available for pickup at PilotHouse
                 </p>
               </div>
             </div>

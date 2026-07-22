@@ -1,4 +1,4 @@
-// Stripe webhook handlers for Animal House Pet Store
+// Stripe webhook handlers for PilotHouse
 
 import { getStripeSync, getUncachableStripeClient } from './stripeClient';
 import { storage } from './storage';
@@ -290,7 +290,7 @@ export class WebhookHandlers {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
-              <h1 style="margin: 0;">🐾 Animal House Pet Store</h1>
+              <h1 style="margin: 0;">PilotHouse</h1>
             </div>
             <div style="padding: 20px; background-color: #f9fafb;">
               <h2 style="color: #16a34a;">✓ Payment Received!</h2>
@@ -308,7 +308,7 @@ export class WebhookHandlers {
               <p>Thank you for shopping with us!</p>
             </div>
             <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
-              <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+              <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
               <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
               <p style="margin: 0;">Phone: (318) 322-3023</p>
             </div>

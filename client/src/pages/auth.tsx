@@ -200,9 +200,9 @@ export default function Auth() {
         <Card className="bg-white/10 backdrop-blur-md border border-white/20">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold text-white mb-2">
-              Welcome to Animal House
+              Welcome to PilotHouse
             </CardTitle>
-            <p className="text-gray-300">Join thousands of happy pet families</p>
+            <p className="text-gray-300">Sign in to manage your account</p>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="signin" className="w-full">

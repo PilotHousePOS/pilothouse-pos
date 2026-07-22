@@ -42,7 +42,7 @@ class EmailService {
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
-            <h1 style="margin: 0;">Animal House Pet Store - Admin Alert</h1>
+            <h1 style="margin: 0;">PilotHouse - Admin Alert</h1>
           </div>
           <div style="padding: 30px; background-color: #f9f9f9;">
             <h2 style="color: #333; margin-bottom: 20px;">🛒 New Order Received #${orderId}</h2>
@@ -55,7 +55,7 @@ class EmailService {
             </div>
           </div>
           <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
-            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
             <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
             <p style="margin: 0;">Phone: (318) 322-3023</p>
           </div>
@@ -66,7 +66,7 @@ class EmailService {
         to: adminEmail,
         from: fromEmail,
         replyTo,
-        subject: `New Order #${orderId} - Animal House Admin Alert`,
+        subject: `New Order #${orderId} - PilotHouse Admin Alert`,
         html: emailContent,
       });
 
@@ -84,7 +84,7 @@ class EmailService {
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
-            <h1 style="margin: 0;">Animal House Pet Store - Admin Alert</h1>
+            <h1 style="margin: 0;">PilotHouse - Admin Alert</h1>
           </div>
           <div style="padding: 30px; background-color: #f9f9f9;">
             <h2 style="color: #333; margin-bottom: 20px;">📅 New Grooming Appointment #${appointmentId}</h2>
@@ -98,7 +98,7 @@ class EmailService {
             </div>
           </div>
           <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
-            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
             <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
             <p style="margin: 0;">Phone: (318) 322-3023</p>
           </div>
@@ -109,7 +109,7 @@ class EmailService {
         to: adminEmail,
         from: fromEmail,
         replyTo,
-        subject: `New Appointment #${appointmentId} - Animal House Admin Alert`,
+        subject: `New Appointment #${appointmentId} - PilotHouse Admin Alert`,
         html: emailContent,
       });
 
@@ -139,7 +139,7 @@ class EmailService {
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
-            <h1 style="margin: 0;">Animal House Pet Store</h1>
+            <h1 style="margin: 0;">PilotHouse</h1>
           </div>
           <div style="padding: 30px; background-color: #f9f9f9;">
             <h2 style="color: #333; margin-bottom: 20px;">We Got Your Order! #${orderId}</h2>
@@ -185,11 +185,11 @@ class EmailService {
             </div>
 
             <p style="font-size: 14px; color: #666; margin-top: 30px;">
-              Thank you for choosing Animal House Pet Store!
+              Thank you for choosing PilotHouse!
             </p>
           </div>
           <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
-            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
             <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
             <p style="margin: 0;">Phone: (318) 322-3023</p>
           </div>
@@ -200,7 +200,7 @@ class EmailService {
         to,
         from: fromEmail,
         replyTo,
-        subject: `Order Received #${orderId} - Animal House Pet Store`,
+        subject: `Order Received #${orderId} - PilotHouse`,
         html: emailContent,
       });
 
@@ -229,7 +229,7 @@ class EmailService {
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
-            <h1 style="margin: 0;">Animal House Pet Store</h1>
+            <h1 style="margin: 0;">PilotHouse</h1>
           </div>
           <div style="padding: 30px; background-color: #f9f9f9;">
             <h2 style="color: #333; margin-bottom: 20px;">You Left Something Behind!</h2>
@@ -262,10 +262,10 @@ class EmailService {
             </p>
           </div>
           <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
-            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
             <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
             <p style="margin: 0 0 10px 0;">Phone: (318) 322-3023</p>
-            <p style="margin: 0 0 5px 0;">You are receiving this email because you have an account with Animal House Pet Store.</p>
+            <p style="margin: 0 0 5px 0;">You are receiving this email because you have an account with PilotHouse.</p>
             <p style="margin: 0;"><a href="${baseUrl}/profile" style="color: #93c5fd; text-decoration: underline;">Unsubscribe from marketing emails</a></p>
           </div>
         </div>
@@ -275,7 +275,7 @@ class EmailService {
         to,
         from: fromEmail,
         replyTo,
-        subject: `Don't Forget Your Cart - Animal House Pet Store`,
+        subject: `Don't Forget Your Cart - PilotHouse`,
         html: emailContent,
       });
 
@@ -293,12 +293,12 @@ class EmailService {
       
       const statusMessages = {
         'in_progress': {
-          subject: 'Your Order is Being Prepared - Animal House',
+          subject: 'Your Order is Being Prepared - PilotHouse',
           message: 'Great news! We\'ve started preparing your order and it will be ready for pickup soon.'
         },
         'ready': {
-          subject: 'Your Order is Ready for Pickup - Animal House',
-          message: 'Your order is ready! Please come to Animal House Pet Store to pick up your items.'
+          subject: 'Your Order is Ready for Pickup - PilotHouse',
+          message: 'Your order is ready! Please come to PilotHouse to pick up your items.'
         }
       };
 
@@ -308,7 +308,7 @@ class EmailService {
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
-            <h1 style="margin: 0;">Animal House Pet Store</h1>
+            <h1 style="margin: 0;">PilotHouse</h1>
           </div>
           <div style="padding: 30px; background-color: #f9f9f9;">
             <h2 style="color: #333; margin-bottom: 20px;">Order Update #${orderId}</h2>
@@ -317,16 +317,16 @@ class EmailService {
             ${status === 'ready' ? `
               <div style="background-color: #dc2626; color: white; padding: 15px; border-radius: 5px; margin: 20px 0;">
                 <strong>📍 Pickup Location:</strong><br>
-                Animal House Pet Store<br>
+                PilotHouse<br>
                 Ready for immediate pickup during business hours
               </div>
             ` : ''}
             <p style="font-size: 14px; color: #666; margin-top: 30px;">
-              Thank you for choosing Animal House Pet Store!
+              Thank you for choosing PilotHouse!
             </p>
           </div>
           <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
-            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
             <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
             <p style="margin: 0;">Phone: (318) 322-3023</p>
           </div>
@@ -378,11 +378,11 @@ class EmailService {
             </p>
             
             <p style="font-size: 14px; color: #666; margin-top: 30px;">
-              Thank you for choosing Animal House Pet Store!
+              Thank you for choosing PilotHouse!
             </p>
           </div>
           <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
-            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
             <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
             <p style="margin: 0;">Phone: (318) 322-3023</p>
           </div>
@@ -412,13 +412,13 @@ class EmailService {
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #1e40af; color: white; padding: 20px; text-align: center;">
-            <h1 style="margin: 0;">Animal House Pet Store</h1>
+            <h1 style="margin: 0;">PilotHouse</h1>
           </div>
           <div style="background-color: #f8f9fa; padding: 30px;">
             <h2 style="color: #1e40af; margin-bottom: 20px;">📋 Booking Received #${appointmentId}</h2>
             <p style="font-size: 16px; line-height: 1.5;">Hi ${firstName},</p>
             <p style="font-size: 16px; line-height: 1.5;">
-              Thanks for booking with Animal House! We've received your appointment request and it is now <strong>pending review</strong>. You'll get another email once it's been confirmed or if we need to make any changes.
+              Thanks for booking with PilotHouse! We've received your appointment request and it is now <strong>pending review</strong>. You'll get another email once it's been confirmed or if we need to make any changes.
             </p>
 
             <div style="background-color: #dbeafe; color: #1e3a8a; padding: 15px; border-radius: 5px; margin: 20px 0;">
@@ -431,10 +431,10 @@ class EmailService {
             <p style="font-size: 14px; color: #6b7280; margin-top: 30px;">
               If you have any questions, call us at <strong>(318) 322-3023</strong>.
             </p>
-            <p style="font-size: 14px; color: #666;">Thank you for choosing Animal House Pet Store!</p>
+            <p style="font-size: 14px; color: #666;">Thank you for choosing PilotHouse!</p>
           </div>
           <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
-            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
             <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
             <p style="margin: 0;">Phone: (318) 322-3023</p>
           </div>
@@ -464,16 +464,16 @@ class EmailService {
       const emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #1e40af; color: white; padding: 20px; text-align: center;">
-            <h1 style="margin: 0;">Animal House Pet Store</h1>
+            <h1 style="margin: 0;">PilotHouse</h1>
           </div>
           <div style="padding: 30px; background-color: #f9fafb;">
             <h2 style="color: #dc2626;">Appointment Update</h2>
             <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">
-              The Animal House regrets to inform you that we could not accept your appointment. This may have been due to several reasons. If you have any questions about this please contact us at <strong>318-323-6090</strong>.
+              PilotHouse regrets to inform you that we could not accept your appointment. This may have been due to several reasons. If you have any questions about this please contact us at <strong>318-323-6090</strong>.
             </p>
           </div>
           <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
-            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
             <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
             <p style="margin: 0;">Phone: (318) 322-3023</p>
           </div>
@@ -484,7 +484,7 @@ class EmailService {
         to,
         from: fromEmail,
         replyTo,
-        subject: 'Animal House - Appointment Update',
+        subject: 'PilotHouse - Appointment Update',
         html: emailContent,
       });
 
@@ -542,7 +542,7 @@ class PushNotificationService {
     // For now, we'll log the notification that would be sent
     const messages = {
       'in_progress': `Your order #${orderId} is being prepared!`,
-      'ready': `Order #${orderId} is ready for pickup at Animal House Pet Store!`
+      'ready': `Order #${orderId} is ready for pickup at PilotHouse!`
     };
 
     const message = messages[status as keyof typeof messages];
@@ -591,7 +591,7 @@ class SMSService {
   }
 
   async sendAdminNewOrderSMS(phoneNumber: string, orderId: number, customerName: string, totalAmount: string): Promise<boolean> {
-    const message = `Animal House: New order #${orderId} from ${customerName} - Total: $${parseFloat(totalAmount).toFixed(2)}. Check the admin dashboard.`;
+    const message = `PilotHouse: New order #${orderId} from ${customerName} - Total: $${parseFloat(totalAmount).toFixed(2)}. Check the admin dashboard.`;
 
     if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_PHONE_NUMBER) {
       console.log('Twilio not configured, admin SMS skipped');
@@ -630,7 +630,7 @@ class SMSService {
     try {
       const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
       const result = await client.messages.create({
-        body: `Animal House Pet Store: SMS notifications are active! 🐾 Order alerts will be sent to this number.`,
+        body: `PilotHouse: SMS notifications are active! 🐾 Order alerts will be sent to this number.`,
         from: process.env.TWILIO_PHONE_NUMBER,
         to: toNumber,
       });
@@ -644,10 +644,10 @@ class SMSService {
 
   async sendOrderStatusSMS(phoneNumber: string, firstName: string, orderId: number, status: string): Promise<boolean> {
     const messages = {
-      'approved': `Hi ${firstName}! Your Animal House order #${orderId} has been approved. We'll text you when it's ready for pickup! Reply STOP to opt out.`,
-      'in_progress': `Hi ${firstName}! Your Animal House order #${orderId} is being prepared. We'll text you when it's ready for pickup! Reply STOP to opt out.`,
-      'ready': `${firstName}, your order #${orderId} is ready for pickup at Animal House Pet Store! 🐾 Reply STOP to opt out.`,
-      'picked_up': `Hi ${firstName}! Your Animal House order #${orderId} has been picked up. Thanks for shopping with us! 🐾 Reply STOP to opt out.`,
+      'approved': `Hi ${firstName}! Your PilotHouse order #${orderId} has been approved. We'll text you when it's ready for pickup! Reply STOP to opt out.`,
+      'in_progress': `Hi ${firstName}! Your PilotHouse order #${orderId} is being prepared. We'll text you when it's ready for pickup! Reply STOP to opt out.`,
+      'ready': `${firstName}, your order #${orderId} is ready for pickup at PilotHouse! 🐾 Reply STOP to opt out.`,
+      'picked_up': `Hi ${firstName}! Your PilotHouse order #${orderId} has been picked up. Thanks for shopping with us! 🐾 Reply STOP to opt out.`,
     };
     const message = messages[status as keyof typeof messages];
     if (!message) return false;
@@ -685,7 +685,7 @@ class SMSService {
   }
 
   async sendPetReadySMS(phoneNumber: string, firstName: string, petName: string, appointmentId?: number): Promise<boolean> {
-    const message = `Your Fur Baby is ready for pick-up, unless you've already spoken to a groomer, please give us a call to let us know you're on your way. The Animal House 318-323-6090. Reply STOP to opt out.`;
+    const message = `Your Fur Baby is ready for pick-up, unless you've already spoken to a groomer, please give us a call to let us know you're on your way. PilotHouse 318-323-6090. Reply STOP to opt out.`;
     // Route through sendGenericSMS so E.164 normalization and duplicate guard apply automatically
     return await this.sendGenericSMS(phoneNumber, message, appointmentId);
   }

@@ -1,6 +1,7 @@
 {
-  "name": "rest-express",
+  "name": "pilotHouse",
   "version": "1.0.0",
+  "description": "PilotHouse — the all-in-one platform for small business operations: POS, inventory, loyalty, bookings, and reporting.",
   "type": "module",
   "license": "MIT",
   "scripts": {

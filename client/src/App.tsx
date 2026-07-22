@@ -73,11 +73,8 @@ const Auth = safeLazy(() => import("@/pages/auth"), "auth");
 const ForgotPassword = safeLazy(() => import("@/pages/forgot-password"), "forgot-password");
 const ResetPassword = safeLazy(() => import("@/pages/reset-password"), "reset-password");
 const Home = safeLazy(() => import("@/pages/home"), "home");
-const Pets = safeLazy(() => import("@/pages/pets"), "pets");
 const Supplies = safeLazy(() => import("@/pages/supplies"), "supplies");
 const SupplyDetail = safeLazy(() => import("@/pages/supply-detail"), "supply-detail");
-const Aquatics = safeLazy(() => import("@/pages/aquatics"), "aquatics");
-const Reptiles = safeLazy(() => import("@/pages/reptiles"), "reptiles");
 const Booking = safeLazy(() => import("@/pages/booking"), "booking");
 const Profile = safeLazy(() => import("@/pages/profile"), "profile");
 const Settings = safeLazy(() => import("@/pages/settings"), "settings");
@@ -130,11 +127,8 @@ function Router() {
           <Route path="/about" component={About} />
           <Route path="/sms-consent" component={SmsConsent} />
           <Route path="/store" component={Home} />
-          <Route path="/pets" component={Pets} />
           <Route path="/supplies" component={Supplies} />
           <Route path="/supplies/:id" component={SupplyDetail} />
-          <Route path="/aquatics" component={Aquatics} />
-          <Route path="/reptiles" component={Reptiles} />
           
           {!isAuthenticated ? (
             <>
@@ -145,11 +139,8 @@ function Router() {
           ) : (
             <>
               <Route path="/" component={Home} />
-              <Route path="/pets" component={Pets} />
               <Route path="/supplies" component={Supplies} />
               <Route path="/supplies/:id" component={SupplyDetail} />
-              <Route path="/aquatics" component={Aquatics} />
-              <Route path="/reptiles" component={Reptiles} />
               <Route path="/booking" component={Booking} />
               <Route path="/profile" component={Profile} />
               <Route path="/settings" component={Settings} />

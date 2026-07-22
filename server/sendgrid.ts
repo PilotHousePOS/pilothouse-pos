@@ -15,14 +15,14 @@ export async function sendVerificationEmail(toEmail: string, firstName: string, 
 
     const msg = {
       to: toEmail,
-      from: { email: fromEmail, name: 'Animal House Pet Store' },
+      from: { email: fromEmail, name: 'PilotHouse' },
       replyTo,
-      subject: 'Verify Your Animal House Account',
-      text: `Welcome to Animal House Pet Store, ${firstName}!\n\nPlease verify your email address within 24 hours by visiting:\n\n${verifyLink}\n\nIf you did not create an account, you can ignore this email.\n\nAnimal House Pet Store\n(318) 322-3023`,
+      subject: 'Verify Your PilotHouse Account',
+      text: `Welcome to PilotHouse, ${firstName}!\n\nPlease verify your email address within 24 hours by visiting:\n\n${verifyLink}\n\nIf you did not create an account, you can ignore this email.\n\nPilotHouse\n(318) 322-3023`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
-            <h1 style="margin: 0;">Animal House Pet Store</h1>
+            <h1 style="margin: 0;">PilotHouse</h1>
           </div>
           <div style="padding: 30px; background-color: #f9f9f9;">
             <h2 style="color: #333; margin-bottom: 10px;">Welcome, ${firstName}!</h2>
@@ -46,7 +46,7 @@ export async function sendVerificationEmail(toEmail: string, firstName: string, 
             <p style="font-size: 12px; color: #999; word-break: break-all;">${verifyLink}</p>
           </div>
           <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
-            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
             <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
             <p style="margin: 0;">Phone: (318) 322-3023</p>
           </div>
@@ -82,15 +82,15 @@ export async function sendPasswordResetEmail(toEmail: string, resetToken: string
       to: toEmail,
       from: {
         email: fromEmail,
-        name: 'Animal House Pet Store'
+        name: 'PilotHouse'
       },
       replyTo,
-      subject: 'Your Animal House Account - Action Required',
-      text: `Animal House Pet Store - Account Security\n\nHello,\n\nWe received a request to update your account credentials. To complete this process, please visit:\n\n${resetLink}\n\nThis link expires in 1 hour.\n\nIf you did not make this request, no action is needed - your account remains secure.\n\nThank you,\nAnimal House Pet Store\n318-323-6090`,
+      subject: 'Your PilotHouse Account - Action Required',
+      text: `PilotHouse - Account Security\n\nHello,\n\nWe received a request to update your account credentials. To complete this process, please visit:\n\n${resetLink}\n\nThis link expires in 1 hour.\n\nIf you did not make this request, no action is needed - your account remains secure.\n\nThank you,\nPilotHouse\n318-323-6090`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
-            <h1 style="margin: 0;">Animal House Pet Store</h1>
+            <h1 style="margin: 0;">PilotHouse</h1>
           </div>
           <div style="padding: 30px; background-color: #f9f9f9;">
             <h2 style="color: #333; margin-bottom: 20px;">🔐 Account Security Update</h2>
@@ -116,7 +116,7 @@ export async function sendPasswordResetEmail(toEmail: string, resetToken: string
             </p>
           </div>
           <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
-            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
             <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
             <p style="margin: 0;">Phone: (318) 322-3023</p>
           </div>
@@ -147,14 +147,14 @@ export async function sendContactChangeOtpEmail(
     const fieldLabel = changeType === 'email' ? 'email address' : 'phone number';
     const msg = {
       to: toEmail,
-      from: { email: fromEmail, name: 'Animal House Pet Store' },
+      from: { email: fromEmail, name: 'PilotHouse' },
       replyTo,
-      subject: `Animal House – Verify Your ${changeType === 'email' ? 'New Email' : 'Phone Change'}`,
-      text: `Hi ${firstName},\n\nWe received a request to change your ${fieldLabel} to: ${newValue}\n\nYour verification code is: ${otp}\n\nThis code expires in 15 minutes. If you did not request this change, please ignore this email and your account will remain unchanged.\n\nAnimal House Pet Store\n(318) 322-3023`,
+      subject: `PilotHouse – Verify Your ${changeType === 'email' ? 'New Email' : 'Phone Change'}`,
+      text: `Hi ${firstName},\n\nWe received a request to change your ${fieldLabel} to: ${newValue}\n\nYour verification code is: ${otp}\n\nThis code expires in 15 minutes. If you did not request this change, please ignore this email and your account will remain unchanged.\n\nPilotHouse\n(318) 322-3023`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
-            <h1 style="margin: 0;">Animal House Pet Store</h1>
+            <h1 style="margin: 0;">PilotHouse</h1>
           </div>
           <div style="padding: 30px; background-color: #f9f9f9;">
             <h2 style="color: #333;">Verify Your ${fieldLabel === 'email address' ? 'New Email' : 'Phone Change'}</h2>
@@ -169,7 +169,7 @@ export async function sendContactChangeOtpEmail(
             </div>
           </div>
           <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
-            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
             <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
             <p style="margin: 0;">Phone: (318) 322-3023</p>
           </div>
@@ -201,21 +201,21 @@ export async function sendAppointmentRejectionEmail(
       to: toEmail,
       from: fromEmail,
       replyTo,
-      subject: 'Animal House - Appointment Update',
-      text: `The Animal House regrets to inform you that we could not accept your appointment. This may have been due to several reasons. If you have any questions about this please contact us at 318-323-6090`,
+      subject: 'PilotHouse - Appointment Update',
+      text: `PilotHouse regrets to inform you that we could not accept your appointment. This may have been due to several reasons. If you have any questions about this please contact us at 318-323-6090`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #1e40af; color: white; padding: 20px; text-align: center;">
-            <h1 style="margin: 0;">Animal House Pet Store</h1>
+            <h1 style="margin: 0;">PilotHouse</h1>
           </div>
           <div style="padding: 30px; background-color: #f9fafb;">
             <h2 style="color: #dc2626;">Appointment Update</h2>
             <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">
-              The Animal House regrets to inform you that we could not accept your appointment. This may have been due to several reasons. If you have any questions about this please contact us at <strong>318-323-6090</strong>.
+              PilotHouse regrets to inform you that we could not accept your appointment. This may have been due to several reasons. If you have any questions about this please contact us at <strong>318-323-6090</strong>.
             </p>
           </div>
           <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
-            <p style="margin: 0 0 5px 0;"><strong>Animal House Pet Store</strong></p>
+            <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
             <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
             <p style="margin: 0;">Phone: (318) 322-3023</p>
           </div>

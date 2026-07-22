@@ -441,7 +441,7 @@ export default function PosPage() {
           <button onClick={() => setLocation("/admin")} className="flex items-center gap-1 text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-gray-300">
             <ChevronLeft className="h-3 w-3" /> Admin
           </button>
-          <span className="text-sm font-bold">Animal House Pet Store</span>
+          <span className="text-sm font-bold">PilotHouse</span>
           <span className="text-xs bg-blue-700 px-2 py-0.5 rounded font-semibold">IN STORE</span>
         </div>
         <div className="flex items-center gap-3">

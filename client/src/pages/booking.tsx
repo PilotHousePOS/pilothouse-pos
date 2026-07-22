@@ -1096,7 +1096,7 @@ export default function Booking() {
                   data-testid="checkbox-sms-consent"
                 />
                 <span className="text-xs text-gray-600 leading-snug">
-                  By providing my phone number, I consent to receive text message updates about my appointment from Animal House Pet Store. Message &amp; data rates may apply. Reply <strong>STOP</strong> to opt out.
+                  By providing my phone number, I consent to receive text message updates about my appointment from PilotHouse. Message &amp; data rates may apply. Reply <strong>STOP</strong> to opt out.
                 </span>
               </label>
             )}

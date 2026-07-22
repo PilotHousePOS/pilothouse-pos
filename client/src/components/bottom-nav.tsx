@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Home, PawPrint, ShoppingBag, Calendar, User, Settings } from "lucide-react";
+import { Home, ShoppingBag, Calendar, User, Settings } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 
@@ -13,8 +13,7 @@ export default function BottomNav() {
 
   const NAV_ITEMS = [
     { path: "/", icon: Home, label: "Home" },
-    { path: "/pets", icon: PawPrint, label: "Pets" },
-    { path: "/supplies", icon: ShoppingBag, label: "Supplies" },
+    { path: "/supplies", icon: ShoppingBag, label: "Products" },
     { path: "/booking", icon: Calendar, label: "Book" },
     { path: "/profile", icon: User, label: "Profile" },
     ...((user as any)?.isAdmin || (user as any)?.isGroomer ? [{ path: "/admin", icon: Settings, label: "Admin" }] : []),
@@ -44,7 +43,7 @@ export default function BottomNav() {
             >
               <div className="relative">
                 <Icon className="w-5 h-5" />
-                {item.label === "Supplies" && cartCount > 0 && (
+                {item.path === "/supplies" && cartCount > 0 && (
                   <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                     {cartCount > 9 ? '9+' : cartCount}
                   </span>

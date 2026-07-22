@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 const DEFAULT_CONTENT = `<p class="text-xs text-gray-500">Last Updated: February 10, 2026</p>
 
 <h2>1. Acceptance of Terms</h2>
-<p>By accessing or using the Animal House Pet Store website and mobile application (the "Service"), you agree to be bound by these Terms of Service. If you do not agree, please do not use the Service.</p>
+<p>By accessing or using the PilotHouse website and mobile application (the "Service"), you agree to be bound by these Terms of Service. If you do not agree, please do not use the Service.</p>
 
 <h2>2. Account Registration</h2>
 <ul>
@@ -68,10 +68,10 @@ const DEFAULT_CONTENT = `<p class="text-xs text-gray-500">Last Updated: February
 </ul>
 
 <h2>9. Intellectual Property</h2>
-<p>All content on the Service, including text, graphics, logos, images, and software, is the property of Animal House Pet Store or its content suppliers and is protected by intellectual property laws. You may not reproduce, distribute, or create derivative works without our written consent.</p>
+<p>All content on the Service, including text, graphics, logos, images, and software, is the property of PilotHouse or its content suppliers and is protected by intellectual property laws. You may not reproduce, distribute, or create derivative works without our written consent.</p>
 
 <h2>10. Limitation of Liability</h2>
-<p>Animal House Pet Store shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the Service. Our total liability shall not exceed the amount you paid for products or services in the preceding 12 months.</p>
+<p>PilotHouse shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the Service. Our total liability shall not exceed the amount you paid for products or services in the preceding 12 months.</p>
 
 <h2>11. Governing Law</h2>
 <p>These Terms shall be governed by and construed in accordance with the laws of the State of Louisiana, without regard to conflict of law principles. Any disputes shall be resolved in the courts of Ouachita Parish, Louisiana.</p>
@@ -80,8 +80,7 @@ const DEFAULT_CONTENT = `<p class="text-xs text-gray-500">Last Updated: February
 <p>We reserve the right to modify these Terms at any time. Continued use of the Service after changes constitutes acceptance of the updated Terms.</p>
 
 <h2>13. Contact Us</h2>
-<p>If you have questions about these Terms, please contact us:</p>
-<p><strong>Animal House Pet Store</strong><br/>2934 Cypress St<br/>West Monroe, LA 71291<br/>Phone: (318) 322-3023</p>`;
+<p>If you have questions about these Terms, please contact us through the Support page within the app.</p>`;
 
 export default function TermsOfService() {
   const [, navigate] = useLocation();

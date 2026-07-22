@@ -2,7 +2,7 @@
  * Returns the canonical public base URL for this deployment.
  *
  * REPLIT_DOMAINS is a comma-separated list, e.g.:
- *   "animalhouseexperience.replit.app,animalhousepetstore.com"
+ *   "pilothouse.replit.app,pilothouse.app"
  *
  * We prefer the custom domain (anything that is NOT a *.replit.app / *.replit.dev
  * subdomain) so that links sent in emails always use the production custom domain.

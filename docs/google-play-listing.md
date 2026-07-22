@@ -1,59 +1,58 @@
-# Google Play Store Listing - Animal House Pet Store
+# Google Play Store Listing - PilotHouse
 
 ## App Name
-Animal House Pet Store
+PilotHouse
 
 ## Short Description (80 characters max)
-Exotic reptiles, pet supplies & grooming. Book appointments, shop, and more!
+All-in-one business platform: POS, inventory, loyalty, and appointments.
 
 ## Full Description (4000 characters max)
 
-Welcome to Animal House Pet Store - your one-stop destination for exotic reptiles, premium pet supplies, and professional grooming services!
+Welcome to PilotHouse — the all-in-one platform for small business operations!
 
-**BOOK GROOMING APPOINTMENTS**
-Schedule your pet's grooming with just a few taps. Choose from our services:
-- Full Grooming - Complete grooming package for your furry friend
-- Bath Only - Quick refresh for your pet
+**POINT OF SALE**
+Fast, reliable checkout with inventory sync and receipt printing. Integrated with hardware terminals for a seamless in-store experience.
 
-View available times, select your preferred date, and get instant confirmation. No more waiting for callbacks!
+**INVENTORY & PRODUCTS**
+Browse and manage your full product catalog. Customers can shop online and pick up in store, while staff keep inventory accurate in real time.
 
-**SHOP PET SUPPLIES**
-Browse our extensive collection of quality pet products:
-- Premium dog and cat food from trusted brands
-- Treats and supplements
-- Toys and accessories
-- Aquarium and reptile supplies
-- And much more!
+**LOYALTY REWARDS**
+Keep customers coming back. Earn points on every qualifying purchase and redeem them for discounts on future orders. View your balance on your Profile page.
 
-**EXOTIC REPTILES**
-Discover our selection of exotic reptiles and get expert advice on care and habitat setup.
+**APPOINTMENT BOOKING**
+Schedule service appointments with just a few taps. Choose your service, date, and time. Get automated reminders and status updates via SMS.
+
+**REPORTING**
+Daily and periodic sales reports delivered automatically. Track revenue, orders, and top categories across all sales channels.
 
 **KEY FEATURES**
-- Easy appointment booking with real-time availability
-- View your order history and wishlist
-- Get notifications when your pet is ready for pickup
-- Secure account with saved preferences
-- Fast, mobile-friendly experience
+- Fast checkout with integrated POS hardware
+- Online store with in-store pickup
+- Customer loyalty rewards program
+- Service appointment booking with automated reminders
+- Order history and wishlist
+- Real-time push notifications for order and appointment updates
+- Secure JWT-based authentication
+- Mobile-friendly PWA experience
 
-**ABOUT ANIMAL HOUSE**
-Animal House Pet Store is a trusted local pet store offering quality products and services for pet owners. We specialize in exotic reptiles while providing everything you need for dogs, cats, fish, and more.
+**ABOUT PILOTHOUSE**
+PilotHouse is a platform for small businesses that want a modern, unified system for sales, inventory, loyalty, and appointments.
 
-Download now and give your pets the care they deserve!
+Download now and take control of your business!
 
 ---
 
 ## Category
-Shopping > Pet Supplies
+Business > Productivity
 
 ## Tags/Keywords
-pet store, grooming, pet grooming, dog grooming, exotic pets, reptiles, pet supplies, pet food, pet shop, animal store
+POS, point of sale, business management, loyalty rewards, appointment booking, inventory management, small business, online store, order management
 
 ## Content Rating
 Everyone
 
 ## Privacy Policy URL
 [Your published app URL]/privacy-policy
-(You'll need to create a simple privacy policy page)
 
 ---
 
@@ -61,11 +60,11 @@ Everyone
 
 You'll need to take these screenshots from your phone:
 
-1. **Home Screen** - The main landing page showing your store branding
-2. **Grooming Booking** - The appointment booking calendar and time selection
-3. **Pet Supplies** - The supplies/shop browsing page
-4. **Exotic Pets** - The reptiles/exotic pets section
-5. **User Account** - The profile or login screen
+1. **Home Screen** - The main dashboard
+2. **Appointment Booking** - The appointment booking calendar and time selection
+3. **Products / Shop** - The supplies/shop browsing page
+4. **User Profile** - The profile or loyalty page
+5. **POS** - The point-of-sale screen
 
 ### Screenshot Specifications:
 - Minimum: 320px

@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Animal House Pet Store",
-  "short_name": "Animal House",
-  "description": "Exotic reptiles, pet supplies, and professional grooming services. Book grooming appointments, shop for pet supplies, and discover exotic pets.",
+  "name": "PilotHouse",
+  "short_name": "PilotHouse",
+  "description": "The all-in-one platform for small business operations: POS, inventory, loyalty rewards, appointments, and reporting.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -71,44 +71,23 @@
   ],
   "shortcuts": [
     {
-      "name": "Book Grooming",
+      "name": "Book Appointment",
       "short_name": "Book",
-      "description": "Book a grooming appointment",
+      "description": "Book a service appointment",
       "url": "/booking",
       "icons": [{"src": "/icons/icon-96x96.png", "sizes": "96x96", "type": "image/png"}]
     },
     {
       "name": "Shop Supplies",
       "short_name": "Shop",
-      "description": "Browse pet supplies",
+      "description": "Browse products",
       "url": "/supplies",
-      "icons": [{"src": "/icons/icon-96x96.png", "sizes": "96x96", "type": "image/png"}]
-    },
-    {
-      "name": "View Exotic Pets",
-      "short_name": "Pets",
-      "description": "Browse exotic reptiles",
-      "url": "/pets",
       "icons": [{"src": "/icons/icon-96x96.png", "sizes": "96x96", "type": "image/png"}]
     }
   ],
   "categories": ["shopping", "lifestyle", "business"],
   "prefer_related_applications": false,
-  "related_applications": [
-    {
-      "platform": "play",
-      "url": "https://play.google.com/store/apps/details?id=com.animalhousepetstore.app",
-      "id": "com.animalhousepetstore.app"
-    },
-    {
-      "platform": "itunes",
-      "url": "https://apps.apple.com/app/animal-house-pet-store/id000000000"
-    },
-    {
-      "platform": "windows",
-      "url": "https://www.microsoft.com/store/apps/9XXXXXX"
-    }
-  ],
+  "related_applications": [],
   "launch_handler": {
     "client_mode": "navigate-existing"
   },
@@ -126,16 +105,12 @@
   },
   "protocol_handlers": [
     {
-      "protocol": "web+animalhouse",
+      "protocol": "web+pilothouse",
       "url": "/?action=%s"
     }
   ],
   "handle_links": "preferred",
-  "scope_extensions": [
-    {
-      "origin": "https://*.animalhousepetstore.com"
-    }
-  ],
+  "scope_extensions": [],
   "file_handlers": [
     {
       "action": "/",
@@ -159,21 +134,21 @@
       "sizes": "1080x2254",
       "type": "image/jpeg",
       "form_factor": "narrow",
-      "label": "Featured Pets - Exotic Reptiles"
+      "label": "Store Home"
     },
     {
       "src": "/screenshots/services-narrow.jpg",
       "sizes": "1080x2256",
       "type": "image/jpeg",
       "form_factor": "narrow",
-      "label": "Complete Pet Care Services"
+      "label": "Services & Appointments"
     },
     {
       "src": "/screenshots/supplies-narrow.jpg",
       "sizes": "1080x2255",
       "type": "image/jpeg",
       "form_factor": "narrow",
-      "label": "Pet Supplies Shop"
+      "label": "Products Shop"
     },
     {
       "src": "/screenshots/profile-narrow.jpg",

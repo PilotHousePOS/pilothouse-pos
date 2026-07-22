@@ -111,7 +111,7 @@ export default function VerifyEmail() {
         <div className="mb-6">
           <img
             src="/animal-house-logo.png"
-            alt="Animal House"
+            alt="PilotHouse"
             className="h-14 mx-auto mb-4"
             onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
           />

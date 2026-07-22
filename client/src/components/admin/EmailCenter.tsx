@@ -1412,8 +1412,8 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      setSubject('Important Notice from Animal House Pet Store');
-                      setMessage('Dear Valued Customer,\n\nWe have an important update to share with you.\n\n[Your message here]\n\nThank you for being a loyal customer!\n\nBest regards,\nAnimal House Pet Store');
+                      setSubject('Important Notice from PilotHouse');
+                      setMessage('Dear Valued Customer,\n\nWe have an important update to share with you.\n\n[Your message here]\n\nThank you for being a loyal customer!\n\nBest regards,\nPilotHouse');
                     }}
                   >
                     General Announcement
@@ -1423,7 +1423,7 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
                     size="sm"
                     onClick={() => {
                       setSubject('Special Offer Just for You!');
-                      setMessage('Dear Valued Customer,\n\nWe have an exclusive offer waiting for you at Animal House Pet Store!\n\n[Describe your offer here]\n\nVisit us today!\n\nBest regards,\nAnimal House Pet Store');
+                      setMessage('Dear Valued Customer,\n\nWe have an exclusive offer waiting for you at PilotHouse!\n\n[Describe your offer here]\n\nVisit us today!\n\nBest regards,\nPilotHouse');
                     }}
                   >
                     Promotional
@@ -1432,8 +1432,8 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      setSubject('Reminder: Your Appointment at Animal House');
-                      setMessage('Dear Customer,\n\nThis is a friendly reminder about your upcoming appointment.\n\n[Add appointment details]\n\nWe look forward to seeing you!\n\nBest regards,\nAnimal House Pet Store');
+                      setSubject('Reminder: Your Appointment at PilotHouse');
+                      setMessage('Dear Customer,\n\nThis is a friendly reminder about your upcoming appointment.\n\n[Add appointment details]\n\nWe look forward to seeing you!\n\nBest regards,\nPilotHouse');
                     }}
                   >
                     Appointment Reminder
@@ -1444,14 +1444,14 @@ export default function EmailCenter({ groomingSettings }: EmailCenterProps) {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setMessage('Hi from Animal House! Your appointment is tomorrow. Reply CONFIRM to confirm. Questions? Call us!')}
+                    onClick={() => setMessage('Hi from PilotHouse! Your appointment is tomorrow. Reply CONFIRM to confirm. Questions? Call us!')}
                   >
                     Appointment Reminder
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setMessage('Animal House special! Visit us today for exclusive deals on pet supplies!')}
+                    onClick={() => setMessage('PilotHouse special! Visit us today for exclusive deals on pet supplies!')}
                   >
                     Promotional
                   </Button>

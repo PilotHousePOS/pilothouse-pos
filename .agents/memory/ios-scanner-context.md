@@ -4,7 +4,7 @@ description: How the iOS app runs and what that means for the barcode scanner
 ---
 
 ## What the iOS "app" actually is
-The Animal House Pet Store iOS app is published on the App Store as a **WKWebView wrapper** (likely PWABuilder or similar). It is NOT a Safari PWA added to home screen.
+The PilotHouse iOS app is published on the App Store as a **WKWebView wrapper** (likely PWABuilder or similar). It is NOT a Safari PWA added to home screen.
 
 ## Diagnostic data (confirmed from deployment logs, iOS 18.7)
 - `navigator.standalone` = **false** (0) — WKWebView apps never set this; standalone detection is useless here

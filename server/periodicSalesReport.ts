@@ -123,7 +123,7 @@ function buildEmailHtml(
 <body style="font-family:Arial,sans-serif;background:#eef2f7;margin:0;padding:24px;">
   <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1);">
     <div style="background:#111827;padding:24px 28px;color:#fff;">
-      <div style="font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.08em;">Animal House Pet Store</div>
+      <div style="font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.08em;">PilotHouse</div>
       <div style="font-size:22px;font-weight:700;margin-top:4px;">${type} Sales Report</div>
       <div style="font-size:15px;color:#d1d5db;margin-top:2px;">${label}</div>
     </div>
@@ -159,7 +159,7 @@ function buildEmailHtml(
 
     <div style="padding:14px 28px;background:#f3f4f6;text-align:center;font-size:11px;color:#6b7280;">
       Generated ${new Date().toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })} CST
-      &nbsp;·&nbsp; Animal House Pet Store
+      &nbsp;·&nbsp; PilotHouse
     </div>
   </div>
 </body></html>`;

@@ -62,12 +62,12 @@ export default function StoreFooter() {
         <div className="flex items-center space-x-2 text-gray-600">
           <MapPin className="w-4 h-4 flex-shrink-0 text-gray-400" />
           <a
-            href="https://www.google.com/maps/search/?api=1&query=Animal+House+Pet+Store+2934+Cypress+St+West+Monroe+LA+71291"
+            href="https://www.google.com/maps/search/?api=1&query=2934+Cypress+St+West+Monroe+LA+71291"
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs text-brand-blue hover:underline font-medium"
           >
-            Animal House Pet Store
+            2934 Cypress St, West Monroe, LA
           </a>
         </div>
         <div className="flex items-center justify-center gap-3 pt-2 border-t border-gray-200 mt-2">

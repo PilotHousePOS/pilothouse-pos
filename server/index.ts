@@ -231,15 +231,13 @@ app.get('/sw.js', (_req, res) => {
 });
 
 app.get('/sitemap.xml', (_req, res) => {
-  const domain = process.env.REPLIT_DOMAINS?.split(',')[0] || 'animalhousepetstore.com';
+  const domain = process.env.REPLIT_DOMAINS?.split(',')[0] || 'pilothouse.app';
   const baseUrl = `https://${domain}`;
   const today = new Date().toISOString().split('T')[0];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>${baseUrl}/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
   <url><loc>${baseUrl}/supplies</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
-  <url><loc>${baseUrl}/reptiles</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>${baseUrl}/aquatics</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>${baseUrl}/booking</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>${baseUrl}/privacy-policy</loc><lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.3</priority></url>
   <url><loc>${baseUrl}/terms-of-service</loc><lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.3</priority></url>
@@ -353,7 +351,7 @@ async function seedLegalPages() {
         content: `<p class="text-xs text-gray-500">Last Updated: February 10, 2026</p>
 
 <h2>1. Introduction</h2>
-<p>Animal House Pet Store ("we," "us," or "our"), located at 2934 Cypress St, West Monroe, LA 71291, is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and mobile application (the "Service").</p>
+<p>PilotHouse ("we," "us," or "our"), located at 2934 Cypress St, West Monroe, LA 71291, is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and mobile application (the "Service").</p>
 
 <h2>2. Information We Collect</h2>
 <p><strong>Personal Information:</strong></p>
@@ -419,7 +417,7 @@ async function seedLegalPages() {
 
 <h2>11. Contact Us</h2>
 <p>If you have questions about this Privacy Policy, please contact us:</p>
-<p><strong>Animal House Pet Store</strong><br/>2934 Cypress St<br/>West Monroe, LA 71291<br/>Phone: (318) 322-3023</p>`,
+<p><strong>PilotHouse</strong><br/>2934 Cypress St<br/>West Monroe, LA 71291<br/>Phone: (318) 322-3023</p>`,
       });
       log('Seeded privacy-policy legal page');
     }
@@ -431,7 +429,7 @@ async function seedLegalPages() {
         content: `<p class="text-xs text-gray-500">Last Updated: February 10, 2026</p>
 
 <h2>1. Acceptance of Terms</h2>
-<p>By accessing or using the Animal House Pet Store website and mobile application (the "Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.</p>
+<p>By accessing or using the PilotHouse website and mobile application (the "Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.</p>
 
 <h2>2. Account Registration</h2>
 <ul>
@@ -489,10 +487,10 @@ async function seedLegalPages() {
 </ul>
 
 <h2>8. Intellectual Property</h2>
-<p>All content on the Service, including text, images, logos, and software, is the property of Animal House Pet Store and is protected by applicable intellectual property laws. You may not reproduce, distribute, or create derivative works without our express written permission.</p>
+<p>All content on the Service, including text, images, logos, and software, is the property of PilotHouse and is protected by applicable intellectual property laws. You may not reproduce, distribute, or create derivative works without our express written permission.</p>
 
 <h2>9. Limitation of Liability</h2>
-<p>Animal House Pet Store shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the Service. Our total liability shall not exceed the amount you paid for the specific product or service giving rise to the claim.</p>
+<p>PilotHouse shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the Service. Our total liability shall not exceed the amount you paid for the specific product or service giving rise to the claim.</p>
 
 <h2>10. Disclaimer of Warranties</h2>
 <p>The Service is provided "as is" without warranties of any kind. We do not guarantee that the Service will be uninterrupted, error-free, or free of harmful components.</p>
@@ -505,7 +503,7 @@ async function seedLegalPages() {
 
 <h2>13. Contact Us</h2>
 <p>If you have questions about these Terms of Service, please contact us:</p>
-<p><strong>Animal House Pet Store</strong><br/>2934 Cypress St<br/>West Monroe, LA 71291<br/>Phone: (318) 322-3023</p>`,
+<p><strong>PilotHouse</strong><br/>2934 Cypress St<br/>West Monroe, LA 71291<br/>Phone: (318) 322-3023</p>`,
       });
       log('Seeded terms-of-service legal page');
     }

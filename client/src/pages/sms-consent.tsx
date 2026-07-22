@@ -12,7 +12,7 @@ export default function SmsConsent() {
         </button>
         <div>
           <h1 className="font-bold text-lg">SMS Messaging Consent</h1>
-          <p className="text-blue-200 text-sm">Animal House Pet Store</p>
+          <p className="text-blue-200 text-sm">PilotHouse</p>
         </div>
       </div>
 
@@ -20,8 +20,7 @@ export default function SmsConsent() {
         <section>
           <h2 className="font-bold text-base text-gray-900 mb-2">SMS / Text Message Communications</h2>
           <p>
-            Animal House Pet Store (2934 Cypress St, West Monroe, LA 71291 · (318) 322-3023)
-            sends SMS text messages to customers who have provided their mobile phone number
+            PilotHouse sends SMS text messages to customers who have provided their mobile phone number
             and consented to receive text communications.
           </p>
         </section>
@@ -93,7 +92,7 @@ export default function SmsConsent() {
           <h2 className="font-bold text-base text-gray-900 mb-2">Message & Data Rates</h2>
           <p>
             Message and data rates may apply depending on your mobile carrier and plan.
-            Animal House Pet Store does not charge for SMS messages; however, standard
+            PilotHouse does not charge for SMS messages; however, standard
             carrier rates may apply.
           </p>
         </section>
@@ -117,9 +116,7 @@ export default function SmsConsent() {
         </section>
 
         <div className="border-t pt-4 text-xs text-gray-500">
-          <p><strong>Animal House Pet Store</strong></p>
-          <p>2934 Cypress St, West Monroe, LA 71291</p>
-          <p>Phone: (318) 322-3023</p>
+          <p><strong>PilotHouse</strong></p>
           <p className="mt-1">Last Updated: June 2026</p>
         </div>
       </div>
