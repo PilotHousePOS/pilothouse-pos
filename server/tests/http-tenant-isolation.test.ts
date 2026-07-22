@@ -40,6 +40,11 @@ let tenantASlug: string;
 let userAId: string;
 let userBId: string;
 
+/** Groomer user in Tenant A — non-admin, isGroomer=true */
+let groomerAId: string;
+/** Bearer token for Tenant A's groomer user */
+let tokenGroomerA: string;
+
 let supplyAId: number;
 let supplyBId: number;
 let contactAId: number;
@@ -94,6 +99,25 @@ async function createTestAdminUser(tenantId: number, email: string): Promise<str
       tenantId,
       password: "hashed-password-for-test",
       isAdmin: true,
+      tokenVersion: 0,
+    })
+    .returning();
+  return user.id;
+}
+
+async function createTestGroomerUser(tenantId: number, email: string): Promise<string> {
+  const id = "http-test-" + randomSuffix();
+  const [user] = await db
+    .insert(users)
+    .values({
+      id,
+      email,
+      firstName: "HTTP",
+      lastName: "Groomer",
+      tenantId,
+      password: "hashed-password-for-test",
+      isAdmin: false,
+      isGroomer: true,
       tokenVersion: 0,
     })
     .returning();
@@ -228,6 +252,12 @@ beforeAll(async () => {
   const dbUserA = await getDbUser(userAId);
   tokenA = generateToken(dbUserA as any);
 
+  // Create a groomer user in Tenant A and generate their token
+  const sfxG = randomSuffix();
+  groomerAId = await createTestGroomerUser(tenantAId, `http-groomer-a-${sfxG}@test.local`);
+  const dbGroomerA = await getDbUser(groomerAId);
+  tokenGroomerA = generateToken(dbGroomerA as any);
+
   const app = await buildTestApp();
   agent = supertest(app);
 }, 60_000);
@@ -252,6 +282,7 @@ afterAll(async () => {
 
   if (userAId) await db.delete(users).where(eq(users.id, userAId));
   if (userBId) await db.delete(users).where(eq(users.id, userBId));
+  if (groomerAId) await db.delete(users).where(eq(users.id, groomerAId));
 
   if (tenantAId) await db.delete(tenants).where(eq(tenants.id, tenantAId));
   if (tenantBId) await db.delete(tenants).where(eq(tenants.id, tenantBId));
@@ -533,5 +564,88 @@ describe("Unauthenticated requests are rejected with 401", () => {
       .delete(`/api/pets/${petAId}`)
       .set("X-Tenant-Slug", tenantASlug);
     expect(res.status).toBe(401);
+  });
+});
+
+// ─── Groomer cross-tenant isolation ──────────────────────────────────────────
+//
+// Groomers (isGroomer=true, isAdmin=false) in Tenant A are allowed to call
+// PUT /api/contacts/:id and PUT /api/appointments/:id for their own tenant.
+// Targeting Tenant B's records must be rejected (HTTP 404) and leave the
+// records unchanged.
+
+describe("PUT /api/contacts/:id — groomer cross-tenant write rejected", () => {
+  it("returns 404 when Tenant A groomer targets Tenant B's contact", async () => {
+    const res = await agent
+      .put(`/api/contacts/${contactBId}`)
+      .set("Authorization", `Bearer ${tokenGroomerA}`)
+      .send({ name: "GROOMER-HACKED", phoneNumber: "5550000022" });
+
+    expect(res.status).toBe(404);
+  });
+
+  it("Tenant B's contact name is unchanged after groomer's rejected update", async () => {
+    const [row] = await db
+      .select({ name: contacts.name })
+      .from(contacts)
+      .where(eq(contacts.id, contactBId));
+    expect(row?.name).toBe(contactBOriginalName);
+  });
+
+  it("returns 200 when Tenant A groomer updates their own tenant's contact", async () => {
+    // Create a throwaway contact in Tenant A for the groomer to update
+    const throwawayId = await createTestContact(tenantAId, "Groomer Throwaway", "5559990099");
+    const res = await agent
+      .put(`/api/contacts/${throwawayId}`)
+      .set("Authorization", `Bearer ${tokenGroomerA}`)
+      .send({ name: "Groomer Updated", phoneNumber: "5559990099" });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("id", throwawayId);
+
+    // Cleanup
+    await db.delete(contacts).where(eq(contacts.id, throwawayId));
+  });
+});
+
+describe("PUT /api/appointments/:id — groomer cross-tenant status update rejected", () => {
+  it("returns 404 when Tenant A groomer targets Tenant B's appointment", async () => {
+    const res = await agent
+      .put(`/api/appointments/${appointmentBId}`)
+      .set("Authorization", `Bearer ${tokenGroomerA}`)
+      .send({ status: "confirmed" });
+
+    expect(res.status).toBe(404);
+  });
+
+  it("Tenant B's appointment status is unchanged after groomer's rejected update", async () => {
+    const [row] = await db
+      .select({ status: appointments.status })
+      .from(appointments)
+      .where(eq(appointments.id, appointmentBId));
+    expect(row?.status).toBe(appointmentBOriginalStatus);
+  });
+
+  it("returns 200 when Tenant A groomer updates status on their own appointment (non-scheduled)", async () => {
+    // Create a throwaway appointment in Tenant A that is already confirmed
+    // so the groomer (non-admin) is allowed to update it
+    const throwawayApptId = await createTestAppointment(tenantAId, userAId, "GroomerOwner");
+    // Set it to confirmed so groomer can act on it (groomers cannot approve 'scheduled')
+    await db
+      .update(appointments)
+      .set({ status: "confirmed" })
+      .where(eq(appointments.id, throwawayApptId));
+
+    const res = await agent
+      .put(`/api/appointments/${throwawayApptId}`)
+      .set("Authorization", `Bearer ${tokenGroomerA}`)
+      .send({ status: "confirmed" });
+
+    // 200 confirms the groomer can write to their own tenant's appointment
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("id", throwawayApptId);
+
+    // Cleanup
+    await db.delete(appointments).where(eq(appointments.id, throwawayApptId));
   });
 });
