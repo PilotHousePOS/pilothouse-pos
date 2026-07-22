@@ -217,14 +217,8 @@ const excelUpload = multer({
 // Keys are user IDs; the value is the UTC date string (YYYY-MM-DD) when the alert was last sent.
 //
 // Known limitation — one-per-server-restart edge case:
-// This map is held in process memory only. If the server restarts mid-day, the
-// map is cleared and a stranded user who already received an alert that day could
-// trigger a second email after the restart. This is an accepted tradeoff: the
-// alert is an operational safety net rather than a billing-critical event, and
-// the alternative (persisting state to the database) adds complexity for a
-// rarely-exercised path. See the follow-up task
-// "Persist the stranded-account flag so alerts survive server restarts".
-const noTenantAlertSentToday = new Map<string, string>();
+// Stranded-account alert deduplication is now persisted to the database via the
+// strandedAlertSentAt column on the users table. This survives server restarts.
 
 // In-memory store for pending contact-change OTPs (email/phone).
 // Keyed by a random pendingToken returned to the client.
@@ -1108,15 +1102,22 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
       // Detect stranded accounts: authenticated user with no tenant and not a super-admin.
       // Log a warning and fire a one-per-day alert to super-admins so they can act immediately.
+      // Deduplication uses strandedAlertSentAt persisted in the database so it survives restarts.
       if (!freshUser.tenantId && !freshUser.isSuperAdmin) {
         const todayUtc = new Date().toISOString().slice(0, 10);
         const userId = String(freshUser.id);
-        const lastAlertDate = noTenantAlertSentToday.get(userId);
+        const lastAlertDate = freshUser.strandedAlertSentAt
+          ? new Date(freshUser.strandedAlertSentAt).toISOString().slice(0, 10)
+          : null;
         console.warn(
           `[no-tenant] Stranded account login — userId=${userId} email=${freshUser.email ?? '(none)'} joined=${freshUser.createdAt ?? 'unknown'}`
         );
         if (lastAlertDate !== todayUtc) {
-          noTenantAlertSentToday.set(userId, todayUtc);
+          // Persist the timestamp before firing the alert so a rapid second request
+          // within the same UTC day won't send a duplicate even mid-flight.
+          storage.updateUserStrandedAlertSentAt(userId, new Date()).catch((err) => {
+            console.error('[no-tenant-alert] Failed to persist strandedAlertSentAt:', err);
+          });
           // Fire-and-forget: do not await so the user response is not delayed
           sendNoTenantAlertToSuperAdmins({
             id: userId,

@@ -502,6 +502,7 @@ export interface IStorage {
   updateUserLoyalty(userId: string, data: { loyaltyCredits?: string; totalSpent?: string }): Promise<User>;
   addToUserTotalSpent(userId: string, amount: number): Promise<{ newCreditsEarned: boolean; creditsAmount: string }>;
   updateUserStripeInfo(userId: string, data: { stripeCustomerId?: string; stripeDefaultPaymentMethod?: string }): Promise<User>;
+  updateUserStrandedAlertSentAt(userId: string, sentAt: Date): Promise<void>;
 
   // Legal pages operations
   getLegalPage(slug: string): Promise<LegalPage | undefined>;
@@ -5085,6 +5086,12 @@ export class DatabaseStorage implements IStorage {
       console.error('Error updating user Stripe info:', error);
       throw error;
     }
+  }
+
+  async updateUserStrandedAlertSentAt(userId: string, sentAt: Date): Promise<void> {
+    await db.update(users)
+      .set({ strandedAlertSentAt: sentAt, updatedAt: new Date() })
+      .where(eq(users.id, userId));
   }
 
   async getLegalPage(slug: string): Promise<LegalPage | undefined> {

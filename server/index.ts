@@ -543,6 +543,7 @@ async function runAppMigrations() {
     await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW()`);
     await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS phone_number VARCHAR(100)`);
     await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS token_version INTEGER DEFAULT 0`);
+    await migPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS stranded_alert_sent_at TIMESTAMP`);
     await migPool.query(`CREATE TABLE IF NOT EXISTS specials (
       id SERIAL PRIMARY KEY,
       title VARCHAR(255) NOT NULL,
