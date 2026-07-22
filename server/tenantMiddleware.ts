@@ -29,7 +29,9 @@ declare global {
  *  1. Authenticated user's tenantId (from JWT → DB user record)
  *  2. X-Tenant-Slug request header (for public/unauthenticated routes)
  *  3. ?tenant= query parameter
- *  4. Default to tenant 1 (single-tenant / development fallback)
+ *  4. 400 error — slug is required for unauthenticated requests.
+ *     Set ALLOW_TENANT_FALLBACK=true to revert to the single-tenant /
+ *     development fallback (tenant 1) instead.
  *
  * Attaches req.tenantId (number) for all downstream handlers.
  * Does NOT block unauthenticated requests — that's auth middleware's job.
@@ -93,13 +95,24 @@ export async function tenantMiddleware(
         req.tenantId = tenant.id;
         return next();
       }
+      // Slug provided but not found — reject rather than fall through to tenant 1.
+      res.status(404).json({ message: `Store '${slug}' not found.` });
+      return;
     }
 
-    // 3. Public unauthenticated request with no slug — default to tenant 1
-    //    (single-tenant / development fallback for public endpoints like store-hours,
-    //    booking availability, hiring-open, etc.)
-    req.tenantId = 1;
-    next();
+    // 3. Public unauthenticated request with no slug.
+    //    In production this is a 400 — the caller must supply X-Tenant-Slug (or ?tenant=).
+    //    Set ALLOW_TENANT_FALLBACK=true to keep the single-tenant / development fallback.
+    if (process.env.ALLOW_TENANT_FALLBACK === "true") {
+      req.tenantId = 1;
+      return next();
+    }
+
+    res.status(400).json({
+      message:
+        "Missing tenant: include an X-Tenant-Slug header or ?tenant= query parameter.",
+    });
+    return;
   } catch {
     // Tenant resolution error — reject the request instead of proceeding with undefined
     // tenant context, which would silently degrade into cross-tenant/global data access.

@@ -4,16 +4,18 @@
  * Verifies that the customer signup route cannot silently assign a new user to
  * the wrong store when the tenant context is ambiguous or absent.
  *
- * Two behaviours are covered:
+ * Three behaviours are covered:
  *
  *  1. X-Tenant-Slug header present — tenantMiddleware resolves the slug to the
  *     matching tenant's id, and storage.createUser stores that id on the new
  *     user record.
  *
- *  2. No tenant context at all — tenantMiddleware falls back to tenant 1
- *     (documented single-tenant / development fallback, see tenantMiddleware.ts
- *     line ~101).  The test confirms the fallback is predictable and explicit
- *     rather than undefined, and that the signup route preserves it.
+ *  2. No tenant context at all — tenantMiddleware returns HTTP 400 and does NOT
+ *     call next(), preventing any silent fallback to tenant 1.
+ *     (Set ALLOW_TENANT_FALLBACK=true to restore the dev fallback.)
+ *
+ *  3. Unknown slug — tenantMiddleware returns HTTP 404 rather than falling
+ *     through to tenant 1.
  *
  * These tests hit the real database via the same helpers used in
  * tenant-isolation.test.ts.
@@ -83,7 +85,7 @@ describe("tenantMiddleware — slug resolution for signup", () => {
     expect(req.tenantId).toBe(signupTenantId);
   });
 
-  it("defaults to tenantId 1 when no slug header or auth token is provided", async () => {
+  it("returns 400 and does not call next() when no slug header or auth token is provided", async () => {
     const { tenantMiddleware } = await import("../tenantMiddleware");
 
     const req: any = {
@@ -91,17 +93,27 @@ describe("tenantMiddleware — slug resolution for signup", () => {
       headers: {},
       query: {},
     };
-    const res: any = { status: () => res, json: () => res };
+
+    let statusCode: number | undefined;
+    let nextCalled = false;
+    const res: any = {
+      status(code: number) { statusCode = code; return res; },
+      json() { return res; },
+    };
 
     await new Promise<void>((resolve, reject) => {
-      tenantMiddleware(req, res as any, () => resolve()).catch(reject);
+      tenantMiddleware(req, res as any, () => { nextCalled = true; resolve(); })
+        .then(() => resolve())
+        .catch(reject);
     });
 
-    // Must be exactly 1 — not undefined, not null, not another tenant's id
-    expect(req.tenantId).toBe(1);
+    // Middleware must reject with 400 — no silent fallback to tenant 1
+    expect(statusCode).toBe(400);
+    expect(nextCalled).toBe(false);
+    expect(req.tenantId).toBeUndefined();
   });
 
-  it("resolves an unknown slug gracefully and falls back to tenant 1", async () => {
+  it("returns 404 and does not call next() when an unknown slug is provided", async () => {
     const { tenantMiddleware } = await import("../tenantMiddleware");
 
     const req: any = {
@@ -109,14 +121,24 @@ describe("tenantMiddleware — slug resolution for signup", () => {
       headers: { "x-tenant-slug": "this-slug-does-not-exist-xyz" },
       query: {},
     };
-    const res: any = { status: () => res, json: () => res };
+
+    let statusCode: number | undefined;
+    let nextCalled = false;
+    const res: any = {
+      status(code: number) { statusCode = code; return res; },
+      json() { return res; },
+    };
 
     await new Promise<void>((resolve, reject) => {
-      tenantMiddleware(req, res as any, () => resolve()).catch(reject);
+      tenantMiddleware(req, res as any, () => { nextCalled = true; resolve(); })
+        .then(() => resolve())
+        .catch(reject);
     });
 
-    // Unknown slug → falls through to the default-tenant-1 branch
-    expect(req.tenantId).toBe(1);
+    // Unknown slug → 404, not a silent fall-through to tenant 1
+    expect(statusCode).toBe(404);
+    expect(nextCalled).toBe(false);
+    expect(req.tenantId).toBeUndefined();
   });
 });
 
@@ -144,8 +166,8 @@ describe("Signup — tenantId is stored correctly on the new user", () => {
     const { storage } = await import("../storage");
     const sfx = randomSuffix();
 
-    // tenantMiddleware sets req.tenantId = 1 for unauthenticated requests with
-    // no slug; the signup route passes req.tenantId directly to createUser.
+    // Simulates the ALLOW_TENANT_FALLBACK=true path or an explicit tenantId: 1
+    // passed by a known-tenant signup route; verifies storage stores it correctly.
     const newUser = await storage.createUser({
       email: `signup-notenant-${sfx}@test.local`,
       password: "hashed-for-test",
