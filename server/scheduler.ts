@@ -244,7 +244,14 @@ export async function runTrialExpiryWarnings(): Promise<void> {
   const now = Date.now();
   const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
 
+  // Guard against getAllTenants returning duplicate rows for the same tenant in one run.
+  // Without this, two records with the same id but separate object references would both
+  // see trialWarningEmailSentAt = null and trigger a second send before the DB write lands.
+  const processedIds = new Set<number>();
+
   for (const tenant of allTenants) {
+    if (processedIds.has(tenant.id)) continue;
+    processedIds.add(tenant.id);
     try {
       // Only trial tenants with a set expiry date
       if (tenant.subscriptionStatus !== 'trial' || !tenant.trialEndsAt) continue;

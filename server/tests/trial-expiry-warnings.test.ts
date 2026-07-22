@@ -240,6 +240,36 @@ describe("runTrialExpiryWarnings — trialWarningEmailSentAt deduplication", () 
   });
 });
 
+describe("runTrialExpiryWarnings — idempotency within a single run (duplicate tenant records)", () => {
+  it("sends exactly one email when getAllTenants returns two distinct objects for the same tenant id", async () => {
+    // Simulate a getAllTenants bug that yields duplicate rows as *separate* objects.
+    // This is the realistic production failure: two distinct JS objects with the same id
+    // both have trialWarningEmailSentAt = null, so a naive loop would send twice
+    // unless the scheduler tracks which ids it has already processed in this run.
+    const base = {
+      id: 99,
+      name: "Duplicate Store",
+      ownerId: "owner-1",
+      subscriptionStatus: "trial",
+      trialEndsAt: daysFromNow(2),
+      trialWarningEmailSentAt: null,
+    };
+    const recordA: MockTenant = { ...base };
+    const recordB: MockTenant = { ...base }; // separate object, same id, same null sentinel
+
+    mockTenants.splice(0, mockTenants.length, recordA, recordB);
+
+    await runTrialExpiryWarnings();
+
+    // The scheduler's in-run Set guard must skip the second record.
+    expect(mockSendTrialWarningEmail).toHaveBeenCalledOnce();
+    expect(mockStorage.updateTenant).toHaveBeenCalledOnce();
+
+    // The first record that was processed must have trialWarningEmailSentAt stamped.
+    expect(recordA.trialWarningEmailSentAt).toBeInstanceOf(Date);
+  });
+});
+
 describe("runTrialExpiryWarnings — retry after failed delivery", () => {
   it("does NOT mark trialWarningEmailSentAt after a SendGrid failure, and re-sends on next run", async () => {
     resetTenants({
