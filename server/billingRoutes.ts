@@ -6,6 +6,23 @@ import { authMiddleware } from "./auth";
 import { storage } from "./storage";
 import { getUncachableStripeClient } from "./stripeClient";
 
+// Warn at startup if price ID secrets are not configured
+export function checkBillingConfig(): void {
+  const missing: string[] = [];
+  if (!process.env.STRIPE_STARTER_PRICE_ID) missing.push('STRIPE_STARTER_PRICE_ID');
+  if (!process.env.STRIPE_PRO_PRICE_ID) missing.push('STRIPE_PRO_PRICE_ID');
+
+  if (missing.length > 0) {
+    console.warn(
+      `[Billing] WARNING: The following Stripe price ID secrets are not configured: ${missing.join(', ')}. ` +
+      `Products/prices will be auto-created on first use, which can cause duplicates across environments. ` +
+      `Set these secrets in Replit Secrets to pin billing to specific Stripe price IDs.`
+    );
+  } else {
+    console.log('[Billing] Stripe price IDs configured: STRIPE_STARTER_PRICE_ID, STRIPE_PRO_PRICE_ID');
+  }
+}
+
 // Get or create Stripe products/prices for subscription tiers
 // Falls back gracefully if env vars are not set by creating them on-demand
 async function getOrCreatePriceId(tier: 'starter' | 'pro'): Promise<string> {
@@ -19,6 +36,10 @@ async function getOrCreatePriceId(tier: 'starter' | 'pro'): Promise<string> {
   }
 
   // Auto-create product and price if not configured (dev/first-run convenience)
+  console.warn(
+    `[Billing] ${envKey} is not set — auto-creating Stripe product/price for '${tier}'. ` +
+    `Set ${envKey} in Replit Secrets to prevent duplicate products across environments.`
+  );
   const productName = tier === 'starter' ? 'PilotHouse Starter' : 'PilotHouse Pro';
   const unitAmount = tier === 'starter' ? 4900 : 9900; // $49 or $99 in cents
 
@@ -83,6 +104,7 @@ async function ensureTenantStripeCustomer(tenantId: number): Promise<string> {
 }
 
 export function registerBillingRoutes(app: Express): void {
+  checkBillingConfig();
 
   // GET /api/billing/status — current plan, status, and trial info for the tenant
   app.get('/api/billing/status', authMiddleware, async (req: any, res) => {
