@@ -27,7 +27,7 @@ export default function TrialStatusCard() {
   if (!(user as any)?.isAdmin) return null;
   if (!billing) return null;
 
-  const { subscriptionStatus, trialDaysLeft } = billing;
+  const { subscriptionStatus, trialDaysLeft, trialEndsAt } = billing;
 
   // Only show during trial — active subscriptions and paywalled states are handled elsewhere
   if (subscriptionStatus !== "trial") return null;
@@ -35,11 +35,18 @@ export default function TrialStatusCard() {
   const isUrgent = trialDaysLeft !== null && trialDaysLeft <= 3;
   const isExpiring = trialDaysLeft !== null && trialDaysLeft <= 7;
 
+  // Compute hours remaining when on the last day
+  let hoursLeft: number | null = null;
+  if (trialDaysLeft === 0 && trialEndsAt) {
+    const msLeft = new Date(trialEndsAt).getTime() - Date.now();
+    hoursLeft = msLeft > 0 ? Math.ceil(msLeft / (1000 * 60 * 60)) : 0;
+  }
+
   let daysLabel: string;
   if (trialDaysLeft === null) {
     daysLabel = "Trial active";
   } else if (trialDaysLeft === 0) {
-    daysLabel = "Ends today";
+    daysLabel = hoursLeft !== null && hoursLeft > 0 ? `Ends in ~${hoursLeft} hour${hoursLeft === 1 ? "" : "s"}` : "Ends today";
   } else if (trialDaysLeft === 1) {
     daysLabel = "1 day left";
   } else {
@@ -98,7 +105,9 @@ export default function TrialStatusCard() {
           }`}
         >
           {trialDaysLeft === 0
-            ? "Your trial ends today. Subscribe now to keep access."
+            ? hoursLeft !== null && hoursLeft > 0
+              ? `Your trial ends in ~${hoursLeft} hour${hoursLeft === 1 ? "" : "s"}. Subscribe now to keep access.`
+              : "Your trial ends today. Subscribe now to keep access."
             : `${daysLabel} in your trial.`}
         </p>
       </div>

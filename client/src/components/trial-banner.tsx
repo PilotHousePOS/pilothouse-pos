@@ -41,12 +41,19 @@ export default function TrialBanner() {
   if (dismissed) return null;
   if (!billing) return null;
 
-  const { subscriptionStatus, trialDaysLeft } = billing;
+  const { subscriptionStatus, trialDaysLeft, trialEndsAt } = billing;
 
   // Only show for trial status (past_due/cancelled handled by paywall)
   if (subscriptionStatus !== "trial") return null;
 
   const isUrgent = trialDaysLeft !== null && trialDaysLeft <= 3;
+
+  // Compute hours remaining when on the last day
+  let hoursLeft: number | null = null;
+  if (trialDaysLeft === 0 && trialEndsAt) {
+    const msLeft = new Date(trialEndsAt).getTime() - Date.now();
+    hoursLeft = msLeft > 0 ? Math.ceil(msLeft / (1000 * 60 * 60)) : 0;
+  }
 
   const handleDismiss = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -79,7 +86,12 @@ export default function TrialBanner() {
         {trialDaysLeft === null ? (
           <span>You're on a free trial. Subscribe to keep access.</span>
         ) : trialDaysLeft === 0 ? (
-          <span className="font-medium">Your trial ends today! Subscribe now to keep access.</span>
+          <span className="font-medium">
+            {hoursLeft !== null && hoursLeft > 0
+              ? `Your trial ends in ~${hoursLeft} hour${hoursLeft === 1 ? "" : "s"}!`
+              : "Your trial ends today!"}{" "}
+            Subscribe now to keep access.
+          </span>
         ) : (
           <span>
             <span className="font-medium">{trialDaysLeft} day{trialDaysLeft === 1 ? "" : "s"}</span>
