@@ -5,6 +5,8 @@ import type { Express } from "express";
 import { authMiddleware } from "./auth";
 import { storage } from "./storage";
 import { getUncachableStripeClient } from "./stripeClient";
+import { sendTrialWarningEmail } from "./sendgrid";
+import { getBaseUrl } from "./utils";
 
 // Warn at startup if price ID secrets are not configured
 export function checkBillingConfig(): void {
@@ -265,6 +267,76 @@ export function registerBillingRoutes(app: Express): void {
     } catch (error: any) {
       console.error('Portal session error:', error);
       res.status(500).json({ message: 'Failed to open billing portal' });
+    }
+  });
+
+  // POST /api/billing/send-trial-warning — manually trigger the trial warning email for a tenant
+  // Accessible to the tenant owner (isAdmin) or any super-admin
+  app.post('/api/billing/send-trial-warning', authMiddleware, async (req: any, res) => {
+    try {
+      const requestingUser = await storage.getUser(req.user?.id);
+      if (!requestingUser) return res.status(401).json({ message: 'Unauthorized' });
+
+      const isSuperAdmin = requestingUser.isSuperAdmin;
+      const isOwner = requestingUser.isAdmin;
+
+      if (!isOwner && !isSuperAdmin) {
+        return res.status(403).json({ message: 'Only account owners or super-admins can send trial reminder emails' });
+      }
+
+      // Super-admins may target any tenant via body.tenantId; owners always target their own
+      let tenantId: number | undefined;
+      if (isSuperAdmin && req.body.tenantId) {
+        tenantId = Number(req.body.tenantId);
+      } else {
+        if (!requestingUser.tenantId) {
+          return res.status(400).json({ message: 'No tenant associated with this account' });
+        }
+        tenantId = requestingUser.tenantId;
+      }
+
+      const tenant = await storage.getTenant(tenantId);
+      if (!tenant) return res.status(404).json({ message: 'Tenant not found' });
+
+      if (tenant.subscriptionStatus !== 'trial') {
+        return res.status(400).json({ message: 'This tenant is not on a trial plan' });
+      }
+
+      // Find the tenant owner to get their name and email
+      let ownerEmail: string | undefined;
+      let ownerFirstName: string = 'there';
+
+      if (tenant.ownerId) {
+        const owner = await storage.getUser(tenant.ownerId);
+        if (owner?.email) {
+          ownerEmail = owner.email;
+          ownerFirstName = owner.firstName || 'there';
+        }
+      }
+
+      if (!ownerEmail) {
+        return res.status(400).json({ message: 'Tenant owner email not found — cannot send reminder' });
+      }
+
+      // Calculate days left (default to 0 if trial has already expired)
+      let daysLeft = 0;
+      if (tenant.trialEndsAt) {
+        const msLeft = new Date(tenant.trialEndsAt).getTime() - Date.now();
+        daysLeft = Math.max(0, Math.ceil(msLeft / (1000 * 60 * 60 * 24)));
+      }
+
+      const baseUrl = getBaseUrl();
+      await sendTrialWarningEmail(ownerEmail, ownerFirstName, daysLeft, tenant.name, baseUrl);
+
+      // Reset trialWarningEmailSentAt so the scheduled job can send future reminders
+      await storage.updateTenant(tenantId, { trialWarningEmailSentAt: new Date() } as any);
+
+      console.log(`[Billing] Manual trial warning email sent to ${ownerEmail} for tenant ${tenantId} by user ${requestingUser.id}`);
+
+      res.json({ message: 'Trial reminder email sent successfully', sentTo: ownerEmail, daysLeft });
+    } catch (error: any) {
+      console.error('Send trial warning error:', error);
+      res.status(500).json({ message: error.message || 'Failed to send trial reminder email' });
     }
   });
 

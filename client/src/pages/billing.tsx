@@ -17,6 +17,7 @@ import {
   Star,
   ExternalLink,
   Loader2,
+  Mail,
 } from "lucide-react";
 
 interface BillingStatus {
@@ -96,6 +97,30 @@ export default function BillingPage() {
     onError: (error: Error) => {
       toast({
         title: "Checkout failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const sendTrialReminderMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/billing/send-trial-warning", {});
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to send trial reminder");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Trial reminder sent",
+        description: `Email sent to ${data.sentTo}${data.daysLeft !== undefined ? ` (${data.daysLeft} day${data.daysLeft === 1 ? "" : "s"} remaining)` : ""}`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to send reminder",
         description: error.message,
         variant: "destructive",
       });
@@ -235,6 +260,23 @@ export default function BillingPage() {
                 </span>
               )}
             </div>
+          )}
+
+          {/* Send trial reminder — visible to admins when on trial */}
+          {isOwner && isTrial && (
+            <Button
+              variant="outline"
+              className="w-full mt-2"
+              onClick={() => sendTrialReminderMutation.mutate()}
+              disabled={sendTrialReminderMutation.isPending}
+            >
+              {sendTrialReminderMutation.isPending ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Mail className="w-4 h-4 mr-2" />
+              )}
+              Send Trial Reminder Email
+            </Button>
           )}
 
           {/* Customer Portal button for existing subscribers */}
