@@ -677,32 +677,38 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
       const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000); // 14 days
 
-      // Atomically assign a unique slug: attempt insert; on unique-constraint violation
-      // (PG code 23505) increment suffix and retry. Bounded at 20 attempts to avoid
-      // infinite loops under adversarial conditions.
+      // Attempt to create the tenant with the requested slug. If the slug is taken
+      // (Postgres unique-constraint violation 23505 on the slug column) we return a
+      // 409 with alternative suggestions so the owner can consciously pick a new URL
+      // rather than being silently assigned a different one.
       let tenant: Awaited<ReturnType<typeof storage.createTenant>> | null = null;
-      let slug = baseSlug;
-      for (let attempt = 1; attempt <= 20; attempt++) {
-        try {
-          tenant = await storage.createTenant({
-            name: businessName.trim(),
-            slug,
-            subscriptionStatus: 'trial',
-            subscriptionTier: 'starter',
-            trialEndsAt,
-          });
-          break; // success
-        } catch (err: any) {
-          // Postgres unique-violation: code 23505. Check constraint name or detail for 'slug'
-          // so we don't swallow unrelated unique violations (e.g. on ownerId).
-          const isSlugConflict = err?.code === '23505' &&
-            (err?.constraint?.includes('slug') || err?.detail?.includes('slug'));
-          if (isSlugConflict) {
-            slug = `${baseSlug}-${attempt + 1}`;
-          } else {
-            throw err; // re-throw non-slug errors
+      try {
+        tenant = await storage.createTenant({
+          name: businessName.trim(),
+          slug: baseSlug,
+          subscriptionStatus: 'trial',
+          subscriptionTier: 'starter',
+          trialEndsAt,
+        });
+      } catch (err: any) {
+        const isSlugConflict = err?.code === '23505' &&
+          (err?.constraint?.includes('slug') || err?.detail?.includes('slug'));
+        if (isSlugConflict) {
+          // Build a short list of available alternatives and tell the client.
+          const suggestions: string[] = [];
+          for (let i = 2; suggestions.length < 3; i++) {
+            const candidate = `${baseSlug}-${i}`;
+            if (!(await storage.getTenantBySlug(candidate))) {
+              suggestions.push(candidate);
+            }
           }
+          return res.status(409).json({
+            message: `The URL "${baseSlug}" was just taken. Please choose one of the suggestions or enter your own.`,
+            slug: baseSlug,
+            suggestions,
+          });
         }
+        throw err; // re-throw non-slug errors
       }
       if (!tenant) {
         return res.status(500).json({ message: "Unable to assign a unique store URL. Please try a different business name." });

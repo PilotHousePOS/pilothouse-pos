@@ -93,6 +93,17 @@ export default function Signup() {
           localStorage.setItem('token', data.token);
         }
         window.location.replace('/onboarding');
+      } else if (response.status === 409) {
+        // Slug was taken between the availability check and submission.
+        const error = await response.json();
+        setSlugStatus('taken');
+        setSlugSuggestions(error.suggestions || []);
+        setSlugEdited(true);
+        toast({
+          title: "URL just taken",
+          description: error.message || "That store URL was just claimed. Please pick one of the suggestions or enter your own.",
+          variant: "destructive",
+        });
       } else {
         const error = await response.json();
         toast({
