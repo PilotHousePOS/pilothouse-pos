@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,24 @@ import { CheckCircle, ArrowRight, Building2, CreditCard, Users, Sparkles, Star, 
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
+/** BroadcastChannel name used to sync onboarding state across tabs. */
+const ONBOARDING_CHANNEL = "onboarding_sync";
+
+/** Broadcast that billing/tenant data changed so other tabs re-fetch. */
+function broadcastBillingUpdate() {
+  try {
+    const ch = new BroadcastChannel(ONBOARDING_CHANNEL);
+    ch.postMessage({ type: "billing_updated" });
+    ch.close();
+  } catch {
+    // BroadcastChannel not supported — fall back to storage event
+    try {
+      localStorage.setItem("onboarding_billing_updated_at", String(Date.now()));
+    } catch {}
+  }
+}
 
 const STEPS = ['Business Details', 'Choose a Plan', 'Invite Staff'];
 
@@ -422,6 +439,7 @@ function detectStartStep(
 export default function Onboarding() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   // ?step=3 is the Stripe checkout success redirect — map to internal step 2 (Invite Staff).
   // No other URL step values are trusted as an override; page-level detection takes precedence.
@@ -465,6 +483,75 @@ export default function Onboarding() {
       setStep(detectedStep);
     }
   }, [detectedStep, step]);
+
+  // ── Cross-tab reconciliation ─────────────────────────────────────────────
+  // After queries are invalidated (e.g. via BroadcastChannel from the Stripe
+  // return tab), re-derive the target step from fresh billing data and advance
+  // step forward if the server state has progressed.  Never regress step — we
+  // only move forward (monotonically) so in-progress user edits are preserved.
+  const subscriptionStatus = billingData?.subscriptionStatus;
+  useEffect(() => {
+    if (step === null || !tenantData) return;
+
+    // Subscription became active/cancelled — skip the plan step if we're still on it
+    const subscriptionActive =
+      subscriptionStatus === "active" || subscriptionStatus === "cancelled";
+    if (subscriptionActive && step < 2) {
+      setStep(2);
+    }
+  }, [subscriptionStatus, step, tenantData]);
+
+  // ── Cross-tab sync ──────────────────────────────────────────────────────────
+  // When the Stripe checkout tab returns here with ?step=3, broadcast so that
+  // the original tab (still showing the plan step) can refresh immediately.
+  const broadcastedRef = useRef(false);
+  useEffect(() => {
+    if (stripeReturn && !broadcastedRef.current) {
+      broadcastedRef.current = true;
+      broadcastBillingUpdate();
+    }
+  }, [stripeReturn]);
+
+  // Listen for billing-updated broadcasts from other tabs (e.g. the Stripe
+  // return tab) and invalidate the local React Query cache so this tab
+  // re-fetches without waiting for focus.
+  useEffect(() => {
+    if (!user) return;
+
+    const invalidate = () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/billing/status'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/tenants/current'] });
+    };
+
+    // Primary: BroadcastChannel (Chrome / Firefox / Safari 15.4+)
+    let channel: BroadcastChannel | null = null;
+    try {
+      channel = new BroadcastChannel(ONBOARDING_CHANNEL);
+      channel.addEventListener("message", (e) => {
+        if (e.data?.type === "billing_updated") invalidate();
+      });
+    } catch {
+      channel = null;
+    }
+
+    // Fallback: storage event (works even when BroadcastChannel is unavailable)
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "onboarding_billing_updated_at") invalidate();
+    };
+    window.addEventListener("storage", onStorage);
+
+    // Secondary fallback: re-fetch when this tab regains visibility
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") invalidate();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      channel?.close();
+      window.removeEventListener("storage", onStorage);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [user, queryClient]);
 
   if (!user) {
     setLocation('/signup');
