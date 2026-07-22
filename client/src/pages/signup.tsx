@@ -1,21 +1,67 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles, CheckCircle, AlertTriangle, Loader2, Pencil } from "lucide-react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+
+function toSlug(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
 
 export default function Signup() {
   const [, setLocation] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  // Slug state
+  const [businessName, setBusinessName] = useState('');
+  const [slug, setSlug] = useState('');
+  const [slugEdited, setSlugEdited] = useState(false); // true once user manually edits slug
+  const [slugStatus, setSlugStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
+  const [slugSuggestions, setSlugSuggestions] = useState<string[]>([]);
+  const slugCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // When business name changes, auto-update slug unless user manually edited it
+  useEffect(() => {
+    if (!slugEdited) {
+      setSlug(toSlug(businessName));
+    }
+  }, [businessName, slugEdited]);
+
+  // Debounced slug availability check
+  useEffect(() => {
+    if (!slug) {
+      setSlugStatus('idle');
+      setSlugSuggestions([]);
+      return;
+    }
+    if (slugCheckTimer.current) clearTimeout(slugCheckTimer.current);
+    setSlugStatus('checking');
+    slugCheckTimer.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/tenants/slug-check?slug=${encodeURIComponent(slug)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setSlugStatus(data.available ? 'available' : 'taken');
+          setSlugSuggestions(data.suggestions || []);
+        } else {
+          setSlugStatus('idle');
+        }
+      } catch {
+        setSlugStatus('idle');
+      }
+    }, 400);
+    return () => {
+      if (slugCheckTimer.current) clearTimeout(slugCheckTimer.current);
+    };
+  }, [slug]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-    const businessName = (formData.get('businessName') as string).trim();
     const firstName = (formData.get('firstName') as string).trim();
     const lastName = (formData.get('lastName') as string).trim();
     const email = (formData.get('email') as string).trim();
@@ -27,13 +73,18 @@ export default function Signup() {
       return;
     }
 
+    if (slugStatus === 'taken') {
+      toast({ title: "Slug is already taken", description: "Please choose a different URL slug before continuing.", variant: "destructive" });
+      return;
+    }
+
     setIsLoading(true);
     try {
       const response = await fetch('/api/tenants/signup', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ businessName, firstName, lastName, email, password, phone }),
+        body: JSON.stringify({ businessName, firstName, lastName, email, password, phone, slug: slug || undefined }),
       });
 
       if (response.ok) {
@@ -104,11 +155,77 @@ export default function Signup() {
                 <Label className="text-white font-semibold">Business Name <span className="text-red-400">*</span></Label>
                 <Input
                   name="businessName"
+                  value={businessName}
+                  onChange={e => setBusinessName(e.target.value)}
                   placeholder="e.g. Animal House Pet Store"
                   className="bg-white/10 border-white/30 text-white placeholder:text-gray-500"
                   required
                 />
               </div>
+
+              {/* Slug preview / editor */}
+              {businessName.trim() && (
+                <div className="space-y-1.5">
+                  <Label className="text-white font-semibold flex items-center gap-1.5">
+                    Your store URL
+                    {!slugEdited && (
+                      <button
+                        type="button"
+                        onClick={() => setSlugEdited(true)}
+                        className="text-gray-400 hover:text-white transition-colors"
+                        title="Edit URL"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </Label>
+                  <div className="flex items-center rounded-lg border border-white/30 bg-white/10 overflow-hidden">
+                    <span className="pl-3 pr-1 text-gray-400 text-sm whitespace-nowrap select-none">pilothouse.app/</span>
+                    <input
+                      type="text"
+                      value={slug}
+                      readOnly={!slugEdited}
+                      onChange={e => {
+                        setSlug(toSlug(e.target.value));
+                      }}
+                      className={`flex-1 bg-transparent text-white text-sm py-2 pr-3 outline-none ${slugEdited ? 'cursor-text' : 'cursor-default select-all'}`}
+                      placeholder="your-business"
+                      aria-label="Store URL slug"
+                    />
+                    <span className="pr-3 pl-1">
+                      {slugStatus === 'checking' && <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />}
+                      {slugStatus === 'available' && <CheckCircle className="w-4 h-4 text-green-400" />}
+                      {slugStatus === 'taken' && <AlertTriangle className="w-4 h-4 text-yellow-400" />}
+                    </span>
+                  </div>
+
+                  {slugStatus === 'available' && (
+                    <p className="text-green-400 text-xs flex items-center gap-1">
+                      <CheckCircle className="w-3 h-3" /> This URL is available
+                    </p>
+                  )}
+
+                  {slugStatus === 'taken' && (
+                    <div className="space-y-1.5">
+                      <p className="text-yellow-400 text-xs flex items-center gap-1">
+                        <AlertTriangle className="w-3 h-3" /> This URL is already taken. Try one of these or type your own:
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {slugSuggestions.map(s => (
+                          <button
+                            key={s}
+                            type="button"
+                            onClick={() => { setSlug(s); setSlugEdited(true); }}
+                            className="text-xs px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-colors"
+                          >
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="border-t border-white/10 pt-4">
                 <p className="text-xs text-gray-400 uppercase font-semibold tracking-wider mb-3">Owner Details</p>
@@ -170,8 +287,8 @@ export default function Signup() {
 
               <Button
                 type="submit"
-                disabled={isLoading}
-                className="w-full bg-gradient-to-r from-brand-red to-brand-blue hover:from-red-600 hover:to-blue-600 text-white font-bold py-3 rounded-xl mt-2"
+                disabled={isLoading || slugStatus === 'taken' || slugStatus === 'checking'}
+                className="w-full bg-gradient-to-r from-brand-red to-brand-blue hover:from-red-600 hover:to-blue-600 text-white font-bold py-3 rounded-xl mt-2 disabled:opacity-60"
               >
                 {isLoading ? "Creating your account..." : (
                   <>

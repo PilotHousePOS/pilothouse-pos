@@ -611,11 +611,35 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   });
 
   // ─── Tenant Self-Service Signup ───────────────────────────────────────────────
+  // GET /api/tenants/slug-check — check if a slug is available and suggest alternatives
+  app.get('/api/tenants/slug-check', async (req, res) => {
+    try {
+      const raw = (req.query.slug as string || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      if (!raw) {
+        return res.status(400).json({ message: 'slug is required' });
+      }
+      const taken = !!(await storage.getTenantBySlug(raw));
+      const suggestions: string[] = [];
+      if (taken) {
+        for (let i = 2; suggestions.length < 3; i++) {
+          const candidate = `${raw}-${i}`;
+          if (!(await storage.getTenantBySlug(candidate))) {
+            suggestions.push(candidate);
+          }
+        }
+      }
+      return res.json({ slug: raw, available: !taken, suggestions });
+    } catch (error) {
+      console.error('slug-check error:', error);
+      return res.status(500).json({ message: 'Failed to check slug.' });
+    }
+  });
+
   // POST /api/tenants/signup — create a new tenant + owner account in one step.
   // Returns a session token; auto-logs the user in.
   app.post('/api/tenants/signup', async (req, res) => {
     try {
-      const { businessName, firstName: rawFirst, lastName: rawLast, email, password, phone } = req.body;
+      const { businessName, firstName: rawFirst, lastName: rawLast, email, password, phone, slug: requestedSlug } = req.body;
 
       if (!businessName || !rawFirst || !rawLast || !email || !password) {
         return res.status(400).json({ message: "Business name, owner name, email, and password are required." });
@@ -639,24 +663,45 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(400).json({ message: "An account with this email already exists. Please sign in." });
       }
 
-      // Generate a unique slug from the business name
-      const baseSlug = businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'business';
-      let slug = baseSlug;
-      let suffix = 1;
-      while (await storage.getTenantBySlug(slug)) {
-        slug = `${baseSlug}-${suffix++}`;
-      }
+      // Determine the base slug from the client-supplied slug or the business name.
+      // The advisory pre-check on the client is UX-only; slug uniqueness is enforced here
+      // atomically by catching unique-constraint violations and retrying with a numeric suffix.
+      const baseSlug = (requestedSlug
+        ? requestedSlug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+        : businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')) || 'business';
 
       const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000); // 14 days
 
-      // Create the tenant first (ownerId set after user creation)
-      const tenant = await storage.createTenant({
-        name: businessName.trim(),
-        slug,
-        subscriptionStatus: 'trial',
-        subscriptionTier: 'starter',
-        trialEndsAt,
-      });
+      // Atomically assign a unique slug: attempt insert; on unique-constraint violation
+      // (PG code 23505) increment suffix and retry. Bounded at 20 attempts to avoid
+      // infinite loops under adversarial conditions.
+      let tenant: Awaited<ReturnType<typeof storage.createTenant>> | null = null;
+      let slug = baseSlug;
+      for (let attempt = 1; attempt <= 20; attempt++) {
+        try {
+          tenant = await storage.createTenant({
+            name: businessName.trim(),
+            slug,
+            subscriptionStatus: 'trial',
+            subscriptionTier: 'starter',
+            trialEndsAt,
+          });
+          break; // success
+        } catch (err: any) {
+          // Postgres unique-violation: code 23505. Check constraint name or detail for 'slug'
+          // so we don't swallow unrelated unique violations (e.g. on ownerId).
+          const isSlugConflict = err?.code === '23505' &&
+            (err?.constraint?.includes('slug') || err?.detail?.includes('slug'));
+          if (isSlugConflict) {
+            slug = `${baseSlug}-${attempt + 1}`;
+          } else {
+            throw err; // re-throw non-slug errors
+          }
+        }
+      }
+      if (!tenant) {
+        return res.status(500).json({ message: "Unable to assign a unique store URL. Please try a different business name." });
+      }
 
       // Hash password and create the owner user linked to this tenant
       const hashedPassword = await hashPassword(password);
