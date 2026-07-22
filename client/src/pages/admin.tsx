@@ -101,7 +101,8 @@ import {
   Tag,
   Wrench,
   CreditCard,
-  ShoppingCart
+  ShoppingCart,
+  Copy
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -7321,6 +7322,7 @@ export default function Admin() {
 
   // Super-admin: local search filter for the tenant lookup card
   const [tenantLookupSearch, setTenantLookupSearch] = useState("");
+  const [copiedTenantId, setCopiedTenantId] = useState<number | null>(null);
 
   // Super-admin: audit log filters and pagination
   const [auditLogTenantFilter, setAuditLogTenantFilter] = useState("");
@@ -12975,7 +12977,23 @@ export default function Admin() {
                           {filtered.map((t: any) => (
                             <tr key={t.id} className="bg-white hover:bg-blue-50 transition-colors">
                               <td className="px-3 py-2">
-                                <code className="font-mono font-bold text-blue-700">#{t.id}</code>
+                                <div className="flex items-center gap-1">
+                                  <code className="font-mono font-bold text-blue-700">#{t.id}</code>
+                                  <button
+                                    title="Copy ID to clipboard"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(String(t.id)).then(() => {
+                                        setCopiedTenantId(t.id);
+                                        setTimeout(() => setCopiedTenantId(null), 2000);
+                                      });
+                                    }}
+                                    className="ml-1 p-0.5 rounded text-blue-400 hover:text-blue-700 hover:bg-blue-100 transition-colors"
+                                  >
+                                    {copiedTenantId === t.id
+                                      ? <Check className="w-3.5 h-3.5 text-green-600" />
+                                      : <Copy className="w-3.5 h-3.5" />}
+                                  </button>
+                                </div>
                               </td>
                               <td className="px-3 py-2 font-medium">{t.name}</td>
                               <td className="px-3 py-2 text-gray-600 font-mono text-xs">{t.slug}</td>
