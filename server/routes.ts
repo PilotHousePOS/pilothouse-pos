@@ -129,7 +129,7 @@ function resolveWriteTenantId(req: any, res: any): number | undefined {
         const method: string = req.method?.toUpperCase() ?? 'POST';
         const actionType = method === 'DELETE' ? 'delete' : method === 'POST' ? 'create' : 'update';
         const recordType = inferRecordType(req.path ?? '');
-        storage.createAuditLog({
+        withRetry(() => storage.createAuditLog({
           actorUserId,
           targetTenantId,
           actionType,
@@ -139,8 +139,13 @@ function resolveWriteTenantId(req: any, res: any): number | undefined {
             path: req.path,
             statusCode: res.statusCode,
           },
-        }).catch((err: any) => {
-          console.error('[auditLog] Failed to write audit log entry:', err);
+        })).catch((err: any) => {
+          console.warn(
+            '[auditLog] AUDIT ENTRY DROPPED — failed to write after retries. ' +
+            `actor=${actorUserId} tenant=${targetTenantId} action=${actionType} record=${recordType} ` +
+            `path=${req.path} status=${res.statusCode}`,
+            err
+          );
         });
       });
       return tid;
