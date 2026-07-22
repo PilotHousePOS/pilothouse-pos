@@ -215,6 +215,15 @@ const excelUpload = multer({
 // In-memory deduplication for no-tenant alerts.
 // Prevents flooding super-admins when a stranded user keeps reloading the app.
 // Keys are user IDs; the value is the UTC date string (YYYY-MM-DD) when the alert was last sent.
+//
+// Known limitation — one-per-server-restart edge case:
+// This map is held in process memory only. If the server restarts mid-day, the
+// map is cleared and a stranded user who already received an alert that day could
+// trigger a second email after the restart. This is an accepted tradeoff: the
+// alert is an operational safety net rather than a billing-critical event, and
+// the alternative (persisting state to the database) adds complexity for a
+// rarely-exercised path. See the follow-up task
+// "Persist the stranded-account flag so alerts survive server restarts".
 const noTenantAlertSentToday = new Map<string, string>();
 
 // In-memory store for pending contact-change OTPs (email/phone).
