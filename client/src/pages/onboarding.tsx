@@ -142,6 +142,21 @@ function Step2({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) {
   const [selectedPlan, setSelectedPlan] = useState<'starter' | 'pro' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const { data: tenantData } = useQuery<{
+    id: number;
+    name: string;
+    slug: string;
+    subscriptionStatus: string | null;
+    subscriptionTier: string | null;
+    trialEndsAt: string | null;
+  }>({ queryKey: ['/api/tenants/current'] });
+
+  const trialDaysLeft = (() => {
+    if (!tenantData?.trialEndsAt) return null;
+    const diff = new Date(tenantData.trialEndsAt).getTime() - Date.now();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  })();
+
   const plans = [
     {
       id: 'starter' as const,
@@ -204,6 +219,22 @@ function Step2({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) {
         <h2 className="text-2xl font-black text-white">Choose your plan</h2>
         <p className="text-gray-400 mt-1 text-sm">Your trial continues free for 14 days. Cancel anytime.</p>
       </div>
+
+      {trialDaysLeft !== null && (
+        trialDaysLeft > 0 ? (
+          <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-xl px-4 py-3 text-sm text-green-300 font-medium">
+            <Sparkles className="w-4 h-4 text-green-400 flex-shrink-0" />
+            {trialDaysLeft === 1
+              ? '1 day left in your free trial'
+              : `${trialDaysLeft} days left in your free trial`}
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-sm text-red-300 font-medium">
+            <CreditCard className="w-4 h-4 text-red-400 flex-shrink-0" />
+            Your trial has ended — choose a plan to continue
+          </div>
+        )
+      )}
 
       <div className="grid grid-cols-1 gap-4">
         {plans.map(plan => {
