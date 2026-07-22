@@ -14652,11 +14652,20 @@ CRITICAL RULES:
 
   // ─── Super-admin verification route ──────────────────────────────────────────
   // GET /api/super-admin/tenants — lists all tenants with row counts (super-admin only)
+  // Optional ?search= query param filters by name or slug (case-insensitive substring match)
   app.get('/api/super-admin/tenants', requireSuperAdminMiddleware, async (req: any, res) => {
     try {
       const allTenants = await storage.getAllTenants();
+      const searchQuery = (req.query.search as string | undefined)?.trim().toLowerCase();
+      const filtered = searchQuery
+        ? allTenants.filter(
+            (t) =>
+              t.name?.toLowerCase().includes(searchQuery) ||
+              t.slug?.toLowerCase().includes(searchQuery)
+          )
+        : allTenants;
       const results = await Promise.all(
-        allTenants.map(async (tenant) => ({
+        filtered.map(async (tenant) => ({
           ...tenant,
           rowCounts: await storage.getTenantRowCounts(tenant.id),
         }))

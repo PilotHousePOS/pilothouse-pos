@@ -7306,17 +7306,21 @@ export default function Admin() {
     staleTime: 30000,
   });
 
-  // Super-admin: all tenants (for assignment dropdown)
+  // Super-admin: all tenants (for assignment dropdown + store ID lookup)
   const { data: allTenants = [] } = useQuery<any[]>({
     queryKey: ["/api/super-admin/tenants"],
     queryFn: async () => {
       const res = await fetch("/api/super-admin/tenants", { credentials: "include" });
       if (!res.ok) return [];
-      return res.json();
+      const json = await res.json();
+      return Array.isArray(json) ? json : (json.tenants ?? []);
     },
     enabled: Boolean(isAuthenticated && (typedUser as any)?.isSuperAdmin),
     staleTime: 60000,
   });
+
+  // Super-admin: local search filter for the tenant lookup card
+  const [tenantLookupSearch, setTenantLookupSearch] = useState("");
 
   const { data: specialDates = [] } = useQuery<any[]>({
     queryKey: ["/api/admin/special-dates"],
@@ -12865,6 +12869,92 @@ export default function Admin() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Super-admin: store ID lookup */}
+          {(typedUser as any)?.isSuperAdmin && (
+            <Card className="border-blue-200 bg-blue-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-blue-800">
+                  <Search className="w-5 h-5" />
+                  Store ID Lookup
+                </CardTitle>
+                <p className="text-sm text-blue-700">
+                  Find a store's numeric ID by searching its name or URL slug.
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    placeholder="Search by store name or slug…"
+                    value={tenantLookupSearch}
+                    onChange={(e) => setTenantLookupSearch(e.target.value)}
+                    className="pl-9 bg-white"
+                  />
+                  {tenantLookupSearch && (
+                    <button
+                      onClick={() => setTenantLookupSearch("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+                {(() => {
+                  const q = tenantLookupSearch.trim().toLowerCase();
+                  const filtered = q
+                    ? allTenants.filter(
+                        (t: any) =>
+                          t.name?.toLowerCase().includes(q) ||
+                          t.slug?.toLowerCase().includes(q)
+                      )
+                    : allTenants;
+                  if (allTenants.length === 0) {
+                    return <p className="text-sm text-blue-600">Loading stores…</p>;
+                  }
+                  if (filtered.length === 0) {
+                    return <p className="text-sm text-gray-500">No stores match "{tenantLookupSearch}"</p>;
+                  }
+                  return (
+                    <div className="overflow-x-auto rounded-md border border-blue-200">
+                      <table className="w-full text-sm">
+                        <thead className="bg-blue-100 text-blue-800">
+                          <tr>
+                            <th className="text-left px-3 py-2 font-semibold w-16">ID</th>
+                            <th className="text-left px-3 py-2 font-semibold">Name</th>
+                            <th className="text-left px-3 py-2 font-semibold">Slug</th>
+                            <th className="text-left px-3 py-2 font-semibold w-24">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-blue-100">
+                          {filtered.map((t: any) => (
+                            <tr key={t.id} className="bg-white hover:bg-blue-50 transition-colors">
+                              <td className="px-3 py-2">
+                                <code className="font-mono font-bold text-blue-700">#{t.id}</code>
+                              </td>
+                              <td className="px-3 py-2 font-medium">{t.name}</td>
+                              <td className="px-3 py-2 text-gray-600 font-mono text-xs">{t.slug}</td>
+                              <td className="px-3 py-2">
+                                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                                  t.subscriptionStatus === 'active'
+                                    ? 'bg-green-100 text-green-700'
+                                    : t.subscriptionStatus === 'trialing'
+                                    ? 'bg-yellow-100 text-yellow-700'
+                                    : 'bg-gray-100 text-gray-600'
+                                }`}>
+                                  {t.subscriptionStatus ?? 'none'}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  );
+                })()}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Super-admin: users with no tenant assigned */}
           {(typedUser as any)?.isSuperAdmin && (
