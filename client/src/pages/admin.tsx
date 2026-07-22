@@ -7322,6 +7322,29 @@ export default function Admin() {
   // Super-admin: local search filter for the tenant lookup card
   const [tenantLookupSearch, setTenantLookupSearch] = useState("");
 
+  // Super-admin: audit log filters and pagination
+  const [auditLogTenantFilter, setAuditLogTenantFilter] = useState("");
+  const [auditLogActorFilter, setAuditLogActorFilter] = useState("");
+  const [auditLogPage, setAuditLogPage] = useState(0);
+  const AUDIT_LOG_PAGE_SIZE = 25;
+
+  const auditLogQueryParams = new URLSearchParams();
+  if (auditLogTenantFilter.trim()) auditLogQueryParams.set("targetTenantId", auditLogTenantFilter.trim());
+  if (auditLogActorFilter.trim()) auditLogQueryParams.set("actorUserId", auditLogActorFilter.trim());
+  auditLogQueryParams.set("limit", String(AUDIT_LOG_PAGE_SIZE));
+  auditLogQueryParams.set("offset", String(auditLogPage * AUDIT_LOG_PAGE_SIZE));
+
+  const { data: auditLogData, isLoading: auditLogLoading, refetch: refetchAuditLog } = useQuery<{ entries: any[]; total: number }>({
+    queryKey: ["/api/super-admin/audit-log", auditLogTenantFilter, auditLogActorFilter, auditLogPage],
+    queryFn: async () => {
+      const res = await fetch(`/api/super-admin/audit-log?${auditLogQueryParams.toString()}`, { credentials: "include" });
+      if (!res.ok) return { entries: [], total: 0 };
+      return res.json();
+    },
+    enabled: Boolean(isAuthenticated && (typedUser as any)?.isSuperAdmin),
+    staleTime: 30000,
+  });
+
   // Super-admin: send trial reminder for any tenant
   const sendTrialReminderMutation = useMutation({
     mutationFn: async (tenantId: number) => {
@@ -13020,6 +13043,152 @@ export default function Admin() {
                   ))}
                 </CardContent>
               )}
+            </Card>
+          )}
+
+          {/* Super-admin: audit log */}
+          {(typedUser as any)?.isSuperAdmin && (
+            <Card className="border-slate-300 bg-slate-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-slate-800">
+                  <History className="w-5 h-5" />
+                  Audit Log
+                </CardTitle>
+                <p className="text-sm text-slate-600">
+                  Super-admin writes made on behalf of tenants. Filter by tenant ID or actor user ID.
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Filters */}
+                <div className="flex flex-wrap gap-3">
+                  <div className="flex-1 min-w-[160px]">
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Tenant ID</label>
+                    <Input
+                      placeholder="e.g. 42"
+                      value={auditLogTenantFilter}
+                      onChange={(e) => { setAuditLogTenantFilter(e.target.value); setAuditLogPage(0); }}
+                      className="bg-white h-8 text-sm"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-[160px]">
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Actor User ID</label>
+                    <Input
+                      placeholder="e.g. 7"
+                      value={auditLogActorFilter}
+                      onChange={(e) => { setAuditLogActorFilter(e.target.value); setAuditLogPage(0); }}
+                      className="bg-white h-8 text-sm"
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-8 text-xs"
+                      onClick={() => { setAuditLogTenantFilter(""); setAuditLogActorFilter(""); setAuditLogPage(0); }}
+                    >
+                      <X className="w-3 h-3 mr-1" />
+                      Clear
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-8 text-xs ml-2"
+                      onClick={() => refetchAuditLog()}
+                    >
+                      <RefreshCw className="w-3 h-3 mr-1" />
+                      Refresh
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Table */}
+                {auditLogLoading ? (
+                  <div className="flex items-center gap-2 text-sm text-slate-500 py-4">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Loading audit log…
+                  </div>
+                ) : (auditLogData?.entries?.length ?? 0) === 0 ? (
+                  <p className="text-sm text-slate-500 py-4">No audit log entries found.</p>
+                ) : (
+                  <div className="overflow-x-auto rounded-md border border-slate-200">
+                    <table className="w-full text-xs">
+                      <thead className="bg-slate-100 text-slate-700">
+                        <tr>
+                          <th className="text-left px-3 py-2 font-semibold whitespace-nowrap">Timestamp</th>
+                          <th className="text-left px-3 py-2 font-semibold whitespace-nowrap">Actor User</th>
+                          <th className="text-left px-3 py-2 font-semibold whitespace-nowrap">Target Tenant</th>
+                          <th className="text-left px-3 py-2 font-semibold whitespace-nowrap">Action</th>
+                          <th className="text-left px-3 py-2 font-semibold whitespace-nowrap">Record Type</th>
+                          <th className="text-left px-3 py-2 font-semibold whitespace-nowrap">Path</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {(auditLogData?.entries ?? []).map((entry: any) => (
+                          <tr key={entry.id} className="bg-white hover:bg-slate-50 transition-colors">
+                            <td className="px-3 py-2 font-mono whitespace-nowrap text-slate-600">
+                              {entry.createdAt ? new Date(entry.createdAt).toLocaleString() : "—"}
+                            </td>
+                            <td className="px-3 py-2 whitespace-nowrap">
+                              <code className="font-mono text-slate-700">{entry.actorUserId ?? "—"}</code>
+                            </td>
+                            <td className="px-3 py-2 whitespace-nowrap">
+                              <code className="font-mono font-bold text-blue-700">#{entry.targetTenantId ?? "—"}</code>
+                            </td>
+                            <td className="px-3 py-2 whitespace-nowrap">
+                              <span className={`px-2 py-0.5 rounded-full font-medium ${
+                                entry.actionType === "create"
+                                  ? "bg-green-100 text-green-700"
+                                  : entry.actionType === "delete"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-yellow-100 text-yellow-700"
+                              }`}>
+                                {entry.actionType ?? "—"}
+                              </span>
+                            </td>
+                            <td className="px-3 py-2 whitespace-nowrap text-slate-700">
+                              {entry.recordType ?? "—"}
+                            </td>
+                            <td className="px-3 py-2 font-mono text-slate-500 max-w-[220px] truncate" title={entry.metadata?.path ?? ""}>
+                              {entry.metadata?.path ?? "—"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* Pagination */}
+                {(auditLogData?.total ?? 0) > AUDIT_LOG_PAGE_SIZE && (
+                  <div className="flex items-center justify-between pt-2">
+                    <span className="text-xs text-slate-500">
+                      Showing {auditLogPage * AUDIT_LOG_PAGE_SIZE + 1}–{Math.min((auditLogPage + 1) * AUDIT_LOG_PAGE_SIZE, auditLogData?.total ?? 0)} of {auditLogData?.total ?? 0} entries
+                    </span>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs"
+                        disabled={auditLogPage === 0}
+                        onClick={() => setAuditLogPage((p) => Math.max(0, p - 1))}
+                      >
+                        <ChevronLeft className="w-3 h-3 mr-1" />
+                        Prev
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs"
+                        disabled={(auditLogPage + 1) * AUDIT_LOG_PAGE_SIZE >= (auditLogData?.total ?? 0)}
+                        onClick={() => setAuditLogPage((p) => p + 1)}
+                      >
+                        Next
+                        <ChevronRight className="w-3 h-3 ml-1" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
             </Card>
           )}
         </TabsContent>
