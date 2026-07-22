@@ -2,6 +2,10 @@
  * Applies missing tenant_id and related columns that exist in the Drizzle
  * schema but may not yet be present in the database.
  * Safe to run multiple times — uses ALTER TABLE ... ADD COLUMN IF NOT EXISTS.
+ *
+ * Connection errors are retried once (with a 3-second delay) before the error
+ * is re-thrown so that callers can treat an unreachable database as fatal
+ * rather than silently skipping the migration.
  */
 import { db } from "../db";
 import { sql } from "drizzle-orm";
@@ -26,17 +30,79 @@ const STATEMENTS = [
 ];
 
 /**
- * Exported function so callers (server startup, test global setup) can await
- * the migration without spawning a subprocess.
+ * Returns true when the error looks like a transient database connectivity
+ * problem (TCP refused, timeout, DNS failure, dropped connection, etc.).
  */
-export async function applyMissingColumns(): Promise<void> {
+function isConnectionError(err: any): boolean {
+  // PostgreSQL SQLSTATE class 08 = Connection Exception; 57P0x = crash/shutdown
+  const pgConnectionCodes = [
+    "08000", "08001", "08003", "08004", "08006", "08P01",
+    "57P01", "57P02", "57P03",
+  ];
+  if (err?.code && pgConnectionCodes.includes(String(err.code))) return true;
+
+  // Node.js / OS network errors
+  const nodeNetworkCodes = [
+    "ECONNREFUSED", "ETIMEDOUT", "ENOTFOUND", "ECONNRESET", "EPIPE",
+  ];
+  if (err?.code && nodeNetworkCodes.includes(String(err.code))) return true;
+
+  // Message-based fallback (covers driver-level messages)
+  const msg = (err?.message ?? "").toLowerCase();
+  return (
+    msg.includes("connect econnrefused") ||
+    msg.includes("connection refused") ||
+    msg.includes("etimedout") ||
+    msg.includes("enotfound") ||
+    msg.includes("econnreset") ||
+    msg.includes("connection terminated") ||
+    msg.includes("terminating connection")
+  );
+}
+
+/**
+ * Executes every ALTER TABLE statement once.  Per-statement errors that are
+ * NOT connectivity problems (e.g. an unexpected schema conflict) are logged
+ * and skipped so the remaining statements still run.  Connectivity errors are
+ * re-thrown immediately so the caller's retry/fatal logic can handle them.
+ */
+async function runStatements(): Promise<void> {
   for (const stmt of STATEMENTS) {
     console.log(`[migration] ${stmt}`);
     try {
       await db.execute(sql.raw(stmt));
       console.log("  ✓ OK");
     } catch (err: any) {
+      if (isConnectionError(err)) {
+        // Propagate so the retry wrapper (or the caller) sees it.
+        throw err;
+      }
       console.error("  ✗ FAILED:", err.message);
+    }
+  }
+}
+
+/**
+ * Exported function so callers (server startup, test global setup) can await
+ * the migration without spawning a subprocess.
+ *
+ * On a connectivity error the function waits 3 seconds and retries once.
+ * If the retry also fails the error is re-thrown so the caller (runAppMigrations)
+ * treats the missing migration as fatal and operators see a clear message.
+ */
+export async function applyMissingColumns(): Promise<void> {
+  try {
+    await runStatements();
+  } catch (err: any) {
+    if (isConnectionError(err)) {
+      console.warn(
+        `[migration] Database connection error — retrying in 3 s: ${err.message}`
+      );
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      // Second attempt — let any error propagate to the caller.
+      await runStatements();
+    } else {
+      throw err;
     }
   }
   console.log("[migration] Done.");

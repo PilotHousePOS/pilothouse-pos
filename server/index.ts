@@ -651,7 +651,8 @@ async function runAppMigrations() {
 
     log('App migrations complete');
   } catch (err: any) {
-    console.error('App migration error (non-fatal):', err.message);
+    console.error('App migration error (fatal):', err.message);
+    throw err;
   }
 }
 
