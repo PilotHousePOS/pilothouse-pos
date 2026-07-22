@@ -9,19 +9,35 @@ import BottomNav from "@/components/bottom-nav";
 import BackToTop from "@/components/back-to-top";
 
 function safeLazy<T extends React.ComponentType<any>>(
-  factory: () => Promise<{ default: T }>
+  factory: () => Promise<{ default: T }>,
+  chunkKey: string
 ) {
   return lazy(() =>
     factory().catch(() => {
+      // Use a per-chunk key so multiple chunks don't block each other's one retry
+      const storageKey = `_chunk_reload_${chunkKey}`;
       let reloaded = false;
-      try { reloaded = !!sessionStorage.getItem('_chunk_reload'); } catch {}
+      try { reloaded = !!sessionStorage.getItem(storageKey); } catch {}
       if (!reloaded) {
-        try { sessionStorage.setItem('_chunk_reload', '1'); } catch {}
-        window.location.reload();
+        try { sessionStorage.setItem(storageKey, '1'); } catch {}
+        // Hard reload bypasses service worker cache so new chunk filenames are fetched
+        window.location.href = window.location.href;
         return new Promise<{ default: T }>(() => {});
       }
-      try { sessionStorage.removeItem('_chunk_reload'); } catch {}
-      return Promise.resolve({ default: (() => null) as unknown as T });
+      // Second failure — clear flag and show a visible reload prompt instead of blank
+      try { sessionStorage.removeItem(storageKey); } catch {}
+      const Fallback = () => (
+        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"60vh", gap:16, padding:32, textAlign:"center" }}>
+          <p style={{ color:"#555", fontSize:15 }}>This page failed to load. This usually happens right after a new version is deployed.</p>
+          <button
+            style={{ padding:"10px 24px", background:"#1a56db", color:"#fff", border:"none", borderRadius:8, fontSize:14, cursor:"pointer" }}
+            onClick={() => { try { sessionStorage.clear(); } catch {} window.location.reload(); }}
+          >
+            Reload Page
+          </button>
+        </div>
+      );
+      return Promise.resolve({ default: Fallback as unknown as T });
     })
   );
 }
@@ -52,34 +68,34 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
   }
 }
 
-const Landing = safeLazy(() => import("@/pages/landing"));
-const Auth = safeLazy(() => import("@/pages/auth"));
-const ForgotPassword = safeLazy(() => import("@/pages/forgot-password"));
-const ResetPassword = safeLazy(() => import("@/pages/reset-password"));
-const Home = safeLazy(() => import("@/pages/home"));
-const Pets = safeLazy(() => import("@/pages/pets"));
-const Supplies = safeLazy(() => import("@/pages/supplies"));
-const SupplyDetail = safeLazy(() => import("@/pages/supply-detail"));
-const Aquatics = safeLazy(() => import("@/pages/aquatics"));
-const Reptiles = safeLazy(() => import("@/pages/reptiles"));
-const Booking = safeLazy(() => import("@/pages/booking"));
-const Profile = safeLazy(() => import("@/pages/profile"));
-const Settings = safeLazy(() => import("@/pages/settings"));
-const Admin = safeLazy(() => import("@/pages/admin"));
-const PosPage = safeLazy(() => import("@/pages/pos"));
-const OrderHistory = safeLazy(() => import("@/pages/order-history"));
-const OrderConfirmation = safeLazy(() => import("@/pages/order-confirmation"));
-const MyAppointments = safeLazy(() => import("@/pages/my-appointments"));
-const Wishlist = safeLazy(() => import("@/pages/wishlist"));
-const PrivacyPolicy = safeLazy(() => import("@/pages/privacy-policy"));
-const TermsOfService = safeLazy(() => import("@/pages/terms-of-service"));
-const Support = safeLazy(() => import("@/pages/support"));
-const VerifyEmail = safeLazy(() => import("@/pages/verify-email"));
-const DeleteAccount = safeLazy(() => import("@/pages/delete-account"));
-const NotFound = safeLazy(() => import("@/pages/not-found"));
-const Apply = safeLazy(() => import("@/pages/apply"));
-const About = safeLazy(() => import("@/pages/about"));
-const SmsConsent = safeLazy(() => import("@/pages/sms-consent"));
+const Landing = safeLazy(() => import("@/pages/landing"), "landing");
+const Auth = safeLazy(() => import("@/pages/auth"), "auth");
+const ForgotPassword = safeLazy(() => import("@/pages/forgot-password"), "forgot-password");
+const ResetPassword = safeLazy(() => import("@/pages/reset-password"), "reset-password");
+const Home = safeLazy(() => import("@/pages/home"), "home");
+const Pets = safeLazy(() => import("@/pages/pets"), "pets");
+const Supplies = safeLazy(() => import("@/pages/supplies"), "supplies");
+const SupplyDetail = safeLazy(() => import("@/pages/supply-detail"), "supply-detail");
+const Aquatics = safeLazy(() => import("@/pages/aquatics"), "aquatics");
+const Reptiles = safeLazy(() => import("@/pages/reptiles"), "reptiles");
+const Booking = safeLazy(() => import("@/pages/booking"), "booking");
+const Profile = safeLazy(() => import("@/pages/profile"), "profile");
+const Settings = safeLazy(() => import("@/pages/settings"), "settings");
+const Admin = safeLazy(() => import("@/pages/admin"), "admin");
+const PosPage = safeLazy(() => import("@/pages/pos"), "pos");
+const OrderHistory = safeLazy(() => import("@/pages/order-history"), "order-history");
+const OrderConfirmation = safeLazy(() => import("@/pages/order-confirmation"), "order-confirmation");
+const MyAppointments = safeLazy(() => import("@/pages/my-appointments"), "my-appointments");
+const Wishlist = safeLazy(() => import("@/pages/wishlist"), "wishlist");
+const PrivacyPolicy = safeLazy(() => import("@/pages/privacy-policy"), "privacy-policy");
+const TermsOfService = safeLazy(() => import("@/pages/terms-of-service"), "terms-of-service");
+const Support = safeLazy(() => import("@/pages/support"), "support");
+const VerifyEmail = safeLazy(() => import("@/pages/verify-email"), "verify-email");
+const DeleteAccount = safeLazy(() => import("@/pages/delete-account"), "delete-account");
+const NotFound = safeLazy(() => import("@/pages/not-found"), "not-found");
+const Apply = safeLazy(() => import("@/pages/apply"), "apply");
+const About = safeLazy(() => import("@/pages/about"), "about");
+const SmsConsent = safeLazy(() => import("@/pages/sms-consent"), "sms-consent");
 
 function PageLoader() {
   return (
