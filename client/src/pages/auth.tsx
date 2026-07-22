@@ -87,12 +87,18 @@ export default function Auth() {
   const handleSignUp = async (email: string, password: string, firstName: string, lastName: string, phoneNumber: string) => {
     setIsLoading(true);
     try {
+      // Read the tenant slug from the URL (?tenant=<slug>) so new accounts are
+      // scoped to the correct store. Without this header the server returns 400
+      // and the user would silently end up in the wrong (or no) store.
+      const tenantSlug = new URLSearchParams(window.location.search).get('tenant') || '';
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (tenantSlug) {
+        headers['X-Tenant-Slug'] = tenantSlug;
+      }
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({ email, password, firstName, lastName, phoneNumber }),
       });
       
