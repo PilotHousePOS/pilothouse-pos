@@ -48,4 +48,4 @@ VAPID_SUBJECT = "mailto:theanimalhouse@comcast.net"
 
 [postMerge]
 path = "scripts/post-merge.sh"
-timeoutMs = 20000
+timeoutMs = 120000
