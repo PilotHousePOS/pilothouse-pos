@@ -4,7 +4,7 @@
 import type { Express } from "express";
 import { authMiddleware } from "./auth";
 import { storage } from "./storage";
-import { getUncachableStripeClient } from "./stripeClient";
+import { getUncachableStripeClient, clearCredentialCache } from "./stripeClient";
 import { sendTrialWarningEmail } from "./sendgrid";
 import { getBaseUrl } from "./utils";
 
@@ -337,6 +337,73 @@ export function registerBillingRoutes(app: Express): void {
     } catch (error: any) {
       console.error('Send trial warning error:', error);
       res.status(500).json({ message: error.message || 'Failed to send trial reminder email' });
+    }
+  });
+
+  // GET /api/billing/health — super-admin only; verifies the Stripe key and price IDs are valid
+  app.get('/api/billing/health', authMiddleware, async (req: any, res) => {
+    try {
+      const requestingUser = await storage.getUser(req.user?.id);
+      if (!requestingUser?.isSuperAdmin) {
+        return res.status(403).json({ message: 'Super-admin access required' });
+      }
+
+      // Force a fresh credential check so health always reflects the live key
+      clearCredentialCache();
+
+      const stripe = await getUncachableStripeClient();
+
+      // Verify the key resolves to a real Stripe account
+      let accountId: string;
+      try {
+        const account = await stripe.accounts.retrieve();
+        accountId = account.id;
+      } catch (err: any) {
+        return res.status(500).json({
+          ok: false,
+          error: `Stripe key invalid: ${err.message?.substring(0, 120)}`,
+        });
+      }
+
+      // Check each configured price ID
+      const priceResults: Record<string, { ok: boolean; status?: string; error?: string }> = {};
+      const priceEnvKeys: { env: string; label: string }[] = [
+        { env: 'STRIPE_STARTER_PRICE_ID', label: 'starter' },
+        { env: 'STRIPE_PRO_PRICE_ID', label: 'pro' },
+      ];
+
+      let allPricesOk = true;
+      for (const { env, label } of priceEnvKeys) {
+        const priceId = process.env[env];
+        if (!priceId) {
+          priceResults[label] = { ok: false, error: `${env} not set` };
+          allPricesOk = false;
+          continue;
+        }
+        try {
+          const price = await stripe.prices.retrieve(priceId);
+          const isOk = price.active && price.type === 'recurring';
+          priceResults[label] = {
+            ok: isOk,
+            status: price.active ? 'active' : 'inactive',
+            ...(!isOk ? { error: price.active ? 'not a recurring price' : 'price inactive' } : {}),
+          };
+          if (!isOk) allPricesOk = false;
+        } catch (err: any) {
+          priceResults[label] = { ok: false, error: err.message?.substring(0, 120) };
+          allPricesOk = false;
+        }
+      }
+
+      const ok = allPricesOk;
+      res.status(ok ? 200 : 500).json({
+        ok,
+        stripeAccountId: accountId,
+        prices: priceResults,
+      });
+    } catch (error: any) {
+      console.error('Billing health check error:', error);
+      res.status(500).json({ ok: false, error: error.message || 'Health check failed' });
     }
   });
 

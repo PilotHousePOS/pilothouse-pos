@@ -3,9 +3,43 @@
 
 import Stripe from 'stripe';
 
+// TTL for the credential cache. Defaults to 1 hour so a rotated key is picked
+// up without a full restart. Override with STRIPE_CREDENTIAL_TTL_MS env var.
+const CREDENTIAL_TTL_MS = Number(process.env.STRIPE_CREDENTIAL_TTL_MS) || 60 * 60 * 1000;
+
+// --- Module-level state (all declared here so clearCredentialCache can reach them) ---
 let validatedCredentials: { publishableKey: string; secretKey: string } | null = null;
+let validatedAt: number | null = null;
+
+// StripeSync singleton — tracks the secret key it was built with so it can be
+// recreated automatically when credentials are rotated.
+let stripeSync: any = null;
+let stripeSyncSecretKey: string | null = null;
+
+/**
+ * Clear the credential cache and invalidate the StripeSync singleton.
+ * The next call to getCredentials() / getStripeSync() will re-validate from
+ * env vars / connector and rebuild the singleton with the new key.
+ * Exported so health-check routes and tests can force a fresh validation.
+ */
+export function clearCredentialCache(): void {
+  validatedCredentials = null;
+  validatedAt = null;
+  stripeSync = null;
+  stripeSyncSecretKey = null;
+}
+
+// ---------------------------------------------------------------------------------
 
 async function getCredentials() {
+  // Expire cache if the TTL has elapsed (e.g. after key rotation)
+  if (validatedCredentials && validatedAt !== null) {
+    if (Date.now() - validatedAt > CREDENTIAL_TTL_MS) {
+      console.log('[Stripe] Credential cache expired — re-validating keys');
+      clearCredentialCache();
+    }
+  }
+
   if (validatedCredentials) return validatedCredentials;
 
   const candidates: { publishableKey: string; secretKey: string; source: string }[] = [];
@@ -32,9 +66,10 @@ async function getCredentials() {
   for (const cred of candidates) {
     try {
       const testStripe = new Stripe(cred.secretKey, { apiVersion: '2025-08-27.basil' });
-      await testStripe.accounts.retrieve();
-      console.log(`[Stripe] Using validated key from: ${cred.source}`);
+      const account = await testStripe.accounts.retrieve();
+      console.log(`[Stripe] Using validated key from: ${cred.source} (account: ${account.id})`);
       validatedCredentials = { publishableKey: cred.publishableKey, secretKey: cred.secretKey };
+      validatedAt = Date.now();
       return validatedCredentials;
     } catch (err: any) {
       console.warn(`[Stripe] Key from ${cred.source} failed validation: ${err.message?.substring(0, 80)}`);
@@ -45,6 +80,7 @@ async function getCredentials() {
     console.warn('[Stripe] No key passed validation, using first available (live keys)');
     const fallback = candidates[0];
     validatedCredentials = { publishableKey: fallback.publishableKey, secretKey: fallback.secretKey };
+    validatedAt = Date.now();
     return validatedCredentials;
   }
 
@@ -108,12 +144,18 @@ export async function getStripeSecretKey() {
   return secretKey;
 }
 
-let stripeSync: any = null;
-
 export async function getStripeSync() {
+  const secretKey = await getStripeSecretKey();
+
+  // Recreate the singleton if the key has changed (e.g. after rotation + TTL expiry)
+  if (stripeSync && stripeSyncSecretKey !== secretKey) {
+    console.log('[Stripe] Secret key changed — rebuilding StripeSync with new key');
+    stripeSync = null;
+    stripeSyncSecretKey = null;
+  }
+
   if (!stripeSync) {
     const { StripeSync } = await import('stripe-replit-sync');
-    const secretKey = await getStripeSecretKey();
 
     stripeSync = new StripeSync({
       poolConfig: {
@@ -122,6 +164,8 @@ export async function getStripeSync() {
       },
       stripeSecretKey: secretKey,
     });
+    stripeSyncSecretKey = secretKey;
   }
+
   return stripeSync;
 }
