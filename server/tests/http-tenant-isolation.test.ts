@@ -27,6 +27,7 @@ import {
   contacts,
   appointments,
   orders,
+  pets,
 } from "@shared/schema";
 import { eq, sql } from "drizzle-orm";
 import { generateToken } from "../auth";
@@ -35,6 +36,7 @@ import { generateToken } from "../auth";
 
 let tenantAId: number;
 let tenantBId: number;
+let tenantASlug: string;
 let userAId: string;
 let userBId: string;
 
@@ -46,11 +48,14 @@ let appointmentAId: number;
 let appointmentBId: number;
 let orderAId: number;
 let orderBId: number;
+let petAId: number;
+let petBId: number;
 
 // Names/values seeded for Tenant B's records — used to confirm no mutation
 let supplyBOriginalName: string;
 let contactBOriginalName: string;
 let appointmentBOriginalStatus: string | null;
+let petBOriginalName: string;
 
 /** Bearer token for Tenant A's admin user */
 let tokenA: string;
@@ -71,6 +76,10 @@ async function createTestTenant(name: string, slug: string): Promise<number> {
         RETURNING id`,
   );
   return (result.rows[0] as { id: number }).id;
+}
+
+function tenantASlugValue() {
+  return tenantASlug;
 }
 
 async function createTestAdminUser(tenantId: number, email: string): Promise<string> {
@@ -143,6 +152,20 @@ async function createTestOrder(tenantId: number, userId: string): Promise<number
   return order.id;
 }
 
+async function createTestPet(tenantId: number, name: string): Promise<number> {
+  const [pet] = await db
+    .insert(pets)
+    .values({
+      tenantId,
+      name,
+      species: "dog",
+      price: "299.99",
+      isAvailable: true,
+    })
+    .returning();
+  return pet.id;
+}
+
 async function getDbUser(id: string) {
   const [user] = await db.select().from(users).where(eq(users.id, id));
   return user;
@@ -168,7 +191,8 @@ beforeAll(async () => {
     sql`SELECT setval(pg_get_serial_sequence('tenants', 'id'), GREATEST((SELECT MAX(id) FROM tenants), 1))`,
   );
 
-  tenantAId = await createTestTenant(`HTTP-A-${sfx}`, `http-a-${sfx}`);
+  tenantASlug = `http-a-${sfx}`;
+  tenantAId = await createTestTenant(`HTTP-A-${sfx}`, tenantASlug);
   tenantBId = await createTestTenant(`HTTP-B-${sfx}`, `http-b-${sfx}`);
 
   userAId = await createTestAdminUser(tenantAId, `http-a-${sfx}@test.local`);
@@ -195,6 +219,11 @@ beforeAll(async () => {
   orderAId = await createTestOrder(tenantAId, userAId);
   orderBId = await createTestOrder(tenantBId, userBId);
 
+  // Seed pets
+  petBOriginalName = `PetB-${sfx}`;
+  petAId = await createTestPet(tenantAId, `PetA-${sfx}`);
+  petBId = await createTestPet(tenantBId, petBOriginalName);
+
   // Generate JWT from the DB user row (tokenVersion must match DB)
   const dbUserA = await getDbUser(userAId);
   tokenA = generateToken(dbUserA as any);
@@ -217,6 +246,9 @@ afterAll(async () => {
 
   if (supplyAId) await db.delete(supplies).where(eq(supplies.id, supplyAId));
   if (supplyBId) await db.delete(supplies).where(eq(supplies.id, supplyBId));
+
+  if (petAId) await db.delete(pets).where(eq(pets.id, petAId));
+  if (petBId) await db.delete(pets).where(eq(pets.id, petBId));
 
   if (userAId) await db.delete(users).where(eq(users.id, userAId));
   if (userBId) await db.delete(users).where(eq(users.id, userBId));
@@ -391,28 +423,115 @@ describe("DELETE /api/admin/orders/:orderId — cross-tenant delete rejected", (
   });
 });
 
+// ─── PUT /api/pets/:id ───────────────────────────────────────────────────────
+
+describe("PUT /api/pets/:id — cross-tenant write rejected", () => {
+  it("returns 404 when Tenant A targets Tenant B's pet", async () => {
+    const res = await agent
+      .put(`/api/pets/${petBId}`)
+      .set("Authorization", `Bearer ${tokenA}`)
+      .send({ name: "HACKED-PET", species: "dog", price: "1.00" });
+
+    expect(res.status).toBe(404);
+  });
+
+  it("Tenant B's pet name is unchanged after Tenant A's rejected update", async () => {
+    const [row] = await db
+      .select({ name: pets.name })
+      .from(pets)
+      .where(eq(pets.id, petBId));
+    expect(row?.name).toBe(petBOriginalName);
+  });
+
+  it("returns 200 when Tenant A updates their own pet", async () => {
+    const res = await agent
+      .put(`/api/pets/${petAId}`)
+      .set("Authorization", `Bearer ${tokenA}`)
+      .send({ name: "Updated-PetA", species: "dog", price: "350.00" });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("id", petAId);
+  });
+});
+
+// ─── DELETE /api/pets/:id ─────────────────────────────────────────────────────
+
+describe("DELETE /api/pets/:id — cross-tenant delete rejected", () => {
+  it("returns 404 when Tenant A targets Tenant B's pet", async () => {
+    const res = await agent
+      .delete(`/api/pets/${petBId}`)
+      .set("Authorization", `Bearer ${tokenA}`);
+
+    expect(res.status).toBe(404);
+  });
+
+  it("Tenant B's pet still exists after Tenant A's rejected delete", async () => {
+    const [row] = await db
+      .select({ id: pets.id })
+      .from(pets)
+      .where(eq(pets.id, petBId));
+    expect(row).toBeDefined();
+  });
+
+  it("returns 200 when Tenant A deletes their own pet", async () => {
+    // Create a throwaway pet to delete so petAId remains available for earlier tests
+    const throwawayId = await createTestPet(tenantAId, "Throwaway-PetA");
+    const res = await agent
+      .delete(`/api/pets/${throwawayId}`)
+      .set("Authorization", `Bearer ${tokenA}`);
+
+    expect(res.status).toBe(200);
+  });
+});
+
 // ─── Unauthenticated requests are rejected ────────────────────────────────────
+//
+// tenantMiddleware runs before authMiddleware for all /api routes.  Without a
+// tenant slug, it short-circuits with 400. Providing X-Tenant-Slug lets the
+// middleware resolve the tenant so authMiddleware can then return 401.
 
 describe("Unauthenticated requests are rejected with 401", () => {
   it("PUT /api/supplies/:id without token → 401", async () => {
     const res = await agent
       .put(`/api/supplies/${supplyAId}`)
+      .set("X-Tenant-Slug", tenantASlug)
       .send({ name: "no-auth" });
     expect(res.status).toBe(401);
   });
 
   it("DELETE /api/supplies/:id without token → 401", async () => {
-    const res = await agent.delete(`/api/supplies/${supplyAId}`);
+    const res = await agent
+      .delete(`/api/supplies/${supplyAId}`)
+      .set("X-Tenant-Slug", tenantASlug);
     expect(res.status).toBe(401);
   });
 
   it("DELETE /api/contacts/:id without token → 401", async () => {
-    const res = await agent.delete(`/api/contacts/${contactAId}`);
+    const res = await agent
+      .delete(`/api/contacts/${contactAId}`)
+      .set("X-Tenant-Slug", tenantASlug);
     expect(res.status).toBe(401);
   });
 
   it("DELETE /api/admin/orders/:orderId without token → 401", async () => {
-    const res = await agent.delete(`/api/admin/orders/${orderAId}`);
+    const res = await agent
+      .delete(`/api/admin/orders/${orderAId}`)
+      .set("X-Tenant-Slug", tenantASlug);
+    expect(res.status).toBe(401);
+  });
+
+  it("PUT /api/pets/:id without token → 401", async () => {
+    const res = await agent
+      .put(`/api/pets/${petAId}`)
+      .set("X-Tenant-Slug", tenantASlug)
+      .send({ name: "no-auth" });
+    expect(res.status).toBe(401);
+  });
+
+  it("DELETE /api/pets/:id without token → 401", async () => {
+    const res = await agent
+      .delete(`/api/pets/${petAId}`)
+      .set("X-Tenant-Slug", tenantASlug);
     expect(res.status).toBe(401);
   });
 });

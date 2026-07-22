@@ -2055,6 +2055,13 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const tenantId = resolveWriteTenantId(req, res);
       if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
+
+      // Route-layer guard: confirm the pet belongs to this tenant before writing
+      const existing = await storage.getPet(id, tenantId);
+      if (!existing) {
+        return res.status(404).json({ message: "Pet not found" });
+      }
+
       const petData = insertPetSchema.partial().parse(req.body);
       const pet = await storage.updatePet(id, petData, tenantId);
       res.json(pet);
@@ -2081,6 +2088,13 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const tenantId = resolveWriteTenantId(req, res);
       if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
+
+      // Route-layer guard: confirm the pet belongs to this tenant before deleting
+      const existing = await storage.getPet(id, tenantId);
+      if (!existing) {
+        return res.status(404).json({ message: "Pet not found" });
+      }
+
       await storage.deletePet(id, tenantId);
       res.json({ message: "Pet deleted successfully" });
     } catch (error) {
