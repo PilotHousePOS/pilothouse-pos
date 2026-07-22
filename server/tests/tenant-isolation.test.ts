@@ -43,11 +43,14 @@ function randomSuffix() {
 }
 
 async function createTestTenant(name: string, slug: string) {
-  const [tenant] = await db
-    .insert(tenants)
-    .values({ name, slug, subscriptionStatus: "active", subscriptionTier: "starter" })
-    .returning();
-  return tenant;
+  // Use raw SQL to avoid columns that exist in the Drizzle schema but haven't
+  // been applied to the DB yet (e.g. trial_warning_email_sent_at).
+  const result = await db.execute(
+    sql`INSERT INTO tenants (name, slug, subscription_status, subscription_tier)
+        VALUES (${name}, ${slug}, 'active', 'starter')
+        RETURNING *`
+  );
+  return result.rows[0] as typeof tenants.$inferSelect;
 }
 
 async function createTestUser(
