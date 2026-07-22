@@ -73,9 +73,152 @@ export class WebhookHandlers {
       case 'charge.refunded':
         await WebhookHandlers.handleChargeRefunded(event.data.object);
         break;
+
+      // ── Subscription lifecycle events ──────────────────────────────────────
+      case 'customer.subscription.created':
+      case 'customer.subscription.updated':
+        await WebhookHandlers.handleSubscriptionUpsert(event.data.object);
+        break;
+
+      case 'customer.subscription.deleted':
+        await WebhookHandlers.handleSubscriptionDeleted(event.data.object);
+        break;
+
+      case 'invoice.payment_failed':
+        await WebhookHandlers.handleInvoicePaymentFailed(event.data.object);
+        break;
+
+      case 'invoice.payment_succeeded':
+        await WebhookHandlers.handleInvoicePaymentSucceeded(event.data.object);
+        break;
         
       default:
         break;
+    }
+  }
+
+  // ── Subscription handlers ──────────────────────────────────────────────────
+
+  static async handleSubscriptionUpsert(subscription: any): Promise<void> {
+    console.log('Processing subscription upsert:', subscription.id, 'status:', subscription.status);
+
+    const tenantId = subscription.metadata?.tenantId
+      ? parseInt(subscription.metadata.tenantId, 10)
+      : null;
+
+    if (!tenantId) {
+      // Try to resolve tenant via Stripe customer ID
+      console.warn('Subscription upsert missing tenantId metadata, skipping:', subscription.id);
+      return;
+    }
+
+    const stripeStatusMap: Record<string, string> = {
+      active: 'active',
+      trialing: 'trial',
+      past_due: 'past_due',
+      canceled: 'cancelled',
+      unpaid: 'past_due',
+      incomplete: 'trial',
+      incomplete_expired: 'cancelled',
+      paused: 'past_due',
+    };
+
+    const subscriptionStatus = stripeStatusMap[subscription.status] ?? 'trial';
+
+    // Resolve tier from the price metadata or price amount
+    let subscriptionTier = subscription.metadata?.tier ?? 'starter';
+    if (!subscriptionTier && subscription.items?.data?.[0]?.price) {
+      const price = subscription.items.data[0].price;
+      subscriptionTier = price.metadata?.tier ?? (price.unit_amount >= 9900 ? 'pro' : 'starter');
+    }
+
+    const periodEnd = subscription.current_period_end
+      ? new Date(subscription.current_period_end * 1000)
+      : null;
+
+    await storage.updateTenant(tenantId, {
+      subscriptionStatus,
+      subscriptionTier,
+      stripeSubscriptionId: subscription.id,
+      stripeCurrentPeriodEnd: periodEnd,
+    } as any);
+
+    console.log(`Tenant ${tenantId} subscription updated: status=${subscriptionStatus}, tier=${subscriptionTier}`);
+  }
+
+  static async handleSubscriptionDeleted(subscription: any): Promise<void> {
+    console.log('Processing subscription deleted:', subscription.id);
+
+    const tenantId = subscription.metadata?.tenantId
+      ? parseInt(subscription.metadata.tenantId, 10)
+      : null;
+
+    if (!tenantId) {
+      console.warn('Subscription delete missing tenantId metadata, skipping:', subscription.id);
+      return;
+    }
+
+    await storage.updateTenant(tenantId, {
+      subscriptionStatus: 'cancelled',
+      stripeSubscriptionId: null,
+      stripeCurrentPeriodEnd: null,
+    } as any);
+
+    console.log(`Tenant ${tenantId} subscription cancelled`);
+  }
+
+  static async handleInvoicePaymentFailed(invoice: any): Promise<void> {
+    console.log('Processing invoice.payment_failed:', invoice.id);
+
+    const subscriptionId = invoice.subscription;
+    if (!subscriptionId) return;
+
+    try {
+      const stripe = await getUncachableStripeClient();
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+      const tenantId = subscription.metadata?.tenantId
+        ? parseInt(subscription.metadata.tenantId, 10)
+        : null;
+
+      if (!tenantId) return;
+
+      await storage.updateTenant(tenantId, {
+        subscriptionStatus: 'past_due',
+      } as any);
+
+      console.log(`Tenant ${tenantId} marked past_due due to invoice payment failure`);
+    } catch (err: any) {
+      console.error('Error handling invoice payment failed:', err.message);
+    }
+  }
+
+  static async handleInvoicePaymentSucceeded(invoice: any): Promise<void> {
+    console.log('Processing invoice.payment_succeeded:', invoice.id);
+
+    const subscriptionId = invoice.subscription;
+    if (!subscriptionId) return;
+
+    try {
+      const stripe = await getUncachableStripeClient();
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+      const tenantId = subscription.metadata?.tenantId
+        ? parseInt(subscription.metadata.tenantId, 10)
+        : null;
+
+      if (!tenantId) return;
+
+      const periodEnd = (subscription as any).current_period_end
+        ? new Date((subscription as any).current_period_end * 1000)
+        : null;
+
+      await storage.updateTenant(tenantId, {
+        subscriptionStatus: 'active',
+        stripeCurrentPeriodEnd: periodEnd,
+      } as any);
+
+      console.log(`Tenant ${tenantId} subscription restored to active after successful payment`);
+    } catch (err: any) {
+      console.error('Error handling invoice payment succeeded:', err.message);
     }
   }
   

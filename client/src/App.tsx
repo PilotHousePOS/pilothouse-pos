@@ -1,12 +1,14 @@
 import { lazy, Suspense, Component, ReactNode } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import BottomNav from "@/components/bottom-nav";
 import BackToTop from "@/components/back-to-top";
+import TrialBanner from "@/components/trial-banner";
+import Paywall from "@/components/paywall";
 
 function safeLazy<T extends React.ComponentType<any>>(
   factory: () => Promise<{ default: T }>,
@@ -93,6 +95,7 @@ const NotFound = safeLazy(() => import("@/pages/not-found"), "not-found");
 const Apply = safeLazy(() => import("@/pages/apply"), "apply");
 const About = safeLazy(() => import("@/pages/about"), "about");
 const SmsConsent = safeLazy(() => import("@/pages/sms-consent"), "sms-consent");
+const BillingPage = safeLazy(() => import("@/pages/billing"), "billing");
 
 function PageLoader() {
   return (
@@ -100,6 +103,44 @@ function PageLoader() {
       <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
     </div>
   );
+}
+
+// Routes that are always accessible even when subscription is lapsed
+const BILLING_SAFE_PATHS = new Set([
+  "/settings/billing",
+  "/settings",
+  "/profile",
+  "/privacy-policy",
+  "/terms-of-service",
+  "/support",
+  "/about",
+]);
+
+function isBillingSafe(location: string): boolean {
+  if (BILLING_SAFE_PATHS.has(location)) return true;
+  if (location.startsWith("/settings")) return true;
+  return false;
+}
+
+// Paywall guard: blocks access to POS/admin for past_due or cancelled tenants
+function PaywallGuard({ children }: { children: ReactNode }) {
+  const [location] = useLocation();
+  const { user } = useAuth();
+
+  const { data: billing } = useQuery<{ subscriptionStatus: string }>({
+    queryKey: ["/api/billing/status"],
+    enabled: !!user,
+    staleTime: 2 * 60 * 1000,
+  });
+
+  const status = billing?.subscriptionStatus;
+  const isBlocked = status === "past_due" || status === "cancelled";
+
+  if (isBlocked && !isBillingSafe(location)) {
+    return <Paywall status={status as "past_due" | "cancelled"} />;
+  }
+
+  return <>{children}</>;
 }
 
 function Router() {
@@ -114,47 +155,54 @@ function Router() {
 
   return (
     <div className={`${isWideRoute ? "w-full" : "max-w-md mx-auto lg:max-w-full"} bg-white min-h-screen relative`}>
-      <Suspense fallback={<PageLoader />}>
-        <Switch>
-          <Route path="/forgot-password" component={ForgotPassword} />
-          <Route path="/reset-password" component={ResetPassword} />
-          <Route path="/verify-email" component={VerifyEmail} />
-          <Route path="/delete-account" component={DeleteAccount} />
-          <Route path="/privacy-policy" component={PrivacyPolicy} />
-          <Route path="/terms-of-service" component={TermsOfService} />
-          <Route path="/support" component={Support} />
-          <Route path="/apply" component={Apply} />
-          <Route path="/about" component={About} />
-          <Route path="/sms-consent" component={SmsConsent} />
-          <Route path="/store" component={Home} />
-          <Route path="/supplies" component={Supplies} />
-          <Route path="/supplies/:id" component={SupplyDetail} />
-          
-          {!isAuthenticated ? (
-            <>
-              <Route path="/" component={Landing} />
-              <Route path="/auth" component={Auth} />
-              <Route component={NotFound} />
-            </>
-          ) : (
-            <>
-              <Route path="/" component={Home} />
-              <Route path="/supplies" component={Supplies} />
-              <Route path="/supplies/:id" component={SupplyDetail} />
-              <Route path="/booking" component={Booking} />
-              <Route path="/profile" component={Profile} />
-              <Route path="/settings" component={Settings} />
-              <Route path="/admin" component={Admin} />
-              <Route path="/pos" component={PosPage} />
-              <Route path="/orders" component={OrderHistory} />
-              <Route path="/order-confirmation/:orderId" component={OrderConfirmation} />
-              <Route path="/appointments" component={MyAppointments} />
-              <Route path="/wishlist" component={Wishlist} />
-            </>
-          )}
-          <Route component={NotFound} />
-        </Switch>
-      </Suspense>
+      {/* Trial countdown banner — only shown when authenticated and in trial */}
+      {isAuthenticated && <TrialBanner />}
+
+      <PaywallGuard>
+        <Suspense fallback={<PageLoader />}>
+          <Switch>
+            <Route path="/forgot-password" component={ForgotPassword} />
+            <Route path="/reset-password" component={ResetPassword} />
+            <Route path="/verify-email" component={VerifyEmail} />
+            <Route path="/delete-account" component={DeleteAccount} />
+            <Route path="/privacy-policy" component={PrivacyPolicy} />
+            <Route path="/terms-of-service" component={TermsOfService} />
+            <Route path="/support" component={Support} />
+            <Route path="/apply" component={Apply} />
+            <Route path="/about" component={About} />
+            <Route path="/sms-consent" component={SmsConsent} />
+            <Route path="/store" component={Home} />
+            <Route path="/supplies" component={Supplies} />
+            <Route path="/supplies/:id" component={SupplyDetail} />
+            
+            {!isAuthenticated ? (
+              <>
+                <Route path="/" component={Landing} />
+                <Route path="/auth" component={Auth} />
+                <Route component={NotFound} />
+              </>
+            ) : (
+              <>
+                <Route path="/" component={Home} />
+                <Route path="/supplies" component={Supplies} />
+                <Route path="/supplies/:id" component={SupplyDetail} />
+                <Route path="/booking" component={Booking} />
+                <Route path="/profile" component={Profile} />
+                <Route path="/settings/billing" component={BillingPage} />
+                <Route path="/settings" component={Settings} />
+                <Route path="/admin" component={Admin} />
+                <Route path="/pos" component={PosPage} />
+                <Route path="/orders" component={OrderHistory} />
+                <Route path="/order-confirmation/:orderId" component={OrderConfirmation} />
+                <Route path="/appointments" component={MyAppointments} />
+                <Route path="/wishlist" component={Wishlist} />
+              </>
+            )}
+            <Route component={NotFound} />
+          </Switch>
+        </Suspense>
+      </PaywallGuard>
+
       {isAuthenticated && location !== "/pos" && <BottomNav />}
       {isAuthenticated && <BackToTop />}
     </div>

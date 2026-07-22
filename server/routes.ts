@@ -64,6 +64,7 @@ async function withRetry<T>(operation: () => Promise<T>, maxRetries = 3, delayMs
 }
 import { extractOrderFromPhoto, apply99Pricing } from './orderPhotoProcessor';
 import { categorizeProduct, detectLiveAnimal } from './productCategorization';
+import { registerBillingRoutes } from './billingRoutes';
 
 // Helper: clean a name string — collapse extra spaces, trim
 function cleanName(name: string | undefined | null): string {
@@ -205,6 +206,9 @@ async function requireAdminMiddleware(req: any, res: any, next: any): Promise<vo
 }
 
 export async function registerRoutes(app: Express, server?: Server): Promise<void> {
+
+  // Register subscription billing routes (Stripe Checkout, Portal, status)
+  registerBillingRoutes(app);
 
   // Prevent browser caching of API responses to avoid stale data
   app.use('/api', (req, res, next) => {

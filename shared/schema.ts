@@ -28,6 +28,9 @@ export const tenants = pgTable("tenants", {
   subscriptionStatus: varchar("subscription_status", { length: 50 }).default("trial").notNull(), // trial, active, past_due, cancelled
   subscriptionTier: varchar("subscription_tier", { length: 50 }).default("starter").notNull(), // starter, pro, enterprise
   trialEndsAt: timestamp("trial_ends_at"),
+  stripeCustomerId: varchar("stripe_customer_id", { length: 255 }), // Stripe customer for this tenant
+  stripeSubscriptionId: varchar("stripe_subscription_id", { length: 255 }), // Active Stripe subscription ID
+  stripeCurrentPeriodEnd: timestamp("stripe_current_period_end"), // When the current billing period ends
   createdAt: timestamp("created_at").defaultNow(),
 });
 

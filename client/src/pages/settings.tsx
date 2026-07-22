@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLocation } from "wouter";
-import { ArrowLeft, Mail, Save, User as UserIcon, Lock, Phone, CreditCard, Trash2, Star, Plus, Loader2 } from "lucide-react";
+import { ArrowLeft, Mail, Save, User as UserIcon, Lock, Phone, CreditCard, Trash2, Star, Plus, Loader2, Receipt, ChevronRight } from "lucide-react";
 import type { User } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { z } from "zod";
@@ -1070,6 +1070,32 @@ export default function Settings() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Subscription Billing — visible to admins (tenant owners) */}
+      {currentUser.isAdmin && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Receipt className="w-5 h-5" />
+              Subscription & Billing
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-gray-500 mb-3">
+              Manage your PilotHouse subscription, update payment methods, and view your billing history.
+            </p>
+            <Button
+              variant="outline"
+              className="w-full flex items-center justify-between"
+              onClick={() => setLocation("/settings/billing")}
+            >
+              <span>View Billing Settings</span>
+              <ChevronRight className="w-4 h-4 text-gray-400" />
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       </div>
     </div>
   );
