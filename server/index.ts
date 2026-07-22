@@ -628,6 +628,11 @@ async function runAppMigrations() {
     await migPool.query(`ALTER TABLE tenants ADD COLUMN IF NOT EXISTS trial_warning_email_sent_at TIMESTAMP`);
 
     await migPool.end();
+
+    // Apply any Drizzle-schema columns that may be missing on a fresh environment
+    const { applyMissingColumns } = await import('./scripts/apply-missing-columns');
+    await applyMissingColumns();
+
     log('App migrations complete');
   } catch (err: any) {
     console.error('App migration error (non-fatal):', err.message);

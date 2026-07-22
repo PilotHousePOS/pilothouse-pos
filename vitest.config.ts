@@ -7,6 +7,8 @@ export default defineConfig({
     environment: "node",
     testTimeout: 30000,
     hookTimeout: 30000,
+    // Runs once before any test file: ensures all schema columns exist on a fresh DB
+    globalSetup: ["server/tests/globalSetup.ts"],
     // Run test files sequentially to avoid DB conflicts
     sequence: {
       concurrent: false,
