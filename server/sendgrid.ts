@@ -305,3 +305,97 @@ export async function sendAppointmentRejectionEmail(
     throw new Error('Failed to send appointment rejection email');
   }
 }
+
+/**
+ * Sends an alert email to all platform super-admins when an authenticated user
+ * has no tenant assigned to their account (i.e., they are stuck and cannot use the app).
+ */
+export async function sendNoTenantAlertToSuperAdmins(strandedUser: {
+  id: string;
+  email: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  createdAt: Date | null;
+}): Promise<void> {
+  try {
+    const { storage } = await import('./storage');
+    const allUsers = await storage.getAllUsers();
+    const superAdmins = allUsers.filter((u: any) => u.isSuperAdmin && u.email);
+
+    if (superAdmins.length === 0) {
+      console.warn('[no-tenant-alert] No super-admins with email found to notify.');
+      return;
+    }
+
+    const { client, fromEmail } = await getUncachableSendGridClient();
+
+    const displayName = [strandedUser.firstName, strandedUser.lastName].filter(Boolean).join(' ') || '(no name)';
+    const joinDate = strandedUser.createdAt
+      ? new Date(strandedUser.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
+      : 'unknown';
+
+    const subject = `[PilotHouse] Stranded account — user has no store assigned`;
+    const textBody = `A user logged in but has no tenant (store) assigned to their account.\n\nUser details:\n  Name:      ${displayName}\n  Email:     ${strandedUser.email || '(none)'}\n  User ID:   ${strandedUser.id}\n  Joined:    ${joinDate}\n\nPlease assign the correct tenant from the admin panel or contact the user directly.`;
+    const htmlBody = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
+          <h1 style="margin: 0;">PilotHouse</h1>
+        </div>
+        <div style="padding: 30px; background-color: #f9f9f9;">
+          <h2 style="color: #92400e; margin-bottom: 10px;">⚠️ Stranded Account Alert</h2>
+          <p style="font-size: 15px; color: #444; line-height: 1.5;">
+            A user logged in but has <strong>no store (tenant) assigned</strong> to their account.
+            They are currently seeing the "Account Not Configured" screen and cannot use the app.
+          </p>
+          <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px;">
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+              <td style="padding: 8px 12px; color: #6b7280; width: 100px;">Name</td>
+              <td style="padding: 8px 12px; color: #111827; font-weight: 500;">${displayName}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+              <td style="padding: 8px 12px; color: #6b7280;">Email</td>
+              <td style="padding: 8px 12px; color: #111827;">${strandedUser.email || '<em>(none)</em>'}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+              <td style="padding: 8px 12px; color: #6b7280;">User ID</td>
+              <td style="padding: 8px 12px; color: #111827; font-family: monospace;">${strandedUser.id}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 12px; color: #6b7280;">Joined</td>
+              <td style="padding: 8px 12px; color: #111827;">${joinDate}</td>
+            </tr>
+          </table>
+          <div style="background-color: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 5px;">
+            <p style="margin: 0; color: #92400e; font-size: 14px;">
+              Please assign the correct tenant from the admin panel or contact the user directly so they can access their store.
+            </p>
+          </div>
+        </div>
+        <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+          <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
+          <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+          <p style="margin: 0;">Phone: (318) 322-3023</p>
+        </div>
+      </div>
+    `;
+
+    for (const admin of superAdmins) {
+      try {
+        await client.send({
+          to: admin.email!,
+          from: { email: fromEmail, name: 'PilotHouse' },
+          subject,
+          text: textBody,
+          html: htmlBody,
+          trackingSettings: { clickTracking: { enable: false, enableText: false } },
+        });
+        console.log(`[no-tenant-alert] Alert sent to super-admin ${admin.email}`);
+      } catch (adminEmailErr) {
+        console.error(`[no-tenant-alert] Failed to send alert to ${admin.email}:`, adminEmailErr);
+      }
+    }
+  } catch (error) {
+    console.error('[no-tenant-alert] Error sending no-tenant alert:', error);
+    // Non-fatal — never block the user response for an alert failure
+  }
+}

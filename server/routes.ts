@@ -22,7 +22,7 @@ import {
 } from "@shared/schema";
 import { z } from "zod/v4";
 import { notificationService } from './notifications';
-import { sendPasswordResetEmail, sendVerificationEmail, sendContactChangeOtpEmail } from './sendgrid';
+import { sendPasswordResetEmail, sendVerificationEmail, sendContactChangeOtpEmail, sendNoTenantAlertToSuperAdmins } from './sendgrid';
 import { normalizePhoneNumber } from './phoneUtils';
 import { db, resetPool } from './db';
 import { eq, inArray, or, and, ilike, sql } from 'drizzle-orm';
@@ -157,6 +157,11 @@ const excelUpload = multer({
     }
   }
 });
+
+// In-memory deduplication for no-tenant alerts.
+// Prevents flooding super-admins when a stranded user keeps reloading the app.
+// Keys are user IDs; the value is the UTC date string (YYYY-MM-DD) when the alert was last sent.
+const noTenantAlertSentToday = new Map<string, string>();
 
 // In-memory store for pending contact-change OTPs (email/phone).
 // Keyed by a random pendingToken returned to the client.
@@ -1024,7 +1029,31 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (!freshUser) {
         return res.status(404).json({ message: "User not found" });
       }
-      
+
+      // Detect stranded accounts: authenticated user with no tenant and not a super-admin.
+      // Log a warning and fire a one-per-day alert to super-admins so they can act immediately.
+      if (!freshUser.tenantId && !freshUser.isSuperAdmin) {
+        const todayUtc = new Date().toISOString().slice(0, 10);
+        const userId = String(freshUser.id);
+        const lastAlertDate = noTenantAlertSentToday.get(userId);
+        console.warn(
+          `[no-tenant] Stranded account login — userId=${userId} email=${freshUser.email ?? '(none)'} joined=${freshUser.createdAt ?? 'unknown'}`
+        );
+        if (lastAlertDate !== todayUtc) {
+          noTenantAlertSentToday.set(userId, todayUtc);
+          // Fire-and-forget: do not await so the user response is not delayed
+          sendNoTenantAlertToSuperAdmins({
+            id: userId,
+            email: freshUser.email ?? null,
+            firstName: freshUser.firstName ?? null,
+            lastName: freshUser.lastName ?? null,
+            createdAt: freshUser.createdAt ?? null,
+          }).catch((err) => {
+            console.error('[no-tenant-alert] Background alert failed:', err);
+          });
+        }
+      }
+
       res.json(sanitizeUser(freshUser));
     } catch (error) {
       console.error("Error fetching user:", error);
