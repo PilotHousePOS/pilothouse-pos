@@ -147,6 +147,8 @@ function PaywallGuard({ children }: { children: ReactNode }) {
 
 // Shown when an authenticated user has no tenant assigned to their account
 function NoTenantScreen() {
+  const { refetch, isFetching } = useAuth();
+
   return (
     <div className="max-w-md mx-auto bg-white min-h-screen flex flex-col items-center justify-center gap-6 p-8 text-center">
       <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center">
@@ -169,6 +171,20 @@ function NoTenantScreen() {
       >
         Contact Support
       </a>
+      <button
+        className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-sm text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+        onClick={() => refetch()}
+        disabled={isFetching}
+      >
+        {isFetching ? (
+          <>
+            <span className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+            Checking…
+          </>
+        ) : (
+          "Check again"
+        )}
+      </button>
       <button
         className="text-sm text-gray-400 hover:text-gray-600 underline"
         onClick={() => {
