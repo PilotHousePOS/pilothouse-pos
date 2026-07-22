@@ -627,6 +627,21 @@ async function runAppMigrations() {
     await migPool.query(`ALTER TABLE pos_orders ADD COLUMN IF NOT EXISTS tenant_id INTEGER`);
     await migPool.query(`ALTER TABLE tenants ADD COLUMN IF NOT EXISTS trial_warning_email_sent_at TIMESTAMP`);
 
+    // Super-admin audit log — records every cross-tenant write made by a super-admin
+    await migPool.query(`CREATE TABLE IF NOT EXISTS audit_log (
+      id SERIAL PRIMARY KEY,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      actor_user_id VARCHAR(255) NOT NULL,
+      target_tenant_id INTEGER NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+      action_type VARCHAR(20) NOT NULL,
+      record_type VARCHAR(100) NOT NULL,
+      record_id INTEGER,
+      metadata JSONB
+    )`);
+    await migPool.query(`CREATE INDEX IF NOT EXISTS audit_log_target_tenant_idx ON audit_log (target_tenant_id)`);
+    await migPool.query(`CREATE INDEX IF NOT EXISTS audit_log_actor_idx ON audit_log (actor_user_id)`);
+    await migPool.query(`CREATE INDEX IF NOT EXISTS audit_log_created_at_idx ON audit_log (created_at)`);
+
     await migPool.end();
 
     // Apply any Drizzle-schema columns that may be missing on a fresh environment

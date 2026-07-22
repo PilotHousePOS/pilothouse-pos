@@ -1226,3 +1226,32 @@ export const supplyCategories = pgTable("supply_categories", {
 export const insertSupplyCategorySchema = createInsertSchema(supplyCategories).omit({ id: true, createdAt: true });
 export type InsertSupplyCategory = z.infer<typeof insertSupplyCategorySchema>;
 export type SupplyCategoryDef = typeof supplyCategories.$inferSelect;
+
+// ─── Super-admin Audit Log ────────────────────────────────────────────────────
+// Records every write (create / update / delete) made by a super-admin acting
+// on behalf of a tenant so that data disputes can be investigated.
+export const auditLog = pgTable("audit_log", {
+  id: serial("id").primaryKey(),
+  /** UTC timestamp of the action */
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  /** User ID of the super-admin who performed the action */
+  actorUserId: varchar("actor_user_id", { length: 255 }).notNull(),
+  /** Tenant that was written to */
+  targetTenantId: integer("target_tenant_id").notNull().references(() => tenants.id, { onDelete: "cascade" }),
+  /** "create" | "update" | "delete" */
+  actionType: varchar("action_type", { length: 20 }).notNull(),
+  /** e.g. "supply", "pet", "appointment", "contact", "order" */
+  recordType: varchar("record_type", { length: 100 }).notNull(),
+  /** Primary key of the affected record when known */
+  recordId: integer("record_id"),
+  /** Extra context (request path, HTTP method, etc.) stored as JSON */
+  metadata: jsonb("metadata"),
+}, (table) => [
+  index("audit_log_target_tenant_idx").on(table.targetTenantId),
+  index("audit_log_actor_idx").on(table.actorUserId),
+  index("audit_log_created_at_idx").on(table.createdAt),
+]);
+
+export const insertAuditLogSchema = createInsertSchema(auditLog).omit({ id: true, createdAt: true });
+export type AuditLog = typeof auditLog.$inferSelect;
+export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;

@@ -18,6 +18,8 @@ declare global {
     interface Request {
       tenantId?: number;
       isSuperAdmin?: boolean;
+      /** Authenticated user ID resolved from the JWT token by tenantMiddleware */
+      actorUserId?: string;
     }
   }
 }
@@ -55,6 +57,7 @@ export async function tenantMiddleware(
         const user = await storage.getUser(decoded.id);
         if (user) {
           req.isSuperAdmin = user.isSuperAdmin ?? false;
+          req.actorUserId = user.id;
           if (user.tenantId) {
             // Happy path: authenticated user with a tenant
             req.tenantId = user.tenantId;

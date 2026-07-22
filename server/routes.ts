@@ -73,6 +73,30 @@ function cleanName(name: string | undefined | null): string {
 }
 
 /**
+ * Infer a human-readable record type from the request URL path for audit logging.
+ * e.g. "/api/supplies/123" → "supply", "/api/pets" → "pet"
+ */
+function inferRecordType(path: string): string {
+  const segment = path.replace(/^\/api\//, '').split('/')[0] ?? 'unknown';
+  // Normalise common plurals to singular
+  const map: Record<string, string> = {
+    supplies: 'supply',
+    pets: 'pet',
+    appointments: 'appointment',
+    contacts: 'contact',
+    orders: 'order',
+    groomers: 'groomer',
+    boarding: 'boarding_record',
+    'boarding-records': 'boarding_record',
+    specials: 'special',
+    'legal-pages': 'legal_page',
+    'appointment-items': 'appointment_item',
+    users: 'user',
+  };
+  return map[segment] ?? segment;
+}
+
+/**
  * Resolves the tenantId to use for a write (INSERT/UPDATE) operation.
  *
  * - Super-admins may pass `targetTenantId` in the request body to write on
@@ -80,6 +104,10 @@ function cleanName(name: string | undefined | null): string {
  * - All other callers must have req.tenantId set by tenantMiddleware.
  * - Returns undefined and sends a 400 response when tenant context is absent,
  *   so the caller can simply `return` without writing anything.
+ *
+ * When a super-admin override is resolved, this function automatically schedules
+ * an audit-log insert that fires after the response is sent (res.on('finish')).
+ * No changes to individual route handlers are needed.
  */
 function resolveWriteTenantId(req: any, res: any): number | undefined {
   // Reject targetTenantId from non-super-admin callers to prevent privilege escalation.
@@ -89,7 +117,33 @@ function resolveWriteTenantId(req: any, res: any): number | undefined {
       return undefined;
     }
     const tid = parseInt(req.body.targetTenantId, 10);
-    if (!isNaN(tid) && tid > 0) return tid;
+    if (!isNaN(tid) && tid > 0) {
+      // Super-admin override detected — schedule an audit log entry once the
+      // response has been sent so we know whether the write actually succeeded.
+      const actorUserId: string = req.actorUserId ?? req.user?.id ?? 'unknown';
+      const targetTenantId = tid;
+      res.on('finish', () => {
+        // Only record successful writes (2xx status codes)
+        if (res.statusCode < 200 || res.statusCode >= 300) return;
+        const method: string = req.method?.toUpperCase() ?? 'POST';
+        const actionType = method === 'DELETE' ? 'delete' : method === 'POST' ? 'create' : 'update';
+        const recordType = inferRecordType(req.path ?? '');
+        storage.createAuditLog({
+          actorUserId,
+          targetTenantId,
+          actionType,
+          recordType,
+          metadata: {
+            method: req.method,
+            path: req.path,
+            statusCode: res.statusCode,
+          },
+        }).catch((err: any) => {
+          console.error('[auditLog] Failed to write audit log entry:', err);
+        });
+      });
+      return tid;
+    }
   }
   const tenantId: number | undefined = req.tenantId;
   if (!tenantId) {
@@ -14663,6 +14717,31 @@ CRITICAL RULES:
       res.json(result.map(sanitizeUser));
     } catch (error: any) {
       res.status(500).json({ message: error.message || 'Failed to fetch users' });
+    }
+  });
+
+  /**
+   * GET /api/super-admin/audit-log
+   *
+   * Returns paginated audit log entries for super-admin writes on behalf of tenants.
+   * Query params:
+   *   - targetTenantId  (number) — filter by the tenant that was written to
+   *   - actorUserId     (string) — filter by the super-admin who acted
+   *   - limit           (number, default 50, max 200)
+   *   - offset          (number, default 0)
+   */
+  app.get('/api/super-admin/audit-log', requireSuperAdminMiddleware, async (req: any, res) => {
+    try {
+      const targetTenantId = req.query.targetTenantId ? parseInt(req.query.targetTenantId as string, 10) : undefined;
+      const actorUserId = req.query.actorUserId as string | undefined;
+      const limit = Math.min(parseInt(req.query.limit as string ?? '50', 10) || 50, 200);
+      const offset = parseInt(req.query.offset as string ?? '0', 10) || 0;
+
+      const result = await storage.getAuditLogs({ targetTenantId, actorUserId, limit, offset });
+      res.json(result);
+    } catch (error: any) {
+      console.error('Failed to fetch audit log:', error);
+      res.status(500).json({ message: error.message || 'Failed to fetch audit log' });
     }
   });
 

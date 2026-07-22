@@ -30,6 +30,9 @@ import {
   orderPhotos,
   extractedOrderItems,
   loyaltySettings,
+  auditLog,
+  type AuditLog,
+  type InsertAuditLog,
   type Tenant,
   type InsertTenant,
   type User,
@@ -521,6 +524,10 @@ export interface IStorage {
   getAllJobApplications(): Promise<JobApplication[]>;
   getJobApplication(id: number): Promise<JobApplication | undefined>;
   updateJobApplicationStatus(id: number, status: string, adminNotes?: string): Promise<JobApplication>;
+
+  // Audit Log operations
+  createAuditLog(entry: InsertAuditLog): Promise<AuditLog>;
+  getAuditLogs(params: { targetTenantId?: number; actorUserId?: string; limit?: number; offset?: number }): Promise<{ entries: AuditLog[]; total: number }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -5160,6 +5167,37 @@ export class DatabaseStorage implements IStorage {
     if (adminNotes !== undefined) updates.adminNotes = adminNotes;
     const [updated] = await db.update(jobApplications).set(updates).where(eq(jobApplications.id, id)).returning();
     return updated;
+  }
+
+  // ─── Audit Log operations ────────────────────────────────────────────────────
+
+  async createAuditLog(entry: InsertAuditLog): Promise<AuditLog> {
+    const [row] = await db.insert(auditLog).values(entry).returning();
+    return row;
+  }
+
+  async getAuditLogs(params: { targetTenantId?: number; actorUserId?: string; limit?: number; offset?: number }): Promise<{ entries: AuditLog[]; total: number }> {
+    const { targetTenantId, actorUserId, limit = 50, offset = 0 } = params;
+
+    const conditions = [];
+    if (targetTenantId) conditions.push(eq(auditLog.targetTenantId, targetTenantId));
+    if (actorUserId) conditions.push(eq(auditLog.actorUserId, actorUserId));
+    const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+    const [{ total }] = await db
+      .select({ total: count() })
+      .from(auditLog)
+      .where(where);
+
+    const entries = await db
+      .select()
+      .from(auditLog)
+      .where(where)
+      .orderBy(desc(auditLog.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return { entries, total: Number(total) };
   }
 
   // ─── Tenant operations ───────────────────────────────────────────────────────
