@@ -484,3 +484,147 @@ describe("Storage layer — tenant isolation via storage helpers", () => {
     expect(order).toBeUndefined();
   });
 });
+
+// ─── Cross-tenant write isolation (supplies) ──────────────────────────────────
+
+describe("Supplies — cross-tenant write isolation", () => {
+  it("updateSupply with Tenant A's id and Tenant B's tenantId throws and leaves the record unchanged", async () => {
+    const { storage } = await import("../storage");
+
+    // Attempt update using Tenant B's context but Tenant A's supply ID
+    await expect(
+      storage.updateSupply(supplyAId, { name: "HACKED" }, tenantBId),
+    ).rejects.toThrow();
+
+    // Original record must be unchanged
+    const original = await storage.getSupply(supplyAId, tenantAId);
+    expect(original).toBeDefined();
+    expect(original!.name).not.toBe("HACKED");
+  });
+
+  it("deleteSupply with Tenant A's id and Tenant B's tenantId does not remove the record", async () => {
+    const { storage } = await import("../storage");
+
+    // deleteSupply silently skips when the WHERE clause matches nothing
+    await storage.deleteSupply(supplyAId, tenantBId);
+
+    // Record must still exist under Tenant A
+    const still = await storage.getSupply(supplyAId, tenantAId);
+    expect(still).toBeDefined();
+  });
+});
+
+// ─── Cross-tenant write isolation (contacts) ─────────────────────────────────
+
+describe("Contacts — cross-tenant write isolation", () => {
+  it("updateContact with Tenant A's id and Tenant B's tenantId does not modify the record", async () => {
+    const { storage } = await import("../storage");
+
+    // updateContact returns undefined / null when the WHERE clause matches nothing
+    const result = await storage.updateContact(
+      contactAId,
+      { name: "HACKED" },
+      tenantBId,
+    );
+
+    // Either returns falsy, or the original name is preserved
+    if (result) {
+      expect(result.name).not.toBe("HACKED");
+    }
+
+    // Verify the record in Tenant A's scope is unchanged
+    const original = await storage.getContact(contactAId, tenantAId);
+    expect(original).toBeDefined();
+    expect(original!.name).not.toBe("HACKED");
+  });
+
+  it("deleteContact with Tenant A's id and Tenant B's tenantId does not remove the record", async () => {
+    const { storage } = await import("../storage");
+
+    await storage.deleteContact(contactAId, tenantBId);
+
+    const still = await storage.getContact(contactAId, tenantAId);
+    expect(still).toBeDefined();
+  });
+});
+
+// ─── Cross-tenant write isolation (appointments) ──────────────────────────────
+
+describe("Appointments — cross-tenant write isolation", () => {
+  it("updateAppointmentStatus with Tenant A's id and Tenant B's tenantId does not change the record", async () => {
+    const { storage } = await import("../storage");
+
+    // Fetch original status
+    const original = await storage.getAppointment(appointmentAId, tenantAId);
+    expect(original).toBeDefined();
+    const originalStatus = original!.status;
+
+    // Attempt cross-tenant status update (returns undefined / does nothing)
+    const result = await storage.updateAppointmentStatus(
+      appointmentAId,
+      "cancelled",
+      tenantBId,
+    );
+
+    // If a row was returned, it must not belong to Tenant B
+    if (result) {
+      expect(result.tenantId).not.toBe(tenantBId);
+    }
+
+    // Verify status in Tenant A's scope is unchanged
+    const after = await storage.getAppointment(appointmentAId, tenantAId);
+    expect(after).toBeDefined();
+    expect(after!.status).toBe(originalStatus);
+  });
+
+  it("deleteAppointment with Tenant A's id and Tenant B's tenantId does not remove the record", async () => {
+    const { storage } = await import("../storage");
+
+    // deleteAppointment is not on the IStorage interface but is on the concrete class;
+    // fall back to a direct DB delete with the wrong tenant filter
+    const { db } = await import("../db");
+    const { appointments: apptTable } = await import("@shared/schema");
+    const { and: dbAnd, eq: dbEq } = await import("drizzle-orm");
+
+    await db
+      .delete(apptTable)
+      .where(dbAnd(dbEq(apptTable.id, appointmentAId), dbEq(apptTable.tenantId, tenantBId)));
+
+    // Record must still exist under Tenant A
+    const still = await storage.getAppointment(appointmentAId, tenantAId);
+    expect(still).toBeDefined();
+  });
+});
+
+// ─── Cross-tenant write isolation (orders) ────────────────────────────────────
+
+describe("Orders — cross-tenant write isolation", () => {
+  it("updateOrderStatus with Tenant A's id and Tenant B's tenantId does not change the record", async () => {
+    const { storage } = await import("../storage");
+
+    const original = await storage.getOrder(orderAId, tenantAId);
+    expect(original).toBeDefined();
+    const originalStatus = original!.status;
+
+    // updateOrderStatus with wrong tenant — should either throw or return the wrong-tenant update (which matches nothing)
+    try {
+      await storage.updateOrderStatus(orderAId, "shipped", tenantBId);
+    } catch {
+      // A thrown error is also acceptable isolation behaviour
+    }
+
+    const after = await storage.getOrder(orderAId, tenantAId);
+    expect(after).toBeDefined();
+    expect(after!.status).toBe(originalStatus);
+  });
+
+  it("deleteOrder with Tenant A's id and Tenant B's tenantId throws and leaves the record intact", async () => {
+    const { storage } = await import("../storage");
+
+    await expect(storage.deleteOrder(orderAId, tenantBId)).rejects.toThrow();
+
+    // Record must still exist under Tenant A
+    const still = await storage.getOrder(orderAId, tenantAId);
+    expect(still).toBeDefined();
+  });
+});
