@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -66,6 +66,7 @@ export default function BillingPage() {
   const { user } = useAuth();
   const currentUser = user as any;
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const { data: billing, isLoading: billingLoading } = useQuery<BillingStatus>({
     queryKey: ["/api/billing/status"],
@@ -152,13 +153,21 @@ export default function BillingPage() {
     },
   });
 
-  // Show success/cancel toast from Stripe redirect
-  if (typeof window !== "undefined") {
+  // Invalidate billing cache and show a success toast when Stripe redirects back after checkout
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("success") === "1") {
+      // Strip the query param immediately so a refresh doesn't re-trigger this
       window.history.replaceState({}, "", "/settings/billing");
+      // Force-refetch billing status so the TrialStatusCard and TrialBanner disappear right away
+      queryClient.invalidateQueries({ queryKey: ["/api/billing/status"] });
+      toast({
+        title: "Subscription activated!",
+        description: "Your account is now active. Thank you for subscribing.",
+      });
     }
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const isOwner = currentUser?.isAdmin;
   const isActive = billing?.subscriptionStatus === "active";
