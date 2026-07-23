@@ -193,7 +193,21 @@ export default function Auth() {
           // Show verification pending screen
           setPendingEmail(email);
           setVerificationPending(true);
+        } else if (!userData.tenantId && !userData.isSuperAdmin) {
+          // Stranded user (no tenant assigned) — seed the React Query auth cache
+          // and navigate in-app so NoTenantScreen appears immediately without a
+          // full page reload.  Mirrors the same pattern used in handleLogin.
+          if (userData.token) {
+            localStorage.setItem('token', userData.token);
+          }
+          queryClient.setQueryData(["/api/auth/user"], userData);
+          setLocation('/');
         } else {
+          // Normal signup — force a full reload so the tenant slug, session
+          // cookie, and any per-tenant config are all picked up cleanly.
+          if (userData.token) {
+            localStorage.setItem('token', userData.token);
+          }
           window.location.replace('/');
         }
       } else {
