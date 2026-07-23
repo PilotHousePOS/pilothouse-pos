@@ -20,6 +20,8 @@ import {
   users,
   appointments,
   orders,
+  contacts,
+  boardingRecords,
 } from "@shared/schema";
 import { eq, sql } from "drizzle-orm";
 import { generateToken } from "../auth";
@@ -45,6 +47,8 @@ let strandedGroomerToken: string;
 
 let seededAppointmentId: number;
 let seededOrderId: number;
+let seededContactId: number;
+let seededBoardingRecordId: number;
 
 /** Supertest agent bound to the test Express app */
 let agent: ReturnType<typeof supertest>;
@@ -184,11 +188,42 @@ beforeAll(async () => {
     .returning();
   seededOrderId = order.id;
 
+  // Seed a contact belonging to the real tenant
+  const [contact] = await db
+    .insert(contacts)
+    .values({
+      tenantId: realTenantId,
+      name: "RealContact-" + sfx,
+      phoneNumber: "5550002222",
+    })
+    .returning();
+  seededContactId = contact.id;
+
+  // Seed a boarding record belonging to the real tenant
+  const [boardingRecord] = await db
+    .insert(boardingRecords)
+    .values({
+      tenantId: realTenantId,
+      customerName: "RealBoarder-" + sfx,
+      customerPhone: "5550003333",
+      animalType: "Dog",
+      animalName: "RealDog-" + sfx,
+      estimatedDropOffDate: "2099-12-30",
+      estimatedPickUpDate: "2099-12-31",
+      dailyRate: "30.00",
+    })
+    .returning();
+  seededBoardingRecordId = boardingRecord.id;
+
   const app = await buildTestApp();
   agent = supertest(app);
 }, 60_000);
 
 afterAll(async () => {
+  if (seededBoardingRecordId)
+    await db.delete(boardingRecords).where(eq(boardingRecords.id, seededBoardingRecordId));
+  if (seededContactId)
+    await db.delete(contacts).where(eq(contacts.id, seededContactId));
   if (seededOrderId)
     await db.delete(orders).where(eq(orders.id, seededOrderId));
   if (seededAppointmentId)
@@ -330,5 +365,131 @@ describe("storage.getOrders — storage-layer guard", () => {
   it("does not return the real tenant's order when tenantId is absent", async () => {
     const result = await storage.getOrders(strandedUserId, undefined);
     expect(result).toEqual([]);
+  });
+});
+
+// ─── Contacts endpoint — stranded users ───────────────────────────────────────
+//
+// GET /api/contacts requires isAdmin or isGroomer. tenantMiddleware already
+// blocks stranded users with 403. The storage layer also guards against
+// a missing tenantId by returning [].
+
+describe("GET /api/contacts — stranded user cannot read contact data", () => {
+  it("returns HTTP 403 for a stranded regular user (no tenant, no slug header)", async () => {
+    const res = await agent
+      .get("/api/contacts")
+      .set("Authorization", `Bearer ${strandedUserToken}`);
+
+    // Non-admin, non-groomer → 403 from the route guard before any DB call
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .get("/api/contacts")
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    // tenantMiddleware blocks before the route handler executes
+    expect(res.status).toBe(403);
+  });
+
+  it("does NOT expose the real tenant's contact to the stranded admin", async () => {
+    const res = await agent
+      .get("/api/contacts")
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    const ids = Array.isArray(res.body) ? res.body.map((c: any) => c.id) : [];
+    expect(ids).not.toContain(seededContactId);
+  });
+
+  it("returns HTTP 403 for a stranded groomer (isGroomer=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .get("/api/contacts")
+      .set("Authorization", `Bearer ${strandedGroomerToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("does NOT expose the real tenant's contact to the stranded groomer", async () => {
+    const res = await agent
+      .get("/api/contacts")
+      .set("Authorization", `Bearer ${strandedGroomerToken}`);
+
+    const ids = Array.isArray(res.body) ? res.body.map((c: any) => c.id) : [];
+    expect(ids).not.toContain(seededContactId);
+  });
+});
+
+// ─── Boarding records endpoint — stranded users ───────────────────────────────
+//
+// GET /api/admin/boarding requires isAdmin. tenantMiddleware already blocks
+// stranded users with 403. The storage layer also guards against a missing
+// tenantId by returning [].
+
+describe("GET /api/admin/boarding — stranded user cannot read boarding data", () => {
+  it("returns HTTP 403 for a stranded regular user (no tenant, no slug header)", async () => {
+    const res = await agent
+      .get("/api/admin/boarding")
+      .set("Authorization", `Bearer ${strandedUserToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .get("/api/admin/boarding")
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    // tenantMiddleware blocks before the route handler executes
+    expect(res.status).toBe(403);
+  });
+
+  it("does NOT expose the real tenant's boarding record to the stranded admin", async () => {
+    const res = await agent
+      .get("/api/admin/boarding")
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    const ids = Array.isArray(res.body) ? res.body.map((r: any) => r.id) : [];
+    expect(ids).not.toContain(seededBoardingRecordId);
+  });
+});
+
+// ─── Storage-layer unit tests — contacts and boarding ─────────────────────────
+
+describe("storage.getAllContacts — storage-layer guard", () => {
+  it("returns [] when tenantId is undefined", async () => {
+    const result = await storage.getAllContacts(undefined);
+    expect(result).toEqual([]);
+  });
+
+  it("does not return the real tenant's contact when tenantId is absent", async () => {
+    const result = await storage.getAllContacts(undefined);
+    const ids = result.map((c) => c.id);
+    expect(ids).not.toContain(seededContactId);
+  });
+
+  it("returns the real tenant's contact when called with the correct tenantId", async () => {
+    const result = await storage.getAllContacts(realTenantId);
+    const ids = result.map((c) => c.id);
+    expect(ids).toContain(seededContactId);
+  });
+});
+
+describe("storage.getAllBoardingRecords — storage-layer guard", () => {
+  it("returns [] when tenantId is undefined", async () => {
+    const result = await storage.getAllBoardingRecords(undefined);
+    expect(result).toEqual([]);
+  });
+
+  it("does not return the real tenant's boarding record when tenantId is absent", async () => {
+    const result = await storage.getAllBoardingRecords(undefined);
+    const ids = result.map((r) => r.id);
+    expect(ids).not.toContain(seededBoardingRecordId);
+  });
+
+  it("returns the real tenant's boarding record when called with the correct tenantId", async () => {
+    const result = await storage.getAllBoardingRecords(realTenantId);
+    const ids = result.map((r) => r.id);
+    expect(ids).toContain(seededBoardingRecordId);
   });
 });

@@ -3760,10 +3760,12 @@ export class DatabaseStorage implements IStorage {
 
   // Contact operations
   async getAllContacts(tenantId?: number): Promise<Contact[]> {
-    if (tenantId) {
-      return await db.select().from(contacts).where(eq(contacts.tenantId, tenantId)).orderBy(desc(contacts.createdAt));
+    if (!tenantId) {
+      // Refuse to return contacts without a tenant scope — prevents cross-tenant data leaks
+      // when called from a stranded account (tenantId = null/undefined).
+      return [];
     }
-    return await db.select().from(contacts).orderBy(desc(contacts.createdAt));
+    return await db.select().from(contacts).where(eq(contacts.tenantId, tenantId)).orderBy(desc(contacts.createdAt));
   }
 
   async getContact(id: number, tenantId?: number): Promise<Contact | undefined> {
@@ -4582,10 +4584,12 @@ export class DatabaseStorage implements IStorage {
 
   // Boarding operations
   async getAllBoardingRecords(tenantId?: number): Promise<BoardingRecord[]> {
-    if (tenantId) {
-      return await db.select().from(boardingRecords).where(eq(boardingRecords.tenantId, tenantId)).orderBy(desc(boardingRecords.createdAt));
+    if (!tenantId) {
+      // Refuse to return boarding records without a tenant scope — prevents cross-tenant data leaks
+      // when called from a stranded account (tenantId = null/undefined).
+      return [];
     }
-    return await db.select().from(boardingRecords).orderBy(desc(boardingRecords.createdAt));
+    return await db.select().from(boardingRecords).where(eq(boardingRecords.tenantId, tenantId)).orderBy(desc(boardingRecords.createdAt));
   }
 
   async getBoardingRecord(id: number, tenantId?: number): Promise<BoardingRecord | undefined> {
