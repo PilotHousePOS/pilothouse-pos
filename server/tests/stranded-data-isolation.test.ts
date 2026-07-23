@@ -705,6 +705,43 @@ describe("storage.getBoardingRecord — storage-layer guard (single record)", ()
   });
 });
 
+// ─── Storage-layer unit tests — updateBoardingRecord ─────────────────────────
+
+describe("storage.updateBoardingRecord — storage-layer guard", () => {
+  it("throws when tenantId is undefined", async () => {
+    await expect(
+      storage.updateBoardingRecord(seededBoardingRecordId, { customerName: "hacked" }, undefined)
+    ).rejects.toThrow("tenantId is required to update a boarding record");
+  });
+
+  it("does NOT persist changes when tenantId is undefined", async () => {
+    // Capture the customerName before the attempted mutation
+    const before = await storage.getBoardingRecord(seededBoardingRecordId, realTenantId);
+    const originalName = before?.customerName;
+
+    // Attempt the mutation — expected to throw
+    await expect(
+      storage.updateBoardingRecord(seededBoardingRecordId, { customerName: "hacked" }, undefined)
+    ).rejects.toThrow();
+
+    // Verify the record is unchanged
+    const after = await storage.getBoardingRecord(seededBoardingRecordId, realTenantId);
+    expect(after?.customerName).toBe(originalName);
+    expect(after?.customerName).not.toBe("hacked");
+  });
+
+  it("succeeds and persists changes when called with the correct tenantId", async () => {
+    const result = await storage.updateBoardingRecord(
+      seededBoardingRecordId,
+      { customerName: "Legitimate Update" },
+      realTenantId
+    );
+    expect(result).toBeDefined();
+    expect(result.id).toBe(seededBoardingRecordId);
+    expect(result.customerName).toBe("Legitimate Update");
+  });
+});
+
 // ─── Storage-layer unit tests — checkInBoardingRecord ────────────────────────
 
 describe("storage.checkInBoardingRecord — storage-layer guard", () => {
