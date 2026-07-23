@@ -808,3 +808,52 @@ describe("GET /api/contacts/:id/history — stranded user cannot read contact hi
     expect(items.length).toBe(0);
   });
 });
+
+// ─── PATCH /api/contacts/:id/sms-opt-out — stranded users ────────────────────
+//
+// The handler calls resolveWriteTenantId which relies on req.tenantId set by
+// tenantMiddleware.  A stranded account has no tenant, so tenantMiddleware
+// rejects the request with 403 before the storage call is ever reached.
+// The seeded contact's sms_opt_out flag must remain false after every
+// rejected attempt.
+
+describe("PATCH /api/contacts/:id/sms-opt-out — stranded user cannot update SMS opt-out", () => {
+  it("returns HTTP 403 for a stranded regular user", async () => {
+    const res = await agent
+      .patch(`/api/contacts/${seededContactId}/sms-opt-out`)
+      .set("Authorization", `Bearer ${strandedUserToken}`)
+      .send({ optOut: true });
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant)", async () => {
+    const res = await agent
+      .patch(`/api/contacts/${seededContactId}/sms-opt-out`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`)
+      .send({ optOut: true });
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded groomer (isGroomer=true, no tenant)", async () => {
+    const res = await agent
+      .patch(`/api/contacts/${seededContactId}/sms-opt-out`)
+      .set("Authorization", `Bearer ${strandedGroomerToken}`)
+      .send({ optOut: true });
+
+    expect(res.status).toBe(403);
+  });
+
+  it("leaves the seeded contact's sms_opt_out unchanged after all rejected requests", async () => {
+    // All three stranded callers already attempted optOut: true above and were
+    // blocked.  The contact must still have sms_opt_out = false in the DB.
+    const [row] = await db
+      .select()
+      .from(contacts)
+      .where(eq(contacts.id, seededContactId));
+
+    expect(row).toBeDefined();
+    expect(row.smsOptOut).toBe(false);
+  });
+});
