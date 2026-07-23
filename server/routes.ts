@@ -338,6 +338,24 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   app.use('/api/auth/reset-password', authLimiter);
   app.use('/api/auth/change-password', authLimiter);
 
+  // Separate limiter for customer signup that does NOT count requests that will
+  // be immediately rejected with 400 due to a missing tenant context.
+  // A misconfigured client or embedded widget that hammers /api/auth/signup
+  // without a valid store slug would otherwise exhaust the budget and block
+  // real users on the same IP from signing up through a legitimate store link.
+  // By the time this middleware runs, tenantMiddleware has already attached
+  // req.tenantId (or left it undefined), so we can skip counting those requests
+  // safely — they carry no authentication risk because they always return 400.
+  const signupLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 15,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: "Too many signup attempts, please try again in 15 minutes." },
+    skip: (req: any) => !req.tenantId,
+  });
+  app.use('/api/auth/signup', signupLimiter);
+
   const searchLimiter = rateLimit({
     windowMs: 1 * 60 * 1000,
     max: 60,
