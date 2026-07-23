@@ -704,3 +704,107 @@ describe("storage.getBoardingRecord — storage-layer guard (single record)", ()
     expect(result!.id).toBe(seededBoardingRecordId);
   });
 });
+
+// ─── Contact sub-resource endpoints — stranded users ─────────────────────────
+//
+// GET /api/contacts/:id/appointments and GET /api/contacts/:id/history both
+// call storage.getContact(contactId, req.tenantId) early in the handler.
+// tenantMiddleware rejects stranded accounts (no tenant, no slug header) with
+// 403 before the route handler executes, so neither endpoint should expose
+// appointment or history data for a contact owned by another store.
+
+describe("GET /api/contacts/:id/appointments — stranded user cannot read contact appointment history", () => {
+  it("returns HTTP 403 for a stranded regular user (no tenant, no slug header)", async () => {
+    const res = await agent
+      .get(`/api/contacts/${seededContactId}/appointments`)
+      .set("Authorization", `Bearer ${strandedUserToken}`);
+
+    // tenantMiddleware blocks before the route handler executes
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .get(`/api/contacts/${seededContactId}/appointments`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("does NOT expose the real tenant's appointment data to the stranded admin", async () => {
+    const res = await agent
+      .get(`/api/contacts/${seededContactId}/appointments`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    // Must be 403; body must not be an array containing real appointment data
+    expect(res.status).toBe(403);
+    const ids = Array.isArray(res.body) ? res.body.map((a: any) => a.id) : [];
+    expect(ids).not.toContain(seededAppointmentId);
+  });
+
+  it("returns HTTP 403 for a stranded groomer (isGroomer=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .get(`/api/contacts/${seededContactId}/appointments`)
+      .set("Authorization", `Bearer ${strandedGroomerToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("does NOT expose the real tenant's appointment data to the stranded groomer", async () => {
+    const res = await agent
+      .get(`/api/contacts/${seededContactId}/appointments`)
+      .set("Authorization", `Bearer ${strandedGroomerToken}`);
+
+    expect(res.status).toBe(403);
+    const ids = Array.isArray(res.body) ? res.body.map((a: any) => a.id) : [];
+    expect(ids).not.toContain(seededAppointmentId);
+  });
+});
+
+describe("GET /api/contacts/:id/history — stranded user cannot read contact history", () => {
+  it("returns HTTP 403 for a stranded regular user (no tenant, no slug header)", async () => {
+    const res = await agent
+      .get(`/api/contacts/${seededContactId}/history`)
+      .set("Authorization", `Bearer ${strandedUserToken}`);
+
+    // tenantMiddleware blocks before the route handler executes
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .get(`/api/contacts/${seededContactId}/history`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("does NOT expose the real tenant's history data to the stranded admin", async () => {
+    const res = await agent
+      .get(`/api/contacts/${seededContactId}/history`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    // Must be 403; body must not be a non-empty array of history records
+    expect(res.status).toBe(403);
+    const items = Array.isArray(res.body) ? res.body : [];
+    expect(items.length).toBe(0);
+  });
+
+  it("returns HTTP 403 for a stranded groomer (isGroomer=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .get(`/api/contacts/${seededContactId}/history`)
+      .set("Authorization", `Bearer ${strandedGroomerToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("does NOT expose the real tenant's history data to the stranded groomer", async () => {
+    const res = await agent
+      .get(`/api/contacts/${seededContactId}/history`)
+      .set("Authorization", `Bearer ${strandedGroomerToken}`);
+
+    expect(res.status).toBe(403);
+    const items = Array.isArray(res.body) ? res.body : [];
+    expect(items.length).toBe(0);
+  });
+});
