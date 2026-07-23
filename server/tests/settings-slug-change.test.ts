@@ -28,7 +28,7 @@
  *    preventing a pointless PATCH.
  */
 
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 import express from "express";
 import cookieParser from "cookie-parser";
 import supertest from "supertest";
@@ -36,6 +36,7 @@ import { db } from "../db";
 import { tenants, users, contacts } from "@shared/schema";
 import { eq, inArray, sql } from "drizzle-orm";
 import { generateToken } from "../auth";
+import { storage } from "../storage";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -274,6 +275,51 @@ describe("PATCH /api/tenants/current — auth and permission guards", () => {
       .send({ slug: `slug-staff-${sfx}` });
 
     expect(res.status).toBe(403);
+  });
+});
+
+// ─── PATCH /api/tenants/current — race-condition: DB throws 23505 ─────────────
+//
+// Tests the path where the pre-check passes (slug appears available) but the
+// database UPDATE fails with a 23505 unique-constraint violation because another
+// request claimed the slug between the check and the write.  The fix must convert
+// this into a 4xx (not 500).
+
+describe("PATCH /api/tenants/current — DB-level slug constraint violation (race condition)", () => {
+  it("returns 409 (not 500) when the DB throws a 23505 unique-constraint error on the slug column", async () => {
+    const sfx = randomSuffix();
+    const takenSlug = `slug-race-${sfx}`;
+
+    // Seed tenant B's slug directly so it exists in the DB
+    const bId = await createTestTenant(`Race-Tenant-B-${sfx}`, takenSlug);
+
+    // Bypass the pre-check by making getTenantBySlug return null, simulating
+    // the window between the availability check and the actual DB write.
+    const spy = vi
+      .spyOn(storage, "getTenantBySlug")
+      .mockResolvedValueOnce(null as any);
+
+    try {
+      const res = await agent
+        .patch("/api/tenants/current")
+        .set("Authorization", `Bearer ${tokenA}`)
+        .set("X-Tenant-Slug", tenantASlug)
+        .send({ slug: takenSlug });
+
+      // Must be 4xx, not 500
+      expect(res.status).toBeGreaterThanOrEqual(400);
+      expect(res.status).toBeLessThan(500);
+      // Must include a human-readable conflict message
+      expect(typeof res.body.message).toBe("string");
+      expect(res.body.message.toLowerCase()).toMatch(/taken|already|use|conflict/);
+    } finally {
+      spy.mockRestore();
+      // Clean up the extra tenant we seeded for this test
+      await db.delete(tenants).where(eq(tenants.id, bId)).catch(() => {});
+      // Remove bId from createdTenantIds if it got pushed there
+      const idx = createdTenantIds.indexOf(bId);
+      if (idx !== -1) createdTenantIds.splice(idx, 1);
+    }
   });
 });
 

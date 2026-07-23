@@ -865,8 +865,17 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       }
       const updated = await storage.updateTenant(dbUser.tenantId, updates as any);
       res.json({ id: updated.id, name: updated.name, slug: updated.slug, onboardingStep: updated.onboardingStep ?? 0 });
-    } catch (error) {
+    } catch (error: any) {
       console.error('PATCH /api/tenants/current error:', error);
+      // Detect a Postgres unique-constraint violation (23505) on the slug column.
+      // Drizzle wraps the underlying pg error in err.cause, so check both the
+      // top-level error and its cause — matching the same pattern used in signup.
+      const pgErr = (error?.code === '23505') ? error : (error?.cause?.code === '23505' ? error.cause : null);
+      const isSlugConflict = pgErr !== null && pgErr !== undefined &&
+        (pgErr?.constraint?.includes('slug') || pgErr?.detail?.includes('slug'));
+      if (isSlugConflict) {
+        return res.status(409).json({ message: "This slug is already taken. Please choose another." });
+      }
       res.status(500).json({ message: "Failed to update business details." });
     }
   });
