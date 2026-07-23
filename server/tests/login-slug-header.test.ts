@@ -21,7 +21,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import supertest from "supertest";
 import { db } from "../db";
-import { tenants, users, contacts } from "@shared/schema";
+import { tenants, users, contacts, passwordResetTokens } from "@shared/schema";
 import { eq, sql, inArray } from "drizzle-orm";
 import { hashPassword } from "../passwordUtils";
 
@@ -508,5 +508,130 @@ describe("POST /api/auth/resend-verification — cross-tenant token isolation", 
     // The tenantId in the login response must be tenant A's.
     expect(res.body.tenantId).toBe(tenantA.id);
     expect(res.body.tenantId).not.toBe(tenantB.id);
+  });
+});
+
+// ─── Password-reset cross-tenant isolation ────────────────────────────────────
+
+/**
+ * This describe block covers the password-reset token cross-tenant scenario:
+ *
+ *   1. A password-reset token is issued for a user who belongs to tenant A.
+ *   2. An attacker (or a confused user) POSTs that token to
+ *      POST /api/auth/reset-password while sending X-Tenant-Slug: tenantB.slug.
+ *   3. The server resolves the user purely from the reset token (not from the
+ *      slug header), so the password change must only affect the tenant-A user.
+ *   4. The user can still log in as tenant A after the reset.
+ *   5. The login response must carry tenant A's tenantId — not tenant B's.
+ *
+ * This ensures the password-reset flow cannot be used to "move" a user from
+ * the tenant they signed up under to an arbitrary other tenant.
+ */
+describe("POST /api/auth/reset-password — cross-tenant token isolation", () => {
+  let resetUserEmail: string;
+  let resetUserId: string | undefined;
+  let resetRawToken: string;
+  const RESET_OLD_PASSWORD = "ResetOldPass1!";
+  const RESET_NEW_PASSWORD = "ResetNewPass2@";
+
+  beforeAll(async () => {
+    const sfx = randomSuffix();
+    resetUserEmail = `reset-xtenant-${sfx}@test.local`;
+
+    // Step 1 — create a pre-verified tenant-A user directly in the DB so we
+    // bypass signup's X-Tenant-Slug requirement and control the tenantId.
+    const hashed = await hashPassword(RESET_OLD_PASSWORD);
+    const [inserted] = await db
+      .insert(users)
+      .values({
+        id: `reset-xtenant-${sfx}`,
+        email: resetUserEmail,
+        password: hashed,
+        firstName: "Reset",
+        lastName: "XTenant",
+        phoneNumber: `555${sfx.slice(0, 7)}`,
+        tenantId: tenantA.id,
+        isAdmin: false,
+        emailVerified: true,
+        tokenVersion: 0,
+      } as any)
+      .returning({ id: users.id });
+
+    resetUserId = inserted.id as string;
+
+    // Step 2 — issue a password-reset token directly in the DB, mirroring what
+    // POST /api/auth/forgot-password does internally.  We bypass the actual
+    // endpoint to avoid a SendGrid call and stay focused on isolation behaviour.
+    const crypto = await import("crypto");
+    resetRawToken = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    await db.insert(passwordResetTokens).values({
+      token: resetRawToken,
+      userId: resetUserId,
+      expiresAt,
+      used: false,
+    } as any);
+  }, 60_000);
+
+  afterAll(async () => {
+    if (resetUserId) {
+      // Remove any leftover reset tokens first (FK constraint).
+      await db
+        .delete(passwordResetTokens)
+        .where(eq(passwordResetTokens.userId as any, resetUserId as any));
+      await db
+        .update(contacts)
+        .set({ linkedUserId: null })
+        .where(eq(contacts.linkedUserId, resetUserId as any));
+      await db.delete(users).where(eq(users.id, resetUserId as any));
+    }
+  }, 30_000);
+
+  it("resets the password when the token is submitted with tenant B's slug header", async () => {
+    // POST the reset request while sending tenant B's slug — simulating an
+    // attacker who attempts to associate the reset with store B.
+    const res = await agent
+      .post("/api/auth/reset-password")
+      .set("X-Tenant-Slug", tenantB.slug)
+      .send({ token: resetRawToken, newPassword: RESET_NEW_PASSWORD });
+
+    // The reset must succeed — the X-Tenant-Slug header is irrelevant to
+    // whether the token is valid.
+    expect(res.status).toBe(200);
+  });
+
+  it("allows the user to log in as tenant A after the cross-tenant reset", async () => {
+    // After the password was changed above, login with the NEW password while
+    // still sending tenant B's slug — the stored tenantId must still win.
+    const res = await agent
+      .post("/api/auth/login")
+      .set("X-Tenant-Slug", tenantB.slug)
+      .send({ email: resetUserEmail, password: RESET_NEW_PASSWORD });
+
+    expect(res.status).toBe(200);
+
+    // The session must be scoped to tenant A — where the user's account lives.
+    expect(res.body.tenantId).toBe(tenantA.id);
+    expect(res.body.tenantId).not.toBe(tenantB.id);
+  });
+
+  it("login response does not expose tenant B's tenantId after the cross-tenant reset", async () => {
+    // Log in without any X-Tenant-Slug header to confirm the reset did not
+    // permanently associate the user with tenant B.
+    const res = await agent
+      .post("/api/auth/login")
+      .send({ email: resetUserEmail, password: RESET_NEW_PASSWORD });
+
+    expect(res.status).toBe(200);
+
+    // Regardless of which slug header was sent during the reset, the returned
+    // tenantId must always be tenant A's.
+    expect(res.body.tenantId).toBe(tenantA.id);
+    expect(res.body.tenantId).not.toBe(tenantB.id);
+
+    // The server must not return any redirect URL that could steer the browser
+    // toward a tenant-B page.
+    expect(res.body.redirectTo).toBeUndefined();
+    expect(res.body.redirect).toBeUndefined();
   });
 });
