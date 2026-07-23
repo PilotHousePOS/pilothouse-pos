@@ -636,6 +636,117 @@ describe("POST /api/auth/reset-password — cross-tenant token isolation", () =>
   });
 });
 
+// ─── Expired password-reset token rejection ───────────────────────────────────
+
+/**
+ * This describe block confirms that a password-reset token whose `expiresAt`
+ * timestamp is in the past is rejected BEFORE the password is changed:
+ *
+ *   1. A user is created with a known password.
+ *   2. A password-reset token is inserted directly into the DB with
+ *      `expiresAt` set one hour in the past.
+ *   3. POST /api/auth/reset-password with that token must return 400 with
+ *      "Reset token has expired".
+ *   4. A login attempt with the original password must still succeed —
+ *      confirming the password was never changed.
+ *
+ * This guards against a regression where the `expiresAt` check is removed or
+ * bypassed, which would allow stale links to reset passwords.
+ */
+describe("POST /api/auth/reset-password — expired token rejection", () => {
+  let expiredUserEmail: string;
+  let expiredUserId: string | undefined;
+  let expiredRawToken: string;
+
+  const EXPIRED_ORIGINAL_PASSWORD = "ExpiredOrig1!";
+  const EXPIRED_NEW_PASSWORD = "ExpiredNew2@";
+
+  beforeAll(async () => {
+    const sfx = randomSuffix();
+    expiredUserEmail = `reset-expired-${sfx}@test.local`;
+
+    // Create a pre-verified tenant-A user directly in the DB.
+    const hashed = await hashPassword(EXPIRED_ORIGINAL_PASSWORD);
+    const [inserted] = await db
+      .insert(users)
+      .values({
+        id: `reset-expired-${sfx}`,
+        email: expiredUserEmail,
+        password: hashed,
+        firstName: "Expired",
+        lastName: "TokenTest",
+        phoneNumber: `555${sfx.slice(0, 7)}`,
+        tenantId: tenantA.id,
+        isAdmin: false,
+        emailVerified: true,
+        tokenVersion: 0,
+      } as any)
+      .returning({ id: users.id });
+
+    expiredUserId = inserted.id as string;
+
+    // Insert a password-reset token with expiresAt in the past — one hour ago.
+    // This simulates a link that was generated but never clicked until it expired.
+    const crypto = await import("crypto");
+    expiredRawToken = crypto.randomBytes(32).toString("hex");
+    const expiredAt = new Date(Date.now() - 60 * 60 * 1000); // 1 hour ago
+    await db.insert(passwordResetTokens).values({
+      token: expiredRawToken,
+      userId: expiredUserId,
+      expiresAt: expiredAt,
+      used: false,
+    } as any);
+  }, 60_000);
+
+  afterAll(async () => {
+    if (expiredUserId) {
+      await db
+        .delete(passwordResetTokens)
+        .where(eq(passwordResetTokens.userId as any, expiredUserId as any));
+      await db
+        .update(contacts)
+        .set({ linkedUserId: null })
+        .where(eq(contacts.linkedUserId, expiredUserId as any));
+      await db.delete(users).where(eq(users.id, expiredUserId as any));
+    }
+  }, 30_000);
+
+  it("returns 400 with 'Reset token has expired' when the token's expiresAt is in the past", async () => {
+    const res = await agent
+      .post("/api/auth/reset-password")
+      .send({ token: expiredRawToken, newPassword: EXPIRED_NEW_PASSWORD });
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toMatch(/Reset token has expired/i);
+  });
+
+  it("the stored password hash is unchanged — the original password would still let the user log in", async () => {
+    // Read the stored password hash directly from the DB.  This approach avoids
+    // consuming additional slots from the shared auth rate-limiter (login,
+    // reset-password, etc. all count toward the same pool of 15 per window).
+    const [row] = await db
+      .select({ password: users.password })
+      .from(users)
+      .where(eq(users.id, expiredUserId as any))
+      .limit(1);
+
+    expect(row).toBeDefined();
+
+    const { verifyPassword: vp } = await import("../passwordUtils");
+
+    // The original password must still match — the expired token must not have
+    // caused any write to the database.  bcrypt matching here is equivalent to
+    // a successful login: if the hash matches, the login endpoint would accept it.
+    const originalMatches = await vp(EXPIRED_ORIGINAL_PASSWORD, row!.password!);
+    expect(originalMatches).toBe(true);
+
+    // The "new" password the caller tried to set must NOT match — confirming
+    // the reset was blocked before any DB write occurred.
+    const newMatches = await vp(EXPIRED_NEW_PASSWORD, row!.password!);
+    expect(newMatches).toBe(false);
+  });
+});
+
 // ─── Password-reset token replay protection ───────────────────────────────────
 
 /**
@@ -657,6 +768,11 @@ describe("POST /api/auth/reset-password — token replay protection", () => {
   let replayUserEmail: string;
   let replayUserId: string | undefined;
   let replayRawToken: string;
+  // Own app instance so this block gets a fresh authLimiter counter that is
+  // independent of the quota consumed by earlier describe blocks in this file.
+  // Each call to registerRoutes() creates a new rateLimit() instance, so
+  // requests to `replayAgent` never share a counter with `agent`.
+  let replayAgent: ReturnType<typeof supertest>;
 
   const REPLAY_OLD_PASSWORD = "ReplayOld1!";
   const REPLAY_NEW_PASSWORD = "ReplayNew2@";
@@ -696,6 +812,11 @@ describe("POST /api/auth/reset-password — token replay protection", () => {
       expiresAt,
       used: false,
     } as any);
+
+    // Spin up a dedicated app so this block's reset-password calls don't share
+    // the rate-limit window that the earlier describe blocks have already
+    // partially consumed.
+    replayAgent = supertest(await buildTestApp());
   }, 60_000);
 
   afterAll(async () => {
@@ -712,7 +833,7 @@ describe("POST /api/auth/reset-password — token replay protection", () => {
   }, 30_000);
 
   it("first use of the token resets the password successfully", async () => {
-    const res = await agent
+    const res = await replayAgent
       .post("/api/auth/reset-password")
       .send({ token: replayRawToken, newPassword: REPLAY_NEW_PASSWORD });
 
@@ -721,7 +842,7 @@ describe("POST /api/auth/reset-password — token replay protection", () => {
 
   it("second use of the same token is rejected with 400", async () => {
     // Attempt to replay the already-used token with a different password.
-    const res = await agent
+    const res = await replayAgent
       .post("/api/auth/reset-password")
       .send({ token: replayRawToken, newPassword: REPLAY_THIRD_PASSWORD });
 
