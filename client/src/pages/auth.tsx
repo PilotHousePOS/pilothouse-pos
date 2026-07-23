@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getActiveTenantSlug } from "@/lib/queryClient";
+import { getActiveTenantSlug, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -119,9 +119,25 @@ export default function Auth() {
         if (userData.token) {
           localStorage.setItem('token', userData.token);
         }
-        
-        // Force a complete page reload to ensure authentication state is picked up
-        window.location.replace('/');
+
+        // Seed the React Query auth cache with the login response so that
+        // App.tsx's Router can evaluate the tenantId guard in the same
+        // navigation without waiting for a separate /api/auth/user round-trip.
+        // This is especially important for stranded users (tenantId=null): the
+        // NoTenantScreen guard in Router fires immediately, so there is no
+        // blank/broken intermediate state and no full page reload is needed.
+        queryClient.setQueryData(["/api/auth/user"], userData);
+
+        if (!userData.tenantId && !userData.isSuperAdmin) {
+          // Stranded user — navigate in-app so NoTenantScreen appears instantly
+          // without a hard page reload.  The Router guard detects tenantId=null
+          // and renders NoTenantScreen before any tenant-scoped route is shown.
+          setLocation('/');
+        } else {
+          // Normal user — force a complete page reload so the tenant slug, session
+          // cookie, and any per-tenant config are all picked up cleanly.
+          window.location.replace('/');
+        }
       } else {
         const error = await response.json();
         console.error('Login failed:', error.message);
