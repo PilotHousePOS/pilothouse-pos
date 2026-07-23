@@ -322,6 +322,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     standardHeaders: true,
     legacyHeaders: false,
     message: { message: "Too many requests, please try again later." },
+    // Exclude no-tenant signup attempts so a flood of misconfigured no-slug
+    // requests from one IP cannot exhaust the general budget and block
+    // unrelated API calls (e.g. browsing the store catalog).
+    // These requests always return 400 and carry no authentication risk.
+    skip: (req: any) => req.path === '/auth/signup' && !req.tenantId,
   });
   app.use('/api', generalLimiter);
 
