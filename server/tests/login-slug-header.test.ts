@@ -281,3 +281,112 @@ describe("Full signup-under-A → login-with-B-slug flow", () => {
     expect(res.body.tenantId).toBe(tenantA.id);
   });
 });
+
+// ─── Email verification cross-tenant replay ───────────────────────────────────
+
+/**
+ * This describe block covers the email-verification token replay scenario:
+ *
+ *   1. A customer signs up under tenant A — the server stores an
+ *      emailVerificationToken against the new user record (still tied to
+ *      tenant A's tenantId).
+ *   2. An attacker (or a confused user) visits /auth?tenant=<store-b-slug>
+ *      and POSTs the *same* verification token to POST /api/auth/verify-email
+ *      while sending X-Tenant-Slug: tenantB.slug in the request header.
+ *   3. The server looks up the user purely by the verification token, not by
+ *      the slug header, so the user's stored tenantId (tenant A) must be
+ *      unchanged in the response and in any subsequent login.
+ *
+ * This ensures the email-verification flow cannot be used to "move" a user
+ * account from the tenant they signed up under to an arbitrary other tenant.
+ */
+describe("POST /api/auth/verify-email — cross-tenant token replay", () => {
+  let verifUserEmail: string;
+  let verifUserId: string | undefined;
+  let verifToken: string;
+
+  const VERIF_PASSWORD = "VerifReplay1!";
+
+  beforeAll(async () => {
+    const sfx = randomSuffix();
+    verifUserEmail = `verif-replay-${sfx}@test.local`;
+
+    // Sign up under tenant A — this creates the user with an
+    // emailVerificationToken stored in the DB.
+    const signupRes = await agent
+      .post("/api/auth/signup")
+      .set("X-Tenant-Slug", tenantA.slug)
+      .send({
+        email: verifUserEmail,
+        password: VERIF_PASSWORD,
+        firstName: "Verif",
+        lastName: "ReplayTest",
+        phoneNumber: `555${sfx.slice(0, 7)}`,
+      });
+
+    if (signupRes.status !== 200) {
+      throw new Error(
+        `Signup in beforeAll failed: ${signupRes.status} ${JSON.stringify(signupRes.body)}`
+      );
+    }
+
+    verifUserId = signupRes.body.id as string;
+
+    // Read the raw verification token directly from the database.
+    // In production the user would receive it via email; here we retrieve it
+    // directly so we can replay it with a different tenant slug.
+    const [row] = await db
+      .select({ token: users.emailVerificationToken })
+      .from(users)
+      .where(eq(users.id, verifUserId as any))
+      .limit(1);
+
+    if (!row?.token) {
+      throw new Error("emailVerificationToken not found in DB after signup");
+    }
+    verifToken = row.token;
+  }, 60_000);
+
+  afterAll(async () => {
+    if (verifUserId) {
+      await db
+        .update(contacts)
+        .set({ linkedUserId: null })
+        .where(eq(contacts.linkedUserId, verifUserId as any));
+      await db.delete(users).where(eq(users.id, verifUserId as any));
+    }
+  }, 30_000);
+
+  it("verifying with tenant B's slug header still scopes the account to tenant A", async () => {
+    // POST the verification token while sending tenant B's slug — simulating
+    // a user (or attacker) who opens the verification link while visiting the
+    // store-B subdomain / ?tenant=store-b URL.
+    const res = await agent
+      .post("/api/auth/verify-email")
+      .set("X-Tenant-Slug", tenantB.slug)
+      .send({ token: verifToken });
+
+    expect(res.status).toBe(200);
+
+    // The response must carry tenant A's tenantId.  The X-Tenant-Slug header
+    // from store B must have had no effect on which tenant owns this user.
+    expect(res.body.tenantId).toBe(tenantA.id);
+    expect(res.body.tenantId).not.toBe(tenantB.id);
+  });
+
+  it("login after cross-tenant verification still returns tenant A's tenantId", async () => {
+    // After the verification above the account should be fully usable.
+    // Log in while again sending tenant B's slug header — the stored tenantId
+    // must still win.
+    const res = await agent
+      .post("/api/auth/login")
+      .set("X-Tenant-Slug", tenantB.slug)
+      .send({ email: verifUserEmail, password: VERIF_PASSWORD });
+
+    expect(res.status).toBe(200);
+
+    // The tenantId in the login response must be tenant A's.
+    expect(res.body.tenantId).toBe(tenantA.id);
+    expect(res.body.tenantId).not.toBe(tenantB.id);
+  });
+});
