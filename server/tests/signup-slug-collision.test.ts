@@ -25,9 +25,9 @@
  *    re-enabled (`slugStatus !== 'taken'`).
  *
  * Note on tenantMiddleware: the slug-check and tenant-signup endpoints are
- * public routes (they create tenants, so no pre-existing tenant context exists).
- * In tests we set ALLOW_TENANT_FALLBACK=true so the middleware passes through
- * unauthenticated requests, matching the behaviour in the development environment.
+ * listed in UNAUTHENTICATED_NO_SLUG_ALLOWLIST inside tenantMiddleware.ts, so
+ * they are permitted to proceed without any X-Tenant-Slug header or
+ * ALLOW_TENANT_FALLBACK flag. No workaround is needed in tests.
  */
 
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
@@ -60,14 +60,11 @@ async function buildTestApp() {
 // ─── Setup / teardown ─────────────────────────────────────────────────────────
 
 let agent: ReturnType<typeof supertest>;
-let originalFallback: string | undefined;
 
 beforeAll(async () => {
-  // Slug-check and tenant-signup are public routes that create tenants; they
-  // have no pre-existing tenant context. Enable the fallback so tenantMiddleware
-  // passes through unauthenticated requests in the test environment.
-  originalFallback = process.env.ALLOW_TENANT_FALLBACK;
-  process.env.ALLOW_TENANT_FALLBACK = "true";
+  // Slug-check and tenant-signup are listed in UNAUTHENTICATED_NO_SLUG_ALLOWLIST
+  // inside tenantMiddleware.ts, so they pass through without any X-Tenant-Slug
+  // header or ALLOW_TENANT_FALLBACK flag. No env override is needed here.
 
   // Advance the tenants sequence to avoid primary-key collisions across test
   // files that all insert into the tenants table.
@@ -83,13 +80,6 @@ beforeAll(async () => {
 }, 60_000);
 
 afterAll(async () => {
-  // Restore original env value
-  if (originalFallback === undefined) {
-    delete process.env.ALLOW_TENANT_FALLBACK;
-  } else {
-    process.env.ALLOW_TENANT_FALLBACK = originalFallback;
-  }
-
   // Unlink any contacts pointing at test users before deleting users (FK constraint)
   if (createdUserIds.length > 0) {
     await db
