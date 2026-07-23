@@ -705,6 +705,73 @@ describe("storage.getBoardingRecord — storage-layer guard (single record)", ()
   });
 });
 
+// ─── Storage-layer unit tests — checkInBoardingRecord ────────────────────────
+
+describe("storage.checkInBoardingRecord — storage-layer guard", () => {
+  it("throws when tenantId is undefined", async () => {
+    await expect(
+      storage.checkInBoardingRecord(seededBoardingRecordId, undefined)
+    ).rejects.toThrow("tenantId is required to check in a boarding record");
+  });
+
+  it("does NOT update the record when tenantId is undefined", async () => {
+    // Capture actualDropOffDate before the attempted mutation
+    const before = await storage.getBoardingRecord(seededBoardingRecordId, realTenantId);
+    const beforeDate = before?.actualDropOffDate;
+
+    // Attempt the mutation — expected to throw
+    await expect(
+      storage.checkInBoardingRecord(seededBoardingRecordId, undefined)
+    ).rejects.toThrow();
+
+    // Verify the record is unchanged
+    const after = await storage.getBoardingRecord(seededBoardingRecordId, realTenantId);
+    expect(after?.actualDropOffDate).toStrictEqual(beforeDate);
+  });
+
+  it("succeeds and updates the record when called with the correct tenantId", async () => {
+    const result = await storage.checkInBoardingRecord(seededBoardingRecordId, realTenantId);
+    expect(result).toBeDefined();
+    expect(result.id).toBe(seededBoardingRecordId);
+    expect(result.actualDropOffDate).toBeDefined();
+  });
+});
+
+// ─── Storage-layer unit tests — checkOutBoardingRecord ───────────────────────
+
+describe("storage.checkOutBoardingRecord — storage-layer guard", () => {
+  it("throws when tenantId is undefined", async () => {
+    await expect(
+      storage.checkOutBoardingRecord(seededBoardingRecordId, undefined)
+    ).rejects.toThrow("tenantId is required to check out a boarding record");
+  });
+
+  it("does NOT update the record when tenantId is undefined", async () => {
+    // Capture actualPickUpDate and status before the attempted mutation
+    const before = await storage.getBoardingRecord(seededBoardingRecordId, realTenantId);
+    const beforePickUp = before?.actualPickUpDate;
+    const beforeStatus = before?.status;
+
+    // Attempt the mutation — expected to throw
+    await expect(
+      storage.checkOutBoardingRecord(seededBoardingRecordId, undefined)
+    ).rejects.toThrow();
+
+    // Verify the record is unchanged
+    const after = await storage.getBoardingRecord(seededBoardingRecordId, realTenantId);
+    expect(after?.actualPickUpDate).toStrictEqual(beforePickUp);
+    expect(after?.status).toBe(beforeStatus);
+  });
+
+  it("succeeds and updates the record when called with the correct tenantId", async () => {
+    const result = await storage.checkOutBoardingRecord(seededBoardingRecordId, realTenantId);
+    expect(result).toBeDefined();
+    expect(result.id).toBe(seededBoardingRecordId);
+    expect(result.actualPickUpDate).toBeDefined();
+    expect(result.status).toBe("completed");
+  });
+});
+
 // ─── Contact sub-resource endpoints — stranded users ─────────────────────────
 //
 // GET /api/contacts/:id/appointments and GET /api/contacts/:id/history both
