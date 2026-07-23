@@ -121,6 +121,11 @@ afterAll(async () => {
       .update(contacts)
       .set({ linkedUserId: null })
       .where(eq(contacts.linkedUserId, testUserId as any));
+    // Remove any password-reset tokens created by the forgot-password tests
+    // before deleting the user (foreign key constraint).
+    await db
+      .delete(passwordResetTokens)
+      .where(eq(passwordResetTokens.userId, testUserId as any));
     await db.delete(users).where(eq(users.id, testUserId as any));
   }
   if (tenantA?.id) {
@@ -876,5 +881,55 @@ describe("POST /api/auth/reset-password — token replay protection", () => {
     // replay POST was blocked before any DB write occurred.
     const thirdPasswordMatches = await vp(REPLAY_THIRD_PASSWORD, row!.password!);
     expect(thirdPasswordMatches).toBe(false);
+  });
+});
+
+// ─── Forgot-password email-enumeration guard ──────────────────────────────────
+
+/**
+ * POST /api/auth/forgot-password must return the same HTTP status and the same
+ * response body regardless of whether the submitted email address belongs to a
+ * real account.  A different response for unknown emails would let an attacker
+ * enumerate which addresses are registered.
+ */
+describe("POST /api/auth/forgot-password — no email enumeration", () => {
+  const EXPECTED_MESSAGE =
+    "If an account exists with this email, you will receive a password reset link.";
+
+  it("returns 200 with the standard message for an email that does NOT exist in the DB", async () => {
+    // Use a clearly random address that will never be in the database.
+    const nonExistentEmail = `no-account-${randomSuffix()}@test.invalid`;
+
+    const res = await agent
+      .post("/api/auth/forgot-password")
+      .send({ email: nonExistentEmail });
+
+    expect(res.status).toBe(200);
+    // The response must NOT reveal that no account was found.
+    expect(res.body.message).toBe(EXPECTED_MESSAGE);
+  });
+
+  it("returns 200 with the same standard message for a real registered email", async () => {
+    // testUserEmail is the pre-verified account created in the outer beforeAll.
+    const res = await agent
+      .post("/api/auth/forgot-password")
+      .send({ email: testUserEmail });
+
+    expect(res.status).toBe(200);
+    // The response for a real account must be identical to the one above so
+    // the two cases are indistinguishable to an outside observer.
+    expect(res.body.message).toBe(EXPECTED_MESSAGE);
+  });
+
+  it("response body contains no field that distinguishes the two cases", async () => {
+    const nonExistentEmail = `no-account-${randomSuffix()}@test.invalid`;
+
+    const [missingRes, existingRes] = await Promise.all([
+      agent.post("/api/auth/forgot-password").send({ email: nonExistentEmail }),
+      agent.post("/api/auth/forgot-password").send({ email: testUserEmail }),
+    ]);
+
+    expect(missingRes.status).toBe(existingRes.status);
+    expect(missingRes.body).toEqual(existingRes.body);
   });
 });
