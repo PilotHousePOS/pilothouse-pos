@@ -587,6 +587,16 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(400).json({ message: "All fields including phone number are required" });
       }
 
+      // Reject signups that arrive without a valid tenant context.
+      // A missing or unresolvable X-Tenant-Slug header means tenantMiddleware
+      // could not attach req.tenantId.  Creating the account anyway would
+      // produce a stranded user (tenantId = null) that requires manual cleanup.
+      if (!(req as any).tenantId) {
+        return res.status(400).json({
+          message: "Signup is not available: no store was identified. Please use a valid store link to create your account.",
+        });
+      }
+
       const firstName = cleanName(rawFirst);
       const lastName = cleanName(rawLast);
 
