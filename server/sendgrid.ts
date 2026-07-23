@@ -361,6 +361,106 @@ export async function sendTrialOwnerMissingAlertToSuperAdmins(tenant: {
   }
 }
 
+/**
+ * Sends an alert email to all platform super-admins when the scheduled Stripe
+ * key health check detects an invalid or rotated secret key.
+ *
+ * Returns the number of super-admins successfully notified.
+ * Throws if the outer setup fails (no SendGrid client, DB unavailable, etc.)
+ * so the caller can decide whether to mark the idempotency guard.
+ */
+export async function sendStripeKeyFailureAlertToSuperAdmins(error: string): Promise<number> {
+  const { storage } = await import('./storage');
+  const allUsers = await storage.getAllUsers();
+  const superAdmins = allUsers.filter((u: any) => u.isSuperAdmin && u.email);
+
+  if (superAdmins.length === 0) {
+    console.warn('[stripe-health-alert] No super-admins with email found to notify.');
+    // Nothing to send — treat as "delivered to nobody" (0) so the caller can retry
+    return 0;
+  }
+
+  const { client, fromEmail } = await getUncachableSendGridClient();
+
+  const checkedAt = new Date().toLocaleString('en-US', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'America/Chicago',
+  });
+
+  const subject = `[PilotHouse] ⚠️ Stripe key health check failed`;
+  const textBody = [
+    'The scheduled Stripe key health check has detected a failure.',
+    '',
+    `Error: ${error}`,
+    `Checked at: ${checkedAt} CST`,
+    '',
+    'Please rotate or update the Stripe API key in Replit Secrets immediately to prevent checkout failures for customers.',
+  ].join('\n');
+
+  const htmlBody = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
+        <h1 style="margin: 0;">PilotHouse</h1>
+      </div>
+      <div style="padding: 30px; background-color: #f9f9f9;">
+        <h2 style="color: #92400e; margin-bottom: 10px;">⚠️ Stripe Key Health Check Failed</h2>
+        <p style="font-size: 15px; color: #444; line-height: 1.5;">
+          The scheduled Stripe key health check has detected a failure.
+          Customers will be <strong>unable to complete checkout</strong> until the key is fixed.
+        </p>
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px;">
+          <tr style="border-bottom: 1px solid #e5e7eb;">
+            <td style="padding: 8px 12px; color: #6b7280; width: 110px;">Error</td>
+            <td style="padding: 8px 12px; color: #111827; font-family: monospace;">${error}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 12px; color: #6b7280;">Checked At</td>
+            <td style="padding: 8px 12px; color: #111827;">${checkedAt} CST</td>
+          </tr>
+        </table>
+        <div style="background-color: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 5px;">
+          <p style="margin: 0; color: #92400e; font-size: 14px;">
+            <strong>Action required:</strong> Update the Stripe API key in Replit Secrets immediately
+            to restore checkout for all stores.
+          </p>
+        </div>
+      </div>
+      <div style="background-color: #1f2937; color: #d1d5db; padding: 15px; text-align: center; font-size: 12px;">
+        <p style="margin: 0 0 5px 0;"><strong>PilotHouse</strong></p>
+        <p style="margin: 0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+        <p style="margin: 0;">Phone: (318) 322-3023</p>
+      </div>
+    </div>
+  `;
+
+  let sentCount = 0;
+  for (const admin of superAdmins) {
+    try {
+      await client.send({
+        to: admin.email!,
+        from: { email: fromEmail, name: 'PilotHouse' },
+        subject,
+        text: textBody,
+        html: htmlBody,
+        trackingSettings: { clickTracking: { enable: false, enableText: false } },
+      });
+      sentCount++;
+      console.log(`[stripe-health-alert] Alert sent to super-admin ${admin.email}`);
+    } catch (adminEmailErr) {
+      console.error(`[stripe-health-alert] Failed to send alert to ${admin.email}:`, adminEmailErr);
+    }
+  }
+
+  if (sentCount === 0) {
+    throw new Error(
+      `[stripe-health-alert] All ${superAdmins.length} super-admin alert(s) failed to deliver`,
+    );
+  }
+
+  return sentCount;
+}
+
 export async function sendAppointmentRejectionEmail(
   toEmail: string, 
   ownerName: string,

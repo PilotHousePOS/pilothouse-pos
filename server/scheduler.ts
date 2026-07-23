@@ -1,5 +1,6 @@
 import cron from 'node-cron';
 import { storage } from './storage';
+import { getUncachableStripeClient, clearCredentialCache } from './stripeClient';
 
 // Helper to normalize dates to local timezone (America/Chicago) for accurate comparison
 // Prevents late evening CST appointments from shifting to next day in UTC
@@ -238,6 +239,62 @@ async function runYearlyReportForTenant(tenantId: number): Promise<void> {
   }
 }
 
+// In-memory idempotency guard: tracks the UTC date string on which the last
+// Stripe key failure alert was sent. Resets on server restart (accepted tradeoff —
+// same pattern as the no-tenant alert map in routes.ts).
+let stripeAlertLastSentDate: string | null = null;
+
+/**
+ * Reset the in-process Stripe alert guard. Exported as a testing seam only —
+ * production code should never call this directly.
+ */
+export function _resetStripeAlertGuardForTesting(): void {
+  stripeAlertLastSentDate = null;
+}
+
+/**
+ * Validate the configured Stripe secret key by calling stripe.accounts.retrieve().
+ * On failure, sends a single alert email to all super-admins per UTC day.
+ * On success, clears the idempotency guard so a future failure will alert again.
+ */
+export async function runStripeHealthCheck(): Promise<void> {
+  let errorMessage: string | null = null;
+
+  try {
+    // Force a fresh credential fetch — health check must never rely on a cached key
+    clearCredentialCache();
+    const stripe = await getUncachableStripeClient();
+    await stripe.accounts.retrieve();
+    // Key is healthy — clear the guard so the next failure will alert again
+    stripeAlertLastSentDate = null;
+    console.log('[Scheduler] Stripe key health check passed');
+    return;
+  } catch (err: any) {
+    errorMessage = (err.message ?? 'Unknown error').substring(0, 200);
+    console.error(`[Scheduler] Stripe key health check FAILED: ${errorMessage}`);
+  }
+
+  // Key is unhealthy — enforce one-per-day idempotency
+  const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD" UTC
+  if (stripeAlertLastSentDate === today) {
+    console.log('[Scheduler] Stripe key failure alert already sent today — skipping');
+    return;
+  }
+
+  try {
+    const { sendStripeKeyFailureAlertToSuperAdmins } = await import('./sendgrid');
+    const sentCount = await sendStripeKeyFailureAlertToSuperAdmins(errorMessage!);
+    // Only mark the guard when at least one super-admin was actually notified.
+    // If sentCount === 0 the function throws, so this line is only reached on success.
+    stripeAlertLastSentDate = today;
+    console.log(`[Scheduler] Stripe key failure alert dispatched to ${sentCount} super-admin(s)`);
+  } catch (alertErr) {
+    // Alert delivery failed — do NOT set the guard so the next run will retry.
+    // Non-fatal: a failed alert must not crash the scheduler.
+    console.error('[Scheduler] Failed to dispatch Stripe key failure alert:', alertErr);
+  }
+}
+
 // Check for trials expiring within 3 days and send one warning email per trial period
 export async function runTrialExpiryWarnings(): Promise<void> {
   const allTenants = await storage.getAllTenants();
@@ -385,6 +442,16 @@ export function initializeScheduledTasks() {
     } catch (err) { console.error('[Scheduler] Yearly report error:', err); }
   }, { timezone: 'America/Chicago' });
 
+  // Stripe key health check — runs daily at 8 AM CST; emails all super-admins on failure
+  cron.schedule('0 8 * * *', async () => {
+    try {
+      console.log('[Scheduler] Running Stripe key health check...');
+      await runStripeHealthCheck();
+    } catch (err) {
+      console.error('[Scheduler] Stripe key health check error:', err);
+    }
+  }, { timezone: 'America/Chicago' });
+
   // Trial expiry warnings — runs daily at 9 AM CST, sends one email per tenant within 3 days of expiry
   cron.schedule('0 9 * * *', async () => {
     try {
@@ -455,6 +522,7 @@ export function initializeScheduledTasks() {
   console.log('- Daily Sales Report: Hourly check per tenant (sends at configured time if enabled)');
   console.log('- Monthly Sales Report: Hourly check per tenant (sends on configured day/time if enabled)');
   console.log('- Yearly Sales Report: Hourly check on Jan 1 per tenant (sends at configured time if enabled)');
+  console.log('- Stripe Key Health Check: Daily at 8 AM CST (emails super-admins on failure, once per day)');
   console.log('- Trial Expiry Warning: Daily at 9 AM CST (one email per tenant, ≤3 days before trial ends)');
   console.log('- Abandoned Cart Recovery: Every 6 hours (24+ hour idle carts)');
 }
