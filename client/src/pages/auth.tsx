@@ -366,7 +366,7 @@ export default function Auth() {
             <p className="text-gray-300">Sign in to manage your account</p>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="signin" className="w-full">
+            <Tabs defaultValue="signin" className="w-full" onValueChange={() => setSignupError(null)}>
               <TabsList className="grid w-full grid-cols-2 bg-white/10">
                 <TabsTrigger value="signin" className="text-white data-[state=active]:bg-brand-blue data-[state=active]:text-white">
                   Sign In
