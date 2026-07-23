@@ -454,7 +454,87 @@ describe("GET /api/admin/boarding — stranded user cannot read boarding data", 
   });
 });
 
+// ─── Single-contact endpoints — stranded users ────────────────────────────────
+//
+// PUT /api/contacts/:id and DELETE /api/contacts/:id accept a tenantId from
+// req.tenantId. tenantMiddleware rejects stranded accounts (no tenant, no
+// slug header) with 403 before the route handler executes, so these endpoints
+// must never expose or mutate another store's contact.
+
+describe("PUT /api/contacts/:id — stranded user cannot update a contact", () => {
+  it("returns HTTP 403 for a stranded regular user", async () => {
+    const res = await agent
+      .put(`/api/contacts/${seededContactId}`)
+      .set("Authorization", `Bearer ${strandedUserToken}`)
+      .send({ name: "Hacked Name" });
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant)", async () => {
+    const res = await agent
+      .put(`/api/contacts/${seededContactId}`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`)
+      .send({ name: "Hacked Name" });
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded groomer (isGroomer=true, no tenant)", async () => {
+    const res = await agent
+      .put(`/api/contacts/${seededContactId}`)
+      .set("Authorization", `Bearer ${strandedGroomerToken}`)
+      .send({ name: "Hacked Name" });
+
+    expect(res.status).toBe(403);
+  });
+});
+
+describe("DELETE /api/contacts/:id — stranded user cannot delete a contact", () => {
+  it("returns HTTP 403 for a stranded regular user", async () => {
+    const res = await agent
+      .delete(`/api/contacts/${seededContactId}`)
+      .set("Authorization", `Bearer ${strandedUserToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant)", async () => {
+    const res = await agent
+      .delete(`/api/contacts/${seededContactId}`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded groomer (isGroomer=true, no tenant)", async () => {
+    const res = await agent
+      .delete(`/api/contacts/${seededContactId}`)
+      .set("Authorization", `Bearer ${strandedGroomerToken}`);
+
+    expect(res.status).toBe(403);
+  });
+});
+
 // ─── Storage-layer unit tests — contacts and boarding ─────────────────────────
+
+describe("storage.getContact — storage-layer guard (single record)", () => {
+  it("returns undefined when tenantId is undefined", async () => {
+    const result = await storage.getContact(seededContactId, undefined);
+    expect(result).toBeUndefined();
+  });
+
+  it("does not return the real tenant's contact when tenantId is absent", async () => {
+    const result = await storage.getContact(seededContactId, undefined);
+    expect(result).toBeUndefined();
+  });
+
+  it("returns the contact when called with the correct tenantId", async () => {
+    const result = await storage.getContact(seededContactId, realTenantId);
+    expect(result).toBeDefined();
+    expect(result!.id).toBe(seededContactId);
+  });
+});
 
 describe("storage.getAllContacts — storage-layer guard", () => {
   it("returns [] when tenantId is undefined", async () => {

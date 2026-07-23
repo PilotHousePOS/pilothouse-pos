@@ -3769,10 +3769,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getContact(id: number, tenantId?: number): Promise<Contact | undefined> {
-    const where = tenantId
-      ? and(eq(contacts.id, id), eq(contacts.tenantId, tenantId))
-      : eq(contacts.id, id);
-    const [contact] = await db.select().from(contacts).where(where);
+    // Fail-closed: if no tenant context is available, never expose a contact.
+    if (!tenantId) return undefined;
+    const [contact] = await db
+      .select()
+      .from(contacts)
+      .where(and(eq(contacts.id, id), eq(contacts.tenantId, tenantId)));
     return contact;
   }
 
