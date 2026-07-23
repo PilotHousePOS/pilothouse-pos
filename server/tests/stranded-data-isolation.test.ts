@@ -35,6 +35,14 @@ let realUserId: string;
 let strandedUserId: string;
 let strandedUserToken: string;
 
+/** Stranded admin — isAdmin=true, tenantId=null */
+let strandedAdminId: string;
+let strandedAdminToken: string;
+
+/** Stranded groomer — isGroomer=true, tenantId=null */
+let strandedGroomerId: string;
+let strandedGroomerToken: string;
+
 let seededAppointmentId: number;
 let seededOrderId: number;
 
@@ -107,6 +115,44 @@ beforeAll(async () => {
   strandedUserId = strandedRow.id;
   strandedUserToken = generateToken(strandedRow as any);
 
+  // Create a stranded admin — isAdmin=true, no tenantId
+  const strandedAdminIdVal = "stranded-admin-" + sfx;
+  const [strandedAdminRow] = await db
+    .insert(users)
+    .values({
+      id: strandedAdminIdVal,
+      email: `stranded-admin-${sfx}@test.local`,
+      firstName: "StrandedAdmin",
+      lastName: "User",
+      tenantId: null,
+      password: "hashed-password-for-test",
+      isAdmin: true,
+      isGroomer: false,
+      tokenVersion: 0,
+    })
+    .returning();
+  strandedAdminId = strandedAdminRow.id;
+  strandedAdminToken = generateToken(strandedAdminRow as any);
+
+  // Create a stranded groomer — isGroomer=true, no tenantId
+  const strandedGroomerIdVal = "stranded-groomer-" + sfx;
+  const [strandedGroomerRow] = await db
+    .insert(users)
+    .values({
+      id: strandedGroomerIdVal,
+      email: `stranded-groomer-${sfx}@test.local`,
+      firstName: "StrandedGroomer",
+      lastName: "User",
+      tenantId: null,
+      password: "hashed-password-for-test",
+      isAdmin: false,
+      isGroomer: true,
+      tokenVersion: 0,
+    })
+    .returning();
+  strandedGroomerId = strandedGroomerRow.id;
+  strandedGroomerToken = generateToken(strandedGroomerRow as any);
+
   // Seed an appointment belonging to the real tenant / real user
   const [appt] = await db
     .insert(appointments)
@@ -151,6 +197,10 @@ afterAll(async () => {
     await db.delete(users).where(eq(users.id, realUserId));
   if (strandedUserId)
     await db.delete(users).where(eq(users.id, strandedUserId));
+  if (strandedAdminId)
+    await db.delete(users).where(eq(users.id, strandedAdminId));
+  if (strandedGroomerId)
+    await db.delete(users).where(eq(users.id, strandedGroomerId));
   if (realTenantId)
     await db.delete(tenants).where(eq(tenants.id, realTenantId));
 }, 30_000);
@@ -204,6 +254,55 @@ describe("GET /api/orders — stranded user cannot read order data", () => {
 
     const ids = Array.isArray(res.body) ? res.body.map((o: any) => o.id) : [];
     expect(ids).not.toContain(seededOrderId);
+  });
+});
+
+// ─── Admin/groomer branch — stranded accounts ─────────────────────────────────
+//
+// The admin/groomer branch of GET /api/appointments calls
+// getAppointments(undefined, req.tenantId) which would return ALL appointments
+// across every store when tenantId is undefined.  tenantMiddleware already
+// blocks stranded users with 403 before the route runs; the route handler also
+// has a defense-in-depth early-return guard.  These tests confirm both layers
+// hold for isAdmin=true and isGroomer=true stranded accounts.
+
+describe("GET /api/appointments — stranded admin cannot read appointment data", () => {
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .get("/api/appointments")
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    // tenantMiddleware must block before the route handler executes
+    expect(res.status).toBe(403);
+  });
+
+  it("does NOT expose the real tenant's appointment to the stranded admin", async () => {
+    const res = await agent
+      .get("/api/appointments")
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    const ids = Array.isArray(res.body) ? res.body.map((a: any) => a.id) : [];
+    expect(ids).not.toContain(seededAppointmentId);
+  });
+});
+
+describe("GET /api/appointments — stranded groomer cannot read appointment data", () => {
+  it("returns HTTP 403 for a stranded groomer (isGroomer=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .get("/api/appointments")
+      .set("Authorization", `Bearer ${strandedGroomerToken}`);
+
+    // tenantMiddleware must block before the route handler executes
+    expect(res.status).toBe(403);
+  });
+
+  it("does NOT expose the real tenant's appointment to the stranded groomer", async () => {
+    const res = await agent
+      .get("/api/appointments")
+      .set("Authorization", `Bearer ${strandedGroomerToken}`);
+
+    const ids = Array.isArray(res.body) ? res.body.map((a: any) => a.id) : [];
+    expect(ids).not.toContain(seededAppointmentId);
   });
 });
 
