@@ -2650,7 +2650,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (ids && typeof ids === 'string') {
         const idList = ids.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
         if (idList.length > 0) {
-          const items = await storage.getSuppliesByIds(idList);
+          const items = await storage.getSuppliesByIds(idList, (req as any).tenantId);
           return res.json({ items, total: items.length, page: 0, pageSize: items.length });
         }
       }

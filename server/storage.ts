@@ -179,8 +179,8 @@ export interface IStorage {
   // Supply operations
   getAllSupplies(tenantId?: number): Promise<Supply[]>;
   getSuppliesByCategory(category: string, tenantId?: number): Promise<Supply[]>;
-  getReptileSupplies(): Promise<Supply[]>;
-  searchSupplies(query: string): Promise<Supply[]>;
+  getReptileSupplies(tenantId?: number): Promise<Supply[]>;
+  searchSupplies(query: string, tenantId?: number): Promise<Supply[]>;
   getPaginatedSupplies(params: { 
     limit: number; 
     offset: number; 
@@ -199,7 +199,7 @@ export interface IStorage {
   }): Promise<{ items: Supply[]; total: number }>;
   getSupply(id: number, tenantId?: number): Promise<Supply | undefined>;
   getSupplyByUpc(upc: string, tenantId?: number): Promise<Supply | undefined>;
-  getSuppliesByIds(ids: number[]): Promise<Supply[]>;
+  getSuppliesByIds(ids: number[], tenantId?: number): Promise<Supply[]>;
   getRelatedSupplies(excludeId: number, category: string, brand: string | null, limit?: number, productName?: string): Promise<Supply[]>;
   createSupply(supply: InsertSupply): Promise<Supply>;
   updateSupply(id: number, supply: Partial<InsertSupply>, tenantId?: number): Promise<Supply>;
@@ -248,7 +248,7 @@ export interface IStorage {
   }>;
 
   getSuppliesWithoutImages(limit: number, offset: number, brand?: string, category?: string, search?: string): Promise<Supply[]>;
-  getSuppliesByFilter(limit: number, offset: number, brand?: string, category?: string, search?: string): Promise<Supply[]>;
+  getSuppliesByFilter(limit: number, offset: number, brand?: string, category?: string, search?: string, tenantId?: number): Promise<Supply[]>;
   getSupplyImageStats(): Promise<{
     totalProducts: number;
     withImages: number;
@@ -261,6 +261,7 @@ export interface IStorage {
     category?: string;
     limit: number;
     offset: number;
+    tenantId?: number;
   }): Promise<Supply[]>;
 
   // Cart operations
@@ -778,7 +779,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(supplies.createdAt));
   }
 
-  async getReptileSupplies(): Promise<Supply[]> {
+  async getReptileSupplies(tenantId?: number): Promise<Supply[]> {
     // Get supplies for reptiles based on brand or keywords in name/description
     const reptileBrands = ['ZooMed', 'Exo Terra', 'Zilla', "Fluker's", 'ReptiCare'];
     const reptileKeywords = [
@@ -813,6 +814,7 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(supplies.isActive, true),
+          tenantId ? eq(supplies.tenantId, tenantId) : undefined,
           or(...brandConditions, ...keywordConditions),
           ...aquaticBrandExclusions,
           ...aquaticKeywordExclusions
@@ -821,13 +823,14 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(supplies.createdAt));
   }
 
-  async searchSupplies(query: string): Promise<Supply[]> {
+  async searchSupplies(query: string, tenantId?: number): Promise<Supply[]> {
     return await db
       .select()
       .from(supplies)
       .where(
         and(
           eq(supplies.isActive, true),
+          tenantId ? eq(supplies.tenantId, tenantId) : undefined,
           or(
             ilike(supplies.name, `%${query}%`),
             ilike(supplies.brand, `%${query}%`),
@@ -1402,9 +1405,12 @@ export class DatabaseStorage implements IStorage {
     return supply;
   }
 
-  async getSuppliesByIds(ids: number[]): Promise<Supply[]> {
+  async getSuppliesByIds(ids: number[], tenantId?: number): Promise<Supply[]> {
     if (ids.length === 0) return [];
-    return await db.select().from(supplies).where(inArray(supplies.id, ids));
+    const condition = tenantId
+      ? and(inArray(supplies.id, ids), eq(supplies.tenantId, tenantId))
+      : inArray(supplies.id, ids);
+    return await db.select().from(supplies).where(condition);
   }
 
   async getRelatedSupplies(excludeId: number, category: string, brand: string | null, limit: number = 6, productName?: string): Promise<Supply[]> {
@@ -1644,9 +1650,11 @@ export class DatabaseStorage implements IStorage {
     offset: number, 
     brand?: string, 
     category?: string, 
-    search?: string
+    search?: string,
+    tenantId?: number
   ): Promise<Supply[]> {
-    const allSupplies = await db.select().from(supplies);
+    let allSupplies = await db.select().from(supplies)
+      .where(tenantId ? eq(supplies.tenantId, tenantId) : undefined);
     
     let filteredSupplies = allSupplies;
     
@@ -1757,9 +1765,14 @@ export class DatabaseStorage implements IStorage {
     category?: string;
     limit: number;
     offset: number;
+    tenantId?: number;
   }): Promise<Supply[]> {
     const conditions = [];
     
+    if (params.tenantId) {
+      conditions.push(eq(supplies.tenantId, params.tenantId));
+    }
+
     if (params.brand) {
       conditions.push(eq(supplies.brand, params.brand));
     }
@@ -1768,14 +1781,14 @@ export class DatabaseStorage implements IStorage {
       conditions.push(eq(supplies.category, params.category));
     }
 
-    if (conditions.length === 0) {
+    if (!params.brand && !params.category) {
       return [];
     }
 
     return await db
       .select()
       .from(supplies)
-      .where(and(...conditions))
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
       .limit(params.limit)
       .offset(params.offset)
       .orderBy(supplies.id);
