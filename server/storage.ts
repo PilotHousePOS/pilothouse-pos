@@ -2513,7 +2513,16 @@ export class DatabaseStorage implements IStorage {
 
   async getOrders(userId?: string, tenantId?: number): Promise<Order[]> {
     if (userId) {
-      return await db.select().from(orders).where(eq(orders.userId, userId)).orderBy(desc(orders.orderDate));
+      // Always require a non-null tenantId when filtering by user.
+      // A stranded user (tenantId = undefined/null) must not receive data from
+      // an unscoped store; the isNotNull guard makes this safe even if the caller
+      // forgets to check tenantId before calling.
+      if (!tenantId) {
+        return [];
+      }
+      return await db.select().from(orders)
+        .where(and(eq(orders.userId, userId), eq(orders.tenantId, tenantId), isNotNull(orders.tenantId)))
+        .orderBy(desc(orders.orderDate));
     } else if (tenantId) {
       return await db.select().from(orders).where(eq(orders.tenantId, tenantId)).orderBy(desc(orders.orderDate));
     } else {
@@ -2923,10 +2932,9 @@ export class DatabaseStorage implements IStorage {
         .where(and(eq(appointments.userId, userId), eq(appointments.tenantId, tenantId)))
         .orderBy(asc(appointments.appointmentDate));
     } else if (userId) {
-      // Legacy: userId only (no tenant — still scoped by user so limited cross-tenant exposure)
-      return await db.select().from(appointments)
-        .where(eq(appointments.userId, userId))
-        .orderBy(asc(appointments.appointmentDate));
+      // Guard: a stranded user (tenantId = undefined/null) must never receive
+      // appointments from any store. Return empty rather than leaking cross-tenant data.
+      return [];
     } else if (tenantId) {
       return await db.select().from(appointments)
         .where(eq(appointments.tenantId, tenantId))

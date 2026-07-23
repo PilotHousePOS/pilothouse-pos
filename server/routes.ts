@@ -3773,9 +3773,16 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     try {
       const userId = req.user?.id;
       const user = await storage.getUser(userId);
+
+      // Stranded users (no tenant assigned) must not receive data from any store.
+      // Return an empty list immediately rather than letting the storage layer run
+      // a userId-only query that has no tenant filter.
+      if (!req.tenantId) {
+        return res.json([]);
+      }
       
       // Always filter by userId — admins view all orders in the admin panel (/api/admin/orders-with-items)
-      const orders = await storage.getOrders(userId);
+      const orders = await storage.getOrders(userId, req.tenantId);
       
       res.json(orders);
     } catch (error) {
@@ -5559,6 +5566,13 @@ West Monroe LA 71291
     try {
       const userId = req.user?.id;
       const user = await storage.getUser(userId);
+
+      // Stranded users (no tenant assigned) must not receive appointments from any store.
+      // Without a tenantId the admin/groomer branch would call getAppointments(undefined, undefined)
+      // which returns ALL appointments across all tenants — explicitly block that here.
+      if (!req.tenantId) {
+        return res.json([]);
+      }
       
       // For regular customers: auto-link any phone-booked appointments so they show up by userId
       if (user && !user.isAdmin && !user.isGroomer && user.phoneNumber && (req as any).tenantId) {
