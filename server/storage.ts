@@ -4595,10 +4595,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getBoardingRecord(id: number, tenantId?: number): Promise<BoardingRecord | undefined> {
-    const where = tenantId
-      ? and(eq(boardingRecords.id, id), eq(boardingRecords.tenantId, tenantId))
-      : eq(boardingRecords.id, id);
-    const [record] = await db.select().from(boardingRecords).where(where);
+    // Refuse to return a boarding record without a tenant scope — prevents
+    // cross-tenant data leaks when called from a stranded account (tenantId = null/undefined).
+    if (!tenantId) return undefined;
+    const [record] = await db
+      .select()
+      .from(boardingRecords)
+      .where(and(eq(boardingRecords.id, id), eq(boardingRecords.tenantId, tenantId)));
     return record;
   }
 
@@ -4608,29 +4611,35 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateBoardingRecord(id: number, record: Partial<InsertBoardingRecord>, tenantId?: number): Promise<BoardingRecord> {
-    const where = tenantId ? and(eq(boardingRecords.id, id), eq(boardingRecords.tenantId, tenantId)) : eq(boardingRecords.id, id);
+    // Refuse to mutate without a tenant scope — prevents cross-tenant writes
+    // from a stranded account (tenantId = null/undefined).
+    if (!tenantId) throw new Error("tenantId is required to update a boarding record");
     const [updated] = await db
       .update(boardingRecords)
       .set({ ...record, updatedAt: new Date() })
-      .where(where)
+      .where(and(eq(boardingRecords.id, id), eq(boardingRecords.tenantId, tenantId)))
       .returning();
     return updated;
   }
 
   async checkInBoardingRecord(id: number, tenantId?: number): Promise<BoardingRecord> {
+    // Refuse to mutate without a tenant scope — prevents cross-tenant writes
+    // from a stranded account (tenantId = null/undefined).
+    if (!tenantId) throw new Error("tenantId is required to check in a boarding record");
     const today = new Date().toISOString().split('T')[0];
-    const where = tenantId ? and(eq(boardingRecords.id, id), eq(boardingRecords.tenantId, tenantId)) : eq(boardingRecords.id, id);
     const [updated] = await db
       .update(boardingRecords)
       .set({ actualDropOffDate: today, updatedAt: new Date() })
-      .where(where)
+      .where(and(eq(boardingRecords.id, id), eq(boardingRecords.tenantId, tenantId)))
       .returning();
     return updated;
   }
 
   async checkOutBoardingRecord(id: number, tenantId?: number): Promise<BoardingRecord> {
+    // Refuse to mutate without a tenant scope — prevents cross-tenant writes
+    // from a stranded account (tenantId = null/undefined).
+    if (!tenantId) throw new Error("tenantId is required to check out a boarding record");
     const today = new Date().toISOString().split('T')[0];
-    const where = tenantId ? and(eq(boardingRecords.id, id), eq(boardingRecords.tenantId, tenantId)) : eq(boardingRecords.id, id);
     const [updated] = await db
       .update(boardingRecords)
       .set({ 
@@ -4638,14 +4647,18 @@ export class DatabaseStorage implements IStorage {
         status: 'completed',
         updatedAt: new Date() 
       })
-      .where(where)
+      .where(and(eq(boardingRecords.id, id), eq(boardingRecords.tenantId, tenantId)))
       .returning();
     return updated;
   }
 
   async deleteBoardingRecord(id: number, tenantId?: number): Promise<void> {
-    const where = tenantId ? and(eq(boardingRecords.id, id), eq(boardingRecords.tenantId, tenantId)) : eq(boardingRecords.id, id);
-    await db.delete(boardingRecords).where(where);
+    // Refuse to delete without a tenant scope — prevents cross-tenant deletes
+    // from a stranded account (tenantId = null/undefined).
+    if (!tenantId) throw new Error("tenantId is required to delete a boarding record");
+    await db
+      .delete(boardingRecords)
+      .where(and(eq(boardingRecords.id, id), eq(boardingRecords.tenantId, tenantId)));
   }
 
   // Schedule operations

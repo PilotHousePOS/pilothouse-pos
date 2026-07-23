@@ -573,3 +573,134 @@ describe("storage.getAllBoardingRecords — storage-layer guard", () => {
     expect(ids).toContain(seededBoardingRecordId);
   });
 });
+
+// ─── Single boarding-record endpoints — stranded users ────────────────────────
+//
+// GET /api/admin/boarding/:id, PUT /api/admin/boarding/:id,
+// PATCH /api/admin/boarding/:id/check-in, PATCH /api/admin/boarding/:id/check-out,
+// and DELETE /api/admin/boarding/:id all pass tenantId from req.tenantId.
+// tenantMiddleware rejects stranded accounts (no tenant, no slug header) with
+// 403 before the route handler executes, so none of these endpoints should
+// expose or mutate another store's boarding record.
+
+describe("GET /api/admin/boarding/:id — stranded user cannot read a single boarding record", () => {
+  it("returns HTTP 403 for a stranded regular user", async () => {
+    const res = await agent
+      .get(`/api/admin/boarding/${seededBoardingRecordId}`)
+      .set("Authorization", `Bearer ${strandedUserToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant)", async () => {
+    const res = await agent
+      .get(`/api/admin/boarding/${seededBoardingRecordId}`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("does NOT expose the real tenant's boarding record body to the stranded admin", async () => {
+    const res = await agent
+      .get(`/api/admin/boarding/${seededBoardingRecordId}`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    expect(res.status).toBe(403);
+    const body = res.body ?? {};
+    expect(body.id).not.toBe(seededBoardingRecordId);
+  });
+});
+
+describe("PUT /api/admin/boarding/:id — stranded user cannot update a boarding record", () => {
+  it("returns HTTP 403 for a stranded regular user", async () => {
+    const res = await agent
+      .put(`/api/admin/boarding/${seededBoardingRecordId}`)
+      .set("Authorization", `Bearer ${strandedUserToken}`)
+      .send({ customerName: "Hacked Name" });
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant)", async () => {
+    const res = await agent
+      .put(`/api/admin/boarding/${seededBoardingRecordId}`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`)
+      .send({ customerName: "Hacked Name" });
+
+    expect(res.status).toBe(403);
+  });
+});
+
+describe("PATCH /api/admin/boarding/:id/check-in — stranded user cannot check in a boarding record", () => {
+  it("returns HTTP 403 for a stranded regular user", async () => {
+    const res = await agent
+      .patch(`/api/admin/boarding/${seededBoardingRecordId}/check-in`)
+      .set("Authorization", `Bearer ${strandedUserToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant)", async () => {
+    const res = await agent
+      .patch(`/api/admin/boarding/${seededBoardingRecordId}/check-in`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    expect(res.status).toBe(403);
+  });
+});
+
+describe("PATCH /api/admin/boarding/:id/check-out — stranded user cannot check out a boarding record", () => {
+  it("returns HTTP 403 for a stranded regular user", async () => {
+    const res = await agent
+      .patch(`/api/admin/boarding/${seededBoardingRecordId}/check-out`)
+      .set("Authorization", `Bearer ${strandedUserToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant)", async () => {
+    const res = await agent
+      .patch(`/api/admin/boarding/${seededBoardingRecordId}/check-out`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    expect(res.status).toBe(403);
+  });
+});
+
+describe("DELETE /api/admin/boarding/:id — stranded user cannot delete a boarding record", () => {
+  it("returns HTTP 403 for a stranded regular user", async () => {
+    const res = await agent
+      .delete(`/api/admin/boarding/${seededBoardingRecordId}`)
+      .set("Authorization", `Bearer ${strandedUserToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant)", async () => {
+    const res = await agent
+      .delete(`/api/admin/boarding/${seededBoardingRecordId}`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    expect(res.status).toBe(403);
+  });
+});
+
+// ─── Storage-layer unit tests — single boarding record ────────────────────────
+
+describe("storage.getBoardingRecord — storage-layer guard (single record)", () => {
+  it("returns undefined when tenantId is undefined", async () => {
+    const result = await storage.getBoardingRecord(seededBoardingRecordId, undefined);
+    expect(result).toBeUndefined();
+  });
+
+  it("does not return the real tenant's record when tenantId is absent", async () => {
+    const result = await storage.getBoardingRecord(seededBoardingRecordId, undefined);
+    expect(result).toBeUndefined();
+  });
+
+  it("returns the record when called with the correct tenantId", async () => {
+    const result = await storage.getBoardingRecord(seededBoardingRecordId, realTenantId);
+    expect(result).toBeDefined();
+    expect(result!.id).toBe(seededBoardingRecordId);
+  });
+});
