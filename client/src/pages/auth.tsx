@@ -485,7 +485,11 @@ export default function Auth() {
                     />
                   </div>
                   {signupError && (
-                    <div className="flex items-start gap-2 rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2.5 text-sm text-red-300" role="alert">
+                    <div
+                      className="flex items-start gap-2 rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2.5 text-sm text-red-300"
+                      role="alert"
+                      data-testid="signup-error-banner"
+                    >
                       <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-red-400" />
                       <span>{signupError}</span>
                     </div>
