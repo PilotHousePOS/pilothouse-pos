@@ -33,17 +33,42 @@ export default function Auth() {
     }
     let cancelled = false;
     setSlugState("checking");
+    // Enforce a minimum spinner display time so it never flickers.
+    const MIN_DISPLAY_MS = 400;
+    const startedAt = Date.now();
     fetch(`/api/tenants/slug-check?slug=${encodeURIComponent(tenantSlugFromUrl)}`)
       .then(r => r.json())
       .then(data => {
         if (cancelled) return;
         // available: true means the slug is NOT taken (i.e. no matching store)
-        setSlugState(data.available === false ? "valid" : "invalid");
+        const next = data.available === false ? "valid" : "invalid";
+        const elapsed = Date.now() - startedAt;
+        const remaining = Math.max(0, MIN_DISPLAY_MS - elapsed);
+        if (remaining === 0) {
+          setSlugState(next);
+        } else {
+          const t = setTimeout(() => { if (!cancelled) setSlugState(next); }, remaining);
+          // Store the timer id so the cleanup below can clear it.
+          (cleanup as { timerId?: ReturnType<typeof setTimeout> }).timerId = t;
+        }
       })
       .catch(() => {
-        if (!cancelled) setSlugState("valid"); // fail-open: let the form show on network error
+        if (cancelled) return;
+        const elapsed = Date.now() - startedAt;
+        const remaining = Math.max(0, MIN_DISPLAY_MS - elapsed);
+        if (remaining === 0) {
+          setSlugState("valid"); // fail-open: let the form show on network error
+        } else {
+          const t = setTimeout(() => { if (!cancelled) setSlugState("valid"); }, remaining);
+          (cleanup as { timerId?: ReturnType<typeof setTimeout> }).timerId = t;
+        }
       });
-    return () => { cancelled = true; };
+    function cleanup() {}
+    return () => {
+      cancelled = true;
+      const tid = (cleanup as { timerId?: ReturnType<typeof setTimeout> }).timerId;
+      if (tid !== undefined) clearTimeout(tid);
+    };
   }, [tenantSlugFromUrl]);
 
   const handleResendVerification = async (email: string) => {
