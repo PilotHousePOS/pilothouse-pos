@@ -188,4 +188,59 @@ describe("OnboardingBanner dismiss-state machine", () => {
       expect(loadDismissState()?.seenActive).toBe(true);
     });
   });
+
+  describe("serialization round-trip (page reload survival)", () => {
+    it("loadDismissState reads back the exact shape written by saveDismissState", () => {
+      // Write a v2 blob directly (simulates what saveDismissState stores)
+      const blob: DismissState = { dismissed: true, seenActive: false };
+      localStorage.setItem(DISMISSED_KEY, JSON.stringify(blob));
+
+      // Simulate a page reload by calling loadDismissState fresh
+      const loaded = loadDismissState();
+      expect(loaded).not.toBeNull();
+      expect(loaded?.dismissed).toBe(true);
+      expect(loaded?.seenActive).toBe(false);
+    });
+
+    it("loadDismissState reads back seenActive=true correctly after round-trip", () => {
+      const blob: DismissState = { dismissed: true, seenActive: true };
+      localStorage.setItem(DISMISSED_KEY, JSON.stringify(blob));
+
+      const loaded = loadDismissState();
+      expect(loaded?.dismissed).toBe(true);
+      expect(loaded?.seenActive).toBe(true);
+    });
+  });
+
+  describe("legacy / malformed storage values", () => {
+    it("old v1 key 'permanently_dismissed' does not corrupt v2 state", () => {
+      // Simulate a browser that still has the old v1 key from a previous session
+      localStorage.setItem("onboarding_banner_permanently_dismissed", "true");
+
+      // v2 key is absent — loadDismissState should return null
+      const loaded = loadDismissState();
+      expect(loaded).toBeNull();
+
+      // The banner is therefore not dismissed
+      expect(isDismissedLocally()).toBe(false);
+    });
+
+    it("a malformed (non-object) value stored under the v2 key is ignored gracefully", () => {
+      // Someone or a legacy codepath stored a primitive under the v2 key
+      localStorage.setItem(DISMISSED_KEY, "permanently_dismissed");
+
+      // JSON.parse("permanently_dismissed") throws — loadDismissState must catch it
+      const loaded = loadDismissState();
+      expect(loaded).toBeNull();
+      expect(isDismissedLocally()).toBe(false);
+    });
+
+    it("loadDismissState returns null when stored JSON is syntactically invalid", () => {
+      localStorage.setItem(DISMISSED_KEY, "{bad json}");
+
+      const loaded = loadDismissState();
+      expect(loaded).toBeNull();
+      expect(isDismissedLocally()).toBe(false);
+    });
+  });
 });
