@@ -277,6 +277,10 @@ afterAll(async () => {
   if (orderAId) await db.delete(orders).where(eq(orders.id, orderAId));
   if (orderBId) await db.delete(orders).where(eq(orders.id, orderBId));
 
+  // Delete any contacts auto-created during tests (e.g. grooming-completed auto-contact)
+  if (tenantAId) await db.delete(contacts).where(eq(contacts.tenantId, tenantAId));
+  if (tenantBId) await db.delete(contacts).where(eq(contacts.tenantId, tenantBId));
+
   // Delete appointment items before appointments (FK cascade would handle it,
   // but explicit deletion avoids relying on cascade order).
   if (itemBId) await db.delete(appointmentItems).where(eq(appointmentItems.id, itemBId));
@@ -938,5 +942,129 @@ describe("PATCH /api/user/appointments/:id/cancel — cross-tenant rejected", ()
       .from(appointments)
       .where(eq(appointments.id, appointmentBId));
     expect(row?.status).toBe(appointmentBOriginalStatus);
+  });
+});
+
+// ─── PATCH /api/appointments/:id/is-here ─────────────────────────────────────
+
+describe("PATCH /api/appointments/:id/is-here — cross-tenant write rejected", () => {
+  it("returns 404 when Tenant A targets Tenant B's appointment", async () => {
+    const res = await agent
+      .patch(`/api/appointments/${appointmentBId}/is-here`)
+      .set("Authorization", `Bearer ${tokenA}`)
+      .send({ isHere: true });
+
+    expect(res.status).toBe(404);
+  });
+
+  it("Tenant B's appointment isHere field is unchanged after Tenant A's rejected update", async () => {
+    const [row] = await db
+      .select({ isHere: appointments.isHere })
+      .from(appointments)
+      .where(eq(appointments.id, appointmentBId));
+    expect(row?.isHere).not.toBe(true);
+  });
+
+  it("returns 200 when Tenant A updates isHere on their own appointment", async () => {
+    const res = await agent
+      .patch(`/api/appointments/${appointmentAId}/is-here`)
+      .set("Authorization", `Bearer ${tokenA}`)
+      .send({ isHere: true });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("id", appointmentAId);
+  });
+});
+
+// ─── PATCH /api/appointments/:id/is-paid ─────────────────────────────────────
+
+describe("PATCH /api/appointments/:id/is-paid — cross-tenant write rejected", () => {
+  it("returns 404 when Tenant A targets Tenant B's appointment", async () => {
+    const res = await agent
+      .patch(`/api/appointments/${appointmentBId}/is-paid`)
+      .set("Authorization", `Bearer ${tokenA}`)
+      .send({ isPaid: true });
+
+    expect(res.status).toBe(404);
+  });
+
+  it("Tenant B's appointment isPaid field is unchanged after Tenant A's rejected update", async () => {
+    const [row] = await db
+      .select({ isPaid: appointments.isPaid })
+      .from(appointments)
+      .where(eq(appointments.id, appointmentBId));
+    expect(row?.isPaid).not.toBe(true);
+  });
+
+  it("returns 200 when Tenant A updates isPaid on their own appointment", async () => {
+    const res = await agent
+      .patch(`/api/appointments/${appointmentAId}/is-paid`)
+      .set("Authorization", `Bearer ${tokenA}`)
+      .send({ isPaid: true });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("id", appointmentAId);
+  });
+});
+
+// ─── PATCH /api/admin/appointments/:id/ready-for-payment ──────────────────────
+
+describe("PATCH /api/admin/appointments/:id/ready-for-payment — cross-tenant write rejected", () => {
+  it("returns 404 when Tenant A targets Tenant B's appointment", async () => {
+    const res = await agent
+      .patch(`/api/admin/appointments/${appointmentBId}/ready-for-payment`)
+      .set("Authorization", `Bearer ${tokenA}`)
+      .send({ finalAmount: "40.00", readyForPayment: true });
+
+    expect(res.status).toBe(404);
+  });
+
+  it("Tenant B's appointment readyForPayment field is unchanged after Tenant A's rejected update", async () => {
+    const [row] = await db
+      .select({ readyForPayment: appointments.readyForPayment })
+      .from(appointments)
+      .where(eq(appointments.id, appointmentBId));
+    expect(row?.readyForPayment).not.toBe(true);
+  });
+
+  it("returns 200 when Tenant A marks their own appointment ready for payment", async () => {
+    const res = await agent
+      .patch(`/api/admin/appointments/${appointmentAId}/ready-for-payment`)
+      .set("Authorization", `Bearer ${tokenA}`)
+      .send({ finalAmount: "40.00", readyForPayment: true });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("id", appointmentAId);
+  });
+});
+
+// ─── PATCH /api/appointments/:id/grooming-completed ──────────────────────────
+
+describe("PATCH /api/appointments/:id/grooming-completed — cross-tenant write rejected", () => {
+  it("returns 404 when Tenant A targets Tenant B's appointment", async () => {
+    const res = await agent
+      .patch(`/api/appointments/${appointmentBId}/grooming-completed`)
+      .set("Authorization", `Bearer ${tokenA}`)
+      .send({ groomingCompleted: true });
+
+    expect(res.status).toBe(404);
+  });
+
+  it("Tenant B's appointment groomingCompleted field is unchanged after Tenant A's rejected update", async () => {
+    const [row] = await db
+      .select({ groomingCompleted: appointments.groomingCompleted })
+      .from(appointments)
+      .where(eq(appointments.id, appointmentBId));
+    expect(row?.groomingCompleted).not.toBe(true);
+  });
+
+  it("returns 200 when Tenant A marks their own appointment grooming-completed", async () => {
+    const res = await agent
+      .patch(`/api/appointments/${appointmentAId}/grooming-completed`)
+      .set("Authorization", `Bearer ${tokenA}`)
+      .send({ groomingCompleted: true });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("id", appointmentAId);
   });
 });

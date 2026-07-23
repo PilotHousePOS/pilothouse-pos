@@ -2998,6 +2998,7 @@ export class DatabaseStorage implements IStorage {
       .set(setFields)
       .where(where)
       .returning();
+    if (!updated) throw new Error("Appointment not found or access denied");
     return updated;
   }
 
@@ -3011,6 +3012,7 @@ export class DatabaseStorage implements IStorage {
       .set(setFields)
       .where(where)
       .returning();
+    if (!updated) throw new Error("Appointment not found or access denied");
     return updated;
   }
 
@@ -3030,6 +3032,7 @@ export class DatabaseStorage implements IStorage {
       .set({ finalAmount, readyForPayment, updatedAt: new Date() })
       .where(where)
       .returning();
+    if (!updated) throw new Error("Appointment not found or access denied");
     return updated;
   }
 
@@ -3050,6 +3053,7 @@ export class DatabaseStorage implements IStorage {
       .set({ groomingCompleted, updatedAt: new Date() })
       .where(where)
       .returning();
+    if (!updated) throw new Error("Appointment not found or access denied");
     return updated;
   }
 

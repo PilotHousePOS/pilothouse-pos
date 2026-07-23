@@ -6653,12 +6653,12 @@ West Monroe LA 71291
       }
 
       const appointment = await storage.updateAppointmentIsHere(id, isHere, tenantId);
-      if (!appointment) {
+      res.json(appointment);
+    } catch (error: any) {
+      console.error("Error updating appointment arrival status:", error);
+      if (error?.message === "Appointment not found or access denied") {
         return res.status(404).json({ message: "Appointment not found" });
       }
-      res.json(appointment);
-    } catch (error) {
-      console.error("Error updating appointment arrival status:", error);
       res.status(500).json({ message: "Failed to update appointment arrival status" });
     }
   });
@@ -6680,12 +6680,12 @@ West Monroe LA 71291
       }
 
       const appointment = await storage.updateAppointmentIsPaid(id, isPaid, tenantId);
-      if (!appointment) {
+      res.json(appointment);
+    } catch (error: any) {
+      console.error("Error updating appointment payment status:", error);
+      if (error?.message === "Appointment not found or access denied") {
         return res.status(404).json({ message: "Appointment not found" });
       }
-      res.json(appointment);
-    } catch (error) {
-      console.error("Error updating appointment payment status:", error);
       res.status(500).json({ message: "Failed to update appointment payment status" });
     }
   });
@@ -6705,10 +6705,12 @@ West Monroe LA 71291
         return res.status(400).json({ message: "finalAmount is required when marking ready for payment" });
       }
       const appointment = await storage.updateAppointmentReadyForPayment(id, String(parseFloat(finalAmount || "0").toFixed(2)), readyForPayment ?? true, tenantId);
-      if (!appointment) return res.status(404).json({ message: "Appointment not found" });
       res.json(appointment);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error marking appointment ready for payment:", error);
+      if (error?.message === "Appointment not found or access denied") {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
       res.status(500).json({ message: "Failed to update appointment" });
     }
   });
@@ -6884,9 +6886,6 @@ West Monroe LA 71291
       const wasAlreadyCompleted = existingAppointment?.groomingCompleted === true;
 
       const appointment = await storage.updateAppointmentGroomingCompleted(id, groomingCompleted, tenantId);
-      if (!appointment) {
-        return res.status(404).json({ message: "Appointment not found" });
-      }
 
       // Auto-create or update contact when grooming is marked completed (pet showed up = number is real)
       if (groomingCompleted && appointment.ownerPhoneNumber) {
@@ -6947,8 +6946,11 @@ West Monroe LA 71291
       }
 
       res.json(appointment);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating appointment grooming completed status:", error);
+      if (error?.message === "Appointment not found or access denied") {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
       res.status(500).json({ message: "Failed to update appointment grooming completed status" });
     }
   });
