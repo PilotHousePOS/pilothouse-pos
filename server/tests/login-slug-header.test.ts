@@ -635,3 +635,125 @@ describe("POST /api/auth/reset-password — cross-tenant token isolation", () =>
     expect(res.body.redirect).toBeUndefined();
   });
 });
+
+// ─── Password-reset token replay protection ───────────────────────────────────
+
+/**
+ * This describe block confirms that a password-reset token cannot be replayed
+ * once it has been used:
+ *
+ *   1. A valid reset token is issued for a user.
+ *   2. A first POST /api/auth/reset-password with the token succeeds.
+ *   3. A second POST with the SAME token is rejected with 400.
+ *   4. The password remains as set by the first (successful) reset — a login
+ *      with the new password still works.
+ *   5. A login with a hypothetical "third password" (one the attacker tried to
+ *      set via the replay) does not work.
+ *
+ * This guards against a regression where `markTokenAsUsed` is accidentally
+ * skipped, which would allow token replay attacks.
+ */
+describe("POST /api/auth/reset-password — token replay protection", () => {
+  let replayUserEmail: string;
+  let replayUserId: string | undefined;
+  let replayRawToken: string;
+
+  const REPLAY_OLD_PASSWORD = "ReplayOld1!";
+  const REPLAY_NEW_PASSWORD = "ReplayNew2@";
+  const REPLAY_THIRD_PASSWORD = "ReplayThird3#";
+
+  beforeAll(async () => {
+    const sfx = randomSuffix();
+    replayUserEmail = `reset-replay-${sfx}@test.local`;
+
+    // Create a pre-verified tenant-A user directly in the DB.
+    const hashed = await hashPassword(REPLAY_OLD_PASSWORD);
+    const [inserted] = await db
+      .insert(users)
+      .values({
+        id: `reset-replay-${sfx}`,
+        email: replayUserEmail,
+        password: hashed,
+        firstName: "Replay",
+        lastName: "ResetTest",
+        phoneNumber: `555${sfx.slice(0, 7)}`,
+        tenantId: tenantA.id,
+        isAdmin: false,
+        emailVerified: true,
+        tokenVersion: 0,
+      } as any)
+      .returning({ id: users.id });
+
+    replayUserId = inserted.id as string;
+
+    // Issue a password-reset token directly in the DB (avoids a SendGrid call).
+    const crypto = await import("crypto");
+    replayRawToken = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    await db.insert(passwordResetTokens).values({
+      token: replayRawToken,
+      userId: replayUserId,
+      expiresAt,
+      used: false,
+    } as any);
+  }, 60_000);
+
+  afterAll(async () => {
+    if (replayUserId) {
+      await db
+        .delete(passwordResetTokens)
+        .where(eq(passwordResetTokens.userId as any, replayUserId as any));
+      await db
+        .update(contacts)
+        .set({ linkedUserId: null })
+        .where(eq(contacts.linkedUserId, replayUserId as any));
+      await db.delete(users).where(eq(users.id, replayUserId as any));
+    }
+  }, 30_000);
+
+  it("first use of the token resets the password successfully", async () => {
+    const res = await agent
+      .post("/api/auth/reset-password")
+      .send({ token: replayRawToken, newPassword: REPLAY_NEW_PASSWORD });
+
+    expect(res.status).toBe(200);
+  });
+
+  it("second use of the same token is rejected with 400", async () => {
+    // Attempt to replay the already-used token with a different password.
+    const res = await agent
+      .post("/api/auth/reset-password")
+      .send({ token: replayRawToken, newPassword: REPLAY_THIRD_PASSWORD });
+
+    // The server must reject the replay — the token is already marked as used.
+    expect(res.status).toBe(400);
+    // The response should indicate the token was already used (not a generic
+    // "invalid token" which could mask the replay-check being skipped entirely).
+    expect(res.body.message).toMatch(/already been used/i);
+  });
+
+  it("the stored password hash matches the new password and not the third — replay did not write to the DB", async () => {
+    // Read the current password hash directly from the database so we can
+    // verify both conditions without consuming additional rate-limited API
+    // calls (the auth limiter is shared across all tests in this file).
+    const [row] = await db
+      .select({ password: users.password })
+      .from(users)
+      .where(eq(users.id, replayUserId as any))
+      .limit(1);
+
+    expect(row).toBeDefined();
+
+    const { verifyPassword: vp } = await import("../passwordUtils");
+
+    // The stored hash MUST match the new password — confirming the first
+    // (legitimate) reset succeeded and the password is now REPLAY_NEW_PASSWORD.
+    const newPasswordMatches = await vp(REPLAY_NEW_PASSWORD, row!.password!);
+    expect(newPasswordMatches).toBe(true);
+
+    // The stored hash must NOT match the third password — confirming the
+    // replay POST was blocked before any DB write occurred.
+    const thirdPasswordMatches = await vp(REPLAY_THIRD_PASSWORD, row!.password!);
+    expect(thirdPasswordMatches).toBe(false);
+  });
+});
