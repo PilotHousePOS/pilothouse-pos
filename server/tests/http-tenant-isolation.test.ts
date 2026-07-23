@@ -771,6 +771,60 @@ describe("PUT /api/contacts/:id — groomer cross-tenant write rejected", () => 
   });
 });
 
+describe("DELETE /api/contacts/:id — groomer cross-tenant delete rejected", () => {
+  it("returns 404 when Tenant A groomer targets Tenant B's contact", async () => {
+    const res = await agent
+      .delete(`/api/contacts/${contactBId}`)
+      .set("Authorization", `Bearer ${tokenGroomerA}`);
+
+    expect(res.status).toBe(404);
+  });
+
+  it("Tenant B's contact still exists after groomer's rejected delete", async () => {
+    const [row] = await db
+      .select({ id: contacts.id })
+      .from(contacts)
+      .where(eq(contacts.id, contactBId));
+    expect(row).toBeDefined();
+  });
+
+  it("returns 200 when Tenant A groomer deletes their own tenant's contact", async () => {
+    const throwawayId = await createTestContact(tenantAId, "Groomer Delete Throwaway", "5559998877");
+    const res = await agent
+      .delete(`/api/contacts/${throwawayId}`)
+      .set("Authorization", `Bearer ${tokenGroomerA}`);
+
+    expect(res.status).toBe(200);
+  });
+});
+
+describe("DELETE /api/supplies/:id — groomer cross-tenant delete rejected", () => {
+  it("returns 404 when Tenant A groomer targets Tenant B's supply", async () => {
+    const res = await agent
+      .delete(`/api/supplies/${supplyBId}`)
+      .set("Authorization", `Bearer ${tokenGroomerA}`);
+
+    expect(res.status).toBe(404);
+  });
+
+  it("Tenant B's supply still exists after groomer's rejected delete", async () => {
+    const [row] = await db
+      .select({ id: supplies.id })
+      .from(supplies)
+      .where(eq(supplies.id, supplyBId));
+    expect(row).toBeDefined();
+  });
+
+  it("returns 200 when Tenant A groomer deletes their own tenant's supply", async () => {
+    const throwawayId = await createTestSupply(tenantAId, "Groomer Delete Supply");
+    const res = await agent
+      .delete(`/api/supplies/${throwawayId}`)
+      .set("Authorization", `Bearer ${tokenGroomerA}`);
+
+    expect(res.status).toBe(200);
+  });
+});
+
 describe("PUT /api/appointments/:id — groomer cross-tenant status update rejected", () => {
   it("returns 404 when Tenant A groomer targets Tenant B's appointment", async () => {
     const res = await agent

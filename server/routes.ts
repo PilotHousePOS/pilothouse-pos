@@ -2818,8 +2818,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(401).json({ message: "Unauthorized" });
       }
       const user = await storage.getUser(userId);
-      if (!user?.isAdmin) {
-        return res.status(403).json({ message: "Admin access required" });
+      if (!user?.isAdmin && !user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or groomer access required" });
       }
 
       const tenantId = resolveWriteTenantId(req, res);
@@ -9963,8 +9963,8 @@ West Monroe LA 71291
   app.delete("/api/contacts/:id", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
-      if (!user?.isAdmin) {
-        return res.status(403).json({ message: "Admin access required" });
+      if (!user?.isAdmin && !user?.isGroomer) {
+        return res.status(403).json({ message: "Admin or groomer access required" });
       }
 
       const tenantId = resolveWriteTenantId(req, res);
