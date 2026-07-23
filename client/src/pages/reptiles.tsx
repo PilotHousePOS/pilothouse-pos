@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ShoppingCart, Sparkles, X, ChevronLeft, ChevronRight, ArrowLeft, Search, Eye, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, getActiveTenantSlug } from "@/lib/queryClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 import { safeGoBack } from "@/lib/navigation";
@@ -55,7 +55,10 @@ export default function ReptilesPage() {
       if (petSearchQuery) {
         params.append('search', petSearchQuery);
       }
-      const response = await fetch(`/api/pets?${params.toString()}`);
+      const slug = getActiveTenantSlug();
+      const response = await fetch(`/api/pets?${params.toString()}`, {
+        headers: slug ? { 'X-Tenant-Slug': slug } : {},
+      });
       if (!response.ok) throw new Error("Failed to fetch reptiles");
       return response.json();
     },
@@ -67,9 +70,10 @@ export default function ReptilesPage() {
     queryKey: ["/api/supplies", { category: "reptile-supplies", page: currentPage, limit: ITEMS_PER_PAGE, search: searchQuery }],
     queryFn: async () => {
       const searchParam = searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : '';
+      const slug = getActiveTenantSlug();
       const response = await fetch(`/api/supplies?category=reptile-supplies&page=${currentPage}&limit=${ITEMS_PER_PAGE}${searchParam}`, {
         cache: 'no-store',
-        headers: { 'Cache-Control': 'no-cache' }
+        headers: { 'Cache-Control': 'no-cache', ...(slug ? { 'X-Tenant-Slug': slug } : {}) },
       });
       if (!response.ok) throw new Error("Failed to fetch supplies");
       return response.json();

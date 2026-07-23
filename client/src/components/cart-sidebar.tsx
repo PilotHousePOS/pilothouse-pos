@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getActiveTenantSlug } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -94,7 +95,10 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     queryKey: ["/api/supplies", { ids: supplyIds.join(',') }],
     queryFn: async () => {
       if (supplyIds.length === 0) return { items: [] };
-      const res = await fetch(`/api/supplies?ids=${supplyIds.join(',')}`);
+      const slug = getActiveTenantSlug();
+      const res = await fetch(`/api/supplies?ids=${supplyIds.join(',')}`, {
+        headers: slug ? { 'X-Tenant-Slug': slug } : {},
+      });
       return res.json();
     },
     enabled: isOpen && supplyIds.length > 0,

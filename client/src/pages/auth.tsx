@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getActiveTenantSlug } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -23,9 +24,12 @@ export default function Auth() {
   const handleResendVerification = async (email: string) => {
     setResendingVerification(true);
     try {
+      const slug = getActiveTenantSlug();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (slug) headers['X-Tenant-Slug'] = slug;
       const res = await fetch('/api/auth/resend-verification', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ email }),
       });
       const data = await res.json();

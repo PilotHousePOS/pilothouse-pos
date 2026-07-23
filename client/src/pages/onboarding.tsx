@@ -8,6 +8,7 @@ import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 /** BroadcastChannel name used to sync onboarding state across tabs. */
 const ONBOARDING_CHANNEL = "onboarding_sync";
@@ -128,22 +129,15 @@ function Step1({ tenantId, onNext }: { tenantId: number; onNext: () => void }) {
     }
     setIsLoading(true);
     try {
-      const res = await fetch('/api/tenants/current', {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: displayName.trim(), slug: displaySlug.trim(), onboardingStep: 1 }),
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        toast({ title: err.message || "Failed to update business details", variant: "destructive" });
-        return;
-      }
+      await apiRequest('PATCH', '/api/tenants/current', { name: displayName.trim(), slug: displaySlug.trim(), onboardingStep: 1 });
       // Also write the localStorage flag as a best-effort fallback for same-browser sessions
       markStep1Done(tenantId);
       onNext();
-    } catch {
-      toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
+    } catch (err) {
+      // apiRequest throws `${status}: ${message}` — extract just the message part
+      const raw = err instanceof Error ? err.message : "Failed to update business details";
+      const msg = raw.replace(/^\d+:\s*/, '') || "Failed to update business details";
+      toast({ title: msg, variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -244,27 +238,19 @@ function Step2({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) {
     }
     setIsLoading(true);
     try {
-      const res = await fetch('/api/billing/create-checkout-session', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tier: selectedPlan,
-          successUrl: `${window.location.origin}/onboarding?step=3&plan_success=1`,
-          cancelUrl: `${window.location.origin}/onboarding?step=2`,
-        }),
+      const res = await apiRequest('POST', '/api/billing/create-checkout-session', {
+        tier: selectedPlan,
+        successUrl: `${window.location.origin}/onboarding?step=3&plan_success=1`,
+        cancelUrl: `${window.location.origin}/onboarding?step=2`,
       });
-      if (!res.ok) {
-        const err = await res.json();
-        toast({ title: err.message || "Failed to start checkout", variant: "destructive" });
-        return;
-      }
       const { url } = await res.json();
       if (url) {
         window.location.href = url;
       }
-    } catch {
-      toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
+    } catch (err) {
+      const raw = err instanceof Error ? err.message : "Failed to start checkout";
+      const msg = raw.replace(/^\d+:\s*/, '') || "Failed to start checkout";
+      toast({ title: msg, variant: "destructive" });
     } finally {
       setIsLoading(false);
     }

@@ -11,7 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, getQueryFn } from "@/lib/queryClient";
+import { apiRequest, getQueryFn, getActiveTenantSlug } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { safeGoBack } from "@/lib/navigation";
 
@@ -120,7 +120,10 @@ export default function Booking() {
       const startStr = today.toISOString().split('T')[0];
       const endStr = endDate.toISOString().split('T')[0];
       
-      const response = await fetch(`/api/appointments/available-slots?startDate=${startStr}&endDate=${endStr}`);
+      const slug = getActiveTenantSlug();
+      const response = await fetch(`/api/appointments/available-slots?startDate=${startStr}&endDate=${endStr}`, {
+        headers: slug ? { 'X-Tenant-Slug': slug } : {},
+      });
       if (!response.ok) return {};
       return response.json();
     },
@@ -137,7 +140,10 @@ export default function Booking() {
     queryKey: ["/api/groomers/available-for-date", selectedDateStr],
     queryFn: async () => {
       if (!selectedDateStr) return [];
-      const response = await fetch(`/api/groomers/available-for-date/${selectedDateStr}`);
+      const slug = getActiveTenantSlug();
+      const response = await fetch(`/api/groomers/available-for-date/${selectedDateStr}`, {
+        headers: slug ? { 'X-Tenant-Slug': slug } : {},
+      });
       if (!response.ok) return [];
       return response.json();
     },
@@ -150,7 +156,10 @@ export default function Booking() {
     queryKey: ["/api/special-dates", selectedDateStr],
     queryFn: async () => {
       if (!selectedDateStr) return null;
-      const response = await fetch(`/api/special-dates/${selectedDateStr}`);
+      const slug = getActiveTenantSlug();
+      const response = await fetch(`/api/special-dates/${selectedDateStr}`, {
+        headers: slug ? { 'X-Tenant-Slug': slug } : {},
+      });
       if (!response.ok) return null;
       return response.json();
     },

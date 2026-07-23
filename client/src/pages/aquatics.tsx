@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ShoppingCart, Fish, X, ChevronLeft, ChevronRight, ArrowLeft, Search, Eye, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, getActiveTenantSlug } from "@/lib/queryClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 import { safeGoBack } from "@/lib/navigation";
@@ -64,7 +64,10 @@ export default function AquaticsPage() {
       if (petSearchQuery) {
         params.append('search', petSearchQuery);
       }
-      const response = await fetch(`/api/pets?${params.toString()}`);
+      const slug = getActiveTenantSlug();
+      const response = await fetch(`/api/pets?${params.toString()}`, {
+        headers: slug ? { 'X-Tenant-Slug': slug } : {},
+      });
       if (!response.ok) throw new Error("Failed to fetch fish");
       return response.json();
     },
@@ -79,7 +82,10 @@ export default function AquaticsPage() {
     queryFn: async () => {
       const searchParam = searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : '';
       const categoryParam = selectedCategory ? `&category=${selectedCategory}` : '&category=aquatic-supplies';
-      const response = await fetch(`/api/supplies?filterType=aquatic${categoryParam}&page=${currentPage}&limit=${ITEMS_PER_PAGE}${searchParam}`);
+      const slug = getActiveTenantSlug();
+      const response = await fetch(`/api/supplies?filterType=aquatic${categoryParam}&page=${currentPage}&limit=${ITEMS_PER_PAGE}${searchParam}`, {
+        headers: slug ? { 'X-Tenant-Slug': slug } : {},
+      });
       if (!response.ok) throw new Error("Failed to fetch supplies");
       return response.json();
     },

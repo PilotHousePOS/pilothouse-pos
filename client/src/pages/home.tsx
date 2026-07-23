@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, getActiveTenantSlug } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -252,7 +252,10 @@ export default function Home() {
   const { data: recentlyViewedData } = useQuery({
     queryKey: ["/api/supplies", { ids: recentlyViewedIds.join(",") }],
     queryFn: async () => {
-      const res = await fetch(`/api/supplies?ids=${recentlyViewedIds.join(",")}`);
+      const slug = getActiveTenantSlug();
+      const res = await fetch(`/api/supplies?ids=${recentlyViewedIds.join(",")}`, {
+        headers: slug ? { 'X-Tenant-Slug': slug } : {},
+      });
       if (!res.ok) throw new Error("Failed to fetch");
       return res.json();
     },
