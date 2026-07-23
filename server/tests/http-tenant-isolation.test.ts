@@ -552,6 +552,67 @@ describe("DELETE /api/admin/orders/:orderId — cross-tenant delete rejected", (
   });
 });
 
+// ─── GET /api/orders — user-scoped read ──────────────────────────────────────
+//
+// The endpoint filters by userId (the authenticated caller). A user who belongs
+// to Tenant A must not receive orders that were placed by Tenant B's user, even
+// if they share the same Express instance.
+
+describe("GET /api/orders — user sees only their own orders", () => {
+  it("returns 200 and includes Tenant A user's own order", async () => {
+    const res = await agent
+      .get("/api/orders")
+      .set("Authorization", `Bearer ${tokenA}`)
+      .set("X-Tenant-Slug", tenantASlugValue());
+
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+    const ids = res.body.map((o: any) => o.id);
+    expect(ids).toContain(orderAId);
+  });
+
+  it("does NOT return Tenant B user's order when called by Tenant A user", async () => {
+    const res = await agent
+      .get("/api/orders")
+      .set("Authorization", `Bearer ${tokenA}`)
+      .set("X-Tenant-Slug", tenantASlugValue());
+
+    expect(res.status).toBe(200);
+    const ids = res.body.map((o: any) => o.id);
+    expect(ids).not.toContain(orderBId);
+  });
+});
+
+// ─── GET /api/admin/orders-with-items — tenant-scoped admin read ──────────────
+//
+// The endpoint passes req.tenantId to getAllOrdersWithItems, so an admin from
+// Tenant A must only see Tenant A's orders — never Tenant B's.
+
+describe("GET /api/admin/orders-with-items — tenant-scoped read", () => {
+  it("returns 200 and includes Tenant A's order", async () => {
+    const res = await agent
+      .get("/api/admin/orders-with-items")
+      .set("Authorization", `Bearer ${tokenA}`)
+      .set("X-Tenant-Slug", tenantASlugValue());
+
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+    const ids = res.body.map((o: any) => o.id);
+    expect(ids).toContain(orderAId);
+  });
+
+  it("does NOT return Tenant B's order when called by Tenant A admin", async () => {
+    const res = await agent
+      .get("/api/admin/orders-with-items")
+      .set("Authorization", `Bearer ${tokenA}`)
+      .set("X-Tenant-Slug", tenantASlugValue());
+
+    expect(res.status).toBe(200);
+    const ids = res.body.map((o: any) => o.id);
+    expect(ids).not.toContain(orderBId);
+  });
+});
+
 // ─── PUT /api/pets/:id ───────────────────────────────────────────────────────
 
 describe("PUT /api/pets/:id — cross-tenant write rejected", () => {

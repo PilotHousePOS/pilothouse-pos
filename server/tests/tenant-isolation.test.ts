@@ -35,6 +35,8 @@ let appointmentAId: number;
 let appointmentBId: number;
 let orderAId: number;
 let orderBId: number;
+let orderItemAId: number;
+let orderItemBId: number;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -166,10 +168,25 @@ beforeAll(async () => {
   // Seed orders
   orderAId = await createTestOrder(tenantAId, userAId);
   orderBId = await createTestOrder(tenantBId, userBId);
+
+  // Seed one order item per order so getAllOrderItems can be verified
+  const [itemA] = await db
+    .insert(orderItems)
+    .values({ orderId: orderAId, productName: `ItemA-${sfx}`, quantity: 1, price: "5.00" })
+    .returning();
+  orderItemAId = itemA.id;
+
+  const [itemB] = await db
+    .insert(orderItems)
+    .values({ orderId: orderBId, productName: `ItemB-${sfx}`, quantity: 1, price: "7.00" })
+    .returning();
+  orderItemBId = itemB.id;
 });
 
 afterAll(async () => {
   // Delete in reverse dependency order to satisfy FK constraints
+  if (orderItemAId) await db.delete(orderItems).where(eq(orderItems.id, orderItemAId));
+  if (orderItemBId) await db.delete(orderItems).where(eq(orderItems.id, orderItemBId));
   if (orderAId) await db.delete(orders).where(eq(orders.id, orderAId));
   if (orderBId) await db.delete(orders).where(eq(orders.id, orderBId));
 
@@ -596,6 +613,81 @@ describe("Appointments — cross-tenant write isolation", () => {
     // Record must still exist under Tenant A
     const still = await storage.getAppointment(appointmentAId, tenantAId);
     expect(still).toBeDefined();
+  });
+});
+
+// ─── getAllOrdersWithItems — tenant isolation ──────────────────────────────────
+
+describe("Storage layer — getAllOrdersWithItems tenant isolation", () => {
+  it("getAllOrdersWithItems(tenantAId) contains Tenant A's order", async () => {
+    const { storage } = await import("../storage");
+    const rows = await storage.getAllOrdersWithItems(tenantAId);
+    const ids = rows.map((r: any) => r.id);
+    expect(ids).toContain(orderAId);
+  });
+
+  it("getAllOrdersWithItems(tenantAId) excludes Tenant B's order", async () => {
+    const { storage } = await import("../storage");
+    const rows = await storage.getAllOrdersWithItems(tenantAId);
+    const ids = rows.map((r: any) => r.id);
+    expect(ids).not.toContain(orderBId);
+  });
+
+  it("getAllOrdersWithItems(tenantBId) contains Tenant B's order", async () => {
+    const { storage } = await import("../storage");
+    const rows = await storage.getAllOrdersWithItems(tenantBId);
+    const ids = rows.map((r: any) => r.id);
+    expect(ids).toContain(orderBId);
+  });
+
+  it("getAllOrdersWithItems(tenantBId) excludes Tenant A's order", async () => {
+    const { storage } = await import("../storage");
+    const rows = await storage.getAllOrdersWithItems(tenantBId);
+    const ids = rows.map((r: any) => r.id);
+    expect(ids).not.toContain(orderAId);
+  });
+
+  it("items in getAllOrdersWithItems(tenantAId) belong to Tenant A's order", async () => {
+    const { storage } = await import("../storage");
+    const rows = await storage.getAllOrdersWithItems(tenantAId);
+    const orderRow = rows.find((r: any) => r.id === orderAId);
+    expect(orderRow).toBeDefined();
+    // The seeded item for orderA must be present; no item from orderB should appear
+    const itemIds = (orderRow?.items ?? []).map((i: any) => i.id);
+    expect(itemIds).toContain(orderItemAId);
+    expect(itemIds).not.toContain(orderItemBId);
+  });
+});
+
+// ─── getAllOrderItems — tenant isolation ──────────────────────────────────────
+
+describe("Storage layer — getAllOrderItems tenant isolation", () => {
+  it("getAllOrderItems(tenantAId) includes Tenant A's order item", async () => {
+    const { storage } = await import("../storage");
+    const rows = await storage.getAllOrderItems(tenantAId);
+    const ids = rows.map((r: any) => r.id);
+    expect(ids).toContain(orderItemAId);
+  });
+
+  it("getAllOrderItems(tenantAId) excludes Tenant B's order item", async () => {
+    const { storage } = await import("../storage");
+    const rows = await storage.getAllOrderItems(tenantAId);
+    const ids = rows.map((r: any) => r.id);
+    expect(ids).not.toContain(orderItemBId);
+  });
+
+  it("getAllOrderItems(tenantBId) includes Tenant B's order item", async () => {
+    const { storage } = await import("../storage");
+    const rows = await storage.getAllOrderItems(tenantBId);
+    const ids = rows.map((r: any) => r.id);
+    expect(ids).toContain(orderItemBId);
+  });
+
+  it("getAllOrderItems(tenantBId) excludes Tenant A's order item", async () => {
+    const { storage } = await import("../storage");
+    const rows = await storage.getAllOrderItems(tenantBId);
+    const ids = rows.map((r: any) => r.id);
+    expect(ids).not.toContain(orderItemAId);
   });
 });
 
