@@ -390,3 +390,123 @@ describe("POST /api/auth/verify-email — cross-tenant token replay", () => {
     expect(res.body.tenantId).not.toBe(tenantB.id);
   });
 });
+
+// ─── Resend-verification cross-tenant isolation ───────────────────────────────
+
+/**
+ * This describe block covers the resend-verification token isolation scenario:
+ *
+ *   1. A customer signs up under tenant A — the server stores an
+ *      emailVerificationToken against the new user record (tied to tenant A).
+ *   2. The customer (or an attacker) calls POST /api/auth/resend-verification
+ *      while sending X-Tenant-Slug: tenantB.slug in the header.
+ *   3. The server re-issues a fresh token. Because the endpoint resolves the
+ *      user purely by email (not by the slug header), the new token is still
+ *      stored on the same user record — which has tenantA's tenantId.
+ *   4. Using that fresh token to call POST /api/auth/verify-email must return
+ *      tenant A's tenantId, not tenant B's.
+ *   5. A subsequent login must also return tenant A's tenantId.
+ *
+ * This ensures the resend-verification flow cannot be exploited to move a user
+ * from one tenant to another via the X-Tenant-Slug header.
+ */
+describe("POST /api/auth/resend-verification — cross-tenant token isolation", () => {
+  let resendUserEmail: string;
+  let resendUserId: string | undefined;
+  let freshToken: string;
+
+  const RESEND_PASSWORD = "ResendXTenant1!";
+
+  beforeAll(async () => {
+    const sfx = randomSuffix();
+    resendUserEmail = `resend-xtenant-${sfx}@test.local`;
+
+    // Step 1 — sign up under tenant A so the account + initial token exist.
+    const signupRes = await agent
+      .post("/api/auth/signup")
+      .set("X-Tenant-Slug", tenantA.slug)
+      .send({
+        email: resendUserEmail,
+        password: RESEND_PASSWORD,
+        firstName: "Resend",
+        lastName: "XTenant",
+        phoneNumber: `555${sfx.slice(0, 7)}`,
+      });
+
+    if (signupRes.status !== 200) {
+      throw new Error(
+        `Signup in beforeAll failed: ${signupRes.status} ${JSON.stringify(signupRes.body)}`
+      );
+    }
+
+    resendUserId = signupRes.body.id as string;
+
+    // Step 2 — call the resend endpoint while sending tenant B's slug header.
+    // The endpoint should ignore the slug and regenerate the token for the
+    // user found by email — who still belongs to tenant A.
+    const resendRes = await agent
+      .post("/api/auth/resend-verification")
+      .set("X-Tenant-Slug", tenantB.slug)
+      .send({ email: resendUserEmail });
+
+    // The endpoint always returns 200 with a generic message (no enumeration).
+    if (resendRes.status !== 200) {
+      throw new Error(
+        `Resend in beforeAll failed: ${resendRes.status} ${JSON.stringify(resendRes.body)}`
+      );
+    }
+
+    // Step 3 — read the freshly-issued token directly from the database.
+    const [row] = await db
+      .select({ token: users.emailVerificationToken })
+      .from(users)
+      .where(eq(users.id, resendUserId as any))
+      .limit(1);
+
+    if (!row?.token) {
+      throw new Error("emailVerificationToken not found in DB after resend");
+    }
+    freshToken = row.token;
+  }, 60_000);
+
+  afterAll(async () => {
+    if (resendUserId) {
+      await db
+        .update(contacts)
+        .set({ linkedUserId: null })
+        .where(eq(contacts.linkedUserId, resendUserId as any));
+      await db.delete(users).where(eq(users.id, resendUserId as any));
+    }
+  }, 30_000);
+
+  it("verifying the resent token with tenant B's slug header still scopes the account to tenant A", async () => {
+    // POST the fresh token while again sending tenant B's slug — the slug must
+    // have no effect on which tenant the verified account belongs to.
+    const res = await agent
+      .post("/api/auth/verify-email")
+      .set("X-Tenant-Slug", tenantB.slug)
+      .send({ token: freshToken });
+
+    expect(res.status).toBe(200);
+
+    // The response must carry tenant A's tenantId.  The X-Tenant-Slug header
+    // from store B must not redirect ownership to tenant B.
+    expect(res.body.tenantId).toBe(tenantA.id);
+    expect(res.body.tenantId).not.toBe(tenantB.id);
+  });
+
+  it("login after verifying a resent token still returns tenant A's tenantId", async () => {
+    // After verification the account is fully usable. Log in while sending
+    // tenant B's slug to confirm the stored tenantId always wins.
+    const res = await agent
+      .post("/api/auth/login")
+      .set("X-Tenant-Slug", tenantB.slug)
+      .send({ email: resendUserEmail, password: RESEND_PASSWORD });
+
+    expect(res.status).toBe(200);
+
+    // The tenantId in the login response must be tenant A's.
+    expect(res.body.tenantId).toBe(tenantA.id);
+    expect(res.body.tenantId).not.toBe(tenantB.id);
+  });
+});
