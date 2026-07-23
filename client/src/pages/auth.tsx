@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getActiveTenantSlug } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +20,31 @@ export default function Auth() {
   // Detect missing tenant slug — sign-up requires it, sign-in does not.
   const tenantSlugFromUrl = new URLSearchParams(window.location.search).get('tenant');
   const missingTenantForSignup = !tenantSlugFromUrl;
+
+  // Validate the tenant slug (if present) against the server.
+  // "checking" — request in flight; "valid" — slug exists; "invalid" — slug not found.
+  type SlugState = "checking" | "valid" | "invalid" | "idle";
+  const [slugState, setSlugState] = useState<SlugState>(tenantSlugFromUrl ? "checking" : "idle");
+
+  useEffect(() => {
+    if (!tenantSlugFromUrl) {
+      setSlugState("idle");
+      return;
+    }
+    let cancelled = false;
+    setSlugState("checking");
+    fetch(`/api/tenants/slug-check?slug=${encodeURIComponent(tenantSlugFromUrl)}`)
+      .then(r => r.json())
+      .then(data => {
+        if (cancelled) return;
+        // available: true means the slug is NOT taken (i.e. no matching store)
+        setSlugState(data.available === false ? "valid" : "invalid");
+      })
+      .catch(() => {
+        if (!cancelled) setSlugState("valid"); // fail-open: let the form show on network error
+      });
+    return () => { cancelled = true; };
+  }, [tenantSlugFromUrl]);
 
   const handleResendVerification = async (email: string) => {
     setResendingVerification(true);
@@ -169,6 +194,49 @@ export default function Auth() {
     
     await handleLogin(email, password);
   };
+
+  // Slug is being validated — show a neutral loading screen
+  if (slugState === "checking") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-center justify-center p-6">
+        <div className="w-full max-w-md text-center space-y-4">
+          <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto" />
+          <p className="text-gray-300">Loading store…</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Slug is present but no matching store was found
+  if (slugState === "invalid") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          <Card className="bg-white/10 backdrop-blur-md border border-white/20 text-center">
+            <CardContent className="pt-8 pb-8 space-y-4">
+              <div className="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center text-3xl mx-auto">🔍</div>
+              <h2 className="text-2xl font-bold text-white">Store Not Found</h2>
+              <p className="text-gray-300 leading-relaxed">
+                We couldn't find a store matching <strong className="text-white">{tenantSlugFromUrl}</strong>.
+                The link may be incorrect or the store may no longer be active.
+              </p>
+              <p className="text-gray-400 text-sm">
+                Please double-check the link or contact the store that sent it to you.
+              </p>
+              <Button
+                variant="ghost"
+                className="text-gray-400 hover:text-white mt-2"
+                onClick={() => setLocation('/')}
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Home
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   if (verificationPending) {
     return (
