@@ -323,6 +323,64 @@ describe("PATCH /api/tenants/current — DB-level slug constraint violation (rac
   });
 });
 
+// ─── GET /api/tenants/slug-check — suggestion round-trip ─────────────────────
+//
+// This suite proves the full flow that backs the "suggestion chip" UX:
+//
+//   1. Check a taken slug  → available:false, suggestions array is non-empty.
+//   2. Check each suggestion → available:true (every chip would unblock the save button).
+//
+// This mirrors handleSlugChange(s) in settings.tsx: clicking a chip re-runs the
+// slug-check with the suggested value, transitioning slugStatus from
+// { available:false } to { available:true }, which re-enables the save button.
+
+describe("GET /api/tenants/slug-check — suggestion round-trip unblocks save button", () => {
+  it("returns available:false with at least one suggestion when the slug is taken", async () => {
+    // tenantBSlug is seeded in beforeAll — guaranteed taken
+    const res = await agent.get(
+      `/api/tenants/slug-check?slug=${tenantBSlug}`,
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.body.available).toBe(false);
+    expect(Array.isArray(res.body.suggestions)).toBe(true);
+    expect(res.body.suggestions.length).toBeGreaterThan(0);
+  });
+
+  it("every suggestion returned for a taken slug is itself available (would re-enable save button)", async () => {
+    const checkRes = await agent.get(
+      `/api/tenants/slug-check?slug=${tenantBSlug}`,
+    );
+
+    expect(checkRes.status).toBe(200);
+    expect(checkRes.body.available).toBe(false);
+
+    const suggestions: string[] = checkRes.body.suggestions;
+    expect(suggestions.length).toBeGreaterThan(0);
+
+    for (const suggestion of suggestions) {
+      const sugRes = await agent.get(
+        `/api/tenants/slug-check?slug=${suggestion}`,
+      );
+      expect(sugRes.status).toBe(200);
+      expect(sugRes.body.available).toBe(true);
+      // No suggestions expected for an already-available slug
+      expect(sugRes.body.suggestions).toEqual([]);
+    }
+  });
+
+  it("returns available:true (no suggestions) for a genuinely free slug", async () => {
+    const sfx = randomSuffix();
+    const freeSlug = `slug-free-${sfx}`;
+
+    const res = await agent.get(`/api/tenants/slug-check?slug=${freeSlug}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.available).toBe(true);
+    expect(res.body.suggestions).toEqual([]);
+  });
+});
+
 // ─── Frontend contract assertions (code-level) ────────────────────────────────
 //
 // The following behaviours are verified by code inspection of
