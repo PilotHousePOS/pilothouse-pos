@@ -29,9 +29,52 @@ export function setActiveTenantSlug(slug: string | null): void {
 
 export function getActiveTenantSlug(): string | null {
   try {
-    return localStorage.getItem(TENANT_SLUG_KEY);
+    const stored = localStorage.getItem(TENANT_SLUG_KEY);
+    if (stored) return stored;
   } catch {
-    return null;
+    // fall through to URL param fallback
+  }
+
+  // Fallback: read directly from the ?tenant= query parameter so that public
+  // pages work even before the authenticated TenantSlugSync has run.
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const tenantParam = params.get("tenant");
+    if (tenantParam) return tenantParam;
+  } catch {
+    // ignore
+  }
+
+  return null;
+}
+
+/**
+ * Seed the active tenant slug from the ?tenant= query parameter as early as
+ * possible (call at module scope in App.tsx).  This ensures that the very
+ * first API calls made by public-facing pages always include the
+ * X-Tenant-Slug header, even before the authenticated TenantSlugSync
+ * component has had a chance to run.
+ *
+ * The value is only written to localStorage if one isn't already stored so
+ * that an authenticated user's slug is never overwritten by a URL parameter.
+ */
+export function seedSlugFromUrl(): void {
+  try {
+    if (localStorage.getItem(TENANT_SLUG_KEY)) return; // already set — nothing to do
+  } catch {
+    // If localStorage is unavailable we still skip — getActiveTenantSlug()
+    // will read the URL param on the fly instead.
+    return;
+  }
+
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const tenantParam = params.get("tenant");
+    if (tenantParam) {
+      localStorage.setItem(TENANT_SLUG_KEY, tenantParam);
+    }
+  } catch {
+    // ignore
   }
 }
 

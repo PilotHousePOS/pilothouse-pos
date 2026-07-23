@@ -1,6 +1,6 @@
 import { lazy, Suspense, Component, ReactNode, useEffect } from "react";
 import { Switch, Route, useLocation } from "wouter";
-import { queryClient, setActiveTenantSlug } from "./lib/queryClient";
+import { queryClient, setActiveTenantSlug, seedSlugFromUrl } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +9,11 @@ import BottomNav from "@/components/bottom-nav";
 import BackToTop from "@/components/back-to-top";
 import TrialBanner from "@/components/trial-banner";
 import Paywall from "@/components/paywall";
+
+// Seed the tenant slug from ?tenant= as early as possible so that public-page
+// API calls (store front, apply, product pages) always include X-Tenant-Slug
+// even before the authenticated TenantSlugSync component has run.
+seedSlugFromUrl();
 
 function safeLazy<T extends React.ComponentType<any>>(
   factory: () => Promise<{ default: T }>,
