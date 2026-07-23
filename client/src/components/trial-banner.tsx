@@ -1,5 +1,5 @@
 // Trial countdown banner shown to tenants in trial status
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { X, Clock, AlertTriangle } from "lucide-react";
@@ -33,10 +33,34 @@ export default function TrialBanner() {
   const [, setLocation] = useLocation();
   const [dismissed, setDismissed] = useState(!shouldShowBanner());
 
-  const { data: billing } = useQuery<BillingStatus>({
+  const { data: billing, refetch } = useQuery<BillingStatus>({
     queryKey: ["/api/billing/status"],
     staleTime: 30 * 1000,
   });
+
+  // Local clock that ticks every minute when on the final day, so the
+  // "Ends in ~X hours" label updates without waiting for a query refetch.
+  const [now, setNow] = useState(() => Date.now());
+  const isLastDay = billing?.trialDaysLeft === 0;
+
+  useEffect(() => {
+    if (!isLastDay) return;
+
+    const id = setInterval(() => {
+      const current = Date.now();
+      setNow(current);
+
+      // When the trial has expired, refetch billing so the banner disappears.
+      if (billing?.trialEndsAt) {
+        const msLeft = new Date(billing.trialEndsAt).getTime() - current;
+        if (msLeft <= 0) {
+          refetch();
+        }
+      }
+    }, 60_000);
+
+    return () => clearInterval(id);
+  }, [isLastDay, billing?.trialEndsAt, refetch]);
 
   if (dismissed) return null;
   if (!billing) return null;
@@ -48,10 +72,11 @@ export default function TrialBanner() {
 
   const isUrgent = trialDaysLeft !== null && trialDaysLeft <= 3;
 
-  // Compute hours remaining when on the last day
+  // Compute hours remaining when on the last day using the live `now` timestamp
+  // so the label ticks down every minute rather than freezing at mount time.
   let hoursLeft: number | null = null;
   if (trialDaysLeft === 0 && trialEndsAt) {
-    const msLeft = new Date(trialEndsAt).getTime() - Date.now();
+    const msLeft = new Date(trialEndsAt).getTime() - now;
     hoursLeft = msLeft > 0 ? Math.ceil(msLeft / (1000 * 60 * 60)) : 0;
   }
 

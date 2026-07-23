@@ -1,6 +1,7 @@
 // Persistent trial status card shown on the main dashboard to tenant owners.
 // Unlike the global TrialBanner (which is dismissible), this card always appears
 // while the tenant is on a trial, giving owners a clear countdown they can't miss.
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,11 +18,35 @@ export default function TrialStatusCard() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
 
-  const { data: billing } = useQuery<BillingStatus>({
+  const { data: billing, refetch } = useQuery<BillingStatus>({
     queryKey: ["/api/billing/status"],
     staleTime: 30 * 1000,
     enabled: !!(user as any)?.isAdmin,
   });
+
+  // Local clock that ticks every minute when on the final day, so the
+  // "Ends in ~X hours" label updates without waiting for a query refetch.
+  const [now, setNow] = useState(() => Date.now());
+  const isLastDay = billing?.trialDaysLeft === 0;
+
+  useEffect(() => {
+    if (!isLastDay) return;
+
+    const id = setInterval(() => {
+      const current = Date.now();
+      setNow(current);
+
+      // When the trial has expired, refetch billing so the card disappears.
+      if (billing?.trialEndsAt) {
+        const msLeft = new Date(billing.trialEndsAt).getTime() - current;
+        if (msLeft <= 0) {
+          refetch();
+        }
+      }
+    }, 60_000);
+
+    return () => clearInterval(id);
+  }, [isLastDay, billing?.trialEndsAt, refetch]);
 
   // Only show to admin users (tenant owners)
   if (!(user as any)?.isAdmin) return null;
@@ -35,10 +60,11 @@ export default function TrialStatusCard() {
   const isUrgent = trialDaysLeft !== null && trialDaysLeft <= 3;
   const isExpiring = trialDaysLeft !== null && trialDaysLeft <= 7;
 
-  // Compute hours remaining when on the last day
+  // Compute hours remaining when on the last day using the live `now` timestamp
+  // so the label ticks down every minute rather than freezing at mount time.
   let hoursLeft: number | null = null;
   if (trialDaysLeft === 0 && trialEndsAt) {
-    const msLeft = new Date(trialEndsAt).getTime() - Date.now();
+    const msLeft = new Date(trialEndsAt).getTime() - now;
     hoursLeft = msLeft > 0 ? Math.ceil(msLeft / (1000 * 60 * 60)) : 0;
   }
 
