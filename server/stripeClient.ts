@@ -17,12 +17,33 @@ let stripeSync: any = null;
 let stripeSyncSecretKey: string | null = null;
 
 /**
+ * Close the pg connection pool held by a StripeSync instance.
+ * StripeSync exposes its pool via `postgresClient.pool` (a `pg.Pool`).
+ * We log-and-swallow errors so a stale/already-ended pool never prevents
+ * the cache from being cleared.
+ */
+async function closeStripeSyncPool(instance: any): Promise<void> {
+  try {
+    const pool = instance?.postgresClient?.pool;
+    if (pool && typeof pool.end === 'function') {
+      await pool.end();
+      console.log('[Stripe] Closed old StripeSync pg pool');
+    }
+  } catch (err: any) {
+    console.warn('[Stripe] Error closing old StripeSync pg pool:', err.message);
+  }
+}
+
+/**
  * Clear the credential cache and invalidate the StripeSync singleton.
  * The next call to getCredentials() / getStripeSync() will re-validate from
  * env vars / connector and rebuild the singleton with the new key.
  * Exported so health-check routes and tests can force a fresh validation.
  */
-export function clearCredentialCache(): void {
+export async function clearCredentialCache(): Promise<void> {
+  if (stripeSync) {
+    await closeStripeSyncPool(stripeSync);
+  }
   validatedCredentials = null;
   validatedAt = null;
   stripeSync = null;
@@ -36,7 +57,7 @@ async function getCredentials() {
   if (validatedCredentials && validatedAt !== null) {
     if (Date.now() - validatedAt > CREDENTIAL_TTL_MS) {
       console.log('[Stripe] Credential cache expired — re-validating keys');
-      clearCredentialCache();
+      await clearCredentialCache();
     }
   }
 
@@ -150,6 +171,7 @@ export async function getStripeSync() {
   // Recreate the singleton if the key has changed (e.g. after rotation + TTL expiry)
   if (stripeSync && stripeSyncSecretKey !== secretKey) {
     console.log('[Stripe] Secret key changed — rebuilding StripeSync with new key');
+    await closeStripeSyncPool(stripeSync);
     stripeSync = null;
     stripeSyncSecretKey = null;
   }

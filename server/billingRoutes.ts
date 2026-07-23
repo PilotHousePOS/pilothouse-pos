@@ -366,7 +366,7 @@ export function registerBillingRoutes(app: Express): void {
       }
 
       // Force a fresh credential check so health always reflects the live key
-      clearCredentialCache();
+      await clearCredentialCache();
 
       const stripe = await getUncachableStripeClient();
 

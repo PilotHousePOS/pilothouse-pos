@@ -262,7 +262,7 @@ export async function runStripeHealthCheck(): Promise<void> {
 
   try {
     // Force a fresh credential fetch — health check must never rely on a cached key
-    clearCredentialCache();
+    await clearCredentialCache();
     const stripe = await getUncachableStripeClient();
     await stripe.accounts.retrieve();
     // Key is healthy — clear the guard so the next failure will alert again
