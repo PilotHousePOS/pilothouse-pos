@@ -625,6 +625,17 @@ async function runAppMigrations() {
       ON CONFLICT (id) DO NOTHING`));
     await migDb.execute(migSql.raw(`UPDATE users SET tenant_id = 1 WHERE tenant_id IS NULL`));
     await migDb.execute(migSql.raw(`UPDATE appointment_history SET tenant_id = 1 WHERE tenant_id IS NULL`));
+    // One-time backfill: advance pre-existing tenants to onboarding_step = 1 so they
+    // don't land on Step 0 again.  Gated by data_migrations so it only ever runs once —
+    // new tenants created after this point legitimately start at 0.
+    const backfillKey = 'backfill_onboarding_step_2026';
+    const backfillCheck = await migDb.execute(migSql.raw(
+      `SELECT key FROM data_migrations WHERE key = '${backfillKey}'`
+    ));
+    if (!backfillCheck.rows || backfillCheck.rows.length === 0) {
+      await migDb.execute(migSql.raw(`UPDATE tenants SET onboarding_step = 1 WHERE onboarding_step = 0`));
+      await migDb.execute(migSql.raw(`INSERT INTO data_migrations (key) VALUES ('${backfillKey}')`));
+    }
     // Startup cleanup: remove zero-stock items from pending queue (POS tracker)
     await migDb.execute(migSql.raw(`DELETE FROM pos_pending_new_items WHERE pos_stock <= 0`));
 

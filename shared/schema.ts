@@ -33,6 +33,7 @@ export const tenants = pgTable("tenants", {
   stripeCurrentPeriodEnd: timestamp("stripe_current_period_end"), // When the current billing period ends
   trialWarningEmailSentAt: timestamp("trial_warning_email_sent_at"), // Set when the 3-day trial warning email is sent
   trialOwnerMissingAlertSentAt: timestamp("trial_owner_missing_alert_sent_at"), // Set when the owner-missing alert is sent; prevents repeated daily alerts
+  onboardingStep: integer("onboarding_step").default(0).notNull(), // Highest onboarding step completed (0=none, 1=business details done)
   createdAt: timestamp("created_at").defaultNow(),
 });
 

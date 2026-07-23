@@ -826,7 +826,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (!tenant) {
         return res.status(404).json({ message: "Tenant not found." });
       }
-      res.json({ id: tenant.id, name: tenant.name, slug: tenant.slug, subscriptionStatus: tenant.subscriptionStatus, subscriptionTier: tenant.subscriptionTier, trialEndsAt: tenant.trialEndsAt });
+      res.json({ id: tenant.id, name: tenant.name, slug: tenant.slug, subscriptionStatus: tenant.subscriptionStatus, subscriptionTier: tenant.subscriptionTier, trialEndsAt: tenant.trialEndsAt, onboardingStep: tenant.onboardingStep ?? 0 });
     } catch (error) {
       console.error('GET /api/tenants/current error:', error);
       res.status(500).json({ message: "Failed to fetch tenant." });
@@ -844,7 +844,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (!dbUser.isAdmin) {
         return res.status(403).json({ message: "Only admins can update business details." });
       }
-      const { name, slug } = req.body;
+      const { name, slug, onboardingStep } = req.body;
       const updates: Record<string, unknown> = {};
       if (name) updates.name = name.trim();
       if (slug) {
@@ -856,8 +856,15 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         }
         updates.slug = sanitizedSlug;
       }
+      // Only advance the onboarding step — never regress it server-side.
+      if (typeof onboardingStep === 'number' && Number.isInteger(onboardingStep) && onboardingStep >= 0) {
+        const current = await storage.getTenant(dbUser.tenantId);
+        if (current && onboardingStep > (current.onboardingStep ?? 0)) {
+          updates.onboardingStep = onboardingStep;
+        }
+      }
       const updated = await storage.updateTenant(dbUser.tenantId, updates as any);
-      res.json({ id: updated.id, name: updated.name, slug: updated.slug });
+      res.json({ id: updated.id, name: updated.name, slug: updated.slug, onboardingStep: updated.onboardingStep ?? 0 });
     } catch (error) {
       console.error('PATCH /api/tenants/current error:', error);
       res.status(500).json({ message: "Failed to update business details." });

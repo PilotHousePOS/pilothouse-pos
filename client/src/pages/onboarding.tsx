@@ -109,14 +109,14 @@ function Step1({ tenantId, onNext }: { tenantId: number; onNext: () => void }) {
         method: 'PATCH',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: displayName.trim(), slug: displaySlug.trim() }),
+        body: JSON.stringify({ name: displayName.trim(), slug: displaySlug.trim(), onboardingStep: 1 }),
       });
       if (!res.ok) {
         const err = await res.json();
         toast({ title: err.message || "Failed to update business details", variant: "destructive" });
         return;
       }
-      // Persist that this tenant has completed Step 1 so we can skip it on return
+      // Also write the localStorage flag as a best-effort fallback for same-browser sessions
       markStep1Done(tenantId);
       onNext();
     } catch {
@@ -409,6 +409,7 @@ interface TenantData {
   name: string;
   slug: string;
   subscriptionStatus: string | null;
+  onboardingStep: number;
 }
 
 interface BillingStatus {
@@ -418,21 +419,23 @@ interface BillingStatus {
 }
 
 /**
- * Detect the first incomplete onboarding step from server state + localStorage markers.
+ * Detect the first incomplete onboarding step from server state.
  *
- * Step 0 — Business Details: skipped when the owner has previously saved it
- *           (localStorage flag written by Step1's save handler, keyed to tenant ID).
+ * Step 0 — Business Details: skipped when onboardingStep >= 1 (server-side flag) OR
+ *           the legacy localStorage flag is set (for clients that haven't refreshed yet).
  * Step 1 — Choose a Plan:    skipped when billing shows an active subscription.
  * Step 2 — Invite Staff:     always shown last; never auto-skipped.
  */
 function detectStartStep(
   tenantId: number,
   billingStatus: string | undefined,
+  serverOnboardingStep: number,
 ): number {
   const subscriptionActive =
     billingStatus === 'active' || billingStatus === 'cancelled';
   if (subscriptionActive) return 2;
-  if (isStep1Done(tenantId)) return 1;
+  // Server flag is authoritative; fall back to localStorage for resilience
+  if (serverOnboardingStep >= 1 || isStep1Done(tenantId)) return 1;
   return 0;
 }
 
@@ -472,7 +475,7 @@ export default function Onboarding() {
   const detectedStep = (() => {
     if (tenantLoading || billingLoading || !tenantData) return null;
     if (stripeReturn) return 2;
-    return detectStartStep(tenantData.id, billingData?.subscriptionStatus);
+    return detectStartStep(tenantData.id, billingData?.subscriptionStatus, tenantData.onboardingStep ?? 0);
   })();
 
   const [step, setStep] = useState<number | null>(null);
