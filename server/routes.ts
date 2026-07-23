@@ -14255,16 +14255,19 @@ West Monroe LA 71291
 
   // ─── Job Applications ──────────────────────────────────────────────────────
 
-  // Public: submit an application (no auth required)
-  app.post("/api/job-applications", async (req, res) => {
+  // Public: submit an application (no auth required, but scoped to current tenant via X-Tenant-Slug)
+  app.post("/api/job-applications", async (req: any, res) => {
     try {
       const { insertJobApplicationSchema } = await import("@shared/schema");
       const parsed = insertJobApplicationSchema.safeParse(req.body);
       if (!parsed.success) {
         return res.status(400).json({ message: "Invalid application data", errors: parsed.error.flatten() });
       }
-      const application = await storage.createJobApplication(parsed.data);
-      console.log(`[JobApplication] New application submitted: ${application.firstName} ${application.lastName} for "${application.positionApplied}" (id=${application.id})`);
+      // Attach tenantId when available (resolved by tenantMiddleware from X-Tenant-Slug header)
+      const data: any = { ...parsed.data };
+      if (req.tenantId) data.tenantId = req.tenantId;
+      const application = await storage.createJobApplication(data);
+      console.log(`[JobApplication] New application submitted: ${application.firstName} ${application.lastName} for "${application.positionApplied}" (id=${application.id}, tenantId=${application.tenantId ?? 'none'})`);
       res.status(201).json({ message: "Application submitted successfully", id: application.id });
     } catch (error) {
       console.error("[JobApplication] Error submitting application:", error);
@@ -14272,11 +14275,19 @@ West Monroe LA 71291
     }
   });
 
-  // Admin: get all applications
+  // Admin: get all applications (scoped to the authenticated admin's tenant; super-admins may pass ?tenantId=N)
   app.get("/api/admin/job-applications", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) return res.status(403).json({ message: "Forbidden" });
-      const applications = await storage.getAllJobApplications();
+      // Super-admins can view all applications or filter by a specific tenant
+      let filterTenantId: number | undefined;
+      if (req.isSuperAdmin) {
+        const qTenantId = req.query.tenantId ? parseInt(req.query.tenantId as string, 10) : undefined;
+        filterTenantId = qTenantId && !isNaN(qTenantId) ? qTenantId : undefined;
+      } else {
+        filterTenantId = req.tenantId;
+      }
+      const applications = await storage.getAllJobApplications(filterTenantId);
       res.json(applications);
     } catch (error) {
       console.error("[JobApplication] Error fetching applications:", error);
@@ -14284,11 +14295,12 @@ West Monroe LA 71291
     }
   });
 
-  // Admin: get single application
+  // Admin: get single application (scoped to tenant)
   app.get("/api/admin/job-applications/:id", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) return res.status(403).json({ message: "Forbidden" });
-      const application = await storage.getJobApplication(parseInt(req.params.id));
+      const tenantFilter = req.isSuperAdmin ? undefined : req.tenantId;
+      const application = await storage.getJobApplication(parseInt(req.params.id), tenantFilter);
       if (!application) return res.status(404).json({ message: "Application not found" });
       res.json(application);
     } catch (error) {
@@ -14297,12 +14309,14 @@ West Monroe LA 71291
     }
   });
 
-  // Admin: update application status / notes
+  // Admin: update application status / notes (scoped to tenant)
   app.patch("/api/admin/job-applications/:id", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) return res.status(403).json({ message: "Forbidden" });
+      const tenantFilter = req.isSuperAdmin ? undefined : req.tenantId;
       const { status, adminNotes } = req.body;
-      const updated = await storage.updateJobApplicationStatus(parseInt(req.params.id), status, adminNotes);
+      const updated = await storage.updateJobApplicationStatus(parseInt(req.params.id), status, adminNotes, tenantFilter);
+      if (!updated) return res.status(404).json({ message: "Application not found" });
       console.log(`[JobApplication] Application id=${updated.id} (${updated.firstName} ${updated.lastName}) status updated to "${status}"`);
       res.json(updated);
     } catch (error) {

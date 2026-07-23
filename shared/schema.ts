@@ -1168,6 +1168,7 @@ export type InsertSpecial = typeof specials.$inferInsert;
 // ─── Job Applications ─────────────────────────────────────────────────────────
 export const jobApplications = pgTable("job_applications", {
   id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
   // Personal Information
   firstName: varchar("first_name", { length: 100 }).notNull(),
   lastName: varchar("last_name", { length: 100 }).notNull(),

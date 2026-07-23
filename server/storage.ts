@@ -523,9 +523,9 @@ export interface IStorage {
 
   // Job Applications
   createJobApplication(data: InsertJobApplication): Promise<JobApplication>;
-  getAllJobApplications(): Promise<JobApplication[]>;
-  getJobApplication(id: number): Promise<JobApplication | undefined>;
-  updateJobApplicationStatus(id: number, status: string, adminNotes?: string): Promise<JobApplication>;
+  getAllJobApplications(tenantId?: number): Promise<JobApplication[]>;
+  getJobApplication(id: number, tenantId?: number): Promise<JobApplication | undefined>;
+  updateJobApplicationStatus(id: number, status: string, adminNotes?: string, tenantId?: number): Promise<JobApplication>;
 
   // Audit Log operations
   createAuditLog(entry: InsertAuditLog): Promise<AuditLog>;
@@ -5178,19 +5178,28 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
-  async getAllJobApplications(): Promise<JobApplication[]> {
+  async getAllJobApplications(tenantId?: number): Promise<JobApplication[]> {
+    if (tenantId !== undefined) {
+      return db.select().from(jobApplications)
+        .where(eq(jobApplications.tenantId, tenantId))
+        .orderBy(desc(jobApplications.submittedAt));
+    }
     return db.select().from(jobApplications).orderBy(desc(jobApplications.submittedAt));
   }
 
-  async getJobApplication(id: number): Promise<JobApplication | undefined> {
-    const [app] = await db.select().from(jobApplications).where(eq(jobApplications.id, id));
+  async getJobApplication(id: number, tenantId?: number): Promise<JobApplication | undefined> {
+    const conditions = [eq(jobApplications.id, id)];
+    if (tenantId !== undefined) conditions.push(eq(jobApplications.tenantId, tenantId));
+    const [app] = await db.select().from(jobApplications).where(and(...conditions));
     return app;
   }
 
-  async updateJobApplicationStatus(id: number, status: string, adminNotes?: string): Promise<JobApplication> {
+  async updateJobApplicationStatus(id: number, status: string, adminNotes?: string, tenantId?: number): Promise<JobApplication> {
     const updates: any = { status };
     if (adminNotes !== undefined) updates.adminNotes = adminNotes;
-    const [updated] = await db.update(jobApplications).set(updates).where(eq(jobApplications.id, id)).returning();
+    const conditions = [eq(jobApplications.id, id)];
+    if (tenantId !== undefined) conditions.push(eq(jobApplications.tenantId, tenantId));
+    const [updated] = await db.update(jobApplications).set(updates).where(and(...conditions)).returning();
     return updated;
   }
 
