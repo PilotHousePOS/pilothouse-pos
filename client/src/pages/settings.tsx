@@ -254,6 +254,12 @@ export default function Settings() {
       return response.json();
     },
     onSuccess: (data) => {
+      // Immediately update the cached tenant so every component that reads
+      // /api/tenants/current (settings page, onboarding, TenantSlugSync) sees
+      // the new name without waiting for the background refetch.
+      queryClient.setQueryData(["/api/tenants/current"], (old: any) =>
+        old ? { ...old, name: data.name } : old
+      );
       queryClient.invalidateQueries({ queryKey: ["/api/tenants/current"] });
       setNewBusinessName("");
       toast({
