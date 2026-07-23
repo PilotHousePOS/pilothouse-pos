@@ -772,6 +772,55 @@ describe("storage.checkOutBoardingRecord — storage-layer guard", () => {
   });
 });
 
+// ─── Storage-layer unit tests — deleteBoardingRecord ─────────────────────────
+
+describe("storage.deleteBoardingRecord — storage-layer guard", () => {
+  it("throws when tenantId is undefined", async () => {
+    await expect(
+      storage.deleteBoardingRecord(seededBoardingRecordId, undefined)
+    ).rejects.toThrow("tenantId is required to delete a boarding record");
+  });
+
+  it("does NOT delete the record when tenantId is undefined", async () => {
+    // Attempt the delete — expected to throw
+    await expect(
+      storage.deleteBoardingRecord(seededBoardingRecordId, undefined)
+    ).rejects.toThrow();
+
+    // Verify the record still exists
+    const after = await storage.getBoardingRecord(seededBoardingRecordId, realTenantId);
+    expect(after).toBeDefined();
+    expect(after!.id).toBe(seededBoardingRecordId);
+  });
+
+  it("successfully deletes the record when called with the correct tenantId", async () => {
+    // This confirms the guard only blocks undefined tenantId, not valid calls.
+    // Re-seed a temporary record so the seededBoardingRecordId remains intact
+    // for other tests.
+    const [tempRecord] = await db
+      .insert(boardingRecords)
+      .values({
+        tenantId: realTenantId,
+        customerName: "TempDeleteOwner",
+        customerPhone: "5550009999",
+        animalType: "Cat",
+        animalName: "TempDeletePet",
+        estimatedDropOffDate: "2099-12-30",
+        estimatedPickUpDate: "2099-12-31",
+        dailyRate: "20.00",
+      })
+      .returning();
+
+    await expect(
+      storage.deleteBoardingRecord(tempRecord.id, realTenantId)
+    ).resolves.toBeUndefined();
+
+    // Confirm it is gone
+    const gone = await storage.getBoardingRecord(tempRecord.id, realTenantId);
+    expect(gone).toBeUndefined();
+  });
+});
+
 // ─── Contact sub-resource endpoints — stranded users ─────────────────────────
 //
 // GET /api/contacts/:id/appointments and GET /api/contacts/:id/history both
