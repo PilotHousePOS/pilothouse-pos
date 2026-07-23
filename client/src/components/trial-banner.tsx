@@ -35,7 +35,7 @@ export default function TrialBanner() {
 
   const { data: billing } = useQuery<BillingStatus>({
     queryKey: ["/api/billing/status"],
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30 * 1000,
   });
 
   if (dismissed) return null;

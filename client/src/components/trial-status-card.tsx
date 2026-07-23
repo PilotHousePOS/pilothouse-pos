@@ -19,7 +19,7 @@ export default function TrialStatusCard() {
 
   const { data: billing } = useQuery<BillingStatus>({
     queryKey: ["/api/billing/status"],
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30 * 1000,
     enabled: !!(user as any)?.isAdmin,
   });
 
