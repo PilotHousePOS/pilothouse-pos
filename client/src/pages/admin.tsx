@@ -7347,6 +7347,27 @@ export default function Admin() {
     staleTime: 30000,
   });
 
+  // Super-admin: force Stripe credential cache refresh
+  const refreshStripeCredentialsMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/super-admin/stripe/refresh-credentials");
+      return res.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Stripe keys refreshed",
+        description: data.message || "Credential cache cleared. New keys will be used on the next request.",
+      });
+    },
+    onError: (err: any) => {
+      toast({
+        title: "Failed to refresh Stripe keys",
+        description: err.message || "An error occurred",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Super-admin: send trial reminder for any tenant
   const sendTrialReminderMutation = useMutation({
     mutationFn: async (tenantId: number) => {
@@ -13052,6 +13073,33 @@ export default function Admin() {
                     </div>
                   );
                 })()}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Super-admin: Stripe credential refresh */}
+          {(typedUser as any)?.isSuperAdmin && (
+            <Card className="border-purple-200 bg-purple-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-purple-800">
+                  <RefreshCw className="w-5 h-5" />
+                  Stripe Credential Refresh
+                </CardTitle>
+                <p className="text-sm text-purple-700">
+                  After rotating a Stripe API key, the server caches the old key for up to one hour. Click below to force an immediate reload so the new key takes effect right away.
+                </p>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  variant="outline"
+                  className="border-purple-400 text-purple-800 hover:bg-purple-100"
+                  disabled={refreshStripeCredentialsMutation.isPending}
+                  onClick={() => refreshStripeCredentialsMutation.mutate()}
+                  data-testid="button-refresh-stripe-credentials"
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2 ${refreshStripeCredentialsMutation.isPending ? 'animate-spin' : ''}`} />
+                  {refreshStripeCredentialsMutation.isPending ? 'Refreshing…' : 'Refresh Stripe Keys'}
+                </Button>
               </CardContent>
             </Card>
           )}

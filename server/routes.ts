@@ -14828,5 +14828,19 @@ CRITICAL RULES:
     }
   });
 
+  // POST /api/super-admin/stripe/refresh-credentials — immediately clears the credential cache
+  // so the next Stripe call picks up newly-rotated keys without waiting for the 1-hour TTL.
+  app.post('/api/super-admin/stripe/refresh-credentials', requireSuperAdminMiddleware, async (_req, res) => {
+    try {
+      const { clearCredentialCache } = await import('./stripeClient');
+      await clearCredentialCache();
+      console.log('[Stripe] Credential cache manually cleared by super-admin');
+      res.json({ ok: true, message: 'Stripe credential cache cleared. New keys will be used on the next request.' });
+    } catch (error: any) {
+      console.error('Failed to clear Stripe credential cache:', error);
+      res.status(500).json({ ok: false, message: error.message || 'Failed to clear credential cache' });
+    }
+  });
+
   // Server is now created externally in index.ts
 }
