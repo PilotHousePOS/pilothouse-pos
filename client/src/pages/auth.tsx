@@ -137,6 +137,15 @@ export default function Auth() {
         } else {
           // Normal user — force a complete page reload so the tenant slug, session
           // cookie, and any per-tenant config are all picked up cleanly.
+          //
+          // Safety: `window.location.replace` is called synchronously in the same
+          // call stack as `setQueryData` above — there is no `await` between them.
+          // React batches state updates and only flushes renders after the current
+          // synchronous execution completes, but `window.location.replace` initiates
+          // page unload *before* that render opportunity arrives.  The browser never
+          // gives React a chance to paint the seeded cache, so NoTenantScreen cannot
+          // flash for a normal user (whose tenantId is truthy and therefore bypasses
+          // the `!userData.tenantId` guard in the first place).
           window.location.replace('/');
         }
       } else {
