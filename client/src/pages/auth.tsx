@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Heart } from "lucide-react";
+import { ArrowLeft, Heart, AlertCircle } from "lucide-react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
@@ -15,6 +15,7 @@ export default function Auth() {
   const [verificationPending, setVerificationPending] = useState(false);
   const [pendingEmail, setPendingEmail] = useState("");
   const [resendingVerification, setResendingVerification] = useState(false);
+  const [signupError, setSignupError] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Detect missing tenant slug — sign-up requires it, sign-in does not.
@@ -168,6 +169,7 @@ export default function Auth() {
   };
 
   const handleSignUp = async (email: string, password: string, firstName: string, lastName: string, phoneNumber: string) => {
+    setSignupError(null);
     setIsLoading(true);
     try {
       // Read the tenant slug from the URL (?tenant=<slug>) so new accounts are
@@ -197,17 +199,21 @@ export default function Auth() {
       } else {
         const error = await response.json();
         console.error('Signup failed:', error.message);
+        const msg = error.message || "Unable to create account. Please try again.";
+        setSignupError(msg);
         toast({
           title: "Sign Up Failed",
-          description: error.message || "Unable to create account. Please try again.",
+          description: msg,
           variant: "destructive",
         });
       }
     } catch (error) {
       console.error('Signup error:', error);
+      const msg = "An error occurred during sign up. Please try again.";
+      setSignupError(msg);
       toast({
         title: "Error",
-        description: "An error occurred during sign up. Please try again.",
+        description: msg,
         variant: "destructive",
       });
     } finally {
@@ -455,6 +461,12 @@ export default function Auth() {
                       required
                     />
                   </div>
+                  {signupError && (
+                    <div className="flex items-start gap-2 rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2.5 text-sm text-red-300" role="alert">
+                      <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-red-400" />
+                      <span>{signupError}</span>
+                    </div>
+                  )}
                   <Button
                     type="submit"
                     disabled={isLoading}
