@@ -64,6 +64,7 @@ let itemBId: number;
 let supplyBOriginalName: string;
 let contactBOriginalName: string;
 let appointmentBOriginalStatus: string | null;
+let appointmentBOriginalOwnerLastName: string;
 let petBOriginalName: string;
 
 /** Bearer token for Tenant A's admin user */
@@ -237,12 +238,13 @@ beforeAll(async () => {
 
   appointmentAId = await createTestAppointment(tenantAId, userAId, `OwnerA-${sfx}`);
   appointmentBId = await createTestAppointment(tenantBId, userBId, `OwnerB-${sfx}`);
-  // Capture B's current status from DB
+  // Capture B's current status and ownerLastName from DB
   const [apptB] = await db
-    .select({ status: appointments.status })
+    .select({ status: appointments.status, ownerLastName: appointments.ownerLastName })
     .from(appointments)
     .where(eq(appointments.id, appointmentBId));
   appointmentBOriginalStatus = apptB?.status ?? null;
+  appointmentBOriginalOwnerLastName = apptB?.ownerLastName ?? "";
 
   orderAId = await createTestOrder(tenantAId, userAId);
   orderBId = await createTestOrder(tenantBId, userBId);
@@ -1120,5 +1122,48 @@ describe("PATCH /api/appointments/:id/grooming-completed — cross-tenant write 
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty("id", appointmentAId);
+  });
+});
+
+// ─── PATCH /api/admin/appointments/:id/details — groomer cross-tenant isolation
+//
+// Groomers (isGroomer=true, isAdmin=false) are permitted to call this endpoint
+// for their own tenant. Targeting another tenant's appointment via the :id
+// parameter must be rejected with HTTP 404 before any mutation occurs,
+// because the route calls storage.getAppointment(id, req.tenantId) which
+// scopes the lookup to the caller's tenant.
+
+describe("PATCH /api/admin/appointments/:id/details — groomer cross-tenant write rejected", () => {
+  it("returns 404 when Tenant A groomer targets Tenant B's appointment", async () => {
+    const res = await agent
+      .patch(`/api/admin/appointments/${appointmentBId}/details`)
+      .set("Authorization", `Bearer ${tokenGroomerA}`)
+      .send({ ownerLastName: "GROOMER-HACKED" });
+
+    expect(res.status).toBe(404);
+  });
+
+  it("Tenant B's appointment ownerLastName is unchanged after groomer's rejected update", async () => {
+    const [row] = await db
+      .select({ ownerLastName: appointments.ownerLastName })
+      .from(appointments)
+      .where(eq(appointments.id, appointmentBId));
+    expect(row?.ownerLastName).toBe(appointmentBOriginalOwnerLastName);
+  });
+
+  it("returns 200 when Tenant A groomer patches their own tenant's appointment", async () => {
+    // Create a throwaway appointment in Tenant A for the groomer to edit
+    const throwawayApptId = await createTestAppointment(tenantAId, userAId, "GroomerPatchOwner");
+
+    const res = await agent
+      .patch(`/api/admin/appointments/${throwawayApptId}/details`)
+      .set("Authorization", `Bearer ${tokenGroomerA}`)
+      .send({ ownerLastName: "UpdatedByGroomer" });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("id", throwawayApptId);
+
+    // Cleanup
+    await db.delete(appointments).where(eq(appointments.id, throwawayApptId));
   });
 });
