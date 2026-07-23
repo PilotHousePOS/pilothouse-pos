@@ -63,13 +63,36 @@ function markStep1Done(tenantId: number) {
   } catch {}
 }
 
-/** Returns true if the owner has previously completed Step 1 for this tenant. */
+/**
+ * Returns true if localStorage says Step 1 was completed.
+ * This is a fast-path cache only — server state always takes precedence.
+ */
 function isStep1Done(tenantId: number): boolean {
   try {
     return localStorage.getItem(`onboarding_step1_done_${tenantId}`) === 'true';
   } catch {
     return false;
   }
+}
+
+/**
+ * Returns true when the tenant's server-side name/slug look like real business
+ * details (i.e. something other than the generic fallback values produced at
+ * account-creation time).  Used as a secondary server-side heuristic: if the
+ * owner provided meaningful details at signup but never explicitly clicked
+ * "Save & Continue" on the onboarding form, we still treat Step 1 as done so
+ * they don't have to re-confirm details they already supplied.
+ *
+ * "Default" values that do NOT indicate completion:
+ *   – empty/whitespace name
+ *   – slug === 'business' (the code-level fallback when no name is available)
+ */
+function hasNonDefaultBusinessDetails(name: string, slug: string): boolean {
+  const trimmedName = name.trim();
+  const trimmedSlug = slug.trim();
+  if (!trimmedName) return false;
+  if (!trimmedSlug || trimmedSlug === 'business') return false;
+  return true;
 }
 
 // Step 1: Business Details
@@ -421,21 +444,34 @@ interface BillingStatus {
 /**
  * Detect the first incomplete onboarding step from server state.
  *
- * Step 0 — Business Details: skipped when onboardingStep >= 1 (server-side flag) OR
- *           the legacy localStorage flag is set (for clients that haven't refreshed yet).
+ * Step 0 — Business Details: skipped when any of the following hold:
+ *   1. server-side onboardingStep >= 1 (explicit completion flag)
+ *   2. tenant name/slug are non-default, indicating details were saved at signup
+ *   3. localStorage fast-path cache says step 1 is done (same-browser optimisation)
  * Step 1 — Choose a Plan:    skipped when billing shows an active subscription.
  * Step 2 — Invite Staff:     always shown last; never auto-skipped.
+ *
+ * Server-side signals (1 & 2) are authoritative and survive storage clears,
+ * browser switches, and incognito sessions.  localStorage (3) is a cache only.
  */
 function detectStartStep(
   tenantId: number,
   billingStatus: string | undefined,
   serverOnboardingStep: number,
+  tenantName: string,
+  tenantSlug: string,
 ): number {
   const subscriptionActive =
     billingStatus === 'active' || billingStatus === 'cancelled';
   if (subscriptionActive) return 2;
-  // Server flag is authoritative; fall back to localStorage for resilience
-  if (serverOnboardingStep >= 1 || isStep1Done(tenantId)) return 1;
+
+  // Server is the source of truth — check both explicit flag and name/slug heuristic
+  if (
+    serverOnboardingStep >= 1 ||
+    hasNonDefaultBusinessDetails(tenantName, tenantSlug) ||
+    isStep1Done(tenantId)   // localStorage fast-path cache (same-browser only)
+  ) return 1;
+
   return 0;
 }
 
@@ -475,7 +511,13 @@ export default function Onboarding() {
   const detectedStep = (() => {
     if (tenantLoading || billingLoading || !tenantData) return null;
     if (stripeReturn) return 2;
-    return detectStartStep(tenantData.id, billingData?.subscriptionStatus, tenantData.onboardingStep ?? 0);
+    return detectStartStep(
+      tenantData.id,
+      billingData?.subscriptionStatus,
+      tenantData.onboardingStep ?? 0,
+      tenantData.name,
+      tenantData.slug,
+    );
   })();
 
   const [step, setStep] = useState<number | null>(null);
