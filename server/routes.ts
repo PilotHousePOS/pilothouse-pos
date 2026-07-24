@@ -66,6 +66,9 @@ async function withRetry<T>(operation: () => Promise<T>, maxRetries = 3, delayMs
 import { extractOrderFromPhoto, apply99Pricing } from './orderPhotoProcessor';
 import { categorizeProduct, detectLiveAnimal } from './productCategorization';
 import { registerBillingRoutes } from './billingRoutes';
+// Shared-pool limiters MUST be imported from sharedLimiters.ts — never
+// re-created inline.  See server/sharedLimiters.ts for the full explanation.
+import { getRealIp, searchLimiter, checkoutLimiter, uploadLimiter } from './sharedLimiters';
 
 // Helper: clean a name string — collapse extra spaces, trim
 function cleanName(name: string | undefined | null): string {
@@ -331,27 +334,8 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   // Resolve tenant context for all API routes (non-blocking: attaches req.tenantId if authenticated)
   app.use('/api', tenantMiddleware);
 
-  // Spoof-resistant IP extractor for rate limiters.
-  //
-  // Problem: app.set("trust proxy", 1) makes Express use the LEFTMOST entry in
-  // X-Forwarded-For as req.ip. A client can prepend arbitrary fake IPs before
-  // Replit's proxy appends the real one, letting them rotate "IPs" and bypass
-  // per-IP rate limits entirely.
-  //
-  // Fix: always use the RIGHTMOST XFF entry — that is the one Replit's edge
-  // proxy appended and cannot be forged by the client. If no XFF header is
-  // present we fall back to the raw socket address (direct connection).
-  function getRealIp(req: Request): string {
-    const xff = req.headers['x-forwarded-for'];
-    if (xff) {
-      const entries = (Array.isArray(xff) ? xff.join(',') : xff)
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean);
-      if (entries.length > 0) return entries[entries.length - 1];
-    }
-    return (req as any).socket?.remoteAddress ?? 'unknown';
-  }
+  // getRealIp is imported from ./sharedLimiters — see that module for the full
+  // explanation of why the RIGHTMOST X-Forwarded-For entry must be used.
 
   const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -439,66 +423,23 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   });
   app.use('/api/auth/signup', signupLimiter);
 
-  // searchLimiter — shared-pool design (intentional):
-  // The same searchLimiter instance is applied to both /api/supplies/search
-  // and /api/pets via two separate app.use() calls.  Because both calls share
-  // the same MemoryStore, they also share the same per-IP counter (60 req/min).
-  // A burst of /api/supplies/search requests will consume budget from the
-  // /api/pets window and vice versa.  This is intentional: both endpoints are
-  // high-frequency read paths that should be subject to the same aggregate
-  // rate cap to prevent scraping.  If the two paths ever need independent
-  // budgets, create two separate rateLimit() instances with their own stores.
-  const searchLimiter = rateLimit({
-    windowMs: 1 * 60 * 1000,
-    max: 60,
-    standardHeaders: true,
-    legacyHeaders: false,
-    keyGenerator: getRealIp,
-    message: { message: "Too many search requests, please slow down." },
-  });
+  // searchLimiter is imported from ./sharedLimiters (shared-pool singleton).
+  // Both routes reference the SAME instance so they share one per-IP counter.
+  // See server/sharedLimiters.ts for the full shared-pool contract.
+  // Regression guard: server/tests/search-limiter-shared-pool.test.ts
   app.use('/api/supplies/search', searchLimiter);
   app.use('/api/pets', searchLimiter);
 
-  // checkoutLimiter — shared-pool design (intentional):
-  // The same checkoutLimiter instance is applied to both /api/orders and
-  // /api/create-payment-intent via two separate app.use() calls.  Because both
-  // calls share the same MemoryStore, they also share the same per-IP counter
-  // (10 req / 15 min).  A burst of /api/orders submissions will consume budget
-  // from the /api/create-payment-intent window and vice versa.  This is
-  // intentional: both endpoints are high-value write paths that represent a
-  // single checkout flow and should be subject to the same aggregate rate cap
-  // to prevent order-spam and payment-intent abuse.  If the two paths ever need
-  // independent budgets, create two separate rateLimit() instances with their
-  // own stores.
-  const checkoutLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 10,
-    standardHeaders: true,
-    legacyHeaders: false,
-    keyGenerator: getRealIp,
-    message: { message: "Too many checkout attempts, please try again later." },
-  });
+  // checkoutLimiter is imported from ./sharedLimiters (shared-pool singleton).
+  // Both routes reference the SAME instance so they share one per-IP counter.
+  // See server/sharedLimiters.ts for the full shared-pool contract.
   app.use('/api/orders', checkoutLimiter);
   app.use('/api/create-payment-intent', checkoutLimiter);
 
-  // uploadLimiter — shared-pool design (intentional):
-  // The same uploadLimiter instance is applied to both /api/upload and
-  // /api/admin/order-photos via two separate app.use() calls.  Because both
-  // calls share the same MemoryStore, they also share the same per-IP counter
-  // (30 req / 5 min).  A burst of /api/upload requests will consume budget
-  // from the /api/admin/order-photos window and vice versa.  This is
-  // intentional: both endpoints are high-cost file-processing paths that should
-  // be subject to the same aggregate rate cap to prevent upload abuse.  If the
-  // two paths ever need independent budgets, create two separate rateLimit()
-  // instances with their own stores.
-  const uploadLimiter = rateLimit({
-    windowMs: 5 * 60 * 1000,
-    max: 30,
-    standardHeaders: true,
-    legacyHeaders: false,
-    keyGenerator: getRealIp,
-    message: { message: "Too many uploads, please wait a few minutes." },
-  });
+  // uploadLimiter is imported from ./sharedLimiters (shared-pool singleton).
+  // Both routes reference the SAME instance so they share one per-IP counter.
+  // See server/sharedLimiters.ts for the full shared-pool contract.
+  // Regression guard: server/tests/upload-limiter-shared-pool.test.ts
   app.use('/api/upload', uploadLimiter);
   app.use('/api/admin/order-photos', uploadLimiter);
 
