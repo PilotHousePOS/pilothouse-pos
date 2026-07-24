@@ -498,6 +498,22 @@ describe(
         });
 
         expect(res.status).toBe(429);
+
+        // ── Body: user-facing message must match signupLimiter config ─────────
+        // If the message were accidentally changed or the handler were overriding
+        // the rate-limiter's default body, the client would receive a confusing or
+        // empty error.  This assertion pins the exact string so any unintentional
+        // change is caught immediately.
+        expect(res.body.message).toBe(
+          "Too many signup attempts, please try again in 15 minutes.",
+        );
+
+        // ── Header: ratelimit-remaining must be 0 on the blocking response ────
+        // express-rate-limit with standardHeaders: true sets ratelimit-remaining
+        // to 0 on a 429 response because the budget is fully exhausted.  A value
+        // above 0 would indicate the limiter is not enforcing the cap correctly.
+        const remaining = parseRemaining(res.headers as Record<string, string>);
+        expect(remaining).toBe(0);
       },
       30_000,
     );
