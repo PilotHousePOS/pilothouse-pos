@@ -243,7 +243,7 @@ export class WebhookHandlers {
           });
           
           // Update order to ready_for_pickup since payment is complete
-          await storage.updateOrderApprovalStatus(parseInt(orderId), 'ready_for_pickup');
+          await storage.updateOrderApprovalStatus(parseInt(orderId), 'ready_for_pickup', orderById.tenantId ?? undefined);
           
           // Track loyalty rewards for the customer (only if not already paid to prevent double-credit on webhook replay)
           if (!alreadyPaid && orderById.userId) {
@@ -278,7 +278,7 @@ export class WebhookHandlers {
     });
     
     // Update order to ready_for_pickup since payment is complete
-    await storage.updateOrderApprovalStatus(order.id, 'ready_for_pickup');
+    await storage.updateOrderApprovalStatus(order.id, 'ready_for_pickup', order.tenantId ?? undefined);
     
     // Track loyalty rewards for the customer (only if not already paid to prevent double-credit on webhook replay)
     if (!alreadyPaid && order.userId) {
@@ -398,7 +398,7 @@ export class WebhookHandlers {
         await storage.updateOrderStripePayment(order.id, {
           paymentStatus: 'refunded',
         });
-        await storage.updateOrderStatus(order.id, 'refunded');
+        await storage.updateOrderStatus(order.id, 'refunded', order.tenantId ?? undefined);
       }
       
       console.log(`Refund recorded for order #${order.id}: $${refundAmount.toFixed(2)} (${isFullRefund ? 'full' : 'partial'})`);

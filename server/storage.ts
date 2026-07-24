@@ -296,7 +296,7 @@ export interface IStorage {
   getRefundsByOrderId(orderId: number): Promise<Refund[]>;
   getRefundsByDateRange(startDate: Date, endDate: Date, tenantId?: number): Promise<Refund[]>;
   createRefund(refund: InsertRefund): Promise<Refund>;
-  updateOrderItemRefund(orderItemId: number, refundedQuantity: number, refundedAmount: string): Promise<void>;
+  updateOrderItemRefund(orderItemId: number, refundedQuantity: number, refundedAmount: string, tenantId?: number): Promise<void>;
   getRefundReportEmails(tenantId?: number): Promise<RefundReportSetting[]>;
   addRefundReportEmail(email: string, tenantId?: number): Promise<RefundReportSetting>;
   removeRefundReportEmail(id: number, tenantId?: number): Promise<void>;
@@ -331,7 +331,7 @@ export interface IStorage {
     appointmentTime?: string;
     groomerId?: number | null;
     serviceType?: string;
-  }): Promise<Appointment>;
+  }, tenantId?: number): Promise<Appointment>;
   clearAllAppointments(): Promise<void>;
   bulkCreateAppointments(appointments: InsertAppointment[]): Promise<Appointment[]>;
 
@@ -340,7 +340,7 @@ export interface IStorage {
   getAppointmentItemsBulk(appointmentIds: number[]): Promise<any[]>;
   addAppointmentItem(data: { appointmentId: number; supplyId?: number | null; name: string; sku?: string | null; brand?: string | null; category?: string | null; price: string; quantity: number }): Promise<any>;
   removeAppointmentItem(id: number): Promise<void>;
-  updateAppointmentItemPrice(id: number, price: string): Promise<any>;
+  updateAppointmentItemPrice(id: number, price: string, tenantId?: number): Promise<any>;
   getAppointmentItemsByDate(date: string, tenantId?: number): Promise<any[]>;
   
   // Appointment history operations
@@ -351,7 +351,7 @@ export interface IStorage {
   // Customer pet operations
   getCustomerPets(userId: string): Promise<CustomerPet[]>;
   createCustomerPet(pet: InsertCustomerPet): Promise<CustomerPet>;
-  updateCustomerPet(id: number, pet: Partial<InsertCustomerPet>): Promise<CustomerPet>;
+  updateCustomerPet(id: number, pet: Partial<InsertCustomerPet>, tenantId?: number): Promise<CustomerPet>;
   deleteCustomerPet(id: number): Promise<void>;
 
   // Grooming settings operations
@@ -436,7 +436,7 @@ export interface IStorage {
   getSpecialDateSetting(date: string, tenantId?: number): Promise<SpecialDateSetting | undefined>;
   getAllSpecialDateSettings(tenantId?: number): Promise<SpecialDateSetting[]>;
   createSpecialDateSetting(setting: InsertSpecialDateSetting): Promise<SpecialDateSetting>;
-  updateSpecialDateSetting(id: number, setting: Partial<InsertSpecialDateSetting>): Promise<SpecialDateSetting>;
+  updateSpecialDateSetting(id: number, setting: Partial<InsertSpecialDateSetting>, tenantId?: number): Promise<SpecialDateSetting>;
   deleteSpecialDateSetting(id: number, tenantId?: number): Promise<void>;
   getSpecialDateAllowedTimes(specialDateId: number): Promise<SpecialDateAllowedTime[]>;
   addSpecialDateAllowedTime(allowedTime: InsertSpecialDateAllowedTime): Promise<SpecialDateAllowedTime>;
@@ -536,10 +536,11 @@ export interface IStorage {
 /**
  * Throws immediately when tenantId is absent (undefined, null, or 0).
  *
- * Call this at the top of every storage delete method that operates on a
- * tenant-owned table so that a stranded account can never trigger an
- * unscoped DELETE.  Adding a new delete method without this call will be
- * caught by the enumeration test in
+ * Call this at the top of every storage update* or delete* method that
+ * operates on a tenant-owned table so that a stranded account can never
+ * trigger an unscoped mutation.  Adding a new method without this call will
+ * be caught by the enumeration tests in
+ * server/tests/storage-update-tenant-guard.test.ts and
  * server/tests/storage-delete-tenant-guard.test.ts.
  */
 function requireTenantId(
@@ -671,13 +672,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updatePet(id: number, pet: Partial<InsertPet>, tenantId?: number): Promise<Pet> {
-    const condition = tenantId
-      ? and(eq(pets.id, id), eq(pets.tenantId, tenantId))
-      : eq(pets.id, id);
+    requireTenantId(tenantId, "update a pet");
     const [updatedPet] = await db
       .update(pets)
       .set({ ...pet, updatedAt: new Date() })
-      .where(condition)
+      .where(and(eq(pets.id, id), eq(pets.tenantId, tenantId)))
       .returning();
     if (!updatedPet) throw new Error("Pet not found or access denied");
     return updatedPet;
@@ -1824,6 +1823,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateSupply(id: number, supply: Partial<InsertSupply>, tenantId?: number): Promise<Supply> {
+    requireTenantId(tenantId, "update a supply");
     // Keep UPC and SKU fields in sync - they should always have the same value
     const syncedSupply = { ...supply };
     if (syncedSupply.upc !== undefined && syncedSupply.sku === undefined) {
@@ -1835,13 +1835,10 @@ export class DatabaseStorage implements IStorage {
       syncedSupply.sku = syncedSupply.upc;
     }
     
-    const condition = tenantId
-      ? and(eq(supplies.id, id), eq(supplies.tenantId, tenantId))
-      : eq(supplies.id, id);
     const [updatedSupply] = await db
       .update(supplies)
       .set({ ...syncedSupply, updatedAt: new Date() })
-      .where(condition)
+      .where(and(eq(supplies.id, id), eq(supplies.tenantId, tenantId)))
       .returning();
     if (!updatedSupply) throw new Error("Supply not found or access denied");
     return updatedSupply;
@@ -2594,16 +2591,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateOrderStatus(id: number, status: string, tenantId?: number): Promise<Order> {
-    const where = tenantId ? and(eq(orders.id, id), eq(orders.tenantId, tenantId)) : eq(orders.id, id);
+    requireTenantId(tenantId, "update an order status");
     const [updated] = await db
       .update(orders)
       .set({ status, updatedAt: new Date() })
-      .where(where)
+      .where(and(eq(orders.id, id), eq(orders.tenantId, tenantId)))
       .returning();
     return updated;
   }
   
   async updateOrderApprovalStatus(id: number, approvalStatus: string, tenantId?: number): Promise<Order> {
+    requireTenantId(tenantId, "update an order approval status");
     const updateData: any = { approvalStatus, updatedAt: new Date() };
     
     // Set timestamps based on approval status
@@ -2617,11 +2615,10 @@ export class DatabaseStorage implements IStorage {
       updateData.status = 'completed';
     }
     
-    const where = tenantId ? and(eq(orders.id, id), eq(orders.tenantId, tenantId)) : eq(orders.id, id);
     const [updated] = await db
       .update(orders)
       .set(updateData)
-      .where(where)
+      .where(and(eq(orders.id, id), eq(orders.tenantId, tenantId)))
       .returning();
     return updated;
   }
@@ -2853,10 +2850,11 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(refunds.createdAt));
   }
 
-  async updateOrderItemRefund(orderItemId: number, refundedQuantity: number, refundedAmount: string): Promise<void> {
+  async updateOrderItemRefund(orderItemId: number, refundedQuantity: number, refundedAmount: string, tenantId?: number): Promise<void> {
+    requireTenantId(tenantId, "update an order item refund");
     await db.update(orderItems)
       .set({ refundedQuantity, refundedAmount })
-      .where(eq(orderItems.id, orderItemId));
+      .where(and(eq(orderItems.id, orderItemId), eq(orderItems.tenantId, tenantId)));
   }
 
   // Refund report settings
@@ -3008,19 +3006,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAppointmentStatus(id: number, status: string, tenantId?: number): Promise<Appointment> {
-    if (!tenantId) throw new Error("tenantId is required to update an appointment");
-    const where = tenantId ? and(eq(appointments.id, id), eq(appointments.tenantId, tenantId)) : eq(appointments.id, id);
+    requireTenantId(tenantId, "update an appointment");
     const [updated] = await db
       .update(appointments)
       .set({ status, updatedAt: new Date() })
-      .where(where)
+      .where(and(eq(appointments.id, id), eq(appointments.tenantId, tenantId)))
       .returning();
     if (!updated) throw new Error("Appointment not found or access denied");
     return updated;
   }
 
   async updateAppointmentIsHere(id: number, isHere: boolean, tenantId?: number): Promise<Appointment> {
-    if (tenantId === undefined) throw new Error("tenantId is required to update an appointment");
+    requireTenantId(tenantId, "update an appointment");
     // checkedIn is a permanent record — set to true when they arrive, never reset
     const setFields: any = { isHere, updatedAt: new Date() };
     if (isHere) setFields.checkedIn = true;
@@ -3035,7 +3032,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAppointmentIsPaid(id: number, isPaid: boolean, tenantId?: number): Promise<Appointment> {
-    if (tenantId === undefined) throw new Error("tenantId is required to update an appointment");
+    requireTenantId(tenantId, "update an appointment");
     // Do NOT clear readyForPayment here — online double-payment is already blocked by isPaid=true check.
     // Clearing it caused the "Mark Ready" button to reappear after payment when groomer had already marked ready.
     const setFields: any = { isPaid, updatedAt: new Date() };
@@ -3059,7 +3056,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAppointmentReadyForPayment(id: number, finalAmount: string, readyForPayment: boolean, tenantId?: number): Promise<Appointment> {
-    if (tenantId === undefined) throw new Error("tenantId is required to update an appointment");
+    requireTenantId(tenantId, "update an appointment");
     const where = and(eq(appointments.id, id), eq(appointments.tenantId, tenantId));
     const [updated] = await db
       .update(appointments)
@@ -3071,7 +3068,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAppointmentPaidOnline(id: number, sessionId: string, tenantId?: number): Promise<Appointment> {
-    if (tenantId === undefined) throw new Error("tenantId is required to update an appointment");
+    requireTenantId(tenantId, "update an appointment");
     const where = and(eq(appointments.id, id), eq(appointments.tenantId, tenantId));
     const [updated] = await db
       .update(appointments)
@@ -3082,7 +3079,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAppointmentGroomingCompleted(id: number, groomingCompleted: boolean, tenantId?: number): Promise<Appointment> {
-    if (tenantId === undefined) throw new Error("tenantId is required to update an appointment");
+    requireTenantId(tenantId, "update an appointment");
     const where = and(eq(appointments.id, id), eq(appointments.tenantId, tenantId));
     const [updated] = await db
       .update(appointments)
@@ -3132,10 +3129,11 @@ export class DatabaseStorage implements IStorage {
     await db.delete(appointmentItems).where(eq(appointmentItems.id, id));
   }
 
-  async updateAppointmentItemPrice(id: number, price: string): Promise<any> {
+  async updateAppointmentItemPrice(id: number, price: string, tenantId?: number): Promise<any> {
+    requireTenantId(tenantId, "update an appointment item price");
     const [item] = await db.update(appointmentItems)
       .set({ price })
-      .where(eq(appointmentItems.id, id))
+      .where(and(eq(appointmentItems.id, id), eq(appointmentItems.tenantId, tenantId)))
       .returning();
     return item;
   }
@@ -3345,7 +3343,8 @@ export class DatabaseStorage implements IStorage {
     appointmentTime?: string;
     groomerId?: number | null;
     serviceType?: string;
-  }): Promise<Appointment> {
+  }, tenantId?: number): Promise<Appointment> {
+    requireTenantId(tenantId, "update appointment details");
     const updateData: any = { updatedAt: new Date() };
     
     if (updates.ownerFirstName !== undefined) updateData.ownerFirstName = updates.ownerFirstName;
@@ -3364,7 +3363,7 @@ export class DatabaseStorage implements IStorage {
     const [updated] = await db
       .update(appointments)
       .set(updateData)
-      .where(eq(appointments.id, id))
+      .where(and(eq(appointments.id, id), eq(appointments.tenantId, tenantId)))
       .returning();
     return updated;
   }
@@ -3383,11 +3382,12 @@ export class DatabaseStorage implements IStorage {
     return newPet;
   }
 
-  async updateCustomerPet(id: number, pet: Partial<InsertCustomerPet>): Promise<CustomerPet> {
+  async updateCustomerPet(id: number, pet: Partial<InsertCustomerPet>, tenantId?: number): Promise<CustomerPet> {
+    requireTenantId(tenantId, "update a customer pet");
     const [updated] = await db
       .update(customerPets)
       .set({ ...pet, updatedAt: new Date() })
-      .where(eq(customerPets.id, id))
+      .where(and(eq(customerPets.id, id), eq(customerPets.tenantId, tenantId)))
       .returning();
     return updated;
   }
@@ -3445,13 +3445,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAppointmentHistoryRecord(id: number, data: Partial<{ appointmentDate: string; appointmentTime: string; petName: string; petType: string; breed: string; serviceType: string; groomerName: string; status: string; notes: string }>, tenantId?: number): Promise<AppointmentHistory> {
-    const condition = tenantId
-      ? and(eq(appointmentHistory.id, id), eq(appointmentHistory.tenantId, tenantId))
-      : eq(appointmentHistory.id, id);
+    requireTenantId(tenantId, "update an appointment history record");
     const [record] = await db
       .update(appointmentHistory)
       .set(data as any)
-      .where(condition)
+      .where(and(eq(appointmentHistory.id, id), eq(appointmentHistory.tenantId, tenantId)))
       .returning();
     if (!record) {
       throw new Error('Appointment history record not found or access denied');
@@ -3601,11 +3599,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateGroomer(id: number, groomerData: Partial<InsertGroomer>, tenantId?: number): Promise<Groomer> {
-    const where = tenantId ? and(eq(groomers.id, id), eq(groomers.tenantId, tenantId)) : eq(groomers.id, id);
+    requireTenantId(tenantId, "update a groomer");
     const [groomer] = await db
       .update(groomers)
       .set({ ...groomerData, updatedAt: new Date() })
-      .where(where)
+      .where(and(eq(groomers.id, id), eq(groomers.tenantId, tenantId)))
       .returning();
     return groomer;
   }
@@ -3675,13 +3673,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateGroomerAvailability(id: number, availabilityData: Partial<InsertGroomerAvailability>, tenantId?: number): Promise<GroomerAvailability> {
-    // Verify ownership via parent groomer if tenantId is provided
-    if (tenantId) {
-      const [existing] = await db.select().from(groomerAvailability)
-        .leftJoin(groomers, eq(groomerAvailability.groomerId, groomers.id))
-        .where(and(eq(groomerAvailability.id, id), eq(groomers.tenantId, tenantId)));
-      if (!existing) throw new Error('Not found or access denied');
-    }
+    requireTenantId(tenantId, "update groomer availability");
+    // Verify ownership via parent groomer
+    const [existing] = await db.select().from(groomerAvailability)
+      .leftJoin(groomers, eq(groomerAvailability.groomerId, groomers.id))
+      .where(and(eq(groomerAvailability.id, id), eq(groomers.tenantId, tenantId)));
+    if (!existing) throw new Error('Not found or access denied');
     const [availability] = await db
       .update(groomerAvailability)
       .set({ ...availabilityData, updatedAt: new Date() })
@@ -3814,12 +3811,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateContact(id: number, contact: Partial<InsertContact>, tenantId?: number): Promise<Contact> {
-    if (!tenantId) throw new Error("tenantId is required to update a contact");
-    const where = tenantId ? and(eq(contacts.id, id), eq(contacts.tenantId, tenantId)) : eq(contacts.id, id);
+    requireTenantId(tenantId, "update a contact");
     const [updatedContact] = await db
       .update(contacts)
       .set({ ...contact, updatedAt: new Date() })
-      .where(where)
+      .where(and(eq(contacts.id, id), eq(contacts.tenantId, tenantId)))
       .returning();
     if (!updatedContact) throw new Error("Contact not found or access denied");
     return updatedContact;
@@ -3890,13 +3886,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateContactSmsOptOut(contactId: number, optOut: boolean, tenantId?: number): Promise<Contact> {
-    const where = tenantId
-      ? and(eq(contacts.id, contactId), eq(contacts.tenantId, tenantId))
-      : eq(contacts.id, contactId);
+    requireTenantId(tenantId, "update a contact SMS opt-out");
     const [updated] = await db
       .update(contacts)
       .set({ smsOptOut: optOut, updatedAt: new Date() })
-      .where(where)
+      .where(and(eq(contacts.id, contactId), eq(contacts.tenantId, tenantId)))
       .returning();
     if (!updated) throw new Error("Contact not found or does not belong to this tenant");
     return updated;
@@ -4126,11 +4120,12 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
-  async updateSpecialDateSetting(id: number, settingData: Partial<InsertSpecialDateSetting>): Promise<SpecialDateSetting> {
+  async updateSpecialDateSetting(id: number, settingData: Partial<InsertSpecialDateSetting>, tenantId?: number): Promise<SpecialDateSetting> {
+    requireTenantId(tenantId, "update a special date setting");
     const [result] = await db
       .update(specialDateSettings)
       .set({ ...settingData, updatedAt: new Date() })
-      .where(eq(specialDateSettings.id, id))
+      .where(and(eq(specialDateSettings.id, id), eq(specialDateSettings.tenantId, tenantId)))
       .returning();
     return result;
   }
@@ -4639,9 +4634,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateBoardingRecord(id: number, record: Partial<InsertBoardingRecord>, tenantId?: number): Promise<BoardingRecord> {
-    // Refuse to mutate without a tenant scope — prevents cross-tenant writes
-    // from a stranded account (tenantId = null/undefined).
-    if (!tenantId) throw new Error("tenantId is required to update a boarding record");
+    requireTenantId(tenantId, "update a boarding record");
     const [updated] = await db
       .update(boardingRecords)
       .set({ ...record, updatedAt: new Date() })
@@ -4713,11 +4706,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateScheduleEntry(id: number, entry: Partial<InsertScheduleEntry>, tenantId?: number): Promise<ScheduleEntry> {
-    const where = tenantId ? and(eq(scheduleEntries.id, id), eq(scheduleEntries.tenantId, tenantId)) : eq(scheduleEntries.id, id);
+    requireTenantId(tenantId, "update a schedule entry");
     const [updated] = await db
       .update(scheduleEntries)
       .set({ ...entry, updatedAt: new Date() })
-      .where(where)
+      .where(and(eq(scheduleEntries.id, id), eq(scheduleEntries.tenantId, tenantId)))
       .returning();
     return updated;
   }
@@ -4753,11 +4746,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateGroomingScheduleEntry(id: number, entry: Partial<InsertGroomingScheduleEntry>, tenantId?: number): Promise<GroomingScheduleEntry> {
-    const where = tenantId ? and(eq(groomingScheduleEntries.id, id), eq(groomingScheduleEntries.tenantId, tenantId)) : eq(groomingScheduleEntries.id, id);
+    requireTenantId(tenantId, "update a grooming schedule entry");
     const [updated] = await db
       .update(groomingScheduleEntries)
       .set({ ...entry, updatedAt: new Date() })
-      .where(where)
+      .where(and(eq(groomingScheduleEntries.id, id), eq(groomingScheduleEntries.tenantId, tenantId)))
       .returning();
     return updated;
   }
@@ -5000,19 +4993,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateLoyaltySettings(settings: { spendingThreshold?: string; rewardAmount?: string; isActive?: boolean }, tenantId?: number): Promise<{ spendingThreshold: string; rewardAmount: string; isActive: boolean }> {
+    requireTenantId(tenantId, "update loyalty settings");
     try {
       const existing = await this.getLoyaltySettings(tenantId);
-      const whereClause = tenantId ? eq(loyaltySettings.tenantId, tenantId) : undefined;
-      const updateQuery = db.update(loyaltySettings)
+      const [updated] = await db.update(loyaltySettings)
         .set({
           spendingThreshold: settings.spendingThreshold ?? existing.spendingThreshold,
           rewardAmount: settings.rewardAmount ?? existing.rewardAmount,
           isActive: settings.isActive ?? existing.isActive,
           updatedAt: new Date()
-        });
-      const [updated] = whereClause
-        ? await updateQuery.where(whereClause).returning()
-        : await updateQuery.returning();
+        })
+        .where(eq(loyaltySettings.tenantId, tenantId))
+        .returning();
       if (!updated) {
         // Insert if no rows updated
         const [newSettings] = await db.insert(loyaltySettings).values({
@@ -5248,11 +5240,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateJobApplicationStatus(id: number, status: string, adminNotes?: string, tenantId?: number): Promise<JobApplication> {
+    requireTenantId(tenantId, "update a job application status");
     const updates: any = { status };
     if (adminNotes !== undefined) updates.adminNotes = adminNotes;
-    const conditions = [eq(jobApplications.id, id)];
-    if (tenantId !== undefined) conditions.push(eq(jobApplications.tenantId, tenantId));
-    const [updated] = await db.update(jobApplications).set(updates).where(and(...conditions)).returning();
+    const [updated] = await db.update(jobApplications).set(updates)
+      .where(and(eq(jobApplications.id, id), eq(jobApplications.tenantId, tenantId)))
+      .returning();
     return updated;
   }
 

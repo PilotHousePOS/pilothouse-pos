@@ -5483,7 +5483,7 @@ West Monroe LA 71291
         
         // Update order item refund tracking
         if (item.orderItemId && item.quantity) {
-          await storage.updateOrderItemRefund(item.orderItemId, item.quantity, item.total);
+          await storage.updateOrderItemRefund(item.orderItemId, item.quantity, item.total, tenantId);
         }
         
         createdRefunds.push(refund);
@@ -6454,7 +6454,7 @@ West Monroe LA 71291
       const appointment = await withRetry(async () => {
         return await db.transaction(async (tx) => {
           // Update appointment
-          const updatedAppointment = await storage.updateAppointmentDetails(id, updates);
+          const updatedAppointment = await storage.updateAppointmentDetails(id, updates, (req as any).tenantId);
           
           // Update appointment_pets if pets array provided
           if (pets && Array.isArray(pets)) {
@@ -6601,7 +6601,7 @@ West Monroe LA 71291
       if (!targetItem) return res.status(404).json({ message: "Appointment item not found" });
       const { price } = req.body;
       if (!price) return res.status(400).json({ message: "price is required" });
-      const item = await storage.updateAppointmentItemPrice(itemId, String(price));
+      const item = await storage.updateAppointmentItemPrice(itemId, String(price), tenantId);
       res.json(item);
     } catch (e: any) {
       res.status(500).json({ message: e.message });
@@ -7824,13 +7824,14 @@ West Monroe LA 71291
   app.patch("/api/customer-pets/:id", authMiddleware, async (req: any, res) => {
     try {
       const userId = req.user?.id;
+      const tenantId: number | undefined = req.tenantId;
       const petId = parseInt(req.params.id);
       const pets = await storage.getCustomerPets(userId);
       if (!pets.find((p: any) => p.id === petId)) {
         return res.status(403).json({ message: "Not your pet" });
       }
       const { name, species, breed, age, notes } = req.body;
-      const updated = await storage.updateCustomerPet(petId, { name, species, breed, age, notes });
+      const updated = await storage.updateCustomerPet(petId, { name, species, breed, age, notes }, tenantId);
       res.json(updated);
     } catch (error) {
       console.error("Error updating customer pet:", error);
@@ -10681,11 +10682,14 @@ West Monroe LA 71291
         return res.status(403).json({ message: "Admin access required" });
       }
 
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+
       const { id } = req.params;
       const { date, name, allowedTimes } = req.body;
 
       // Update the special date setting
-      const setting = await storage.updateSpecialDateSetting(parseInt(id), { date, name });
+      const setting = await storage.updateSpecialDateSetting(parseInt(id), { date, name }, tenantId);
 
       // If allowedTimes is provided, update them
       if (allowedTimes && Array.isArray(allowedTimes)) {
