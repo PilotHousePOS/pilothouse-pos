@@ -1528,6 +1528,63 @@ describe("storage.updateAppointmentPaidOnline — storage-layer guard", () => {
     expect(result.paidOnline).toBe(true);
     expect(result.groomingStripeSessionId).toBe("sess_legit");
   });
+
+  // ── Cross-tenant guard ──────────────────────────────────────────────────────
+
+  describe("cross-tenant isolation", () => {
+    let tenantBId: number;
+
+    beforeAll(async () => {
+      const sfx = Math.random().toString(36).slice(2, 9);
+      const result = await db.execute(
+        sql`INSERT INTO tenants (name, slug, subscription_status, subscription_tier)
+            VALUES (${"TenantB-" + sfx}, ${"tenant-b-" + sfx}, 'active', 'starter')
+            RETURNING id`,
+      );
+      tenantBId = (result.rows[0] as { id: number }).id;
+    });
+
+    afterAll(async () => {
+      if (tenantBId) {
+        await db.execute(sql`DELETE FROM tenants WHERE id = ${tenantBId}`);
+      }
+    });
+
+    it("returns undefined when tenantId belongs to a different tenant (cross-tenant call)", async () => {
+      const result = await storage.updateAppointmentPaidOnline(
+        seededAppointmentId,
+        "sess_cross_tenant",
+        tenantBId
+      );
+      expect(result).toBeUndefined();
+    });
+
+    it("does NOT mutate the appointment record when called with a different tenant's ID", async () => {
+      const [before] = await db
+        .select()
+        .from(appointments)
+        .where(eq(appointments.id, seededAppointmentId));
+
+      const sessionIdBefore = before?.groomingStripeSessionId;
+
+      await storage.updateAppointmentPaidOnline(
+        seededAppointmentId,
+        "sess_cross_tenant_mutate",
+        tenantBId
+      );
+
+      const [after] = await db
+        .select()
+        .from(appointments)
+        .where(eq(appointments.id, seededAppointmentId));
+
+      // Record must still belong to tenant A
+      expect(after?.tenantId).toBe(realTenantId);
+      // Session ID must not have been overwritten by the cross-tenant caller
+      expect(after?.groomingStripeSessionId).toBe(sessionIdBefore);
+      expect(after?.groomingStripeSessionId).not.toBe("sess_cross_tenant_mutate");
+    });
+  });
 });
 
 // ─── Storage-layer unit tests — updateAppointmentGroomingCompleted ────────────
