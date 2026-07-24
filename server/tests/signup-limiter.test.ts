@@ -1,7 +1,7 @@
 /**
  * Tests: signupLimiter — rate limiting for POST /api/auth/signup
  *
- * Two scenarios are covered:
+ * Three scenarios are covered:
  *
  *  1. After 15 slug-bearing signup attempts the signupLimiter returns 429.
  *     Because each fresh Express app instance carries a fresh in-memory rate-limit
@@ -12,9 +12,15 @@
  *     demonstrates that the signupLimiter skip (`!req.tenantId`) does NOT
  *     create an unprotected path: the 503 itself acts as the guard.
  *
+ *  3. A second app instance (simulating a server restart) always starts with a
+ *     fresh MemoryStore — it cannot inherit an inflated counter from a previous
+ *     instance even if that instance had already consumed most of the budget.
+ *     This documents the in-memory-reset guarantee and will need updating if a
+ *     persistent store (e.g. Redis) is ever added.
+ *
  * Neither scenario touches production data — scenario 1 uses a real tenant row
  * for slug resolution but intentionally sends invalid bodies that will fail
- * before user creation.
+ * before user creation.  Scenarios 2 and 3 are entirely self-contained.
  */
 
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
@@ -111,6 +117,7 @@ describe("signupLimiter — rate limit fires after 15 slug-bearing attempts", ()
 
 // ─── Scenario 2: tenantMiddleware 503 path still blocks signup requests ───────
 
+
 describe("signupLimiter — tenantMiddleware 503 path does not leave signup unprotected", () => {
   let agent: ReturnType<typeof supertest>;
 
@@ -177,6 +184,97 @@ describe("signupLimiter — tenantMiddleware 503 path does not leave signup unpr
         // Must be 503 (from broken tenantMiddleware), never 200 (handler) or
         // 429 (limiter — which would also mean the skip didn't fire correctly).
         expect(res.status).toBe(503);
+      }
+    },
+    60_000,
+  );
+});
+
+// ─── Scenario 3: counter resets to zero on a fresh server instance ────────────
+
+describe("signupLimiter — counter resets cleanly between server restarts", () => {
+  /**
+   * Helper that builds a self-contained minimal app whose signupLimiter mirrors
+   * the real routes.ts definition.  A middleware attached to /api injects a fake
+   * tenantId so the limiter's skip() function (`!req.tenantId`) never fires —
+   * every request is counted.
+   *
+   * Returns a supertest agent bound to that app.
+   */
+  function buildApp(): ReturnType<typeof supertest> {
+    const app = express();
+    app.use(express.json());
+    app.use(cookieParser());
+
+    // Inject a synthetic tenantId so the limiter always counts requests
+    app.use("/api", (req: any, _res: any, next: any) => {
+      req.tenantId = 1;
+      next();
+    });
+
+    // Exact copy of the signupLimiter from routes.ts
+    const limiter = rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 15,
+      standardHeaders: true,
+      legacyHeaders: false,
+      message: {
+        message: "Too many signup attempts, please try again in 15 minutes.",
+      },
+      skip: (req: any) => !req.tenantId,
+    });
+    app.use("/api/auth/signup", limiter);
+
+    // Dummy handler — returns 200 when the limiter allows the request through
+    app.post("/api/auth/signup", (_req, res) => {
+      res.status(200).json({ ok: true });
+    });
+
+    return supertest(app);
+  }
+
+  it(
+    "second app instance starts at counter 0 even after first instance nearly reached the limit",
+    async () => {
+      // ── First instance: exhaust 14 of the 15 allowed requests ──────────────
+      const firstAgent = buildApp();
+
+      for (let i = 0; i < 14; i++) {
+        const res = await firstAgent
+          .post("/api/auth/signup")
+          .send({ email: `first-${i}@test.local` });
+
+        // The limiter should not have triggered yet (counter ≤ 14 < 15).
+        expect(res.status).not.toBe(429);
+      }
+
+      // Confirm one more request still succeeds on the first instance (15th,
+      // still within the budget).
+      const fifteenth = await firstAgent
+        .post("/api/auth/signup")
+        .send({ email: "first-15@test.local" });
+      expect(fifteenth.status).not.toBe(429);
+
+      // Confirm the very next request on the first instance is rate-limited
+      // (16th hit — over the budget of 15).
+      const overLimit = await firstAgent
+        .post("/api/auth/signup")
+        .send({ email: "first-16@test.local" });
+      expect(overLimit.status).toBe(429);
+
+      // ── Second instance: simulates a server restart ─────────────────────────
+      // A new rateLimit() call creates a brand-new MemoryStore; it has no
+      // knowledge of the first instance's counter.
+      const secondAgent = buildApp();
+
+      // The second instance must accept requests starting from counter 0.
+      // We send 5 requests to confirm it is not blocked from the outset.
+      for (let i = 0; i < 5; i++) {
+        const res = await secondAgent
+          .post("/api/auth/signup")
+          .send({ email: `second-${i}@test.local` });
+
+        expect(res.status).toBe(200);
       }
     },
     60_000,
