@@ -21,7 +21,7 @@
  * 400 before the searchLimiter middleware has a chance to run.
  */
 
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 import express from "express";
 import cookieParser from "cookie-parser";
 import supertest from "supertest";
@@ -163,6 +163,52 @@ describe("searchLimiter shared-pool — /api/supplies/search traffic depletes /a
         petsRes.body?.message,
         "429 body on /api/pets should carry the searchLimiter message",
       ).toMatch(/too many search requests/i);
+    },
+    30_000,
+  );
+});
+
+describe("searchLimiter window reset — counter clears after 1-minute windowMs expires", () => {
+  /**
+   * After the shared-pool tests above have exhausted the 60 req/min budget,
+   * the searchLimiter's MemoryStore still holds a counter ≥ 60 for the test
+   * IP ("::ffff:127.0.0.1").  express-rate-limit's MemoryStore resets a
+   * bucket when Date.now() ≥ bucket.resetTime (i.e. windowMs has elapsed).
+   *
+   * This test advances Date.now() by 61 seconds (past the 1-minute windowMs)
+   * and confirms that the next request is NOT blocked — proving the window
+   * actually resets rather than blocking the IP forever.
+   */
+
+  it(
+    "allows requests again after the 1-minute windowMs elapses — counter reset confirmed",
+    async () => {
+      // Capture the real Date.now() before mocking so we can restore it.
+      const realNow = Date.now();
+
+      // Advance the clock by 61 seconds — just past the 1-minute windowMs.
+      // express-rate-limit's MemoryStore compares Date.now() against the
+      // stored resetTime on every hit; returning a value ≥ resetTime causes
+      // it to reset the counter to 1 (for the current request) instead of
+      // incrementing past the limit.
+      const dateSpy = vi
+        .spyOn(Date, "now")
+        .mockReturnValue(realNow + 61_000);
+
+      try {
+        const res = await agent
+          .get("/api/supplies/search")
+          .set("X-Tenant-Slug", testTenantSlug)
+          .query({ q: "window-reset-probe" });
+
+        expect(
+          res.status,
+          `After 61 s the searchLimiter window should have reset, ` +
+            `but /api/supplies/search returned ${res.status} (expected non-429)`,
+        ).not.toBe(429);
+      } finally {
+        dateSpy.mockRestore();
+      }
     },
     30_000,
   );
