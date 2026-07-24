@@ -68,7 +68,7 @@ import { categorizeProduct, detectLiveAnimal } from './productCategorization';
 import { registerBillingRoutes } from './billingRoutes';
 // Shared-pool limiters MUST be imported from sharedLimiters.ts — never
 // re-created inline.  See server/sharedLimiters.ts for the full explanation.
-import { getRealIp, searchLimiter, checkoutLimiter, uploadLimiter } from './sharedLimiters';
+import { getRealIp, authLimiter, searchLimiter, checkoutLimiter, uploadLimiter } from './sharedLimiters';
 
 // Helper: clean a name string — collapse extra spaces, trim
 function cleanName(name: string | undefined | null): string {
@@ -352,52 +352,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   });
   app.use('/api', generalLimiter);
 
-  // ─── SECURITY: authLimiter keyGenerator — DO NOT REMOVE OR SIMPLIFY ────────
-  //
-  // WHY keyGenerator: getRealIp EXISTS
-  // ------------------------------------
-  // express-rate-limit's default key is req.ip. When Express is configured with
-  // `app.set("trust proxy", 1)` (as this app is), req.ip resolves to the
-  // LEFTMOST X-Forwarded-For entry — a value the client controls directly.
-  //
-  // An attacker can prepend a different fake IP on every request from a single
-  // TCP connection:
-  //   Request 1: X-Forwarded-For: 1.1.1.1, <real-proxy-ip>   → fresh bucket A
-  //   Request 2: X-Forwarded-For: 2.2.2.2, <real-proxy-ip>   → fresh bucket B
-  //   ...
-  // This creates a new per-IP counter each time, completely defeating the limit
-  // and enabling unlimited credential-stuffing / brute-force attacks on login.
-  //
-  // CONSEQUENCE OF REMOVING OR REPLACING keyGenerator
-  // ---------------------------------------------------
-  // Removing `keyGenerator: getRealIp` (or replacing it with a function that
-  // reads req.ip or the leftmost XFF entry) silently re-opens this bypass.
-  // A single attacker with one IP can make unlimited login attempts, exhausting
-  // the credential space for any account.
-  //
-  // THE FIX
-  // --------
-  // getRealIp always reads the RIGHTMOST XFF entry — the one Replit's edge proxy
-  // appends and that the client cannot forge. All requests from the same real
-  // connection share one rate-limit bucket regardless of the spoofed prefix.
-  //
-  // REGRESSION TEST
-  // ---------------
-  // server/tests/auth-limiter-xff-bypass.test.ts verifies this property:
-  // 15 requests with rotating leftmost IPs are all counted in the same bucket,
-  // and the 16th is blocked (429). If keyGenerator is ever dropped, that test
-  // will fail, surfacing the regression before it reaches production.
-  //
-  // See also: docs/adr/002-auth-limiter-xff-keyGenerator.md
-  // ─────────────────────────────────────────────────────────────────────────────
-  const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 15,
-    standardHeaders: true,
-    legacyHeaders: false,
-    keyGenerator: getRealIp,
-    message: { message: "Too many login attempts, please try again in 15 minutes." },
-  });
+  // authLimiter is imported from ./sharedLimiters (shared-pool singleton).
+  // Creating a new rateLimit() call here — or in any future auth router file —
+  // silently gives those routes an independent budget, bypassing brute-force
+  // protection.  See server/sharedLimiters.ts for the full contract and the
+  // regression test: server/tests/auth-limiter-xff-bypass.test.ts
   app.use('/api/auth/login', authLimiter);
   app.use('/api/auth/register', authLimiter);
   app.use('/api/auth/forgot-password', authLimiter);

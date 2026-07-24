@@ -43,6 +43,7 @@
  * server/tests/upload-limiter-shared-pool.test.ts
  * server/tests/search-limiter-shared-pool.test.ts
  * server/tests/checkout-limiter-shared-pool.test.ts
+ * server/tests/auth-limiter-xff-bypass.test.ts
  *
  * These tests verify the shared-pool property by exhausting the budget on one
  * route and confirming the sibling route is also blocked.  If you ever split a
@@ -80,6 +81,48 @@ export function getRealIp(req: Request): string {
   }
   return (req as any).socket?.remoteAddress ?? "unknown";
 }
+
+// ─── authLimiter — brute-force protection for all auth endpoints ──────────────
+//
+// Applied to /api/auth/login, /api/auth/register, /api/auth/forgot-password,
+// /api/auth/reset-password, /api/auth/change-password, /api/auth/verify-email,
+// and /api/auth/resend-verification (same instance → same pool).
+//
+// All auth routes share one 15-attempt / 15-minute budget per real IP.
+// Moving any auth route to a separate router file MUST still import this export
+// — creating a new rateLimit() call there would give that route its own
+// independent budget and silently bypass the brute-force protection.
+//
+// WHY keyGenerator: getRealIp EXISTS
+// ------------------------------------
+// express-rate-limit's default key is req.ip.  When Express is configured with
+// `app.set("trust proxy", 1)` (as this app is), req.ip resolves to the LEFTMOST
+// X-Forwarded-For entry — a value the client controls directly.
+//
+// An attacker can prepend a different fake IP on every request from a single
+// TCP connection, creating a new per-IP counter each time and completely
+// defeating the limit.  getRealIp always reads the RIGHTMOST XFF entry — the
+// one Replit's edge proxy appends and that the client cannot forge.
+//
+// CONSEQUENCE OF REMOVING OR REPLACING keyGenerator
+// ---------------------------------------------------
+// Removing `keyGenerator: getRealIp` (or replacing it with a function that
+// reads req.ip or the leftmost XFF entry) silently re-opens this bypass.
+// A single attacker with one IP can make unlimited login attempts.
+//
+// Regression test: server/tests/auth-limiter-xff-bypass.test.ts
+// See also: docs/adr/002-auth-limiter-xff-keyGenerator.md
+//
+// ⚠  DO NOT create a second rateLimit() call for any auth route.
+//    If you need independent budgets per endpoint, define two named exports here.
+export const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: getRealIp,
+  message: { message: "Too many login attempts, please try again in 15 minutes." },
+});
 
 // ─── searchLimiter — shared-pool design (intentional) ────────────────────────
 //
