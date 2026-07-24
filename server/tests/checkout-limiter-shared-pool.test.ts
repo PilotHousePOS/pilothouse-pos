@@ -23,7 +23,7 @@
  * 400 before the checkoutLimiter middleware has a chance to run.
  */
 
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 import express from "express";
 import cookieParser from "cookie-parser";
 import supertest from "supertest";
@@ -94,6 +94,92 @@ afterAll(async () => {
 }, 30_000);
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
+
+describe("checkoutLimiter window-reset — counter clears after the 15-minute windowMs expires", () => {
+  /**
+   * This describe block uses a dedicated source IP (via X-Forwarded-For) so it
+   * starts with a fresh rate-limit bucket that is completely separate from the
+   * shared-pool tests below, which run against the default loopback address.
+   *
+   * Verification strategy:
+   *   1. Exhaust the checkoutLimiter for the dedicated IP (10 requests).
+   *   2. Confirm the 11th request is blocked (429).
+   *   3. Spy on Date.now() and fast-forward the virtual clock past windowMs
+   *      (15 min + 1 ms).  express-rate-limit's MemoryStore compares timestamps
+   *      with Date.now() on every request, so advancing the virtual clock is
+   *      sufficient — no real sleep needed.
+   *   4. Confirm the next request is no longer blocked (counter has reset).
+   *
+   * NOTE: Only Date.now() is mocked — setTimeout/setInterval are left real so
+   * that supertest's internal async operations are not affected.
+   */
+
+  // A unique fake IP to get a fresh bucket in the shared MemoryStore.
+  // getRealIp() reads the rightmost X-Forwarded-For entry, so this value will
+  // be used as the rate-limit key for every request in this describe block.
+  const RESET_TEST_IP = "10.99.1.1";
+  const CHECKOUT_LIMITER_MAX = 10;
+  const WINDOW_MS = 15 * 60 * 1000; // must match windowMs in sharedLimiters.ts
+
+  it(
+    "allows POST /api/orders again after the 15-minute window expires",
+    async () => {
+      // ── Step 1: exhaust the budget for RESET_TEST_IP ──────────────────────
+      for (let i = 0; i < CHECKOUT_LIMITER_MAX; i++) {
+        const res = await agent
+          .post("/api/orders")
+          .set("X-Tenant-Slug", testTenantSlug)
+          .set("X-Forwarded-For", RESET_TEST_IP);
+
+        expect(
+          res.status,
+          `request ${i + 1}/${CHECKOUT_LIMITER_MAX} should not be rate-limited before budget is exhausted`,
+        ).not.toBe(429);
+      }
+
+      // ── Step 2: confirm the budget is now exhausted ───────────────────────
+      const blockedRes = await agent
+        .post("/api/orders")
+        .set("X-Tenant-Slug", testTenantSlug)
+        .set("X-Forwarded-For", RESET_TEST_IP);
+
+      expect(
+        blockedRes.status,
+        `11th POST /api/orders should be blocked (429) but got ${blockedRes.status}`,
+      ).toBe(429);
+
+      expect(
+        blockedRes.body?.message,
+        "429 body should carry the checkoutLimiter message",
+      ).toMatch(/too many checkout attempts/i);
+
+      // ── Step 3: advance the virtual clock past windowMs ───────────────────
+      // Spy on Date.now() so that express-rate-limit's MemoryStore sees a
+      // timestamp that is beyond the 15-minute window.  We only mock Date.now()
+      // (not timers) to keep supertest's async internals working normally.
+      const realNow = Date.now();
+      const dateSpy = vi
+        .spyOn(Date, "now")
+        .mockReturnValue(realNow + WINDOW_MS + 1);
+
+      try {
+        // ── Step 4: confirm the counter has reset ─────────────────────────
+        const afterResetRes = await agent
+          .post("/api/orders")
+          .set("X-Tenant-Slug", testTenantSlug)
+          .set("X-Forwarded-For", RESET_TEST_IP);
+
+        expect(
+          afterResetRes.status,
+          `POST /api/orders should be allowed after the ${WINDOW_MS}ms window expires, but got ${afterResetRes.status}`,
+        ).not.toBe(429);
+      } finally {
+        dateSpy.mockRestore();
+      }
+    },
+    120_000,
+  );
+});
 
 describe("checkoutLimiter shared-pool — /api/orders traffic depletes /api/create-payment-intent budget", () => {
   /**
