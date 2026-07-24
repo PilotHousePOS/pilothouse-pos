@@ -22,6 +22,7 @@ import {
   orders,
   contacts,
   boardingRecords,
+  appointmentHistory,
 } from "@shared/schema";
 import { eq, sql } from "drizzle-orm";
 import { generateToken } from "../auth";
@@ -49,6 +50,7 @@ let seededAppointmentId: number;
 let seededOrderId: number;
 let seededContactId: number;
 let seededBoardingRecordId: number;
+let seededHistoryId: number;
 
 /** Supertest agent bound to the test Express app */
 let agent: ReturnType<typeof supertest>;
@@ -215,11 +217,29 @@ beforeAll(async () => {
     .returning();
   seededBoardingRecordId = boardingRecord.id;
 
+  // Seed a contact history record belonging to the real tenant / real contact
+  const [historyRecord] = await db
+    .insert(appointmentHistory)
+    .values({
+      tenantId: realTenantId,
+      contactId: seededContactId,
+      appointmentDate: "2099-12-31",
+      appointmentTime: "10:00 AM",
+      petName: "FluffyHistory",
+      petType: "Dog",
+      serviceType: "Full Grooming",
+      status: "completed",
+    })
+    .returning();
+  seededHistoryId = historyRecord.id;
+
   const app = await buildTestApp();
   agent = supertest(app);
 }, 60_000);
 
 afterAll(async () => {
+  if (seededHistoryId)
+    await db.delete(appointmentHistory).where(eq(appointmentHistory.id, seededHistoryId));
   if (seededBoardingRecordId)
     await db.delete(boardingRecords).where(eq(boardingRecords.id, seededBoardingRecordId));
   if (seededContactId)
@@ -1008,5 +1028,94 @@ describe("PATCH /api/contacts/:id/sms-opt-out — stranded user cannot update SM
 
     expect(row).toBeDefined();
     expect(row.smsOptOut).toBe(false);
+  });
+});
+
+// ─── PUT /api/contacts/history/:historyId — stranded users ───────────────────
+//
+// The handler first checks isSuperiorManager, but tenantMiddleware should
+// block any stranded account (tenantId = null) before the handler executes,
+// returning 403.  The seeded history record must remain unmodified after every
+// rejected attempt.
+
+describe("PUT /api/contacts/history/:historyId — stranded user cannot mutate a history record", () => {
+  it("returns HTTP 403 for a stranded regular user (no tenant, no slug header)", async () => {
+    const res = await agent
+      .put(`/api/contacts/history/${seededHistoryId}`)
+      .set("Authorization", `Bearer ${strandedUserToken}`)
+      .send({ notes: "stranded-user-injection" });
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant)", async () => {
+    const res = await agent
+      .put(`/api/contacts/history/${seededHistoryId}`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`)
+      .send({ notes: "stranded-admin-injection" });
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded groomer (isGroomer=true, no tenant)", async () => {
+    const res = await agent
+      .put(`/api/contacts/history/${seededHistoryId}`)
+      .set("Authorization", `Bearer ${strandedGroomerToken}`)
+      .send({ notes: "stranded-groomer-injection" });
+
+    expect(res.status).toBe(403);
+  });
+
+  it("leaves the seeded history record unmodified after all rejected PUT attempts", async () => {
+    const [row] = await db
+      .select()
+      .from(appointmentHistory)
+      .where(eq(appointmentHistory.id, seededHistoryId));
+
+    expect(row).toBeDefined();
+    // notes was null when seeded; all injection attempts must have been blocked
+    expect(row.notes).toBeNull();
+  });
+});
+
+// ─── DELETE /api/contacts/history/:historyId — stranded users ────────────────
+//
+// Same tenantMiddleware gate applies.  The seeded history record must still
+// exist in the database after every rejected DELETE attempt.
+
+describe("DELETE /api/contacts/history/:historyId — stranded user cannot delete a history record", () => {
+  it("returns HTTP 403 for a stranded regular user (no tenant, no slug header)", async () => {
+    const res = await agent
+      .delete(`/api/contacts/history/${seededHistoryId}`)
+      .set("Authorization", `Bearer ${strandedUserToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant)", async () => {
+    const res = await agent
+      .delete(`/api/contacts/history/${seededHistoryId}`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded groomer (isGroomer=true, no tenant)", async () => {
+    const res = await agent
+      .delete(`/api/contacts/history/${seededHistoryId}`)
+      .set("Authorization", `Bearer ${strandedGroomerToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("confirms the seeded history record still exists after all rejected DELETE attempts", async () => {
+    const [row] = await db
+      .select()
+      .from(appointmentHistory)
+      .where(eq(appointmentHistory.id, seededHistoryId));
+
+    // Record must still be present — none of the stranded deletes went through
+    expect(row).toBeDefined();
+    expect(row.id).toBe(seededHistoryId);
   });
 });
