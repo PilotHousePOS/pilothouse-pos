@@ -1345,3 +1345,43 @@ describe("storage.updateContact — storage-layer guard", () => {
     expect(result.name).toBe("Legitimate Update");
   });
 });
+
+// ─── Route-level tests — DELETE /api/admin/appointments/:id ──────────────────
+
+describe("DELETE /api/admin/appointments/:id — stranded user cannot delete an appointment", () => {
+  it("returns HTTP 403 for a stranded regular user (no tenant, no slug header)", async () => {
+    const res = await agent
+      .delete(`/api/admin/appointments/${seededAppointmentId}`)
+      .set("Authorization", `Bearer ${strandedUserToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .delete(`/api/admin/appointments/${seededAppointmentId}`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded groomer (isGroomer=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .delete(`/api/admin/appointments/${seededAppointmentId}`)
+      .set("Authorization", `Bearer ${strandedGroomerToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("confirms the seeded appointment still exists after all rejected DELETE attempts", async () => {
+    const [row] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+
+    // Record must still be present — none of the stranded deletes went through
+    expect(row).toBeDefined();
+    expect(row.id).toBe(seededAppointmentId);
+    expect(row.tenantId).toBe(realTenantId);
+  });
+});
