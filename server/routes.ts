@@ -331,11 +331,34 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   // Resolve tenant context for all API routes (non-blocking: attaches req.tenantId if authenticated)
   app.use('/api', tenantMiddleware);
 
+  // Spoof-resistant IP extractor for rate limiters.
+  //
+  // Problem: app.set("trust proxy", 1) makes Express use the LEFTMOST entry in
+  // X-Forwarded-For as req.ip. A client can prepend arbitrary fake IPs before
+  // Replit's proxy appends the real one, letting them rotate "IPs" and bypass
+  // per-IP rate limits entirely.
+  //
+  // Fix: always use the RIGHTMOST XFF entry — that is the one Replit's edge
+  // proxy appended and cannot be forged by the client. If no XFF header is
+  // present we fall back to the raw socket address (direct connection).
+  function getRealIp(req: Request): string {
+    const xff = req.headers['x-forwarded-for'];
+    if (xff) {
+      const entries = (Array.isArray(xff) ? xff.join(',') : xff)
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+      if (entries.length > 0) return entries[entries.length - 1];
+    }
+    return (req as any).socket?.remoteAddress ?? 'unknown';
+  }
+
   const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 200,
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: getRealIp,
     message: { message: "Too many requests, please try again later." },
     // Exclude no-tenant signup attempts so a flood of misconfigured no-slug
     // requests from one IP cannot exhaust the general budget and block
@@ -350,6 +373,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     max: 15,
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: getRealIp,
     message: { message: "Too many login attempts, please try again in 15 minutes." },
   });
   app.use('/api/auth/login', authLimiter);
@@ -371,6 +395,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     max: 15,
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: getRealIp,
     message: { message: "Too many signup attempts, please try again in 15 minutes." },
     skip: (req: any) => !req.tenantId,
   });
@@ -390,6 +415,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     max: 60,
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: getRealIp,
     message: { message: "Too many search requests, please slow down." },
   });
   app.use('/api/supplies/search', searchLimiter);
@@ -400,6 +426,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     max: 10,
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: getRealIp,
     message: { message: "Too many checkout attempts, please try again later." },
   });
   app.use('/api/orders', checkoutLimiter);
@@ -410,6 +437,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     max: 30,
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: getRealIp,
     message: { message: "Too many uploads, please wait a few minutes." },
   });
   app.use('/api/upload', uploadLimiter);
