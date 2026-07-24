@@ -42,6 +42,7 @@
  * ----------------
  * server/tests/upload-limiter-shared-pool.test.ts
  * server/tests/search-limiter-shared-pool.test.ts
+ * server/tests/checkout-limiter-shared-pool.test.ts
  *
  * These tests verify the shared-pool property by exhausting the budget on one
  * route and confirming the sibling route is also blocked.  If you ever split a

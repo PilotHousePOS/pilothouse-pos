@@ -3,8 +3,9 @@
  *
  * checkoutLimiter (windowMs: 15 min, max: 10) is applied to both
  * /api/orders and /api/create-payment-intent via two separate app.use() calls
- * that reference the **same** rateLimit() instance.  Because both registrations
- * share the same MemoryStore, they also share the same per-IP counter.
+ * that reference the **same** rateLimit() instance.  Because both
+ * registrations share the same MemoryStore, they also share the same per-IP
+ * counter.
  *
  * This test documents and confirms that shared-pool design as a contract:
  *   1. 10 POST /api/orders requests exhaust the checkoutLimiter budget.
@@ -61,7 +62,7 @@ beforeAll(async () => {
   // Create a real tenant so X-Tenant-Slug resolves req.tenantId, which causes
   // tenantMiddleware to call next() and lets checkoutLimiter run.
   const sfx = randomSuffix();
-  testTenantSlug = `co-pool-${sfx}`;
+  testTenantSlug = `cl-pool-${sfx}`;
 
   await db.execute(
     sql`SELECT setval(
@@ -111,14 +112,17 @@ describe("checkoutLimiter shared-pool — /api/orders traffic depletes /api/crea
     async () => {
       const CHECKOUT_LIMITER_MAX = 10;
 
-      // Send exactly max requests. The X-Tenant-Slug header ensures tenantMiddleware
-      // resolves a tenantId and calls next(), so checkoutLimiter can run and count
-      // each hit. Each request must not be blocked by the limiter (non-429).
+      // Send exactly max requests.  The X-Tenant-Slug header ensures
+      // tenantMiddleware resolves a tenantId and calls next(), so
+      // checkoutLimiter can run and count each hit.  Each request must not be
+      // blocked by the limiter (non-429).  We don't include a valid body
+      // because request validation is downstream of the rate-limiter
+      // middleware — the limiter fires first and the response status reflects
+      // the rate-limiter decision, not the payload validation.
       for (let i = 0; i < CHECKOUT_LIMITER_MAX; i++) {
         const res = await agent
           .post("/api/orders")
-          .set("X-Tenant-Slug", testTenantSlug)
-          .send({ items: [] });
+          .set("X-Tenant-Slug", testTenantSlug);
 
         expect(
           res.status,
@@ -129,8 +133,7 @@ describe("checkoutLimiter shared-pool — /api/orders traffic depletes /api/crea
       // The (max + 1)th request must be blocked by checkoutLimiter.
       const blockedRes = await agent
         .post("/api/orders")
-        .set("X-Tenant-Slug", testTenantSlug)
-        .send({ items: [] });
+        .set("X-Tenant-Slug", testTenantSlug);
 
       expect(
         blockedRes.status,
@@ -149,20 +152,19 @@ describe("checkoutLimiter shared-pool — /api/orders traffic depletes /api/crea
     "POST /api/create-payment-intent also returns 429 after the checkoutLimiter budget is depleted by /api/orders — shared-pool confirmed",
     async () => {
       // At this point the checkoutLimiter counter (shared between both routes)
-      // is already past 10.  Any request on /api/create-payment-intent must also
-      // be blocked because it uses the exact same MemoryStore entry.
-      const paymentRes = await agent
+      // is already past 10.  Any request on /api/create-payment-intent must
+      // also be blocked because it uses the exact same MemoryStore entry.
+      const paymentIntentRes = await agent
         .post("/api/create-payment-intent")
-        .set("X-Tenant-Slug", testTenantSlug)
-        .send({ amount: 1000 });
+        .set("X-Tenant-Slug", testTenantSlug);
 
       expect(
-        paymentRes.status,
-        `POST /api/create-payment-intent should return 429 (shared-pool depleted by /api/orders) but got ${paymentRes.status}`,
+        paymentIntentRes.status,
+        `POST /api/create-payment-intent should return 429 (shared-pool depleted by /api/orders) but got ${paymentIntentRes.status}`,
       ).toBe(429);
 
       expect(
-        paymentRes.body?.message,
+        paymentIntentRes.body?.message,
         "429 body on /api/create-payment-intent should carry the checkoutLimiter message",
       ).toMatch(/too many checkout attempts/i);
     },
