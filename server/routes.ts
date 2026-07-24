@@ -140,12 +140,27 @@ function resolveWriteTenantId(req: any, res: any): number | undefined {
             statusCode: res.statusCode,
           },
         })).catch((err: any) => {
-          console.warn(
-            '[auditLog] AUDIT ENTRY DROPPED — failed to write after retries. ' +
-            `actor=${actorUserId} tenant=${targetTenantId} action=${actionType} record=${recordType} ` +
-            `path=${req.path} status=${res.statusCode}`,
-            err
-          );
+          const warning = {
+            droppedAt: new Date().toISOString(),
+            actorUserId,
+            targetTenantId,
+            actionType,
+            recordType,
+            path: req.path,
+            statusCode: res.statusCode,
+            error: err?.message ?? String(err),
+          };
+          console.warn('[auditLog] AUDIT ENTRY DROPPED — failed to write after retries.', warning);
+          // Persist to a local JSONL file so operators can review offline.
+          try {
+            const { appendFileSync, mkdirSync } = require('fs');
+            const { join } = require('path');
+            const dir = join(process.cwd(), '.cache');
+            mkdirSync(dir, { recursive: true });
+            appendFileSync(join(dir, 'dropped-audit-warnings.jsonl'), JSON.stringify(warning) + '\n', 'utf8');
+          } catch (fileErr: any) {
+            console.warn('[auditLog] Also failed to persist dropped warning to file:', fileErr?.message);
+          }
         });
       });
       return tid;
@@ -5031,6 +5046,22 @@ West Monroe LA 71291
     } catch (error) {
       console.error("Error hiding order:", error);
       res.status(500).json({ message: "Failed to hide order" });
+    }
+  });
+
+  // Unhide a previously-hidden order (restores it to the admin view)
+  app.post("/api/admin/orders/:id/unhide", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Access denied. Admin only." });
+      const tenantId = req.tenantId;
+      if (!tenantId) return res.status(400).json({ message: "Tenant context required." });
+      const orderId = parseInt(req.params.id);
+      const order = await storage.unhideOrderFromAdmin(orderId, tenantId);
+      res.json({ success: true, order });
+    } catch (error: any) {
+      console.error("Error unhiding order:", error);
+      res.status(error.message?.includes('not found') ? 404 : 500).json({ message: error.message || "Failed to unhide order" });
     }
   });
 
@@ -14917,16 +14948,63 @@ CRITICAL RULES:
   });
 
   // POST /api/super-admin/stripe/refresh-credentials — immediately clears the credential cache
-  // so the next Stripe call picks up newly-rotated keys without waiting for the 1-hour TTL.
+  // and validates the new key, returning health status so the admin sees the result immediately.
   app.post('/api/super-admin/stripe/refresh-credentials', requireSuperAdminMiddleware, async (_req, res) => {
     try {
-      const { clearCredentialCache } = await import('./stripeClient');
+      const { clearCredentialCache, getUncachableStripeClient } = await import('./stripeClient');
       await clearCredentialCache();
       console.log('[Stripe] Credential cache manually cleared by super-admin');
-      res.json({ ok: true, message: 'Stripe credential cache cleared. New keys will be used on the next request.' });
+
+      // Validate the newly-loaded key immediately so the admin sees the result in-UI.
+      let keyValid = false;
+      let validationError: string | null = null;
+      try {
+        const stripe = await getUncachableStripeClient();
+        await stripe.accounts.retrieve();
+        keyValid = true;
+      } catch (err: any) {
+        validationError = (err.message ?? 'Unknown error').substring(0, 200);
+      }
+
+      res.json({
+        ok: true,
+        keyValid,
+        validationError,
+        message: keyValid
+          ? 'Stripe credentials refreshed and validated successfully.'
+          : `Credentials refreshed but key validation failed: ${validationError}`,
+      });
     } catch (error: any) {
       console.error('Failed to clear Stripe credential cache:', error);
-      res.status(500).json({ ok: false, message: error.message || 'Failed to clear credential cache' });
+      res.status(500).json({ ok: false, keyValid: false, message: error.message || 'Failed to clear credential cache' });
+    }
+  });
+
+  // GET /api/super-admin/audit-log/csv — download the full audit log as a CSV file
+  app.get('/api/super-admin/audit-log/csv', requireSuperAdminMiddleware, async (req: any, res) => {
+    try {
+      const targetTenantId = req.query.targetTenantId ? parseInt(req.query.targetTenantId as string, 10) : undefined;
+      const actorUserId = req.query.actorUserId as string | undefined;
+      // Fetch up to 10 000 rows for CSV export
+      const { entries } = await storage.getAuditLogs({ targetTenantId, actorUserId, limit: 10000, offset: 0 });
+
+      const escape = (v: unknown) => {
+        const s = v == null ? '' : String(v).replace(/"/g, '""');
+        return `"${s}"`;
+      };
+      const header = ['id', 'actorUserId', 'targetTenantId', 'actionType', 'recordType', 'metadata', 'createdAt'].join(',');
+      const rows = entries.map(e =>
+        [e.id, e.actorUserId, e.targetTenantId, e.actionType, e.recordType, JSON.stringify(e.metadata ?? {}), e.createdAt]
+          .map(escape).join(',')
+      );
+      const csv = [header, ...rows].join('\n');
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename="audit-log.csv"');
+      res.send(csv);
+    } catch (error: any) {
+      console.error('Failed to export audit log CSV:', error);
+      res.status(500).json({ message: error.message || 'Failed to export audit log' });
     }
   });
 

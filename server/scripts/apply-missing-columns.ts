@@ -126,6 +126,48 @@ async function runStatements(): Promise<void> {
  * If the retry also fails the error is re-thrown so the caller (runAppMigrations)
  * treats the missing migration as fatal and operators see a clear message.
  */
+/**
+ * After all statements run, verify every column defined in STATEMENTS actually
+ * exists in the live schema.  A mismatch means a statement silently failed or
+ * was added to the wrong file — log a loud warning so it can't be missed.
+ */
+async function validateColumns(): Promise<void> {
+  // Parse "ALTER TABLE <table> ADD COLUMN IF NOT EXISTS <col> ..." from each statement
+  const expected: { table: string; column: string }[] = [];
+  for (const stmt of STATEMENTS) {
+    const m = stmt.match(
+      /ALTER TABLE\s+(\w+)\s+ADD COLUMN IF NOT EXISTS\s+(\w+)/i
+    );
+    if (m) expected.push({ table: m[1], column: m[2] });
+  }
+
+  if (expected.length === 0) return;
+
+  // Fetch all existing columns from information_schema in one query
+  const result = await db.execute(sql.raw(`
+    SELECT table_name, column_name
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name IN (${[...new Set(expected.map((e) => `'${e.table}'`))].join(",")})
+  `));
+  const existing = new Set(
+    (result.rows as { table_name: string; column_name: string }[]).map(
+      (r) => `${r.table_name}.${r.column_name}`
+    )
+  );
+
+  const missing = expected.filter((e) => !existing.has(`${e.table}.${e.column}`));
+  if (missing.length > 0) {
+    console.error(
+      "[migration] VALIDATION FAILED — the following columns are missing from the live schema " +
+      "(check apply-missing-columns.ts for typos or missing entries):\n" +
+      missing.map((m) => `  • ${m.table}.${m.column}`).join("\n")
+    );
+  } else {
+    console.log("[migration] Column validation passed — all expected columns present.");
+  }
+}
+
 export async function applyMissingColumns(): Promise<void> {
   try {
     await runStatements();
@@ -140,6 +182,13 @@ export async function applyMissingColumns(): Promise<void> {
     } else {
       throw err;
     }
+  }
+  // Verify all expected columns landed in the live schema.
+  try {
+    await validateColumns();
+  } catch (err: any) {
+    // Non-fatal: validation is a best-effort check; don't block startup.
+    console.warn("[migration] Column validation query failed (non-fatal):", err.message);
   }
   console.log("[migration] Done.");
 }

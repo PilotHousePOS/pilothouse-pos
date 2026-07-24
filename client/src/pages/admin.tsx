@@ -13004,10 +13004,28 @@ export default function Admin() {
                                   <button
                                     title="Copy ID to clipboard"
                                     onClick={() => {
-                                      navigator.clipboard.writeText(String(t.id)).then(() => {
+                                      const text = String(t.id);
+                                      const doFallback = () => {
+                                        try {
+                                          const el = document.createElement('textarea');
+                                          el.value = text;
+                                          el.style.position = 'fixed';
+                                          el.style.opacity = '0';
+                                          document.body.appendChild(el);
+                                          el.select();
+                                          document.execCommand('copy');
+                                          document.body.removeChild(el);
+                                        } catch {}
                                         setCopiedTenantId(t.id);
                                         setTimeout(() => setCopiedTenantId(null), 2000);
-                                      });
+                                      };
+                                      if (navigator.clipboard) {
+                                        navigator.clipboard.writeText(text)
+                                          .then(() => { setCopiedTenantId(t.id); setTimeout(() => setCopiedTenantId(null), 2000); })
+                                          .catch(doFallback);
+                                      } else {
+                                        doFallback();
+                                      }
                                     }}
                                     className="ml-1 p-0.5 rounded text-blue-400 hover:text-blue-700 hover:bg-blue-100 transition-colors"
                                   >

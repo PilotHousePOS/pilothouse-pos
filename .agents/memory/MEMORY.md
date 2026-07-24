@@ -1,2 +1,3 @@
 - [iOS scanner context](ios-scanner-context.md) — App is an App Store WKWebView wrapper; standalone=0, mediaDevices=undefined; use file input without capture for camera fallback.
 - [POS hardware](pos-hardware.md) — Dejavoo terminal (Electronic Payments), receipt printer + cash drawer pending QZ Tray install.
+- [PilotHouse SaaS decisions](pilotHouse-saas-decisions.md) — Multi-tenancy rules, migration system, Stripe guard persistence, audit log, rate limiters, public route allowlist.

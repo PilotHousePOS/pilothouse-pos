@@ -132,6 +132,7 @@ export async function tenantMiddleware(
       // and must include X-Tenant-Slug so the new user is linked to the correct store.
       "/auth/login",
       "/auth/logout",
+      "/auth/user",
       "/auth/forgot-password",
       "/auth/reset-password",
       // Email verification links are clicked directly from emails and have no slug context.
@@ -140,6 +141,8 @@ export async function tenantMiddleware(
       // Tenant self-service onboarding — no tenant exists yet at this point.
       "/tenants/signup",
       "/tenants/slug-check",
+      // Platform-level public reads — no tenant context needed.
+      "/settings/hiring-open",
     ]);
 
     if (UNAUTHENTICATED_NO_SLUG_ALLOWLIST.has(req.path)) {

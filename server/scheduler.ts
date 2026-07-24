@@ -239,17 +239,37 @@ async function runYearlyReportForTenant(tenantId: number): Promise<void> {
   }
 }
 
-// In-memory idempotency guard: tracks the UTC date string on which the last
-// Stripe key failure alert was sent. Resets on server restart (accepted tradeoff —
-// same pattern as the no-tenant alert map in routes.ts).
-let stripeAlertLastSentDate: string | null = null;
+// Persisted idempotency guard for the Stripe key failure alert.
+// We write the UTC date to a JSON file so it survives server restarts.
+import { readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { join } from 'path';
+
+const STRIPE_GUARD_FILE = join(process.cwd(), '.cache', 'stripe-alert-guard.json');
+
+function readStripeAlertGuard(): string | null {
+  try {
+    const data = JSON.parse(readFileSync(STRIPE_GUARD_FILE, 'utf8'));
+    return data?.date ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function writeStripeAlertGuard(date: string | null): void {
+  try {
+    mkdirSync(join(process.cwd(), '.cache'), { recursive: true });
+    writeFileSync(STRIPE_GUARD_FILE, JSON.stringify({ date }), 'utf8');
+  } catch (err) {
+    console.warn('[Stripe] Failed to persist alert guard:', err);
+  }
+}
 
 /**
  * Reset the in-process Stripe alert guard. Exported as a testing seam only —
  * production code should never call this directly.
  */
 export function _resetStripeAlertGuardForTesting(): void {
-  stripeAlertLastSentDate = null;
+  writeStripeAlertGuard(null);
 }
 
 /**
@@ -266,7 +286,7 @@ export async function runStripeHealthCheck(): Promise<void> {
     const stripe = await getUncachableStripeClient();
     await stripe.accounts.retrieve();
     // Key is healthy — clear the guard so the next failure will alert again
-    stripeAlertLastSentDate = null;
+    writeStripeAlertGuard(null);
     console.log('[Scheduler] Stripe key health check passed');
     return;
   } catch (err: any) {
@@ -274,9 +294,9 @@ export async function runStripeHealthCheck(): Promise<void> {
     console.error(`[Scheduler] Stripe key health check FAILED: ${errorMessage}`);
   }
 
-  // Key is unhealthy — enforce one-per-day idempotency
+  // Key is unhealthy — enforce one-per-day idempotency (persisted across restarts)
   const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD" UTC
-  if (stripeAlertLastSentDate === today) {
+  if (readStripeAlertGuard() === today) {
     console.log('[Scheduler] Stripe key failure alert already sent today — skipping');
     return;
   }
@@ -286,7 +306,7 @@ export async function runStripeHealthCheck(): Promise<void> {
     const sentCount = await sendStripeKeyFailureAlertToSuperAdmins(errorMessage!);
     // Only mark the guard when at least one super-admin was actually notified.
     // If sentCount === 0 the function throws, so this line is only reached on success.
-    stripeAlertLastSentDate = today;
+    writeStripeAlertGuard(today);
     console.log(`[Scheduler] Stripe key failure alert dispatched to ${sentCount} super-admin(s)`);
   } catch (alertErr) {
     // Alert delivery failed — do NOT set the guard so the next run will retry.

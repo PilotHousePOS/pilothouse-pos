@@ -288,6 +288,7 @@ export interface IStorage {
   getOrderByStripePaymentIntent(paymentIntentId: string): Promise<Order | undefined>;
   getChargeAccountOrdersByUser(tenantId?: number): Promise<Array<{ user: any; orders: Array<{ order: Order; items: any[] }> }>>;
   hideOrderFromAdmin(id: number): Promise<Order>;
+  unhideOrderFromAdmin(id: number, tenantId: number): Promise<Order>;
   deleteOrder(id: number, tenantId?: number): Promise<void>;
 
   // Refund operations
@@ -1646,46 +1647,46 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getSuppliesByFilter(
-    limit: number, 
-    offset: number, 
-    brand?: string, 
-    category?: string, 
+    limit: number,
+    offset: number,
+    brand?: string,
+    category?: string,
     search?: string,
     tenantId?: number
   ): Promise<Supply[]> {
-    let allSupplies = await db.select().from(supplies)
-      .where(tenantId ? eq(supplies.tenantId, tenantId) : undefined);
-    
-    let filteredSupplies = allSupplies;
-    
-    // Apply search filter
+    const conditions: any[] = [];
+
+    if (tenantId) conditions.push(eq(supplies.tenantId, tenantId));
+
     if (search && search.trim()) {
-      const searchLower = search.toLowerCase().trim();
-      filteredSupplies = filteredSupplies.filter(s =>
-        s.name?.toLowerCase().includes(searchLower) ||
-        s.description?.toLowerCase().includes(searchLower) ||
-        s.brand?.toLowerCase().includes(searchLower)
+      const pattern = `%${search.trim()}%`;
+      conditions.push(
+        or(
+          ilike(supplies.name, pattern),
+          ilike(supplies.description, pattern),
+          ilike(supplies.brand, pattern),
+        )
       );
     }
-    
-    // Apply brand filter
+
     if (brand) {
-      filteredSupplies = filteredSupplies.filter(s => {
-        if (brand.toLowerCase() === 'unknown') {
-          return !s.brand || s.brand === '';
-        }
-        return s.brand?.toLowerCase() === brand.toLowerCase();
-      });
+      if (brand.toLowerCase() === 'unknown') {
+        conditions.push(or(isNull(supplies.brand), sql`${supplies.brand} = ''`));
+      } else {
+        conditions.push(ilike(supplies.brand, brand));
+      }
     }
-    
-    // Apply category filter
+
     if (category) {
-      filteredSupplies = filteredSupplies.filter(s => 
-        s.category?.toLowerCase() === category.toLowerCase()
-      );
+      conditions.push(ilike(supplies.category, category));
     }
-    
-    return filteredSupplies.slice(offset, offset + limit);
+
+    const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+    return await db.select().from(supplies)
+      .where(where)
+      .limit(limit)
+      .offset(offset);
   }
 
   async getSupplyImageStats() {
@@ -2713,6 +2714,16 @@ export class DatabaseStorage implements IStorage {
       .set({ hiddenFromAdmin: true, updatedAt: new Date() })
       .where(eq(orders.id, id))
       .returning();
+    return updated;
+  }
+
+  async unhideOrderFromAdmin(id: number, tenantId: number): Promise<Order> {
+    const [updated] = await db
+      .update(orders)
+      .set({ hiddenFromAdmin: false, updatedAt: new Date() })
+      .where(and(eq(orders.id, id), eq(orders.tenantId, tenantId)))
+      .returning();
+    if (!updated) throw new Error('Order not found or access denied');
     return updated;
   }
 
