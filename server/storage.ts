@@ -151,8 +151,8 @@ export interface IStorage {
   updateUserSuperiorManager(id: string, isSuperiorManager: boolean): Promise<User>;
   updateUserSuperAdmin(id: string, isSuperAdmin: boolean): Promise<User>;
   updateUserTenant(id: string, tenantId: number): Promise<User>;
-  updateAppointmentHistoryRecord(id: number, data: Partial<{ appointmentDate: string; appointmentTime: string; petName: string; petType: string; breed: string; serviceType: string; groomerName: string; status: string; notes: string }>): Promise<AppointmentHistory>;
-  deleteAppointmentHistoryRecord(id: number): Promise<void>;
+  updateAppointmentHistoryRecord(id: number, data: Partial<{ appointmentDate: string; appointmentTime: string; petName: string; petType: string; breed: string; serviceType: string; groomerName: string; status: string; notes: string }>, tenantId?: number): Promise<AppointmentHistory>;
+  deleteAppointmentHistoryRecord(id: number, tenantId?: number): Promise<void>;
   getAllUsers(tenantId?: number): Promise<User[]>;
   deleteUser(id: string): Promise<void>;
   incrementTokenVersion(id: string): Promise<void>;
@@ -3430,20 +3430,26 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async updateAppointmentHistoryRecord(id: number, data: Partial<{ appointmentDate: string; appointmentTime: string; petName: string; petType: string; breed: string; serviceType: string; groomerName: string; status: string; notes: string }>): Promise<AppointmentHistory> {
+  async updateAppointmentHistoryRecord(id: number, data: Partial<{ appointmentDate: string; appointmentTime: string; petName: string; petType: string; breed: string; serviceType: string; groomerName: string; status: string; notes: string }>, tenantId?: number): Promise<AppointmentHistory> {
+    const condition = tenantId
+      ? and(eq(appointmentHistory.id, id), eq(appointmentHistory.tenantId, tenantId))
+      : eq(appointmentHistory.id, id);
     const [record] = await db
       .update(appointmentHistory)
       .set(data as any)
-      .where(eq(appointmentHistory.id, id))
+      .where(condition)
       .returning();
     if (!record) {
-      throw new Error('Appointment history record not found');
+      throw new Error('Appointment history record not found or access denied');
     }
     return record;
   }
 
-  async deleteAppointmentHistoryRecord(id: number): Promise<void> {
-    await db.delete(appointmentHistory).where(eq(appointmentHistory.id, id));
+  async deleteAppointmentHistoryRecord(id: number, tenantId?: number): Promise<void> {
+    const condition = tenantId
+      ? and(eq(appointmentHistory.id, id), eq(appointmentHistory.tenantId, tenantId))
+      : eq(appointmentHistory.id, id);
+    await db.delete(appointmentHistory).where(condition);
   }
 
   async getAllUsers(tenantId?: number): Promise<User[]> {

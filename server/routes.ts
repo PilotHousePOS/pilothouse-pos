@@ -10045,6 +10045,8 @@ West Monroe LA 71291
       if (!caller?.isSuperiorManager) {
         return res.status(403).json({ message: "Superior Manager access required" });
       }
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const historyId = parseInt(req.params.historyId);
       const { appointmentDate, appointmentTime, petName, petType, breed, serviceType, groomerName, status, notes } = req.body;
       const updated = await storage.updateAppointmentHistoryRecord(historyId, {
@@ -10057,10 +10059,13 @@ West Monroe LA 71291
         ...(groomerName !== undefined && { groomerName }),
         ...(status !== undefined && { status }),
         ...(notes !== undefined && { notes }),
-      });
+      }, tenantId);
       res.json(updated);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating history record:", error);
+      if (error?.message === 'Appointment history record not found or access denied') {
+        return res.status(404).json({ message: "History record not found" });
+      }
       res.status(500).json({ message: "Failed to update history record" });
     }
   });
@@ -10072,8 +10077,10 @@ West Monroe LA 71291
       if (!caller?.isSuperiorManager) {
         return res.status(403).json({ message: "Superior Manager access required" });
       }
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
       const historyId = parseInt(req.params.historyId);
-      await storage.deleteAppointmentHistoryRecord(historyId);
+      await storage.deleteAppointmentHistoryRecord(historyId, tenantId);
       res.json({ message: "History record deleted" });
     } catch (error) {
       console.error("Error deleting history record:", error);
