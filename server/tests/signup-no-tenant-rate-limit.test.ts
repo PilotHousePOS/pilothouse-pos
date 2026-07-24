@@ -97,6 +97,8 @@ describe("POST /api/auth/signup — no tenant context", () => {
     expect(res.body.message).toBeTruthy();
     expect(res.body.message).not.toMatch(/too many/i);
     expect(res.body.message).not.toMatch(/rate/i);
+    // Must include the stable machine-readable code for missing-tenant errors.
+    expect(res.body.code).toBe("MISSING_TENANT");
   });
 
   it("does not decrement the generalLimiter RateLimit-Remaining counter", async () => {
@@ -192,6 +194,8 @@ describe("POST /api/auth/signup — signupLimiter header behaviour on no-tenant 
     expect(res.body.message).not.toMatch(/too many/i);
     expect(res.body.message).not.toMatch(/rate.?limit/i);
     expect(res.body.message).not.toMatch(/signup attempt/i);
+    // Must include the stable machine-readable code for missing-tenant errors.
+    expect(res.body.code).toBe("MISSING_TENANT");
   });
 
   it("signupLimiter RateLimit-* headers are absent from the 400 response when skip fires", async () => {
