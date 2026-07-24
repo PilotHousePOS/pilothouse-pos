@@ -366,7 +366,24 @@ export default function Auth() {
             <p className="text-gray-300">Sign in to manage your account</p>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="signin" className="w-full" onValueChange={() => { setSignupError(null); setIsLoading(false); }}>
+            {/*
+              * Tab-switch handler (onValueChange)
+              * ──────────────────────────────────
+              * Fires synchronously whenever the user switches between the
+              * Sign In and Sign Up tabs.
+              *
+              * We intentionally do NOT reset isLoading here.  If a login (or
+              * sign-up) request is in flight when the user switches tabs, the
+              * button on the originating tab must remain disabled until the
+              * request actually completes.  Resetting here would re-enable the
+              * button prematurely and allow a duplicate submission.
+              *
+              * The `finally` block in handleLogin / handleSignUp is the single
+              * authoritative place that resets isLoading — it always runs,
+              * regardless of whether the request succeeds, errors, or is
+              * abandoned while the user is on a different tab.
+              */}
+            <Tabs defaultValue="signin" className="w-full" onValueChange={() => { setSignupError(null); }}>
               <TabsList className="grid w-full grid-cols-2 bg-white/10">
                 <TabsTrigger value="signin" className="text-white data-[state=active]:bg-brand-blue data-[state=active]:text-white">
                   Sign In
