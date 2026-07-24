@@ -515,6 +515,7 @@ export default function Auth() {
                     type="submit"
                     disabled={isLoading}
                     className="w-full bg-gradient-to-r from-brand-red to-red-600 hover:from-red-600 hover:to-brand-red text-white font-bold py-3"
+                    data-testid="button-signup"
                   >
                     <Heart className="w-4 h-4 mr-2" />
                     {isLoading ? "Creating Account..." : "Create Account"}
