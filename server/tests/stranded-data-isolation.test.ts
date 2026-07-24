@@ -1206,6 +1206,18 @@ describe("PUT /api/contacts/history/:historyId — stranded user cannot mutate a
     expect(res.status).toBe(403);
   });
 
+  it("returns HTTP 403 for a stranded superior-manager (isSuperiorManager=true, no tenant)", async () => {
+    // The handler checks isSuperiorManager before resolveWriteTenantId, but a
+    // stranded superior-manager has tenantId=null so resolveWriteTenantId must
+    // still block the request with 403 before any mutation occurs.
+    const res = await agent
+      .put(`/api/contacts/history/${seededHistoryId}`)
+      .set("Authorization", `Bearer ${strandedSuperiorManagerToken}`)
+      .send({ notes: "stranded-supman-injection" });
+
+    expect(res.status).toBe(403);
+  });
+
   it("leaves the seeded history record unmodified after all rejected PUT attempts", async () => {
     const [row] = await db
       .select()
@@ -1244,6 +1256,17 @@ describe("DELETE /api/contacts/history/:historyId — stranded user cannot delet
     const res = await agent
       .delete(`/api/contacts/history/${seededHistoryId}`)
       .set("Authorization", `Bearer ${strandedGroomerToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded superior-manager (isSuperiorManager=true, no tenant)", async () => {
+    // Even though the handler checks isSuperiorManager first, a stranded
+    // superior-manager has tenantId=null so resolveWriteTenantId must block
+    // the deletion with 403 before the record is touched.
+    const res = await agent
+      .delete(`/api/contacts/history/${seededHistoryId}`)
+      .set("Authorization", `Bearer ${strandedSuperiorManagerToken}`);
 
     expect(res.status).toBe(403);
   });
