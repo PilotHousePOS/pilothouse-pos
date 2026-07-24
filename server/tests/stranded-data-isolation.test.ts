@@ -266,8 +266,11 @@ afterAll(async () => {
     await db.delete(appointmentHistory).where(eq(appointmentHistory.id, seededHistoryId));
   if (seededBoardingRecordId)
     await db.delete(boardingRecords).where(eq(boardingRecords.id, seededBoardingRecordId));
-  if (seededContactId)
-    await db.delete(contacts).where(eq(contacts.id, seededContactId));
+  // Delete all contacts for the real tenant (includes any auto-created by
+  // the grooming-completed route during happy-path tests) before the tenant
+  // row itself is removed, to avoid FK-constraint errors.
+  if (realTenantId)
+    await db.delete(contacts).where(eq(contacts.tenantId, realTenantId));
   if (seededOrderId)
     await db.delete(orders).where(eq(orders.id, seededOrderId));
   if (seededAppointmentId)
@@ -1843,5 +1846,267 @@ describe("PATCH /api/admin/appointments/:id/ready-for-payment — stranded user 
     expect(row.tenantId).toBe(realTenantId);
     // Price must not have been overwritten to 99.99 by any stranded caller
     expect(row.price).not.toBe("99.99");
+  });
+});
+
+// ─── Route-level happy-path tests — groomer UI field updates ──────────────────
+//
+// Confirm that the three PATCH endpoints used by the groomer UI (is-here,
+// is-paid, grooming-completed) always receive a tenantId from their route
+// handlers and return HTTP 200 with the updated appointment when called by a
+// valid admin or groomer with a correctly-assigned tenant.
+
+describe("PATCH /api/appointments/:id/is-here — valid groomer receives HTTP 200 and correct body", () => {
+  let realGroomerToken: string;
+  let realGroomerId: string;
+
+  beforeAll(async () => {
+    const sfx = Math.random().toString(36).slice(2, 9);
+    const [row] = await db
+      .insert(users)
+      .values({
+        id: "real-groomer-ishere-" + sfx,
+        email: `real-groomer-ishere-${sfx}@test.local`,
+        firstName: "RealGroomer",
+        lastName: "IsHere",
+        tenantId: realTenantId,
+        password: "hashed-password-for-test",
+        isAdmin: false,
+        isGroomer: true,
+        tokenVersion: 0,
+      })
+      .returning();
+    realGroomerId = row.id;
+    realGroomerToken = generateToken(row as any);
+  });
+
+  afterAll(async () => {
+    if (realGroomerId) await db.delete(users).where(eq(users.id, realGroomerId));
+  });
+
+  it("returns HTTP 200 and sets isHere to true when called by a valid groomer", async () => {
+    const res = await agent
+      .patch(`/api/appointments/${seededAppointmentId}/is-here`)
+      .set("Authorization", `Bearer ${realGroomerToken}`)
+      .set("X-Tenant-Slug", realTenantSlug)
+      .send({ isHere: true });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ id: seededAppointmentId, isHere: true });
+  });
+
+  it("returns HTTP 200 and sets isHere to false when called by a valid groomer", async () => {
+    const res = await agent
+      .patch(`/api/appointments/${seededAppointmentId}/is-here`)
+      .set("Authorization", `Bearer ${realGroomerToken}`)
+      .set("X-Tenant-Slug", realTenantSlug)
+      .send({ isHere: false });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ id: seededAppointmentId, isHere: false });
+  });
+
+  it("persists the isHere change in the database", async () => {
+    // Set to true via the route
+    await agent
+      .patch(`/api/appointments/${seededAppointmentId}/is-here`)
+      .set("Authorization", `Bearer ${realGroomerToken}`)
+      .set("X-Tenant-Slug", realTenantSlug)
+      .send({ isHere: true });
+
+    const [row] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+
+    expect(row).toBeDefined();
+    expect(row.isHere).toBe(true);
+    expect(row.tenantId).toBe(realTenantId);
+  });
+
+  it("returns HTTP 400 when isHere is not a boolean", async () => {
+    const res = await agent
+      .patch(`/api/appointments/${seededAppointmentId}/is-here`)
+      .set("Authorization", `Bearer ${realGroomerToken}`)
+      .set("X-Tenant-Slug", realTenantSlug)
+      .send({ isHere: "yes" });
+
+    expect(res.status).toBe(400);
+  });
+});
+
+describe("PATCH /api/appointments/:id/is-paid — valid groomer receives HTTP 200 and correct body", () => {
+  let realGroomerToken: string;
+  let realGroomerId: string;
+
+  beforeAll(async () => {
+    const sfx = Math.random().toString(36).slice(2, 9);
+    const [row] = await db
+      .insert(users)
+      .values({
+        id: "real-groomer-ispaid-" + sfx,
+        email: `real-groomer-ispaid-${sfx}@test.local`,
+        firstName: "RealGroomer",
+        lastName: "IsPaid",
+        tenantId: realTenantId,
+        password: "hashed-password-for-test",
+        isAdmin: false,
+        isGroomer: true,
+        tokenVersion: 0,
+      })
+      .returning();
+    realGroomerId = row.id;
+    realGroomerToken = generateToken(row as any);
+  });
+
+  afterAll(async () => {
+    if (realGroomerId) await db.delete(users).where(eq(users.id, realGroomerId));
+  });
+
+  it("returns HTTP 200 and sets isPaid to true when called by a valid groomer", async () => {
+    const res = await agent
+      .patch(`/api/appointments/${seededAppointmentId}/is-paid`)
+      .set("Authorization", `Bearer ${realGroomerToken}`)
+      .set("X-Tenant-Slug", realTenantSlug)
+      .send({ isPaid: true });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ id: seededAppointmentId, isPaid: true });
+  });
+
+  it("returns HTTP 200 and sets isPaid to false when called by a valid groomer", async () => {
+    const res = await agent
+      .patch(`/api/appointments/${seededAppointmentId}/is-paid`)
+      .set("Authorization", `Bearer ${realGroomerToken}`)
+      .set("X-Tenant-Slug", realTenantSlug)
+      .send({ isPaid: false });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ id: seededAppointmentId, isPaid: false });
+  });
+
+  it("persists the isPaid change in the database", async () => {
+    // Set to true via the route
+    await agent
+      .patch(`/api/appointments/${seededAppointmentId}/is-paid`)
+      .set("Authorization", `Bearer ${realGroomerToken}`)
+      .set("X-Tenant-Slug", realTenantSlug)
+      .send({ isPaid: true });
+
+    const [row] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+
+    expect(row).toBeDefined();
+    expect(row.isPaid).toBe(true);
+    expect(row.tenantId).toBe(realTenantId);
+  });
+
+  it("returns HTTP 400 when isPaid is not a boolean", async () => {
+    const res = await agent
+      .patch(`/api/appointments/${seededAppointmentId}/is-paid`)
+      .set("Authorization", `Bearer ${realGroomerToken}`)
+      .set("X-Tenant-Slug", realTenantSlug)
+      .send({ isPaid: "yes" });
+
+    expect(res.status).toBe(400);
+  });
+
+  it("returns HTTP 403 when a stranded groomer attempts to mark isPaid (no tenant)", async () => {
+    const res = await agent
+      .patch(`/api/appointments/${seededAppointmentId}/is-paid`)
+      .set("Authorization", `Bearer ${strandedGroomerToken}`)
+      .send({ isPaid: true });
+
+    expect(res.status).toBe(403);
+  });
+});
+
+describe("PATCH /api/appointments/:id/grooming-completed — valid groomer receives HTTP 200 and correct body", () => {
+  let realGroomerToken: string;
+  let realGroomerId: string;
+
+  beforeAll(async () => {
+    const sfx = Math.random().toString(36).slice(2, 9);
+    const [row] = await db
+      .insert(users)
+      .values({
+        id: "real-groomer-groom-" + sfx,
+        email: `real-groomer-groom-${sfx}@test.local`,
+        firstName: "RealGroomer",
+        lastName: "Grooming",
+        tenantId: realTenantId,
+        password: "hashed-password-for-test",
+        isAdmin: false,
+        isGroomer: true,
+        tokenVersion: 0,
+      })
+      .returning();
+    realGroomerId = row.id;
+    realGroomerToken = generateToken(row as any);
+  });
+
+  afterAll(async () => {
+    if (realGroomerId) await db.delete(users).where(eq(users.id, realGroomerId));
+  });
+
+  it("returns HTTP 200 and sets groomingCompleted to true when called by a valid groomer", async () => {
+    const res = await agent
+      .patch(`/api/appointments/${seededAppointmentId}/grooming-completed`)
+      .set("Authorization", `Bearer ${realGroomerToken}`)
+      .set("X-Tenant-Slug", realTenantSlug)
+      .send({ groomingCompleted: true });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ id: seededAppointmentId, groomingCompleted: true });
+  });
+
+  it("returns HTTP 200 and sets groomingCompleted to false when called by a valid groomer", async () => {
+    const res = await agent
+      .patch(`/api/appointments/${seededAppointmentId}/grooming-completed`)
+      .set("Authorization", `Bearer ${realGroomerToken}`)
+      .set("X-Tenant-Slug", realTenantSlug)
+      .send({ groomingCompleted: false });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ id: seededAppointmentId, groomingCompleted: false });
+  });
+
+  it("persists the groomingCompleted change in the database", async () => {
+    // Set to true via the route
+    await agent
+      .patch(`/api/appointments/${seededAppointmentId}/grooming-completed`)
+      .set("Authorization", `Bearer ${realGroomerToken}`)
+      .set("X-Tenant-Slug", realTenantSlug)
+      .send({ groomingCompleted: true });
+
+    const [row] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+
+    expect(row).toBeDefined();
+    expect(row.groomingCompleted).toBe(true);
+    expect(row.tenantId).toBe(realTenantId);
+  });
+
+  it("returns HTTP 400 when groomingCompleted is not a boolean", async () => {
+    const res = await agent
+      .patch(`/api/appointments/${seededAppointmentId}/grooming-completed`)
+      .set("Authorization", `Bearer ${realGroomerToken}`)
+      .set("X-Tenant-Slug", realTenantSlug)
+      .send({ groomingCompleted: "done" });
+
+    expect(res.status).toBe(400);
+  });
+
+  it("returns HTTP 403 when a stranded groomer attempts to mark groomingCompleted (no tenant)", async () => {
+    const res = await agent
+      .patch(`/api/appointments/${seededAppointmentId}/grooming-completed`)
+      .set("Authorization", `Bearer ${strandedGroomerToken}`)
+      .send({ groomingCompleted: true });
+
+    expect(res.status).toBe(403);
   });
 });
