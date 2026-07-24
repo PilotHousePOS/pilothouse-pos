@@ -449,6 +449,16 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   app.use('/api/orders', checkoutLimiter);
   app.use('/api/create-payment-intent', checkoutLimiter);
 
+  // uploadLimiter — shared-pool design (intentional):
+  // The same uploadLimiter instance is applied to both /api/upload and
+  // /api/admin/order-photos via two separate app.use() calls.  Because both
+  // calls share the same MemoryStore, they also share the same per-IP counter
+  // (30 req / 5 min).  A burst of /api/upload requests will consume budget
+  // from the /api/admin/order-photos window and vice versa.  This is
+  // intentional: both endpoints are high-cost file-processing paths that should
+  // be subject to the same aggregate rate cap to prevent upload abuse.  If the
+  // two paths ever need independent budgets, create two separate rateLimit()
+  // instances with their own stores.
   const uploadLimiter = rateLimit({
     windowMs: 5 * 60 * 1000,
     max: 30,
