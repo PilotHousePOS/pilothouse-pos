@@ -34,7 +34,7 @@
  *  documented, expected behaviour and the tests below assert it explicitly.
  */
 
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 import express from "express";
 import cookieParser from "cookie-parser";
 import supertest from "supertest";
@@ -406,5 +406,158 @@ describe("POST /api/auth/signup — signupLimiter fires on real flood with valid
       expect(overLimit.headers["retry-after"]).toBeDefined();
     },
     60_000,
+  );
+});
+
+// ─── signupLimiter window reset ───────────────────────────────────────────────
+//
+// The limiter above confirms the budget fires at request 16.  This describe
+// block confirms the OTHER half of the contract: once the 15-minute window
+// expires, the counter resets and the IP can sign up again.
+//
+// Without this test a broken windowMs (e.g. 0 or Infinity) would go
+// undetected — the flood test would still pass even though users would remain
+// blocked forever.
+//
+// Implementation note: we freeze Date (only) with vi.useFakeTimers so the
+// MemoryStore's window-expiry logic tracks our artificial clock while real
+// async operations (DB queries, supertest HTTP) continue to work normally.
+
+describe("POST /api/auth/signup — signupLimiter window resets after 15 minutes", () => {
+  let windowResetTenantId: number;
+  let windowResetTenantSlug: string;
+  let windowResetAgent: ReturnType<typeof supertest>;
+  const windowResetCreatedUserIds: string[] = [];
+
+  beforeAll(async () => {
+    const sfx = randomSuffix();
+    windowResetTenantSlug = `rl-win-reset-${sfx}`;
+
+    // Advance the sequence past existing rows to avoid duplicate-key errors
+    // in case parallel test files have already inserted tenants in this run.
+    await db.execute(
+      sql`SELECT setval(
+            pg_get_serial_sequence('tenants', 'id'),
+            GREATEST((SELECT MAX(id) FROM tenants), 1)
+          )`,
+    );
+
+    const [tenant] = await db
+      .insert(tenants)
+      .values({
+        name: `RateLimitWindowReset ${sfx}`,
+        slug: windowResetTenantSlug,
+        subscriptionStatus: "active",
+        subscriptionTier: "starter",
+      })
+      .returning();
+
+    windowResetTenantId = tenant.id;
+
+    // Freeze Date.now() so the MemoryStore window starts at a known time.
+    // Only faking "Date" leaves setTimeout/setInterval running normally so
+    // real async operations (DB queries, supertest) are not affected.
+    vi.useFakeTimers({ toFake: ["Date"] });
+
+    // Build a FRESH app so this describe block gets its own clean MemoryStore.
+    // The flood-test app above has already consumed signupLimiter slots; we
+    // must not share state with it.
+    const freshApp = express();
+    freshApp.use(express.json());
+    freshApp.use(cookieParser());
+    const { registerRoutes } = await import("../routes");
+    await registerRoutes(freshApp);
+    windowResetAgent = supertest(freshApp);
+  }, 60_000);
+
+  afterAll(async () => {
+    vi.useRealTimers();
+
+    if (windowResetCreatedUserIds.length > 0) {
+      const { contacts } = await import("@shared/schema");
+      const { inArray } = await import("drizzle-orm");
+      await db
+        .update(contacts)
+        .set({ linkedUserId: null })
+        .where(inArray(contacts.linkedUserId, windowResetCreatedUserIds));
+      for (const id of windowResetCreatedUserIds) {
+        const { users } = await import("@shared/schema");
+        await db.delete(users).where(eq(users.id, id));
+      }
+    }
+    if (windowResetTenantId) {
+      await db.delete(tenants).where(eq(tenants.id, windowResetTenantId));
+    }
+  }, 30_000);
+
+  it(
+    "allows requests again after the 15-minute window expires, and RateLimit-Remaining resets to 14",
+    async () => {
+      const MAX_ATTEMPTS = 15; // mirrors signupLimiter max
+
+      // ── Phase 1: exhaust the signupLimiter budget ──────────────────────────
+      // Send MAX_ATTEMPTS requests with a valid tenant slug.  Intentionally
+      // incomplete bodies (missing required fields) ensure no user rows are
+      // created, while req.tenantId IS set so the limiter counts every request.
+      for (let i = 0; i < MAX_ATTEMPTS; i++) {
+        const res = await windowResetAgent
+          .post("/api/auth/signup")
+          .set("X-Tenant-Slug", windowResetTenantSlug)
+          .send({ email: `rl-win-${i}-${randomSuffix()}@test.local` }); // intentionally incomplete
+
+        expect(
+          res.status,
+          `attempt ${i + 1}/${MAX_ATTEMPTS} returned 429 before budget was exhausted`,
+        ).not.toBe(429);
+      }
+
+      // ── Phase 2: 16th request must be blocked ─────────────────────────────
+      const blockedRes = await windowResetAgent
+        .post("/api/auth/signup")
+        .set("X-Tenant-Slug", windowResetTenantSlug)
+        .send({ email: `rl-win-blocked-${randomSuffix()}@test.local` });
+
+      expect(
+        blockedRes.status,
+        `16th request should be 429 but got ${blockedRes.status}`,
+      ).toBe(429);
+
+      // ── Phase 3: advance Date past the 15-minute window ───────────────────
+      // The MemoryStore uses Date.now() for window expiry.  Advancing the fake
+      // clock by (windowMs + 1 s) makes the existing window stale so the next
+      // request starts a fresh counter.
+      const WINDOW_MS = 15 * 60 * 1000;
+      vi.setSystemTime(new Date(Date.now() + WINDOW_MS + 1_000));
+
+      // ── Phase 4: first request after rollover must not be blocked ──────────
+      const afterRes = await windowResetAgent
+        .post("/api/auth/signup")
+        .set("X-Tenant-Slug", windowResetTenantSlug)
+        .send({ email: `rl-win-after-${randomSuffix()}@test.local` }); // intentionally incomplete
+
+      expect(
+        afterRes.status,
+        `request after window rollover returned 429 — windowMs did not reset`,
+      ).not.toBe(429);
+
+      // ── Phase 5: RateLimit-Remaining must show 14 (max 15, minus 1 used) ──
+      // The post-rollover request starts a new window.  The limiter consumes
+      // one slot for this request, leaving 14 remaining.
+      const remainingAfterReset = parseInt(
+        afterRes.headers["ratelimit-remaining"] ?? "",
+        10,
+      );
+
+      expect(
+        remainingAfterReset,
+        "RateLimit-Remaining header must be present on the post-rollover response",
+      ).not.toBeNaN();
+
+      expect(
+        remainingAfterReset,
+        `RateLimit-Remaining should be 14 (15 max − 1 used) but got ${remainingAfterReset}`,
+      ).toBe(14);
+    },
+    90_000,
   );
 });
