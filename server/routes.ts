@@ -384,7 +384,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   });
   app.use('/api/auth/login', authLimiter);
   app.use('/api/auth/register', authLimiter);
-  app.use('/api/forgot-password', authLimiter);
+  app.use('/api/auth/forgot-password', authLimiter);
   app.use('/api/auth/reset-password', authLimiter);
   app.use('/api/auth/change-password', authLimiter);
 

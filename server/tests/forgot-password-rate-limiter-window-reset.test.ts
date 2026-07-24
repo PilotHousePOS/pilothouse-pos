@@ -1,24 +1,20 @@
 /**
- * Integration tests: authLimiter window reset for /api/forgot-password
+ * Integration tests: authLimiter on /api/auth/forgot-password
  *
  * The authLimiter (windowMs: 15 min, max: 15) is mounted via
- *   app.use('/api/forgot-password', authLimiter)
- * in routes.ts.  After the window expires the counter must reset so that a
- * previously rate-limited IP can submit another request without being blocked.
+ *   app.use('/api/auth/forgot-password', authLimiter)
+ * in routes.ts.  This test confirms:
+ *   1. The 16th POST to /api/auth/forgot-password returns 429.
+ *   2. After the window expires the counter resets, so a previously
+ *      rate-limited IP can submit again without being blocked.
  *
  * Implementation note on ALLOW_TENANT_FALLBACK:
  *   tenantMiddleware runs before the authLimiter for all /api routes.  For
  *   requests that lack a tenant slug and whose path is not in the
- *   UNAUTHENTICATED_NO_SLUG_ALLOWLIST (e.g. /forgot-password), tenantMiddleware
+ *   UNAUTHENTICATED_NO_SLUG_ALLOWLIST (e.g. /auth/forgot-password), tenantMiddleware
  *   returns 400 before the authLimiter ever runs.  Setting ALLOW_TENANT_FALLBACK
  *   causes tenantMiddleware to fall through with tenantId=1, so the authLimiter
  *   can count and eventually block requests normally.
- *
- * Done looks like:
- *   1. 15 POST /api/forgot-password requests exhaust the budget.
- *   2. The 16th request returns 429.
- *   3. System time is advanced past the 15-minute window.
- *   4. The first request after rollover is NOT 429 — the authLimiter reset.
  */
 
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
@@ -48,7 +44,7 @@ let originalAllowTenantFallback: string | undefined;
 
 beforeAll(async () => {
   // Allow tenantMiddleware to fall through without a real tenant slug.
-  // Without this, tenantMiddleware returns 400 for /api/forgot-password
+  // Without this, tenantMiddleware returns 400 for /api/auth/forgot-password
   // (the path is not in its unauthenticated-no-slug allowlist), which
   // means the authLimiter never runs and cannot be exercised.
   originalAllowTenantFallback = process.env.ALLOW_TENANT_FALLBACK;
@@ -76,21 +72,20 @@ afterAll(async () => {
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
-describe("authLimiter — window reset allows forgot-password attempts after expiry", () => {
+describe("authLimiter — /api/auth/forgot-password: 16th request returns 429, window reset restores access", () => {
   it(
     "blocks on the 16th attempt then allows a new attempt after the window rolls over",
     async () => {
       const MAX_ATTEMPTS = 15; // mirrors authLimiter max
 
       // ── Phase 1: exhaust the rate-limit budget ────────────────────────────
-      // Send MAX_ATTEMPTS forgot-password requests.  The authLimiter counts each
-      // one; there is no route handler registered at /api/forgot-password itself
-      // (the handler lives at /api/auth/forgot-password), so Express returns 404
-      // after the limiter passes — the important thing is that requests are NOT
-      // 429 before the budget is exhausted.
+      // Send MAX_ATTEMPTS forgot-password requests.  The authLimiter is now
+      // mounted at /api/auth/forgot-password — the same path as the real handler
+      // — so each request is counted.  Responses before the budget is exhausted
+      // must NOT be 429.
       for (let i = 0; i < MAX_ATTEMPTS; i++) {
         const res = await agent
-          .post("/api/forgot-password")
+          .post("/api/auth/forgot-password")
           .send({ email: `nonexistent-${i}@test.local` });
 
         expect(
@@ -101,7 +96,7 @@ describe("authLimiter — window reset allows forgot-password attempts after exp
 
       // ── Phase 2: 16th request must be rate-limited ────────────────────────
       const blockedRes = await agent
-        .post("/api/forgot-password")
+        .post("/api/auth/forgot-password")
         .send({ email: "nonexistent-blocked@test.local" });
 
       expect(
@@ -117,13 +112,12 @@ describe("authLimiter — window reset allows forgot-password attempts after exp
 
       // ── Phase 4: first request after rollover must not be blocked ─────────
       const afterRes = await agent
-        .post("/api/forgot-password")
+        .post("/api/auth/forgot-password")
         .send({ email: "nonexistent-after-rollover@test.local" });
 
       // The critical assertion: the window reset must allow new requests through.
-      // The authLimiter is mounted at /api/forgot-password but there is no route
-      // handler at that exact path, so Express returns 404 after the limiter
-      // passes — any status other than 429 confirms the limiter correctly reset.
+      // The authLimiter is mounted at /api/auth/forgot-password where the real
+      // handler lives — any status other than 429 confirms the limiter reset.
       expect(
         afterRes.status,
         `request after window rollover returned 429 — authLimiter window did not reset correctly`,
