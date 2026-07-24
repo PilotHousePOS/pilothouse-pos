@@ -116,13 +116,33 @@ function buildHeaders(includeContentType = false): Record<string, string> {
   return headers;
 }
 
+/**
+ * A structured API error that carries the HTTP status, human-readable message,
+ * and the optional machine-readable `code` field emitted by the server
+ * (e.g. "MISSING_TENANT", "STRANDED_ACCOUNT").  Callers can branch on
+ * `err.code` to display targeted UI without string-matching the message.
+ */
+export class ApiError extends Error {
+  readonly status: number;
+  readonly code?: string;
+
+  constructor(status: number, message: string, code?: string) {
+    super(`${status}: ${message}`);
+    this.name = "ApiError";
+    this.status = status;
+    this.code = code;
+  }
+}
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
     let message: string;
+    let code: string | undefined;
     try {
       const data = JSON.parse(text);
       message = data.message || data.error || res.statusText;
+      code = data.code;
     } catch {
       // Not JSON — if it's an HTML page (proxy/CDN error), use a clean status message
       if (text.includes('<!DOCTYPE') || text.includes('<html') || text.includes('<title>')) {
@@ -131,7 +151,7 @@ async function throwIfResNotOk(res: Response) {
         message = text;
       }
     }
-    throw new Error(`${res.status}: ${message}`);
+    throw new ApiError(res.status, message, code);
   }
 }
 

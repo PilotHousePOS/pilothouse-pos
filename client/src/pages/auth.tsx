@@ -221,8 +221,15 @@ export default function Auth() {
         }
       } else {
         const error = await response.json();
-        console.error('Signup failed:', error.message);
-        const msg = error.message || "Unable to create account. Please try again.";
+        console.error('Signup failed:', error.code ?? response.status, error.message);
+        // Surface the machine-readable code so the widget can show a targeted
+        // message for known failure modes without relying on string matching.
+        let msg: string;
+        if (error.code === "MISSING_TENANT") {
+          msg = "This store link is not valid or has not been set up yet. Please contact the store owner for a correct sign-up link.";
+        } else {
+          msg = error.message || "Unable to create account. Please try again.";
+        }
         setSignupError(msg);
         toast({
           title: "Sign Up Failed",
