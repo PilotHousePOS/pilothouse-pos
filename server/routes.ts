@@ -427,6 +427,17 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   app.use('/api/supplies/search', searchLimiter);
   app.use('/api/pets', searchLimiter);
 
+  // checkoutLimiter — shared-pool design (intentional):
+  // The same checkoutLimiter instance is applied to both /api/orders and
+  // /api/create-payment-intent via two separate app.use() calls.  Because both
+  // calls share the same MemoryStore, they also share the same per-IP counter
+  // (10 req / 15 min).  A burst of /api/orders submissions will consume budget
+  // from the /api/create-payment-intent window and vice versa.  This is
+  // intentional: both endpoints are high-value write paths that represent a
+  // single checkout flow and should be subject to the same aggregate rate cap
+  // to prevent order-spam and payment-intent abuse.  If the two paths ever need
+  // independent budgets, create two separate rateLimit() instances with their
+  // own stores.
   const checkoutLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 10,
