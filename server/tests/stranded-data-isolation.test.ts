@@ -1211,3 +1211,89 @@ describe("DELETE /api/contacts/history/:historyId — stranded user cannot delet
     expect(row.id).toBe(seededHistoryId);
   });
 });
+
+// ─── Storage-layer unit tests — updateAppointmentStatus ──────────────────────
+
+describe("storage.updateAppointmentStatus — storage-layer guard", () => {
+  it("throws when tenantId is undefined", async () => {
+    await expect(
+      storage.updateAppointmentStatus(seededAppointmentId, "cancelled", undefined)
+    ).rejects.toThrow("tenantId is required to update an appointment");
+  });
+
+  it("does NOT persist changes when tenantId is undefined", async () => {
+    // Capture the current status before the attempted mutation
+    const [before] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+    const originalStatus = before?.status;
+
+    // Attempt the mutation — expected to throw
+    await expect(
+      storage.updateAppointmentStatus(seededAppointmentId, "cancelled", undefined)
+    ).rejects.toThrow();
+
+    // Verify the record is unchanged
+    const [after] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+    expect(after?.status).toBe(originalStatus);
+    expect(after?.status).not.toBe("cancelled");
+  });
+
+  it("succeeds and persists changes when called with the correct tenantId", async () => {
+    const result = await storage.updateAppointmentStatus(
+      seededAppointmentId,
+      "confirmed",
+      realTenantId
+    );
+    expect(result).toBeDefined();
+    expect(result.id).toBe(seededAppointmentId);
+    expect(result.status).toBe("confirmed");
+  });
+});
+
+// ─── Storage-layer unit tests — updateContact ────────────────────────────────
+
+describe("storage.updateContact — storage-layer guard", () => {
+  it("throws when tenantId is undefined", async () => {
+    await expect(
+      storage.updateContact(seededContactId, { name: "hacked" }, undefined)
+    ).rejects.toThrow("tenantId is required to update a contact");
+  });
+
+  it("does NOT persist changes when tenantId is undefined", async () => {
+    // Capture the current name before the attempted mutation
+    const [before] = await db
+      .select()
+      .from(contacts)
+      .where(eq(contacts.id, seededContactId));
+    const originalName = before?.name;
+
+    // Attempt the mutation — expected to throw
+    await expect(
+      storage.updateContact(seededContactId, { name: "hacked" }, undefined)
+    ).rejects.toThrow();
+
+    // Verify the record is unchanged
+    const [after] = await db
+      .select()
+      .from(contacts)
+      .where(eq(contacts.id, seededContactId));
+    expect(after?.name).toBe(originalName);
+    expect(after?.name).not.toBe("hacked");
+  });
+
+  it("succeeds and persists changes when called with the correct tenantId", async () => {
+    const result = await storage.updateContact(
+      seededContactId,
+      { name: "Legitimate Update" },
+      realTenantId
+    );
+    expect(result).toBeDefined();
+    expect(result.id).toBe(seededContactId);
+    expect(result.name).toBe("Legitimate Update");
+  });
+});

@@ -2986,6 +2986,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAppointmentStatus(id: number, status: string, tenantId?: number): Promise<Appointment> {
+    if (!tenantId) throw new Error("tenantId is required to update an appointment");
     const where = tenantId ? and(eq(appointments.id, id), eq(appointments.tenantId, tenantId)) : eq(appointments.id, id);
     const [updated] = await db
       .update(appointments)
@@ -3786,6 +3787,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateContact(id: number, contact: Partial<InsertContact>, tenantId?: number): Promise<Contact> {
+    if (!tenantId) throw new Error("tenantId is required to update a contact");
     const where = tenantId ? and(eq(contacts.id, id), eq(contacts.tenantId, tenantId)) : eq(contacts.id, id);
     const [updatedContact] = await db
       .update(contacts)
