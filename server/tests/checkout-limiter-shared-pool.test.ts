@@ -7,16 +7,25 @@
  * registrations share the same MemoryStore, they also share the same per-IP
  * counter.
  *
- * This test documents and confirms that shared-pool design as a contract:
- *   1. 10 POST /api/orders requests exhaust the checkoutLimiter budget.
- *   2. The 11th POST /api/orders returns 429.
- *   3. POST /api/create-payment-intent also returns 429 — the budget was
- *      already depleted by the /api/orders burst, proving the shared-pool
- *      behaviour.
+ * This test documents and confirms that shared-pool design as a contract in
+ * both directions:
  *
- * If this test fails with /api/create-payment-intent NOT returning 429, the
- * two routes have been decoupled onto separate MemoryStore instances — update
- * the comment in routes.ts to reflect the new independent-pool design.
+ *   Direction A (/api/orders → /api/create-payment-intent):
+ *     1. 10 POST /api/orders requests exhaust the checkoutLimiter budget.
+ *     2. The 11th POST /api/orders returns 429.
+ *     3. POST /api/create-payment-intent also returns 429 — the budget was
+ *        already depleted by the /api/orders burst.
+ *
+ *   Direction B (/api/create-payment-intent → /api/orders):
+ *     1. 10 POST /api/create-payment-intent requests exhaust the budget.
+ *     2. The 11th POST /api/create-payment-intent returns 429.
+ *     3. POST /api/orders also returns 429 — proving the shared pool works in
+ *        both directions.  A future split of checkoutLimiter into two separate
+ *        rateLimit() instances would pass Direction A but fail Direction B.
+ *
+ * If this test fails with a route NOT returning 429, the two routes have been
+ * decoupled onto separate MemoryStore instances — update the comment in
+ * routes.ts to reflect the new independent-pool design.
  *
  * NOTE: An X-Tenant-Slug header is required on every request so that
  * tenantMiddleware resolves a tenantId and calls next() rather than returning
@@ -252,6 +261,93 @@ describe("checkoutLimiter shared-pool — /api/orders traffic depletes /api/crea
       expect(
         paymentIntentRes.body?.message,
         "429 body on /api/create-payment-intent should carry the checkoutLimiter message",
+      ).toMatch(/too many checkout attempts/i);
+    },
+    30_000,
+  );
+});
+
+describe("checkoutLimiter shared-pool — /api/create-payment-intent traffic depletes /api/orders budget", () => {
+  /**
+   * Inverse of the describe block above.  Exhausting the budget via
+   * /api/create-payment-intent must also block /api/orders, proving the shared
+   * pool works in both directions.
+   *
+   * A unique fake IP (via X-Forwarded-For) gives this block its own
+   * rate-limit bucket, completely isolated from the other describe blocks.
+   * getRealIp() reads the rightmost XFF entry, so this value is used as the
+   * rate-limit key for every request below.
+   *
+   * Limiter layout (from server/routes.ts):
+   *
+   *   checkoutLimiter → app.use('/api/orders',                 checkoutLimiter)  max: 10
+   *   checkoutLimiter → app.use('/api/create-payment-intent',  checkoutLimiter)  max: 10  (same instance)
+   *
+   * After 10 POST /api/create-payment-intent requests the shared counter
+   * reaches 10 / 10.  The 11th request on either path must be blocked.
+   */
+
+  // Unique IP so this block gets a fresh, isolated rate-limit bucket.
+  const INVERSE_TEST_IP = "10.99.2.1";
+  const CHECKOUT_LIMITER_MAX = 10;
+
+  it(
+    "exhausts checkoutLimiter with 10 POST /api/create-payment-intent requests — 11th returns 429",
+    async () => {
+      // Send exactly max requests via /api/create-payment-intent.
+      // The X-Tenant-Slug header ensures tenantMiddleware resolves a tenantId
+      // and calls next(), so checkoutLimiter can run.  A valid body is not
+      // required because the limiter fires before request-body validation.
+      for (let i = 0; i < CHECKOUT_LIMITER_MAX; i++) {
+        const res = await agent
+          .post("/api/create-payment-intent")
+          .set("X-Tenant-Slug", testTenantSlug)
+          .set("X-Forwarded-For", INVERSE_TEST_IP);
+
+        expect(
+          res.status,
+          `attempt ${i + 1}/${CHECKOUT_LIMITER_MAX} was blocked by checkoutLimiter before budget was exhausted`,
+        ).not.toBe(429);
+      }
+
+      // The (max + 1)th request must be blocked.
+      const blockedRes = await agent
+        .post("/api/create-payment-intent")
+        .set("X-Tenant-Slug", testTenantSlug)
+        .set("X-Forwarded-For", INVERSE_TEST_IP);
+
+      expect(
+        blockedRes.status,
+        `11th POST /api/create-payment-intent should return 429 but got ${blockedRes.status}`,
+      ).toBe(429);
+
+      expect(
+        blockedRes.body?.message,
+        "429 body should carry the checkoutLimiter message",
+      ).toMatch(/too many checkout attempts/i);
+    },
+    120_000,
+  );
+
+  it(
+    "POST /api/orders also returns 429 after the checkoutLimiter budget is depleted by /api/create-payment-intent — shared-pool confirmed in both directions",
+    async () => {
+      // At this point the shared counter for INVERSE_TEST_IP is already past
+      // 10.  Any request on /api/orders must also be blocked because it uses
+      // the exact same MemoryStore entry.
+      const ordersRes = await agent
+        .post("/api/orders")
+        .set("X-Tenant-Slug", testTenantSlug)
+        .set("X-Forwarded-For", INVERSE_TEST_IP);
+
+      expect(
+        ordersRes.status,
+        `POST /api/orders should return 429 (shared-pool depleted by /api/create-payment-intent) but got ${ordersRes.status}`,
+      ).toBe(429);
+
+      expect(
+        ordersRes.body?.message,
+        "429 body on /api/orders should carry the checkoutLimiter message",
       ).toMatch(/too many checkout attempts/i);
     },
     30_000,
