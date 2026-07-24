@@ -361,6 +361,15 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   });
   app.use('/api/auth/signup', signupLimiter);
 
+  // searchLimiter — shared-pool design (intentional):
+  // The same searchLimiter instance is applied to both /api/supplies/search
+  // and /api/pets via two separate app.use() calls.  Because both calls share
+  // the same MemoryStore, they also share the same per-IP counter (60 req/min).
+  // A burst of /api/supplies/search requests will consume budget from the
+  // /api/pets window and vice versa.  This is intentional: both endpoints are
+  // high-frequency read paths that should be subject to the same aggregate
+  // rate cap to prevent scraping.  If the two paths ever need independent
+  // budgets, create two separate rateLimit() instances with their own stores.
   const searchLimiter = rateLimit({
     windowMs: 1 * 60 * 1000,
     max: 60,
