@@ -561,3 +561,143 @@ describe("POST /api/auth/signup — signupLimiter window resets after 15 minutes
     90_000,
   );
 });
+
+// ─── signupLimiter cross-tenant budget sharing ────────────────────────────────
+//
+// INTENDED BEHAVIOUR (as of this writing): the signupLimiter is keyed by IP
+// only (getRealIp).  There is NO tenant dimension in the key.  This means that
+// a single IP exhausting the budget on Tenant A will also be blocked when it
+// tries to sign up on Tenant B in the same 15-minute window.
+//
+// This is a deliberate design choice: the limiter protects against credential-
+// stuffing and bulk account creation, and an attacker rotating through store
+// slugs from the same IP is exactly the threat model the limiter was built for.
+//
+// If the design ever changes to per-IP-per-tenant keys the assertion in the
+// last test below will fail, making the behaviour change visible and explicit.
+
+describe("POST /api/auth/signup — signupLimiter budget is shared across tenant slugs from the same IP", () => {
+  let tenantAId: number;
+  let tenantASlug: string;
+  let tenantBId: number;
+  let tenantBSlug: string;
+  let crossTenantAgent: ReturnType<typeof supertest>;
+
+  beforeAll(async () => {
+    const sfx = randomSuffix();
+    tenantASlug = `cross-tenant-a-${sfx}`;
+    tenantBSlug = `cross-tenant-b-${sfx}`;
+
+    // Advance the sequence past any existing rows to avoid duplicate-key
+    // errors when parallel test files have already inserted tenants.
+    await db.execute(
+      sql`SELECT setval(
+            pg_get_serial_sequence('tenants', 'id'),
+            GREATEST((SELECT MAX(id) FROM tenants), 1)
+          )`,
+    );
+
+    // Insert two independent tenant rows — Tenant A and Tenant B.
+    const [tenantA] = await db
+      .insert(tenants)
+      .values({
+        name: `Cross Tenant A ${sfx}`,
+        slug: tenantASlug,
+        subscriptionStatus: "active",
+        subscriptionTier: "starter",
+      })
+      .returning();
+
+    const [tenantB] = await db
+      .insert(tenants)
+      .values({
+        name: `Cross Tenant B ${sfx}`,
+        slug: tenantBSlug,
+        subscriptionStatus: "active",
+        subscriptionTier: "starter",
+      })
+      .returning();
+
+    tenantAId = tenantA.id;
+    tenantBId = tenantB.id;
+
+    // Build a FRESH app so this describe block starts with a completely clean
+    // MemoryStore — no slots consumed by earlier describe blocks.
+    const freshApp = express();
+    freshApp.use(express.json());
+    freshApp.use(cookieParser());
+    const { registerRoutes } = await import("../routes");
+    await registerRoutes(freshApp);
+    crossTenantAgent = supertest(freshApp);
+  }, 60_000);
+
+  afterAll(async () => {
+    if (tenantAId) {
+      await db.delete(tenants).where(eq(tenants.id, tenantAId));
+    }
+    if (tenantBId) {
+      await db.delete(tenants).where(eq(tenants.id, tenantBId));
+    }
+  }, 30_000);
+
+  it(
+    "exhausting the budget on Tenant A blocks a subsequent request to Tenant B from the same IP (shared per-IP budget)",
+    async () => {
+      // ── Phase 1: exhaust the signupLimiter budget via Tenant A ────────────
+      // Send 15 requests with Tenant A's slug.  Intentionally incomplete bodies
+      // (missing required fields) prevent any user rows from being created, but
+      // req.tenantId IS set by tenantMiddleware so the limiter counts each one.
+      for (let i = 0; i < 15; i++) {
+        const res = await crossTenantAgent
+          .post("/api/auth/signup")
+          .set("X-Tenant-Slug", tenantASlug)
+          .send({ email: `cross-a-${i}-${randomSuffix()}@test.local` }); // intentionally incomplete
+
+        expect(
+          res.status,
+          `Tenant A attempt ${i + 1}/15 was blocked before the budget was exhausted`,
+        ).not.toBe(429);
+      }
+
+      // ── Phase 2: one more request to Tenant A must now be blocked ─────────
+      // Sanity-check that the budget really is exhausted before switching slugs.
+      const tenantAOverLimit = await crossTenantAgent
+        .post("/api/auth/signup")
+        .set("X-Tenant-Slug", tenantASlug)
+        .send({ email: `cross-a-16-${randomSuffix()}@test.local` });
+
+      expect(
+        tenantAOverLimit.status,
+        "16th request to Tenant A should be 429 (budget exhausted)",
+      ).toBe(429);
+
+      // ── Phase 3: a request to Tenant B from the same IP must also be blocked ─
+      //
+      // CURRENT INTENDED BEHAVIOUR: the signupLimiter key is the caller's IP
+      // address with no tenant dimension.  Budget consumed against Tenant A is
+      // therefore drawn from the same pool that Tenant B would use.  The request
+      // below is the FIRST request this IP has sent to Tenant B, but the shared
+      // budget is already exhausted, so it must return 429.
+      //
+      // If this assertion ever starts failing (i.e. Tenant B returns non-429),
+      // the limiter has been changed to a per-IP-per-tenant key.  Update the
+      // comment above and the assertion to reflect the new intended behaviour.
+      const tenantBRes = await crossTenantAgent
+        .post("/api/auth/signup")
+        .set("X-Tenant-Slug", tenantBSlug)
+        .send({ email: `cross-b-1-${randomSuffix()}@test.local` });
+
+      expect(
+        tenantBRes.status,
+        "First request to Tenant B should be 429 — the per-IP budget is shared across tenant slugs",
+      ).toBe(429);
+
+      // The 429 body must carry the signupLimiter's message, not the
+      // generalLimiter's message, confirming it is the correct limiter firing.
+      expect(tenantBRes.body.message).toBe(
+        "Too many signup attempts, please try again in 15 minutes.",
+      );
+    },
+    60_000,
+  );
+});
