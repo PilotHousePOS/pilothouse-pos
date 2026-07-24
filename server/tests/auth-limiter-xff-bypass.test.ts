@@ -1,16 +1,14 @@
 /**
- * Security test: authLimiter cannot be bypassed via X-Forwarded-For header rotation
+ * Security tests: authLimiter behaviour
  *
- * Background
- * ----------
+ * Test 1 — X-Forwarded-For rotation bypass
+ * -----------------------------------------
  * express-rate-limit uses req.ip as its default key. When Express is configured
  * with `app.set("trust proxy", 1)` (as this app is), req.ip is derived from the
  * LEFTMOST X-Forwarded-For entry, which an attacker controls from a single TCP
  * connection. An attacker can prepend rotating fake IPs to bypass per-IP limits.
  *
- * Fix
- * ---
- * The authLimiter uses `keyGenerator: getRealIp`, which reads the RIGHTMOST
+ * Fix: The authLimiter uses `keyGenerator: getRealIp`, which reads the RIGHTMOST
  * X-Forwarded-For entry — the one appended by Replit's edge proxy that a client
  * cannot forge. Rotating the leftmost spoofed entry does not create separate
  * rate-limit buckets; all requests from the same real connection share one counter.
@@ -33,6 +31,19 @@
  *    rotating leftmost entry an attacker controls.
  *    If the limiter used req.ip instead, each request would be a fresh bucket
  *    and the 16th would NOT be 429, meaning the bypass was possible.
+ *
+ * Test 2 — window reset
+ * ----------------------
+ * The authLimiter window is 15 minutes. After the window expires the per-IP
+ * counter must reset so legitimate users are not permanently locked out from
+ * a short burst of failed attempts.
+ *
+ * Test design
+ * -----------
+ * A unique IP (TEST-NET-3, distinct from the XFF-bypass test) exhausts all 15
+ * attempts. The 16th request is confirmed to be 429. vi.setSystemTime() then
+ * advances the clock by 15 minutes + 1 ms so the MemoryStore window expires.
+ * The next request must return non-429, proving the counter was reset.
  */
 
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
@@ -146,6 +157,88 @@ describe("authLimiter — X-Forwarded-For header rotation cannot bypass the per-
         blocked.body?.message,
         "429 response body should carry the authLimiter message",
       ).toMatch(/too many login attempts/i);
+    },
+    90_000,
+  );
+});
+
+// ─── Window-reset test ────────────────────────────────────────────────────────
+//
+// Uses a distinct real IP (203.0.113.2) so this test starts with a fresh
+// per-IP bucket and is not affected by the XFF-bypass test above.
+
+describe("authLimiter — per-IP counter resets after the 15-minute window expires", () => {
+  it(
+    "allows a login attempt from the same IP after the 15-minute window has elapsed",
+    async () => {
+      // A fresh IP distinct from REAL_PROXY_IP used in the XFF-bypass test.
+      // This guarantees an independent counter so the two tests cannot interfere.
+      const WINDOW_RESET_IP = "203.0.113.2"; // TEST-NET-3, never a real client IP
+      const AUTH_LIMITER_MAX = 15;
+      const AUTH_LIMITER_WINDOW_MS = 15 * 60 * 1000; // must match sharedLimiters.ts
+
+      // ── Phase 1: exhaust the budget ──────────────────────────────────────────
+      // Send AUTH_LIMITER_MAX requests from WINDOW_RESET_IP.  All must be
+      // allowed through by the limiter (handler will 401 for bad credentials).
+      for (let i = 1; i <= AUTH_LIMITER_MAX; i++) {
+        const res = await agent
+          .post("/api/auth/login")
+          .set("X-Forwarded-For", WINDOW_RESET_IP)
+          .send({
+            email: `window-reset-exhaust-${i}@test.local`,
+            password: "WrongPassword1!",
+          });
+
+        expect(
+          res.status,
+          `exhaustion attempt ${i}/${AUTH_LIMITER_MAX} from ${WINDOW_RESET_IP} ` +
+            `returned 429 before the budget was exhausted — another test may have ` +
+            `consumed this IP's budget, or the limiter window is shorter than expected`,
+        ).not.toBe(429);
+      }
+
+      // ── Phase 2: confirm the budget is now exhausted ─────────────────────────
+      // The AUTH_LIMITER_MAX + 1 request must be blocked with 429.
+      const blockedBefore = await agent
+        .post("/api/auth/login")
+        .set("X-Forwarded-For", WINDOW_RESET_IP)
+        .send({
+          email: "window-reset-blocked@test.local",
+          password: "WrongPassword1!",
+        });
+
+      expect(
+        blockedBefore.status,
+        `request ${AUTH_LIMITER_MAX + 1} from ${WINDOW_RESET_IP} should be 429 ` +
+          `(budget exhausted) but got ${blockedBefore.status} — the limiter may ` +
+          `not be accumulating all requests from the same IP in one bucket`,
+      ).toBe(429);
+
+      // ── Phase 3: advance the clock past the window ───────────────────────────
+      // vi.setSystemTime() shifts Date.now() forward.  express-rate-limit's
+      // MemoryStore uses Date.now() to determine whether a window has expired,
+      // so advancing the clock by windowMs + 1 ms makes every existing window
+      // appear expired.  The next request should open a fresh window (counter = 1)
+      // and be allowed through.
+      vi.setSystemTime(Date.now() + AUTH_LIMITER_WINDOW_MS + 1);
+
+      // ── Phase 4: confirm the counter has reset ───────────────────────────────
+      // The same IP should no longer be blocked; the limiter allows it through
+      // and the handler returns 401 (bad credentials), not 429.
+      const afterReset = await agent
+        .post("/api/auth/login")
+        .set("X-Forwarded-For", WINDOW_RESET_IP)
+        .send({
+          email: "window-reset-after@test.local",
+          password: "WrongPassword1!",
+        });
+
+      expect(
+        afterReset.status,
+        `first request from ${WINDOW_RESET_IP} after the window expired should ` +
+          `not be 429 (counter should have reset) but got ${afterReset.status} — ` +
+          `the authLimiter window may not be resetting, permanently locking users out`,
+      ).not.toBe(429);
     },
     90_000,
   );
