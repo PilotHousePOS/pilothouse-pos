@@ -368,6 +368,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   });
   app.use('/api', generalLimiter);
 
+  // keyGenerator uses the actual TCP socket address instead of req.ip so that
+  // rotating X-Forwarded-For values cannot bypass the per-connection budget.
+  // req.ip respects app.set("trust proxy", 1) and reads from X-Forwarded-For,
+  // which an attacker can freely rotate from a single connection.
+  // req.socket.remoteAddress is the real network peer — it cannot be spoofed.
   const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 15,
@@ -375,6 +380,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     legacyHeaders: false,
     keyGenerator: getRealIp,
     message: { message: "Too many login attempts, please try again in 15 minutes." },
+    keyGenerator: (req: any) => req.socket?.remoteAddress ?? req.ip,
   });
   app.use('/api/auth/login', authLimiter);
   app.use('/api/auth/register', authLimiter);
