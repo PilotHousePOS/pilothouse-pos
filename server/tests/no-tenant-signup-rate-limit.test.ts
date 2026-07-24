@@ -38,6 +38,7 @@ import supertest from "supertest";
 import { db } from "../db";
 import { tenants, users, contacts } from "@shared/schema";
 import { eq, sql, inArray } from "drizzle-orm";
+import { generateToken } from "../auth";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -500,5 +501,144 @@ describe(
       },
       30_000,
     );
+  },
+);
+
+// ─── Suite 5: Stranded user (auth cookie, no tenant) — general budget is not consumed
+//
+// A "stranded" user has a valid, signed auth cookie (their account exists in the
+// DB) but has no tenantId because no X-Tenant-Slug header or ?tenant= query param
+// is provided.
+//
+// Middleware execution order for POST /api/auth/signup without a slug:
+//
+//   1. tenantMiddleware (app.use '/api') — detects authenticated user with no
+//      tenantId and no slug.  /auth/signup is not in the NO_TENANT_ALLOWLIST,
+//      so it returns 403 immediately and calls res.end().
+//
+//   2. generalLimiter (app.use '/api') — is NEVER reached because tenantMiddleware
+//      already called res.end().  The rate-limit counter is not decremented.
+//
+// Consequence: a stranded user's signup flood consumes zero slots from the
+// general 200 req/15 min budget — even better isolation than the anonymous
+// no-slug case (which relies on the generalLimiter's skip function).
+//
+// This also confirms the generalLimiter skip check (`!req.tenantId`) only tests
+// tenantId — not auth-token presence — so a stranded user who somehow bypassed
+// tenantMiddleware's 403 would still be skipped by the limiter.
+
+describe(
+  "Stranded user (valid auth cookie, no tenant slug) — general budget is not consumed",
+  () => {
+    let agent: ReturnType<typeof supertest>;
+    let strandedUserId: string;
+    let strandedToken: string;
+
+    beforeAll(async () => {
+      const sfx = randomSuffix();
+
+      // Create a stranded user: valid DB record, no tenantId.
+      const [stranded] = await db
+        .insert(users)
+        .values({
+          id: `stranded-rl-${sfx}`,
+          email: `stranded-rl-${sfx}@test.local`,
+          firstName: "Stranded",
+          lastName: "User",
+          password: "hashed-for-test",
+          tenantId: null,
+          isAdmin: false,
+          isSuperAdmin: false,
+          tokenVersion: 0,
+        })
+        .returning();
+
+      strandedUserId = stranded.id;
+      // generateToken produces a valid signed JWT — identical to what the real
+      // login flow issues, so the cookie is indistinguishable from a real session.
+      strandedToken = generateToken(stranded as any);
+
+      // Fresh app → fresh in-memory rate-limit store → deterministic deltas.
+      const app = await buildTestApp();
+      agent = supertest(app);
+    }, 60_000);
+
+    afterAll(async () => {
+      if (strandedUserId) {
+        await db
+          .update(contacts)
+          .set({ linkedUserId: null })
+          .where(eq(contacts.linkedUserId, strandedUserId));
+        await db.delete(users).where(eq(users.id, strandedUserId));
+      }
+    }, 30_000);
+
+    it(
+      "50 signup POSTs with a valid auth cookie but no slug do not consume the general budget — counter drops by exactly 1",
+      async () => {
+        const FLOOD_COUNT = 50;
+
+        // ── Baseline: one catalog GET before the flood ────────────────────────
+        const baselineRes = await agent
+          .get("/api/supplies")
+          .set("X-Tenant-Slug", tenantSlug);
+        expect(baselineRes.status).not.toBe(429);
+
+        const baselineRemaining = parseRemaining(
+          baselineRes.headers as Record<string, string>,
+        );
+        expect(baselineRemaining).not.toBeNaN();
+
+        // ── Flood: 50 signup POSTs carrying the stranded user's auth cookie ──
+        // No X-Tenant-Slug header is sent, so tenantMiddleware detects the
+        // authenticated stranded user and returns 403 before the generalLimiter
+        // runs.  The rate-limit counter is never touched.
+        for (let i = 0; i < FLOOD_COUNT; i++) {
+          const sfx = randomSuffix();
+          const res = await agent
+            .post("/api/auth/signup")
+            .set("Cookie", `auth_token=${strandedToken}`)
+            .send({
+              email: `stranded-flood-${sfx}@test.local`,
+              password: "Test1234!",
+              firstName: "Stranded",
+              lastName: "Flood",
+              phoneNumber: `559${String(i).padStart(7, "0")}`,
+            });
+          // tenantMiddleware short-circuits with 403 (stranded user, no slug,
+          // /auth/signup is not in NO_TENANT_ALLOWLIST) before the signup handler
+          // or any rate limiter runs.
+          expect(res.status).toBe(403);
+        }
+
+        // ── Post-flood probe: one more catalog GET ────────────────────────────
+        const postFloodRes = await agent
+          .get("/api/supplies")
+          .set("X-Tenant-Slug", tenantSlug);
+        expect(postFloodRes.status).not.toBe(429);
+
+        const postFloodRemaining = parseRemaining(
+          postFloodRes.headers as Record<string, string>,
+        );
+        expect(postFloodRemaining).not.toBeNaN();
+
+        // ── Key assertion: delta is exactly 1 (only the post-flood probe GET) ─
+        // tenantMiddleware short-circuits the 50 flood requests before the
+        // generalLimiter runs, so none of them consume a slot.  If the limiter
+        // were somehow reached, the delta would be 51 (50 flood + 1 probe).
+        // A delta of 1 confirms the general budget is fully protected whether by
+        // tenantMiddleware's 403 or by the generalLimiter's !req.tenantId skip.
+        const delta = baselineRemaining - postFloodRemaining;
+        expect(delta).toBe(1);
+      },
+      30_000,
+    );
+
+    it("catalog browsing is unaffected after the stranded-user flood", async () => {
+      const res = await agent
+        .get("/api/supplies")
+        .set("X-Tenant-Slug", tenantSlug);
+      expect(res.status).not.toBe(429);
+    });
   },
 );
