@@ -5,7 +5,7 @@ export default function SmsConsent() {
   const [, navigate] = useLocation();
 
   return (
-    <div className="max-w-md mx-auto bg-white min-h-screen">
+    <div className="w-full bg-white min-h-screen">
       <div className="bg-blue-800 text-white p-4 flex items-center gap-3">
         <button onClick={() => navigate("/")} className="text-white">
           <ArrowLeft className="w-5 h-5" />

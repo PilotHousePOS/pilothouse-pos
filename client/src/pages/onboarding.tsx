@@ -158,7 +158,7 @@ function Step1({ tenantId, onNext }: { tenantId: number; onNext: () => void }) {
         <Input
           value={displayName}
           onChange={e => handleNameChange(e.target.value)}
-          placeholder="Animal House Pet Store"
+          placeholder="e.g. Main Street Coffee Shop"
           className="bg-white/10 border-white/30 text-white placeholder:text-gray-500"
         />
       </div>
@@ -592,7 +592,7 @@ export default function Onboarding() {
   // Spinner while we determine which step to start on
   if (step === null) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex items-center justify-center">
+      <div className="w-full min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-white animate-spin" />
       </div>
     );
@@ -605,7 +605,7 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-start md:items-center justify-center p-6 py-10">
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-start md:items-center justify-center p-6 py-10">
       {/* Background blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-64 h-64 bg-brand-red/10 rounded-full blur-3xl" />

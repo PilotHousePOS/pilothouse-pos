@@ -43,7 +43,7 @@ export default function Paywall({ status }: PaywallProps) {
   const isPastDue = status === "past_due";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+    <div className="w-full min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="max-w-md w-full text-center space-y-6 bg-white rounded-2xl shadow-sm border p-8">
         <div className="flex justify-center">
           <div className={`w-16 h-16 rounded-full flex items-center justify-center ${

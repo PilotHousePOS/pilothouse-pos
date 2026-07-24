@@ -137,7 +137,7 @@ export default function AquaticsPage() {
   const isLoading = petsLoading || suppliesLoading;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-32">
+    <div className="w-full min-h-screen bg-gray-50 pb-32">
       {/* Fixed Back Button */}
       <div className="fixed top-4 left-4 z-50">
         <Button

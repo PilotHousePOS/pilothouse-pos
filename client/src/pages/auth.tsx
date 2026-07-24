@@ -275,7 +275,7 @@ export default function Auth() {
   // Slug is being validated — show a neutral loading screen
   if (slugState === "checking") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-center justify-center p-6">
+      <div className="w-full min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-center justify-center p-6">
         <div className="w-full max-w-md text-center space-y-4">
           <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto" />
           <p className="text-gray-300">Loading store…</p>
@@ -287,7 +287,7 @@ export default function Auth() {
   // Slug is present but no matching store was found
   if (slugState === "invalid") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-center justify-center p-6">
+      <div className="w-full min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           <Card className="bg-white/10 backdrop-blur-md border border-white/20 text-center">
             <CardContent className="pt-8 pb-8 space-y-4">
@@ -317,7 +317,7 @@ export default function Auth() {
 
   if (verificationPending) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-center justify-center p-6">
+      <div className="w-full min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           <Card className="bg-white/10 backdrop-blur-md border border-white/20 text-center">
             <CardContent className="pt-8 pb-8 space-y-4">
@@ -352,7 +352,7 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-start md:items-center justify-center p-6 py-8">
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-start md:items-center justify-center p-6 py-8">
       <div className="w-full max-w-md">
         <div className="mb-6">
           <Button

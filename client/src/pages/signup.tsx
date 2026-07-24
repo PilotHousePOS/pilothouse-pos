@@ -124,7 +124,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-start md:items-center justify-center p-6 py-8">
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-start md:items-center justify-center p-6 py-8">
       {/* Background blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-64 h-64 bg-brand-red/10 rounded-full blur-3xl" />
@@ -168,7 +168,7 @@ export default function Signup() {
                   name="businessName"
                   value={businessName}
                   onChange={e => setBusinessName(e.target.value)}
-                  placeholder="e.g. Animal House Pet Store"
+                  placeholder="e.g. Main Street Coffee Shop"
                   className="bg-white/10 border-white/30 text-white placeholder:text-gray-500"
                   required
                 />

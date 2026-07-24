@@ -12,7 +12,7 @@ export default function Landing() {
   const hiringOpen = hiringData?.open ?? false;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white overflow-x-hidden">
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white overflow-x-hidden">
       {/* Animated background blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-64 h-64 bg-brand-red/10 rounded-full blur-3xl animate-pulse" />

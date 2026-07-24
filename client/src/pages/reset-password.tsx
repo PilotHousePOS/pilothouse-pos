@@ -114,7 +114,7 @@ export default function ResetPassword() {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-center justify-center p-6">
+      <div className="w-full min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-center justify-center p-6">
         <Card className="bg-white/10 backdrop-blur-md border border-white/20 max-w-md">
           <CardContent className="pt-6 text-center">
             <p className="text-gray-300">Invalid or missing reset token. Redirecting...</p>
@@ -125,7 +125,7 @@ export default function ResetPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-center justify-center p-6">
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         {!resetSuccess && (
           <div className="mb-6">

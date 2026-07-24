@@ -175,7 +175,7 @@ export default function SupplyDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="w-full min-h-screen bg-black flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full" />
       </div>
     );
@@ -183,7 +183,7 @@ export default function SupplyDetail() {
 
   if (error || !supply) {
     return (
-      <div className="min-h-screen bg-black p-4">
+      <div className="w-full min-h-screen bg-black p-4">
         <Button 
           variant="ghost" 
           onClick={() => setLocation("/supplies")}
@@ -234,7 +234,7 @@ export default function SupplyDetail() {
   const inStock = true; // Stock quantity is not actively managed; never block Add to Cart on detail page (consistent with list view)
 
   return (
-    <div className="min-h-screen bg-black text-white pb-24">
+    <div className="w-full min-h-screen bg-black text-white pb-24">
       <div className="sticky top-0 z-10 bg-black/90 backdrop-blur-sm border-b border-gray-800 p-3 flex items-center justify-between">
         <Button 
           variant="ghost" 

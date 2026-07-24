@@ -6,8 +6,8 @@ export default function DeleteAccount() {
   const [, setLocation] = useLocation();
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white px-4 py-8">
-      <div className="max-w-lg mx-auto">
+    <div className="w-full min-h-screen bg-gray-950 text-white px-4 py-8">
+      <div className="max-w-lg mx-auto w-full">
         <Button
           variant="ghost"
           className="text-gray-400 hover:text-white mb-6"

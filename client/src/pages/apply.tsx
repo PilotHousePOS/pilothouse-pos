@@ -143,7 +143,7 @@ export default function Apply() {
 
   if (!hiringLoading && !hiringOpen) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
             <BriefcaseIcon className="w-8 h-8 text-gray-500" />
@@ -162,7 +162,7 @@ export default function Apply() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Application Submitted!</h1>
@@ -178,7 +178,7 @@ export default function Apply() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="w-full min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-gray-800 text-white py-6 px-4">
         <div className="max-w-3xl mx-auto">

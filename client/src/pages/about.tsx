@@ -1,6 +1,6 @@
 export default function About() {
   return (
-    <div style={{ fontFamily: 'Arial, sans-serif', maxWidth: '800px', margin: '0 auto', padding: '40px 20px', color: '#111' }}>
+    <div style={{ fontFamily: 'Arial, sans-serif', width: '100%', padding: '40px 20px', color: '#111' }}>
       <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>PilotHouse</h1>
       <p style={{ fontSize: '1.1rem', marginBottom: '24px', color: '#444' }}>The all-in-one platform for small business operations.</p>
 

@@ -460,7 +460,7 @@ export default function MyAppointments() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="w-full min-h-screen bg-gray-50 pb-20">
       <div className="fixed top-4 left-4 z-50">
         <Button
           variant="ghost"

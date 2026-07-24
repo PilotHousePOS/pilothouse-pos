@@ -115,7 +115,7 @@ export default function TermsOfService() {
   const content = page?.content || DEFAULT_CONTENT;
 
   return (
-    <div className="min-h-screen bg-white pb-20">
+    <div className="w-full min-h-screen bg-white pb-20">
       <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white p-4 sticky top-0 z-10">
         <div className="flex items-center gap-3">
           <button onClick={() => navigate(-1 as any)} className="p-1">

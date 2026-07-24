@@ -60,7 +60,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
   render() {
     if (this.state.hasError) {
       return (
-        <div className="max-w-md mx-auto bg-white min-h-screen flex flex-col items-center justify-center gap-4 p-8 text-center">
+        <div className="w-full bg-white min-h-screen flex flex-col items-center justify-center gap-4 p-8 text-center">
           <p className="text-gray-600">Something went wrong. Please refresh the page.</p>
           <button
             className="px-4 py-2 bg-primary text-white rounded-lg text-sm"
@@ -106,7 +106,7 @@ const Onboarding = safeLazy(() => import("@/pages/onboarding"), "onboarding");
 
 function PageLoader() {
   return (
-    <div className="max-w-md mx-auto bg-white min-h-screen flex items-center justify-center">
+    <div className="w-full bg-white min-h-screen flex items-center justify-center">
       <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
     </div>
   );
@@ -155,7 +155,7 @@ function NoTenantScreen() {
   const { refetch, isFetching } = useAuth();
 
   return (
-    <div className="max-w-md mx-auto bg-white min-h-screen flex flex-col items-center justify-center gap-6 p-8 text-center">
+    <div className="w-full bg-white min-h-screen flex flex-col items-center justify-center gap-6 p-8 text-center">
       <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center">
         <svg className="w-8 h-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />

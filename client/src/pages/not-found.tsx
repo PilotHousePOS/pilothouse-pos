@@ -5,7 +5,7 @@ export default function NotFound() {
   const [, navigate] = useLocation();
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
+    <div className="w-full min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
       <div className="text-6xl mb-4">🐾</div>
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Page Not Found</h1>
       <p className="text-gray-600 mb-6">

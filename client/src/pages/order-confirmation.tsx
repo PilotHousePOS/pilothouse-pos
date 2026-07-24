@@ -24,7 +24,7 @@ export default function OrderConfirmation() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
       </div>
     );
@@ -32,7 +32,7 @@ export default function OrderConfirmation() {
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+      <div className="w-full min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
         <Package className="w-16 h-16 text-gray-300 mb-4" />
         <h2 className="text-lg font-semibold text-gray-900 mb-2">Order Not Found</h2>
         <p className="text-gray-500 mb-4">We couldn't find this order.</p>
@@ -64,7 +64,7 @@ export default function OrderConfirmation() {
   const totalAmount = orderData.totalAmount || "0.00";
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="w-full min-h-screen bg-gray-50 pb-24">
       <div className="fixed top-4 right-4 z-50">
         <Button
           variant="ghost"

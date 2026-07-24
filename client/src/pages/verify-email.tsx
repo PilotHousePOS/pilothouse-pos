@@ -106,7 +106,7 @@ export default function VerifyEmail() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+    <div className="w-full min-h-screen bg-gray-950 flex items-center justify-center px-4">
       <div className="bg-gray-900 rounded-2xl p-8 max-w-sm w-full text-center shadow-xl border border-gray-800">
         <div className="mb-6">
           <img
