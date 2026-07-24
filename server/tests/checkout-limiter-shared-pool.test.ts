@@ -352,6 +352,96 @@ describe("checkoutLimiter shared-pool — /api/orders traffic depletes /api/crea
   );
 });
 
+describe("checkoutLimiter window-reset — /api/create-payment-intent burst unblocks /api/orders after window expires", () => {
+  /**
+   * Symmetric counterpart to the payment-intent window-reset block above.
+   * Exhausts the shared budget via /api/create-payment-intent, then
+   * fast-forwards the virtual clock past windowMs and confirms that
+   * POST /api/orders — the *other* route — is also unblocked.
+   *
+   * Without this test, a MemoryStore regression that only resets the counter
+   * for the originating route's path would pass the single-route reset tests
+   * but silently leave the sibling route permanently blocked.
+   *
+   * Verification strategy:
+   *   1. Exhaust the checkoutLimiter for the dedicated IP via 10 POST
+   *      /api/create-payment-intent requests.
+   *   2. Confirm the 11th /api/create-payment-intent is blocked (429).
+   *   3. Spy on Date.now() and fast-forward the virtual clock past windowMs
+   *      (15 min + 1 ms) so express-rate-limit's MemoryStore considers the
+   *      window expired on the next hit.
+   *   4. Confirm the next POST /api/orders — the sibling route — is no longer
+   *      blocked (non-429).
+   *
+   * A unique fake IP ensures this block has its own isolated rate-limit
+   * bucket, completely separate from every other describe block in this file.
+   */
+
+  const RESET_CROSS_TEST_IP = "10.99.4.1";
+  const CHECKOUT_LIMITER_MAX = 10;
+  const WINDOW_MS = 15 * 60 * 1000; // must match windowMs in sharedLimiters.ts
+
+  it(
+    "allows POST /api/orders after the 15-minute window expires — budget was exhausted via /api/create-payment-intent",
+    async () => {
+      // ── Step 1: exhaust the budget for RESET_CROSS_TEST_IP via payment-intent
+      for (let i = 0; i < CHECKOUT_LIMITER_MAX; i++) {
+        const res = await agent
+          .post("/api/create-payment-intent")
+          .set("X-Tenant-Slug", testTenantSlug)
+          .set("X-Forwarded-For", RESET_CROSS_TEST_IP);
+
+        expect(
+          res.status,
+          `request ${i + 1}/${CHECKOUT_LIMITER_MAX} should not be rate-limited before budget is exhausted`,
+        ).not.toBe(429);
+      }
+
+      // ── Step 2: confirm the budget is now exhausted ───────────────────────
+      const blockedRes = await agent
+        .post("/api/create-payment-intent")
+        .set("X-Tenant-Slug", testTenantSlug)
+        .set("X-Forwarded-For", RESET_CROSS_TEST_IP);
+
+      expect(
+        blockedRes.status,
+        `11th POST /api/create-payment-intent should be blocked (429) but got ${blockedRes.status}`,
+      ).toBe(429);
+
+      expect(
+        blockedRes.body?.message,
+        "429 body should carry the checkoutLimiter message",
+      ).toMatch(/too many checkout attempts/i);
+
+      // ── Step 3: advance the virtual clock past windowMs ───────────────────
+      // Only Date.now() is mocked — setTimeout/setInterval are left real so
+      // that supertest's internal async operations are not affected.
+      const realNow = Date.now();
+      const dateSpy = vi
+        .spyOn(Date, "now")
+        .mockReturnValue(realNow + WINDOW_MS + 1);
+
+      try {
+        // ── Step 4: confirm /api/orders is also unblocked after window reset ─
+        // This is the key assertion: the shared MemoryStore must reset the
+        // counter for the whole IP, not just the originating route's path.
+        const afterResetRes = await agent
+          .post("/api/orders")
+          .set("X-Tenant-Slug", testTenantSlug)
+          .set("X-Forwarded-For", RESET_CROSS_TEST_IP);
+
+        expect(
+          afterResetRes.status,
+          `POST /api/orders should be allowed after the ${WINDOW_MS}ms window expires (budget was exhausted via /api/create-payment-intent), but got ${afterResetRes.status}`,
+        ).not.toBe(429);
+      } finally {
+        dateSpy.mockRestore();
+      }
+    },
+    120_000,
+  );
+});
+
 describe("checkoutLimiter shared-pool — /api/create-payment-intent traffic depletes /api/orders budget", () => {
   /**
    * Inverse of the describe block above.  Exhausting the budget via
