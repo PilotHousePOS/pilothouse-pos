@@ -209,4 +209,67 @@ describe("searchLimiter — window reset allows requests after the 1-minute wind
     },
     120_000,
   );
+
+  it(
+    "window reset also unblocks /api/supplies/search after the budget was exhausted via /api/pets",
+    async () => {
+      const SEARCH_LIMITER_MAX = 60; // mirrors searchLimiter max
+      const WINDOW_MS = 1 * 60 * 1000; // mirrors searchLimiter windowMs
+
+      // ── Phase 1: advance to a fresh window ───────────────────────────────
+      // Previous tests may have consumed some of the current window's budget.
+      // Advance the clock by a full window so this test starts with a
+      // completely fresh, unused counter.
+      vi.setSystemTime(new Date(Date.now() + WINDOW_MS + 1000));
+
+      // ── Phase 2: exhaust the shared searchLimiter budget via /api/pets ────
+      // Send SEARCH_LIMITER_MAX requests to /api/pets.  Because /api/pets and
+      // /api/supplies/search share the same searchLimiter instance they count
+      // against the same per-IP budget.  We only care that the limiter counts
+      // them — not whether the route handler succeeds — so any non-429 status
+      // is acceptable here.
+      for (let i = 0; i < SEARCH_LIMITER_MAX; i++) {
+        const res = await agent
+          .get("/api/pets")
+          .set("X-Tenant-Slug", testTenantSlug);
+
+        expect(
+          res.status,
+          `attempt ${i + 1}/${SEARCH_LIMITER_MAX} via /api/pets was unexpectedly blocked before budget was exhausted`,
+        ).not.toBe(429);
+      }
+
+      // ── Phase 3: 61st /api/pets request must be rate-limited ──────────────
+      const blockedPetsRes = await agent
+        .get("/api/pets")
+        .set("X-Tenant-Slug", testTenantSlug);
+
+      expect(
+        blockedPetsRes.status,
+        `61st /api/pets request should be rate-limited (429) but got ${blockedPetsRes.status}`,
+      ).toBe(429);
+
+      expect(
+        blockedPetsRes.body?.message,
+        "429 body on /api/pets should carry the searchLimiter message",
+      ).toMatch(/too many search requests/i);
+
+      // ── Phase 4: advance the clock past the 1-minute window ───────────────
+      vi.setSystemTime(new Date(Date.now() + WINDOW_MS + 1000));
+
+      // ── Phase 5: /api/supplies/search must be unblocked after rollover ─────
+      const afterSearchRes = await agent
+        .get("/api/supplies/search")
+        .set("X-Tenant-Slug", testTenantSlug)
+        .query({ q: "after-pets-rollover" });
+
+      // The critical assertion: exhausting via /api/pets must also unblock
+      // /api/supplies/search once the window rolls over.
+      expect(
+        afterSearchRes.status,
+        `/api/supplies/search returned 429 after window rollover — searchLimiter window did not reset after budget was exhausted via /api/pets`,
+      ).not.toBe(429);
+    },
+    120_000,
+  );
 });
