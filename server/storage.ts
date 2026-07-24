@@ -533,6 +533,24 @@ export interface IStorage {
   getAuditLogs(params: { targetTenantId?: number; actorUserId?: string; limit?: number; offset?: number }): Promise<{ entries: AuditLog[]; total: number }>;
 }
 
+/**
+ * Throws immediately when tenantId is absent (undefined, null, or 0).
+ *
+ * Call this at the top of every storage delete method that operates on a
+ * tenant-owned table so that a stranded account can never trigger an
+ * unscoped DELETE.  Adding a new delete method without this call will be
+ * caught by the enumeration test in
+ * server/tests/storage-delete-tenant-guard.test.ts.
+ */
+function requireTenantId(
+  tenantId: number | undefined | null,
+  context: string,
+): asserts tenantId is number {
+  if (!tenantId) {
+    throw new Error(`tenantId is required to ${context}`);
+  }
+}
+
 export class DatabaseStorage implements IStorage {
   // User operations
   async getUser(id: string): Promise<User | undefined> {
@@ -666,10 +684,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deletePet(id: number, tenantId?: number): Promise<void> {
-    const condition = tenantId
-      ? and(eq(pets.id, id), eq(pets.tenantId, tenantId))
-      : eq(pets.id, id);
-    await db.delete(pets).where(condition);
+    requireTenantId(tenantId, "delete a pet");
+    await db.delete(pets).where(and(eq(pets.id, id), eq(pets.tenantId, tenantId)));
   }
 
   async hasPetReferences(id: number): Promise<boolean> {
@@ -1832,14 +1848,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteSupply(id: number, tenantId?: number): Promise<void> {
+    requireTenantId(tenantId, "delete a supply");
     // Verify tenant ownership before making any side-effect changes
-    if (tenantId) {
-      const [existing] = await db
-        .select({ id: supplies.id })
-        .from(supplies)
-        .where(and(eq(supplies.id, id), eq(supplies.tenantId, tenantId)));
-      if (!existing) throw new Error("Supply not found or access denied");
-    }
+    const [existing] = await db
+      .select({ id: supplies.id })
+      .from(supplies)
+      .where(and(eq(supplies.id, id), eq(supplies.tenantId, tenantId)));
+    if (!existing) throw new Error("Supply not found or access denied");
 
     // Check if supply is referenced in any order items
     const orderItemsWithSupply = await db
@@ -2728,19 +2743,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteOrder(id: number, tenantId?: number): Promise<void> {
+    requireTenantId(tenantId, "delete an order");
     // Verify tenant ownership before deletion
-    if (tenantId) {
-      const [existing] = await db.select({ id: orders.id }).from(orders)
-        .where(and(eq(orders.id, id), eq(orders.tenantId, tenantId)));
-      if (!existing) throw new Error('Order not found');
-    }
+    const [existing] = await db.select({ id: orders.id }).from(orders)
+      .where(and(eq(orders.id, id), eq(orders.tenantId, tenantId)));
+    if (!existing) throw new Error('Order not found');
     // Delete order items first
     await db.delete(orderItems).where(eq(orderItems.orderId, id));
     // Then delete the order
-    const condition = tenantId
-      ? and(eq(orders.id, id), eq(orders.tenantId, tenantId))
-      : eq(orders.id, id);
-    const result = await db.delete(orders).where(condition);
+    const result = await db.delete(orders).where(and(eq(orders.id, id), eq(orders.tenantId, tenantId)));
     if (!result.rowCount || result.rowCount === 0) {
       throw new Error('Order not found');
     }
@@ -3310,9 +3321,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteAppointment(id: number, tenantId?: number): Promise<void> {
-    // Refuse to delete without a tenant scope — prevents cross-tenant deletes
-    // from a stranded account (tenantId = null/undefined).
-    if (!tenantId) throw new Error("tenantId is required to delete an appointment");
+    requireTenantId(tenantId, "delete an appointment");
     await db
       .delete(appointments)
       .where(and(eq(appointments.id, id), eq(appointments.tenantId, tenantId)));
@@ -3446,10 +3455,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteAppointmentHistoryRecord(id: number, tenantId?: number): Promise<void> {
-    const condition = tenantId
-      ? and(eq(appointmentHistory.id, id), eq(appointmentHistory.tenantId, tenantId))
-      : eq(appointmentHistory.id, id);
-    await db.delete(appointmentHistory).where(condition);
+    requireTenantId(tenantId, "delete an appointment history record");
+    await db.delete(appointmentHistory).where(and(eq(appointmentHistory.id, id), eq(appointmentHistory.tenantId, tenantId)));
   }
 
   async getAllUsers(tenantId?: number): Promise<User[]> {
@@ -3599,8 +3606,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteGroomer(id: number, tenantId?: number): Promise<void> {
-    const where = tenantId ? and(eq(groomers.id, id), eq(groomers.tenantId, tenantId)) : eq(groomers.id, id);
-    await db.delete(groomers).where(where);
+    requireTenantId(tenantId, "delete a groomer");
+    await db.delete(groomers).where(and(eq(groomers.id, id), eq(groomers.tenantId, tenantId)));
   }
 
   // Groomer availability operations
@@ -3679,12 +3686,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteGroomerAvailability(id: number, tenantId?: number): Promise<void> {
-    if (tenantId) {
-      const [existing] = await db.select().from(groomerAvailability)
-        .leftJoin(groomers, eq(groomerAvailability.groomerId, groomers.id))
-        .where(and(eq(groomerAvailability.id, id), eq(groomers.tenantId, tenantId)));
-      if (!existing) return; // not found for this tenant — silently ignore (no cross-tenant leakage)
-    }
+    requireTenantId(tenantId, "delete groomer availability");
+    const [existing] = await db.select().from(groomerAvailability)
+      .leftJoin(groomers, eq(groomerAvailability.groomerId, groomers.id))
+      .where(and(eq(groomerAvailability.id, id), eq(groomers.tenantId, tenantId)));
+    if (!existing) throw new Error("Groomer availability not found or access denied");
     await db.delete(groomerAvailability).where(eq(groomerAvailability.id, id));
   }
 
@@ -3717,12 +3723,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteGroomerBlockedDay(id: number, tenantId?: number): Promise<void> {
-    if (tenantId) {
-      const [existing] = await db.select().from(groomerBlockedDays)
-        .leftJoin(groomers, eq(groomerBlockedDays.groomerId, groomers.id))
-        .where(and(eq(groomerBlockedDays.id, id), eq(groomers.tenantId, tenantId)));
-      if (!existing) return; // not found for this tenant — silently ignore
-    }
+    requireTenantId(tenantId, "delete a groomer blocked day");
+    const [existing] = await db.select().from(groomerBlockedDays)
+      .leftJoin(groomers, eq(groomerBlockedDays.groomerId, groomers.id))
+      .where(and(eq(groomerBlockedDays.id, id), eq(groomers.tenantId, tenantId)));
+    if (!existing) throw new Error("Groomer blocked day not found or access denied");
     await db.delete(groomerBlockedDays).where(eq(groomerBlockedDays.id, id));
   }
 
@@ -3816,9 +3821,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteContact(id: number, tenantId?: number): Promise<void> {
-    // Refuse to delete without a tenant scope — prevents cross-tenant deletes
-    // from a stranded account (tenantId = null/undefined).
-    if (!tenantId) throw new Error("tenantId is required to delete a contact");
+    requireTenantId(tenantId, "delete a contact");
     const [existing] = await db
       .select({ id: contacts.id })
       .from(contacts)
@@ -3951,8 +3954,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteDailyAppointmentLimit(id: number, tenantId?: number): Promise<void> {
-    const where = tenantId ? and(eq(dailyAppointmentLimits.id, id), eq(dailyAppointmentLimits.tenantId, tenantId)) : eq(dailyAppointmentLimits.id, id);
-    await db.delete(dailyAppointmentLimits).where(where);
+    requireTenantId(tenantId, "delete a daily appointment limit");
+    await db.delete(dailyAppointmentLimits).where(and(eq(dailyAppointmentLimits.id, id), eq(dailyAppointmentLimits.tenantId, tenantId)));
   }
 
   // Weekly appointment limit operations
@@ -3990,8 +3993,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteWeeklyAppointmentLimit(id: number, tenantId?: number): Promise<void> {
-    const where = tenantId ? and(eq(weeklyAppointmentLimits.id, id), eq(weeklyAppointmentLimits.tenantId, tenantId)) : eq(weeklyAppointmentLimits.id, id);
-    await db.delete(weeklyAppointmentLimits).where(where);
+    requireTenantId(tenantId, "delete a weekly appointment limit");
+    await db.delete(weeklyAppointmentLimits).where(and(eq(weeklyAppointmentLimits.id, id), eq(weeklyAppointmentLimits.tenantId, tenantId)));
   }
 
   async acquireBookingLock(dateStr: string): Promise<void> {
@@ -4128,8 +4131,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteSpecialDateSetting(id: number, tenantId?: number): Promise<void> {
-    const where = tenantId ? and(eq(specialDateSettings.id, id), eq(specialDateSettings.tenantId, tenantId)) : eq(specialDateSettings.id, id);
-    await db.delete(specialDateSettings).where(where);
+    requireTenantId(tenantId, "delete a special date setting");
+    await db.delete(specialDateSettings).where(and(eq(specialDateSettings.id, id), eq(specialDateSettings.tenantId, tenantId)));
   }
 
   async getSpecialDateAllowedTimes(specialDateId: number): Promise<SpecialDateAllowedTime[]> {
@@ -4673,9 +4676,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteBoardingRecord(id: number, tenantId?: number): Promise<void> {
-    // Refuse to delete without a tenant scope — prevents cross-tenant deletes
-    // from a stranded account (tenantId = null/undefined).
-    if (!tenantId) throw new Error("tenantId is required to delete a boarding record");
+    requireTenantId(tenantId, "delete a boarding record");
     await db
       .delete(boardingRecords)
       .where(and(eq(boardingRecords.id, id), eq(boardingRecords.tenantId, tenantId)));
@@ -4717,8 +4718,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteScheduleEntry(id: number, tenantId?: number): Promise<void> {
-    const where = tenantId ? and(eq(scheduleEntries.id, id), eq(scheduleEntries.tenantId, tenantId)) : eq(scheduleEntries.id, id);
-    await db.delete(scheduleEntries).where(where);
+    requireTenantId(tenantId, "delete a schedule entry");
+    await db.delete(scheduleEntries).where(and(eq(scheduleEntries.id, id), eq(scheduleEntries.tenantId, tenantId)));
   }
 
   // Grooming Schedule operations
@@ -4757,8 +4758,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteGroomingScheduleEntry(id: number, tenantId?: number): Promise<void> {
-    const where = tenantId ? and(eq(groomingScheduleEntries.id, id), eq(groomingScheduleEntries.tenantId, tenantId)) : eq(groomingScheduleEntries.id, id);
-    await db.delete(groomingScheduleEntries).where(where);
+    requireTenantId(tenantId, "delete a grooming schedule entry");
+    await db.delete(groomingScheduleEntries).where(and(eq(groomingScheduleEntries.id, id), eq(groomingScheduleEntries.tenantId, tenantId)));
   }
 
   // Order Photo operations
