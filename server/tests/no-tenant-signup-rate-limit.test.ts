@@ -31,7 +31,7 @@
  * rate-limit store starts clean and deltas are deterministic.
  */
 
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 import express from "express";
 import cookieParser from "cookie-parser";
 import supertest from "supertest";
@@ -640,5 +640,173 @@ describe(
         .set("X-Tenant-Slug", tenantSlug);
       expect(res.status).not.toBe(429);
     });
+  },
+);
+
+// ─── Suite 6: signupLimiter resets after the 15-minute window (fallback mode) ─
+//
+// Builds on Suite 4: after the signupLimiter has been exhausted (16th request
+// → 429), this suite verifies two things:
+//
+//   A. The 429 response carries a ratelimit-reset or Retry-After header that
+//      correctly indicates when the window resets (within the 15-minute bound).
+//
+//   B. After advancing the clock past the 15-minute window via vitest fake
+//      timers, subsequent signup attempts are no longer rate-limited (not 429).
+//      This confirms the MemoryStore's expiry logic works correctly and users
+//      are not permanently locked out after the window expires.
+//
+// The app is built BEFORE fake timers are activated so that async startup I/O
+// (DB connections, route registration) runs under real timers and is not
+// inadvertently stalled by the fake clock.
+
+describe(
+  "ALLOW_TENANT_FALLBACK=true — signupLimiter resets after the 15-minute window expires",
+  () => {
+    let agent: ReturnType<typeof supertest>;
+    let prevFallback: string | undefined;
+    const suite6CreatedUserIds: string[] = [];
+
+    beforeAll(async () => {
+      prevFallback = process.env.ALLOW_TENANT_FALLBACK;
+      process.env.ALLOW_TENANT_FALLBACK = "true";
+
+      // Build the app under REAL timers so async startup (DB, route
+      // registration) is not stalled by the fake clock.
+      const app = await buildTestApp();
+      agent = supertest(app);
+    }, 60_000);
+
+    afterAll(async () => {
+      // Guarantee real timers are restored even if a test throws.
+      vi.useRealTimers();
+
+      if (prevFallback === undefined) {
+        delete process.env.ALLOW_TENANT_FALLBACK;
+      } else {
+        process.env.ALLOW_TENANT_FALLBACK = prevFallback;
+      }
+
+      if (suite6CreatedUserIds.length > 0) {
+        await db
+          .update(contacts)
+          .set({ linkedUserId: null })
+          .where(inArray(contacts.linkedUserId, suite6CreatedUserIds));
+        for (const id of suite6CreatedUserIds) {
+          await db.delete(users).where(eq(users.id, id));
+        }
+      }
+    }, 30_000);
+
+    it(
+      "the 429 response includes a ratelimit-reset or Retry-After header within the 15-minute bound",
+      async () => {
+        // Exhaust the signupLimiter budget (max: 15).
+        for (let i = 0; i < 15; i++) {
+          const sfx = randomSuffix();
+          const res = await agent.post("/api/auth/signup").send({
+            email: `sl-rst-${sfx}@test.local`,
+            password: "Test1234!",
+            firstName: "Reset",
+            lastName: "Test",
+            phoneNumber: `561${String(i).padStart(7, "0")}`,
+          });
+
+          if ([200, 201].includes(res.status)) {
+            const [dbUser] = await db
+              .select({ id: users.id })
+              .from(users)
+              .where(eq(users.email, `sl-rst-${sfx}@test.local`));
+            if (dbUser) suite6CreatedUserIds.push(dbUser.id);
+          }
+
+          expect(res.status).not.toBe(429);
+        }
+
+        // 16th request must be blocked.
+        const sfx = randomSuffix();
+        const blockedRes = await agent.post("/api/auth/signup").send({
+          email: `sl-rst-16th-${sfx}@test.local`,
+          password: "Test1234!",
+          firstName: "Reset",
+          lastName: "Blocked",
+          phoneNumber: `5610000016`,
+        });
+
+        expect(blockedRes.status).toBe(429);
+
+        // express-rate-limit with standardHeaders: true sets ratelimit-reset
+        // (seconds REMAINING until the window resets, not a Unix epoch) on every
+        // response, including 429s.  Retry-After may also be present.
+        // At least one of the two headers must exist.
+        const retryAfter = blockedRes.headers["retry-after"] as string | undefined;
+        const rlReset = blockedRes.headers["ratelimit-reset"] as string | undefined;
+
+        expect(
+          retryAfter !== undefined || rlReset !== undefined,
+          "expected a ratelimit-reset or Retry-After header on the 429 response",
+        ).toBe(true);
+
+        // ratelimit-reset is the number of seconds until the window resets.
+        // It must be a positive integer no larger than 15 minutes + a small buffer.
+        if (rlReset !== undefined) {
+          const resetSeconds = parseInt(rlReset, 10);
+          expect(resetSeconds).toBeGreaterThan(0);
+          expect(resetSeconds).toBeLessThanOrEqual(15 * 60 + 10);
+        }
+
+        // Retry-After is also a delay in seconds.  It must be positive and within
+        // the 15-minute window.
+        if (retryAfter !== undefined) {
+          const retrySeconds = parseInt(retryAfter, 10);
+          expect(retrySeconds).toBeGreaterThan(0);
+          expect(retrySeconds).toBeLessThanOrEqual(15 * 60 + 10);
+        }
+      },
+      60_000,
+    );
+
+    it(
+      "signups are permitted again after the 15-minute window expires (fake clock advanced 16 minutes)",
+      async () => {
+        // The signupLimiter's MemoryStore checks whether the current window has
+        // expired by comparing Date.now() against the stored resetTime
+        // (= windowStart + windowMs).  Patching only Date.now() (via
+        // vi.spyOn) is sufficient to move the clock forward without touching
+        // Node.js timers — so supertest's event-loop-driven HTTP round-trip
+        // completes normally and does not time out.
+        const realNow = Date.now();
+        const nowSpy = vi
+          .spyOn(Date, "now")
+          .mockReturnValue(realNow + 16 * 60 * 1000); // 16 minutes ahead
+
+        try {
+          const sfx = randomSuffix();
+          const res = await agent.post("/api/auth/signup").send({
+            email: `sl-after-reset-${sfx}@test.local`,
+            password: "Test1234!",
+            firstName: "After",
+            lastName: "Reset",
+            phoneNumber: `5620000001`,
+          });
+
+          if ([200, 201].includes(res.status)) {
+            const [dbUser] = await db
+              .select({ id: users.id })
+              .from(users)
+              .where(eq(users.email, `sl-after-reset-${sfx}@test.local`));
+            if (dbUser) suite6CreatedUserIds.push(dbUser.id);
+          }
+
+          // After the window has expired the signupLimiter must have reset.
+          // The request must not be rate-limited (429) — the counter is fresh.
+          expect(res.status).not.toBe(429);
+        } finally {
+          // Always restore the real Date.now so no other test is affected.
+          nowSpy.mockRestore();
+        }
+      },
+      30_000,
+    );
   },
 );
