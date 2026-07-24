@@ -53,13 +53,13 @@ export default function Landing() {
           14-day free trial — no credit card required
         </div>
         <h1 className="text-5xl md:text-6xl font-black mb-6 leading-tight">
-          <span className="bg-gradient-to-r from-brand-red via-white to-brand-blue bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-red-400 via-pink-300 to-blue-400 bg-clip-text text-transparent">
             Your Business,
           </span>
           <br />
-          <span className="text-white">Fully Equipped.</span>
+          <span className="text-white drop-shadow-lg">Fully Equipped.</span>
         </h1>
-        <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-10 leading-relaxed">
+        <p className="text-xl text-gray-200 max-w-2xl mx-auto mb-10 leading-relaxed">
           PilotHouse gives small businesses everything they need — POS, inventory, loyalty rewards, service bookings, and powerful reporting — all in one platform.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

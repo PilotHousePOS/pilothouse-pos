@@ -236,8 +236,9 @@ function Router() {
   const { user, isLoading } = useAuth();
   const isAuthenticated = !!user;
   const [location] = useLocation();
-  const isWideRoute = location === "/admin" || location.startsWith("/admin?") || location === "/pos";
-  
+  const isWideRoute = location === "/" || location === "/admin" || location.startsWith("/admin?") || location === "/pos";
+  const isLandingRoute = location === "/";
+
   if (isLoading) {
     return <PageLoader />;
   }
@@ -250,7 +251,7 @@ function Router() {
   }
 
   return (
-    <div className={`${isWideRoute ? "w-full" : "max-w-md mx-auto lg:max-w-full"} bg-white min-h-screen relative`}>
+    <div className={`${isWideRoute ? "w-full" : "max-w-md mx-auto lg:max-w-full"} ${isLandingRoute ? "bg-transparent" : "bg-white"} min-h-screen relative`}>
       {/* Keeps X-Tenant-Slug header in sync with the active store slug */}
       <TenantSlugSync />
       {/* Trial countdown banner — only shown when authenticated and in trial */}
