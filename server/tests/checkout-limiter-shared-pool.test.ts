@@ -190,6 +190,91 @@ describe("checkoutLimiter window-reset — counter clears after the 15-minute wi
   );
 });
 
+describe("checkoutLimiter window-reset — counter clears after 15-minute windowMs expires (payment-intent path)", () => {
+  /**
+   * Mirrors the window-reset block above but exhausts the budget via
+   * /api/create-payment-intent instead of /api/orders.  This confirms that
+   * the MemoryStore TTL logic resets the shared counter regardless of which
+   * route caused the burst — a future change to windowMs or MemoryStore
+   * configuration that makes the block permanent would be caught here.
+   *
+   * Verification strategy:
+   *   1. Exhaust the checkoutLimiter for the dedicated IP via 10 POST
+   *      /api/create-payment-intent requests.
+   *   2. Confirm the 11th request is blocked (429).
+   *   3. Spy on Date.now() and fast-forward the virtual clock past windowMs
+   *      (15 min + 1 ms) so express-rate-limit's MemoryStore considers the
+   *      window expired on the next hit.
+   *   4. Confirm the next POST /api/create-payment-intent is no longer
+   *      blocked (non-429).
+   *
+   * A unique fake IP ensures this block has its own isolated rate-limit
+   * bucket, completely separate from every other describe block in this file.
+   */
+
+  const RESET_PI_TEST_IP = "10.99.3.1";
+  const CHECKOUT_LIMITER_MAX = 10;
+  const WINDOW_MS = 15 * 60 * 1000; // must match windowMs in sharedLimiters.ts
+
+  it(
+    "allows POST /api/create-payment-intent again after the 15-minute window expires",
+    async () => {
+      // ── Step 1: exhaust the budget for RESET_PI_TEST_IP ───────────────────
+      for (let i = 0; i < CHECKOUT_LIMITER_MAX; i++) {
+        const res = await agent
+          .post("/api/create-payment-intent")
+          .set("X-Tenant-Slug", testTenantSlug)
+          .set("X-Forwarded-For", RESET_PI_TEST_IP);
+
+        expect(
+          res.status,
+          `request ${i + 1}/${CHECKOUT_LIMITER_MAX} should not be rate-limited before budget is exhausted`,
+        ).not.toBe(429);
+      }
+
+      // ── Step 2: confirm the budget is now exhausted ────────────────────────
+      const blockedRes = await agent
+        .post("/api/create-payment-intent")
+        .set("X-Tenant-Slug", testTenantSlug)
+        .set("X-Forwarded-For", RESET_PI_TEST_IP);
+
+      expect(
+        blockedRes.status,
+        `11th POST /api/create-payment-intent should be blocked (429) but got ${blockedRes.status}`,
+      ).toBe(429);
+
+      expect(
+        blockedRes.body?.message,
+        "429 body should carry the checkoutLimiter message",
+      ).toMatch(/too many checkout attempts/i);
+
+      // ── Step 3: advance the virtual clock past windowMs ───────────────────
+      // Only Date.now() is mocked — setTimeout/setInterval are left real so
+      // that supertest's internal async operations are not affected.
+      const realNow = Date.now();
+      const dateSpy = vi
+        .spyOn(Date, "now")
+        .mockReturnValue(realNow + WINDOW_MS + 1);
+
+      try {
+        // ── Step 4: confirm the counter has reset ──────────────────────────
+        const afterResetRes = await agent
+          .post("/api/create-payment-intent")
+          .set("X-Tenant-Slug", testTenantSlug)
+          .set("X-Forwarded-For", RESET_PI_TEST_IP);
+
+        expect(
+          afterResetRes.status,
+          `POST /api/create-payment-intent should be allowed after the ${WINDOW_MS}ms window expires, but got ${afterResetRes.status}`,
+        ).not.toBe(429);
+      } finally {
+        dateSpy.mockRestore();
+      }
+    },
+    120_000,
+  );
+});
+
 describe("checkoutLimiter shared-pool — /api/orders traffic depletes /api/create-payment-intent budget", () => {
   /**
    * Limiter layout (from server/routes.ts):
