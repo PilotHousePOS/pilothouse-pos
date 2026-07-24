@@ -3298,10 +3298,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteAppointment(id: number, tenantId?: number): Promise<void> {
-    const condition = tenantId
-      ? and(eq(appointments.id, id), eq(appointments.tenantId, tenantId))
-      : eq(appointments.id, id);
-    await db.delete(appointments).where(condition);
+    // Refuse to delete without a tenant scope — prevents cross-tenant deletes
+    // from a stranded account (tenantId = null/undefined).
+    if (!tenantId) throw new Error("tenantId is required to delete an appointment");
+    await db
+      .delete(appointments)
+      .where(and(eq(appointments.id, id), eq(appointments.tenantId, tenantId)));
   }
 
   async updateAppointmentDetails(id: number, updates: { 
@@ -3795,16 +3797,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteContact(id: number, tenantId?: number): Promise<void> {
-    // Verify tenant ownership before deleting
-    if (tenantId) {
-      const [existing] = await db
-        .select({ id: contacts.id })
-        .from(contacts)
-        .where(and(eq(contacts.id, id), eq(contacts.tenantId, tenantId)));
-      if (!existing) throw new Error("Contact not found or access denied");
-    }
-    const where = tenantId ? and(eq(contacts.id, id), eq(contacts.tenantId, tenantId)) : eq(contacts.id, id);
-    await db.delete(contacts).where(where);
+    // Refuse to delete without a tenant scope — prevents cross-tenant deletes
+    // from a stranded account (tenantId = null/undefined).
+    if (!tenantId) throw new Error("tenantId is required to delete a contact");
+    const [existing] = await db
+      .select({ id: contacts.id })
+      .from(contacts)
+      .where(and(eq(contacts.id, id), eq(contacts.tenantId, tenantId)));
+    if (!existing) throw new Error("Contact not found or access denied");
+    await db.delete(contacts).where(and(eq(contacts.id, id), eq(contacts.tenantId, tenantId)));
   }
 
   async getContactByPhoneNumber(phoneNumber: string, tenantId?: number): Promise<Contact | undefined> {

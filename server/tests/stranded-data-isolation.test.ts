@@ -878,6 +878,98 @@ describe("storage.deleteBoardingRecord — storage-layer guard", () => {
   });
 });
 
+// ─── Storage-layer unit tests — deleteAppointment ────────────────────────────
+
+describe("storage.deleteAppointment — storage-layer guard", () => {
+  it("throws when tenantId is undefined", async () => {
+    await expect(
+      storage.deleteAppointment(seededAppointmentId, undefined)
+    ).rejects.toThrow("tenantId is required to delete an appointment");
+  });
+
+  it("does NOT delete the record when tenantId is undefined", async () => {
+    // Attempt the delete — expected to throw
+    await expect(
+      storage.deleteAppointment(seededAppointmentId, undefined)
+    ).rejects.toThrow();
+
+    // Verify the record still exists
+    const after = await storage.getAppointment(seededAppointmentId, realTenantId);
+    expect(after).toBeDefined();
+    expect(after!.id).toBe(seededAppointmentId);
+  });
+
+  it("successfully deletes the record when called with the correct tenantId", async () => {
+    // Re-seed a temporary record so seededAppointmentId remains intact for other tests
+    const [tempAppt] = await db
+      .insert(appointments)
+      .values({
+        tenantId: realTenantId,
+        userId: realUserId,
+        serviceType: "grooming",
+        appointmentDate: "2099-11-30",
+        appointmentTime: "11:00 AM",
+        petName: "TempDeletePet",
+        petType: "Cat",
+        ownerFirstName: "Temp",
+        ownerLastName: "Delete",
+        ownerPhoneNumber: "5550007777",
+        price: "30.00",
+      })
+      .returning();
+
+    await expect(
+      storage.deleteAppointment(tempAppt.id, realTenantId)
+    ).resolves.toBeUndefined();
+
+    // Confirm it is gone
+    const gone = await storage.getAppointment(tempAppt.id, realTenantId);
+    expect(gone).toBeUndefined();
+  });
+});
+
+// ─── Storage-layer unit tests — deleteContact ─────────────────────────────────
+
+describe("storage.deleteContact — storage-layer guard", () => {
+  it("throws when tenantId is undefined", async () => {
+    await expect(
+      storage.deleteContact(seededContactId, undefined)
+    ).rejects.toThrow("tenantId is required to delete a contact");
+  });
+
+  it("does NOT delete the record when tenantId is undefined", async () => {
+    // Attempt the delete — expected to throw
+    await expect(
+      storage.deleteContact(seededContactId, undefined)
+    ).rejects.toThrow();
+
+    // Verify the record still exists
+    const after = await storage.getContact(seededContactId, realTenantId);
+    expect(after).toBeDefined();
+    expect(after!.id).toBe(seededContactId);
+  });
+
+  it("successfully deletes the record when called with the correct tenantId", async () => {
+    // Re-seed a temporary contact so seededContactId remains intact for other tests
+    const [tempContact] = await db
+      .insert(contacts)
+      .values({
+        tenantId: realTenantId,
+        name: "TempDeleteContact",
+        phoneNumber: "5550008888",
+      })
+      .returning();
+
+    await expect(
+      storage.deleteContact(tempContact.id, realTenantId)
+    ).resolves.toBeUndefined();
+
+    // Confirm it is gone
+    const gone = await storage.getContact(tempContact.id, realTenantId);
+    expect(gone).toBeUndefined();
+  });
+});
+
 // ─── Contact sub-resource endpoints — stranded users ─────────────────────────
 //
 // GET /api/contacts/:id/appointments and GET /api/contacts/:id/history both
