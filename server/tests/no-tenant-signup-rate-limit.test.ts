@@ -396,3 +396,109 @@ describe(
     );
   },
 );
+
+// ─── Suite 4: ALLOW_TENANT_FALLBACK=true — signupLimiter triggers on the 16th ─
+//
+// With ALLOW_TENANT_FALLBACK=true, tenantMiddleware sets req.tenantId = 1 for
+// slug-less requests.  The signupLimiter's skip condition (`!req.tenantId`)
+// evaluates to FALSE — req.tenantId is 1 (truthy) — so every no-slug signup
+// IS counted against the signupLimiter's 15 req/15 min budget.
+//
+// This suite sends exactly 16 no-slug signups and asserts that:
+//   - Requests 1–15 are NOT rate-limited by the signupLimiter (not 429).
+//   - Request 16 IS rate-limited by the signupLimiter (429).
+//
+// This is intentional and documented: ALLOW_TENANT_FALLBACK is a dev/staging-only
+// toggle that is never enabled in production.  The signupLimiter providing flood
+// protection in this mode is a side-effect, not a security requirement.
+
+describe(
+  "ALLOW_TENANT_FALLBACK=true — signupLimiter blocks the 16th no-slug signup (dev-only mode)",
+  () => {
+    let agent: ReturnType<typeof supertest>;
+    let prevFallback: string | undefined;
+    const suite4CreatedUserIds: string[] = [];
+
+    beforeAll(async () => {
+      // Save and override the env var so tenantMiddleware uses the fallback path.
+      prevFallback = process.env.ALLOW_TENANT_FALLBACK;
+      process.env.ALLOW_TENANT_FALLBACK = "true";
+
+      // Fresh app → fresh in-memory rate-limit store so the signupLimiter
+      // starts at its full budget of 15 and the delta assertions are deterministic.
+      const app = await buildTestApp();
+      agent = supertest(app);
+    }, 60_000);
+
+    afterAll(async () => {
+      // Restore env var so subsequent suites / test files are unaffected.
+      if (prevFallback === undefined) {
+        delete process.env.ALLOW_TENANT_FALLBACK;
+      } else {
+        process.env.ALLOW_TENANT_FALLBACK = prevFallback;
+      }
+
+      // Clean up any users that were actually created via the fallback tenant.
+      if (suite4CreatedUserIds.length > 0) {
+        await db
+          .update(contacts)
+          .set({ linkedUserId: null })
+          .where(inArray(contacts.linkedUserId, suite4CreatedUserIds));
+        for (const id of suite4CreatedUserIds) {
+          await db.delete(users).where(eq(users.id, id));
+        }
+      }
+    }, 30_000);
+
+    it(
+      "requests 1–15 are not blocked by the signupLimiter",
+      async () => {
+        // With ALLOW_TENANT_FALLBACK=true the signupLimiter skip (!req.tenantId)
+        // evaluates to false (req.tenantId is 1), so each request consumes one
+        // slot from the signupLimiter's 15 req/15 min budget.
+        for (let i = 0; i < 15; i++) {
+          const sfx = randomSuffix();
+          const res = await agent.post("/api/auth/signup").send({
+            email: `sl-flood-${sfx}@test.local`,
+            password: "Test1234!",
+            firstName: "Signup",
+            lastName: "Limit",
+            phoneNumber: `557${String(i).padStart(7, "0")}`,
+          });
+
+          // Track any users that were actually created so we can clean up.
+          if ([200, 201].includes(res.status)) {
+            const [dbUser] = await db
+              .select({ id: users.id })
+              .from(users)
+              .where(eq(users.email, `sl-flood-${sfx}@test.local`));
+            if (dbUser) suite4CreatedUserIds.push(dbUser.id);
+          }
+
+          // The first 15 requests must NOT be rate-limited by the signupLimiter.
+          expect(res.status).not.toBe(429);
+        }
+      },
+      60_000,
+    );
+
+    it(
+      "the 16th no-slug signup returns 429 (signupLimiter budget exhausted)",
+      async () => {
+        // The signupLimiter budget (max: 15) has been fully consumed by the
+        // previous test.  The 16th request must be rejected with 429.
+        const sfx = randomSuffix();
+        const res = await agent.post("/api/auth/signup").send({
+          email: `sl-flood-16th-${sfx}@test.local`,
+          password: "Test1234!",
+          firstName: "Signup",
+          lastName: "Blocked",
+          phoneNumber: `5580000016`,
+        });
+
+        expect(res.status).toBe(429);
+      },
+      30_000,
+    );
+  },
+);
