@@ -151,4 +151,64 @@ describe("checkoutLimiter — window reset allows requests after the 15-minute w
     },
     120_000,
   );
+
+  it(
+    "blocks /api/create-payment-intent after budget is exhausted via /api/orders, then allows it after the window rolls over",
+    async () => {
+      const CHECKOUT_LIMITER_MAX = 10; // mirrors checkoutLimiter max
+      const WINDOW_MS = 15 * 60 * 1000; // mirrors checkoutLimiter windowMs
+
+      // Reset the clock to a fresh starting point so this test is independent
+      // of the previous one.
+      vi.setSystemTime(new Date(Date.now() + WINDOW_MS + 5_000));
+
+      // ── Phase 1: exhaust the rate-limit budget via /api/orders ───────────
+      for (let i = 0; i < CHECKOUT_LIMITER_MAX; i++) {
+        const res = await agent
+          .post("/api/orders")
+          .set("X-Tenant-Slug", testTenantSlug)
+          .send({});
+
+        expect(
+          res.status,
+          `attempt ${i + 1}/${CHECKOUT_LIMITER_MAX} was blocked by checkoutLimiter before budget was exhausted`,
+        ).not.toBe(429);
+      }
+
+      // ── Phase 2: /api/create-payment-intent must now be blocked ──────────
+      // The shared MemoryStore means exhausting /api/orders also blocks the
+      // payment-intent route.
+      const blockedRes = await agent
+        .post("/api/create-payment-intent")
+        .set("X-Tenant-Slug", testTenantSlug)
+        .send({});
+
+      expect(
+        blockedRes.status,
+        `POST /api/create-payment-intent should be rate-limited (429) after budget exhausted via /api/orders, but got ${blockedRes.status}`,
+      ).toBe(429);
+
+      expect(
+        blockedRes.body?.message,
+        "429 body should carry the checkoutLimiter message",
+      ).toMatch(/too many checkout attempts/i);
+
+      // ── Phase 3: advance the clock past the 15-minute window ─────────────
+      vi.setSystemTime(new Date(Date.now() + WINDOW_MS + 1000));
+
+      // ── Phase 4: /api/create-payment-intent must be unblocked after rollover
+      const afterRes = await agent
+        .post("/api/create-payment-intent")
+        .set("X-Tenant-Slug", testTenantSlug)
+        .send({});
+
+      // The critical assertion: the window reset must allow payment-intent
+      // requests through after the 15-minute window expires.
+      expect(
+        afterRes.status,
+        `POST /api/create-payment-intent returned 429 after window rollover — checkoutLimiter window did not reset for this route`,
+      ).not.toBe(429);
+    },
+    120_000,
+  );
 });
