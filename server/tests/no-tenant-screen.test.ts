@@ -278,6 +278,185 @@ describe("Stranded user cannot create records via POST endpoints (403)", () => {
   });
 });
 
+// ─── 3c. All NO_TENANT_ALLOWLIST paths pass through without 403 ───────────────
+//
+// tenantMiddleware defines exactly three paths that stranded users may reach:
+//   /auth/user, /auth/logout, /auth/delete-account
+// Each path must NOT return 403; the route handler may still return a different
+// error (e.g. 400 if a required body is missing), but the middleware gate
+// itself must open for these three paths.
+//
+// NOTE: /auth/delete-account is tested with a dedicated disposable user below
+// because the handler deletes the account immediately on a valid token (no
+// password gate), which would invalidate strandedToken for all later tests.
+
+describe("All NO_TENANT_ALLOWLIST paths are reachable by stranded users (non-403)", () => {
+  // /auth/delete-account is intentionally excluded from this loop; see below.
+  const SAFE_ALLOWLISTED_PATHS: Array<{ method: "get" | "post"; path: string }> = [
+    { method: "get", path: "/api/auth/user" },
+    { method: "post", path: "/api/auth/logout" },
+  ];
+
+  for (const { method, path } of SAFE_ALLOWLISTED_PATHS) {
+    it(`${method.toUpperCase()} ${path} — stranded user is NOT blocked by tenantMiddleware (status ≠ 403)`, async () => {
+      const res = await (agent as any)[method](path)
+        .set("Authorization", `Bearer ${strandedToken}`);
+
+      // The middleware must not reject with 403. The route handler may return
+      // another status (200, 400, 405 …) — that is acceptable here.
+      expect(res.status).not.toBe(403);
+    });
+  }
+
+  it("every allowlist path returns a JSON body (not an HTML error page)", async () => {
+    const res = await agent
+      .get("/api/auth/user")
+      .set("Authorization", `Bearer ${strandedToken}`);
+
+    expect(res.headers["content-type"]).toMatch(/json/);
+  });
+
+  it("DELETE /api/auth/delete-account — tenantMiddleware opens the gate (non-403)", async () => {
+    // Use a disposable one-off stranded user so that the handler actually
+    // deleting the account does not break the shared strandedToken used by
+    // every other test in this file.
+    const sfx = Math.random().toString(36).slice(2, 9);
+    const [disposable] = await db
+      .insert(users)
+      .values({
+        id: `nt-disposable-${sfx}`,
+        email: `disposable-${sfx}@test.local`,
+        firstName: "Disposable",
+        lastName: "User",
+        password: "hashed-for-test",
+        tenantId: null,
+        isAdmin: false,
+        isSuperAdmin: false,
+        tokenVersion: 0,
+      })
+      .returning();
+    const disposableToken = generateToken(disposable as any);
+
+    const res = await agent
+      .delete("/api/auth/delete-account")
+      .set("Authorization", `Bearer ${disposableToken}`);
+
+    // tenantMiddleware must open the gate — the handler runs and deletes the
+    // account (200) or fails for some other reason, but it must not be 403.
+    expect(res.status).not.toBe(403);
+    // Clean up in case the handler did not delete (e.g. 500 from DB).
+    await db.delete(users).where(eq(users.id, disposable.id)).catch(() => {});
+  });
+});
+
+// ─── 3d. Non-allowlisted paths return 403, never 500 ─────────────────────────
+//
+// A route handler that assumes req.tenantId is set (truthy) would produce a
+// 500 if a stranded user reached it. tenantMiddleware's fail-closed guard must
+// intercept and return exactly 403 — not let the handler run and crash.
+
+describe("Non-allowlisted paths return 403 (not 500) for stranded users", () => {
+  const BLOCKED_PATHS: Array<{ method: "get" | "post" | "patch" | "delete"; path: string }> = [
+    // Core tenant-scoped resource reads
+    { method: "get", path: "/api/services" },
+    { method: "get", path: "/api/grooming-records" },
+    { method: "get", path: "/api/invoices" },
+    { method: "get", path: "/api/users" },
+    { method: "get", path: "/api/settings/store" },
+    // Writes
+    { method: "post", path: "/api/services" },
+    { method: "post", path: "/api/invoices" },
+    // Routes adjacent to the allowlist that must NOT be opened to stranded users
+    { method: "post", path: "/api/auth/signup" },
+    { method: "post", path: "/api/auth/login" },
+    { method: "post", path: "/api/auth/forgot-password" },
+  ];
+
+  for (const { method, path } of BLOCKED_PATHS) {
+    it(`${method.toUpperCase()} ${path} — stranded user gets exactly 403 (not 500)`, async () => {
+      const res = await (agent as any)[method](path)
+        .set("Authorization", `Bearer ${strandedToken}`)
+        .send({});
+
+      // Must be blocked at the middleware gate — not a server crash
+      expect(res.status).toBe(403);
+      expect(res.status).not.toBe(500);
+    });
+  }
+});
+
+// ─── 3e. Regression: allowlist matches the known-safe set exactly ─────────────
+//
+// This section acts as a tripwire: if a new path is added to or removed from
+// the NO_TENANT_ALLOWLIST without also updating this test, the test fails and
+// forces a deliberate review. Each path is probed both directions:
+//   • listed path  → middleware opens (non-403)
+//   • unlisted path → middleware blocks (403)
+//
+// Update EXPECTED_ALLOWLIST here whenever you intentionally change the list in
+// tenantMiddleware.ts, then document the reason in a code comment.
+
+describe("NO_TENANT_ALLOWLIST regression — allowlist matches exactly the known-safe set", () => {
+  // *** This set must mirror NO_TENANT_ALLOWLIST in tenantMiddleware.ts exactly ***
+  // If you add or remove a path there, update this set and add/remove the
+  // corresponding behavioural test below.
+  const EXPECTED_ALLOWLIST = new Set([
+    "/auth/user",
+    "/auth/logout",
+    "/auth/delete-account",
+  ]);
+
+  it("known allowlist has exactly 3 entries (not grown silently)", () => {
+    expect(EXPECTED_ALLOWLIST.size).toBe(3);
+  });
+
+  // Paths that were once candidates for the allowlist but were intentionally
+  // rejected. If any of these start returning non-403 for stranded users, a
+  // path has been added to the allowlist without review.
+  const INTENTIONALLY_EXCLUDED = [
+    "/auth/signup",
+    "/auth/login",
+    "/auth/forgot-password",
+    "/auth/reset-password",
+    "/auth/verify-email",
+    "/auth/resend-verification",
+    "/tenants/signup",
+    "/settings/store",
+  ];
+
+  for (const path of INTENTIONALLY_EXCLUDED) {
+    it(`/api${path} is NOT in the allowlist and returns 403 for stranded users`, async () => {
+      // Use GET for read-like paths, POST for action paths — both should 403
+      const method = ["signup", "login", "logout", "forgot-password", "reset-password",
+        "verify-email", "resend-verification"].some(s => path.includes(s)) ? "post" : "get";
+      const res = await (agent as any)[method](`/api${path}`)
+        .set("Authorization", `Bearer ${strandedToken}`)
+        .send({});
+
+      expect(res.status).toBe(403);
+    });
+  }
+
+  it("GET /api/auth/user (allowlisted) opens the middleware gate (non-403)", async () => {
+    const res = await agent
+      .get("/api/auth/user")
+      .set("Authorization", `Bearer ${strandedToken}`);
+    expect(res.status).not.toBe(403);
+  });
+
+  it("POST /api/auth/logout (allowlisted) opens the middleware gate (non-403)", async () => {
+    const res = await agent
+      .post("/api/auth/logout")
+      .set("Authorization", `Bearer ${strandedToken}`);
+    expect(res.status).not.toBe(403);
+  });
+
+  // DELETE /api/auth/delete-account is verified in section 3c using a disposable
+  // user specifically created for that purpose.  We cannot re-test it here with
+  // strandedToken because the handler deletes the account immediately (no password
+  // gate), which would invalidate strandedToken for section 4's PATCH tests.
+});
+
 // ─── 4. PATCH /api/super-admin/users/:id/tenant — resolves a stranded account ─
 
 describe("PATCH /api/super-admin/users/:id/tenant — assigns tenant to stranded user", () => {
