@@ -680,6 +680,59 @@ describe("DELETE /api/pets/:id — cross-tenant delete rejected", () => {
   });
 });
 
+// ─── DELETE /api/pets/:id — stranded admin is rejected by tenantMiddleware ─────
+//
+// A user who is isAdmin=true but whose tenantId is NULL is "stranded":
+// tenantMiddleware returns 403 (STRANDED_ACCOUNT) before the route handler
+// runs, so storage.deletePet() is never reached.
+
+let strandedAdminId: string;
+let strandedAdminPetId: number;
+let tokenStrandedAdmin: string;
+
+describe("DELETE /api/pets/:id — stranded admin gets 403 from tenantMiddleware", () => {
+  beforeAll(async () => {
+    const sfxS = randomSuffix();
+    strandedAdminId = `http-stranded-${sfxS}`;
+    await db.insert(users).values({
+      id: strandedAdminId,
+      email: `stranded-${sfxS}@test.local`,
+      firstName: "Stranded",
+      lastName: "Admin",
+      tenantId: null, // deliberately stranded — no tenant assigned
+      password: "hashed-password-for-test",
+      isAdmin: true,
+      tokenVersion: 0,
+    });
+    // Pet owned by Tenant A — the stranded call must never delete it
+    strandedAdminPetId = await createTestPet(tenantAId, `StrandedTargetPet-${sfxS}`);
+    const [dbStranded] = await db.select().from(users).where(eq(users.id, strandedAdminId));
+    tokenStrandedAdmin = generateToken(dbStranded as any);
+  });
+
+  afterAll(async () => {
+    if (strandedAdminPetId) await db.delete(pets).where(eq(pets.id, strandedAdminPetId));
+    if (strandedAdminId) await db.delete(users).where(eq(users.id, strandedAdminId));
+  });
+
+  it("returns 403 when a stranded admin (tenantId=null) calls DELETE /api/pets/:id", async () => {
+    const res = await agent
+      .delete(`/api/pets/${strandedAdminPetId}`)
+      .set("Authorization", `Bearer ${tokenStrandedAdmin}`);
+
+    expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty("code", "STRANDED_ACCOUNT");
+  });
+
+  it("the target pet still exists after the stranded admin's rejected delete", async () => {
+    const [row] = await db
+      .select({ id: pets.id })
+      .from(pets)
+      .where(eq(pets.id, strandedAdminPetId));
+    expect(row).toBeDefined();
+  });
+});
+
 // ─── Unauthenticated requests are rejected ────────────────────────────────────
 //
 // tenantMiddleware runs before authMiddleware for all /api routes.  Without a
