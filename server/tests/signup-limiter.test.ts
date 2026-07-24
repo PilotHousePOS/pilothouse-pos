@@ -21,6 +21,52 @@
  * Neither scenario touches production data — scenario 1 uses a real tenant row
  * for slug resolution but intentionally sends invalid bodies that will fail
  * before user creation.  Scenarios 2 and 3 are entirely self-contained.
+ *
+ * ─── Persistent-store (Redis) edge case — documented decision ─────────────────
+ *
+ * The current signupLimiter uses express-rate-limit's default MemoryStore.
+ * Each server process creates its own isolated counter; a restart means a
+ * fresh counter starting at zero (confirmed by Scenario 3 above).
+ *
+ * If a shared persistent store (e.g. rate-limit-redis, ioredis, or any
+ * express-rate-limit store adapter) is ever introduced for horizontal scaling,
+ * the following guarantees MUST be validated before going live:
+ *
+ *   a) Window-boundary alignment:
+ *      The persistent store's TTL must be set to exactly windowMs (15 minutes).
+ *      If the TTL is longer than windowMs the store can hold a stale counter
+ *      beyond the intended window, causing a "phantom" rate-limit that blocks
+ *      users who have not actually hit the limit in the current window.
+ *      Verify that the store adapter honours the windowMs value directly as the
+ *      key TTL — most official adapters do, but confirm in the adapter docs.
+ *
+ *   b) Cross-restart count inheritance:
+ *      Unlike MemoryStore, a Redis store survives server restarts.  A server
+ *      that restarted mid-window will inherit whatever counter value Redis holds.
+ *      This is usually the *desired* behaviour for horizontal scaling (preventing
+ *      a user from bypassing the limit by forcing a restart), but it means a
+ *      burst that happened before a crash still counts against the current
+ *      window.  If the requirement is a clean reset on restart, the startup
+ *      code must explicitly delete the relevant Redis keys (e.g. call
+ *      `store.resetKey(ip)` or flush the namespace) before the server begins
+ *      serving requests.
+ *
+ *   c) Key-namespace isolation:
+ *      All rate limiter instances share the same Redis connection.  Without
+ *      distinct key prefixes the signupLimiter and authLimiter would share
+ *      counters, causing cross-contamination.  Ensure each rateLimit() call
+ *      is configured with a unique prefix (e.g. `prefix: 'rl:signup:'`) in the
+ *      store options before wiring up a shared store.
+ *
+ *   d) Store unavailability behaviour:
+ *      If Redis is unreachable, decide whether to fail-open (allow requests,
+ *      i.e. `skip: () => true` when the store throws) or fail-closed (return 503).
+ *      Failing open is safer for availability; failing closed prevents abuse
+ *      during an outage.  Document and test whichever policy is chosen.
+ *
+ * Until a persistent store is wired in, MemoryStore (the default) remains the
+ * correct choice and Scenario 3 is the authoritative test of the reset guarantee.
+ * ─────────────────────────────────────────────────────────────────────────────
  */
 
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
