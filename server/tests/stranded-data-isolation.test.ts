@@ -1608,3 +1608,183 @@ describe("DELETE /api/admin/appointments/:id — stranded user cannot delete an 
     expect(row.tenantId).toBe(realTenantId);
   });
 });
+
+// ─── Route-level tests — PUT /api/admin/appointments/:id/approve ─────────────
+
+describe("PUT /api/admin/appointments/:id/approve — stranded user cannot approve an appointment", () => {
+  it("returns HTTP 403 for a stranded regular user (no tenant, no slug header)", async () => {
+    const res = await agent
+      .put(`/api/admin/appointments/${seededAppointmentId}/approve`)
+      .set("Authorization", `Bearer ${strandedUserToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .put(`/api/admin/appointments/${seededAppointmentId}/approve`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded groomer (isGroomer=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .put(`/api/admin/appointments/${seededAppointmentId}/approve`)
+      .set("Authorization", `Bearer ${strandedGroomerToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("confirms the seeded appointment status is unchanged after all rejected approve attempts", async () => {
+    const [row] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+
+    expect(row).toBeDefined();
+    expect(row.id).toBe(seededAppointmentId);
+    expect(row.tenantId).toBe(realTenantId);
+    // Status must not have been flipped to 'approved' by any stranded caller
+    expect(row.status).not.toBe("approved");
+  });
+});
+
+// ─── Route-level tests — PUT /api/admin/appointments/:id/reject ──────────────
+
+describe("PUT /api/admin/appointments/:id/reject — stranded user cannot reject an appointment", () => {
+  it("returns HTTP 403 for a stranded regular user (no tenant, no slug header)", async () => {
+    const res = await agent
+      .put(`/api/admin/appointments/${seededAppointmentId}/reject`)
+      .set("Authorization", `Bearer ${strandedUserToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .put(`/api/admin/appointments/${seededAppointmentId}/reject`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded groomer (isGroomer=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .put(`/api/admin/appointments/${seededAppointmentId}/reject`)
+      .set("Authorization", `Bearer ${strandedGroomerToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("confirms the seeded appointment status is unchanged after all rejected reject attempts", async () => {
+    const [row] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+
+    expect(row).toBeDefined();
+    expect(row.id).toBe(seededAppointmentId);
+    expect(row.tenantId).toBe(realTenantId);
+    // Status must not have been flipped to 'rejected' by any stranded caller
+    expect(row.status).not.toBe("rejected");
+  });
+});
+
+// ─── Route-level tests — PATCH /api/admin/appointments/:id/details ───────────
+
+describe("PATCH /api/admin/appointments/:id/details — stranded user cannot update appointment details", () => {
+  const detailsPayload = {
+    ownerFirstName: "Hacker",
+    ownerLastName: "User",
+    ownerPhoneNumber: "5559998888",
+  };
+
+  it("returns HTTP 403 for a stranded regular user (no tenant, no slug header)", async () => {
+    const res = await agent
+      .patch(`/api/admin/appointments/${seededAppointmentId}/details`)
+      .set("Authorization", `Bearer ${strandedUserToken}`)
+      .send(detailsPayload);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .patch(`/api/admin/appointments/${seededAppointmentId}/details`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`)
+      .send(detailsPayload);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded groomer (isGroomer=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .patch(`/api/admin/appointments/${seededAppointmentId}/details`)
+      .set("Authorization", `Bearer ${strandedGroomerToken}`)
+      .send(detailsPayload);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("confirms the seeded appointment details are unchanged after all rejected PATCH attempts", async () => {
+    const [row] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+
+    expect(row).toBeDefined();
+    expect(row.id).toBe(seededAppointmentId);
+    expect(row.tenantId).toBe(realTenantId);
+    // Owner details must not have been overwritten by any stranded caller
+    expect(row.ownerFirstName).toBe("Real");
+    expect(row.ownerLastName).toBe("Owner");
+    expect(row.ownerPhoneNumber).toBe("5550001111");
+  });
+});
+
+// ─── Route-level tests — PATCH /api/admin/appointments/:id/ready-for-payment ─
+
+describe("PATCH /api/admin/appointments/:id/ready-for-payment — stranded user cannot mark appointment ready for payment", () => {
+  const readyForPaymentPayload = { finalAmount: "99.99", readyForPayment: true };
+
+  it("returns HTTP 403 for a stranded regular user (no tenant, no slug header)", async () => {
+    const res = await agent
+      .patch(`/api/admin/appointments/${seededAppointmentId}/ready-for-payment`)
+      .set("Authorization", `Bearer ${strandedUserToken}`)
+      .send(readyForPaymentPayload);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded admin (isAdmin=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .patch(`/api/admin/appointments/${seededAppointmentId}/ready-for-payment`)
+      .set("Authorization", `Bearer ${strandedAdminToken}`)
+      .send(readyForPaymentPayload);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("returns HTTP 403 for a stranded groomer (isGroomer=true, no tenant, no slug header)", async () => {
+    const res = await agent
+      .patch(`/api/admin/appointments/${seededAppointmentId}/ready-for-payment`)
+      .set("Authorization", `Bearer ${strandedGroomerToken}`)
+      .send(readyForPaymentPayload);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("confirms the seeded appointment price is unchanged after all rejected ready-for-payment attempts", async () => {
+    const [row] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+
+    expect(row).toBeDefined();
+    expect(row.id).toBe(seededAppointmentId);
+    expect(row.tenantId).toBe(realTenantId);
+    // Price must not have been overwritten to 99.99 by any stranded caller
+    expect(row.price).not.toBe("99.99");
+  });
+});
