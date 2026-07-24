@@ -34,10 +34,13 @@
  *  documented, expected behaviour and the tests below assert it explicitly.
  */
 
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import express from "express";
 import cookieParser from "cookie-parser";
 import supertest from "supertest";
+import { db } from "../db";
+import { tenants } from "@shared/schema";
+import { eq, sql } from "drizzle-orm";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -280,4 +283,124 @@ describe("POST /api/auth/signup — signupLimiter header behaviour on no-tenant 
       expect(res.headers["ratelimit-remaining"]).toBeUndefined();
     }
   });
+});
+
+// ─── signupLimiter fires 429 when a valid tenant slug IS present ──────────────
+//
+// The no-tenant tests above confirm that the limiter's skip() function fires
+// correctly for slugless requests.  This describe block confirms the OTHER side
+// of the contract: when a valid X-Tenant-Slug IS present, the limiter DOES
+// count and DOES enforce the 15-request cap.
+//
+// Without this test a future accidental removal of the limiter (or a broken
+// skip predicate that always returns true) would be invisible — the no-tenant
+// tests would still pass because they never exercise the counting path.
+
+describe("POST /api/auth/signup — signupLimiter fires on real flood with valid tenant slug", () => {
+  let tenantId: number;
+  let tenantSlug: string;
+  let floodAgent: ReturnType<typeof supertest>;
+
+  beforeAll(async () => {
+    const sfx = randomSuffix();
+    tenantSlug = `flood-test-${sfx}`;
+
+    // Advance the sequence past any existing rows to avoid duplicate-key errors
+    // when parallel test files have already inserted tenants in the same run.
+    await db.execute(
+      sql`SELECT setval(
+            pg_get_serial_sequence('tenants', 'id'),
+            GREATEST((SELECT MAX(id) FROM tenants), 1)
+          )`,
+    );
+
+    // Insert a real tenant row so tenantMiddleware can resolve the slug and
+    // set req.tenantId — the limiter's skip() predicate checks req.tenantId.
+    const [tenant] = await db
+      .insert(tenants)
+      .values({
+        name: `Flood Test Tenant ${sfx}`,
+        slug: tenantSlug,
+        subscriptionStatus: "active",
+        subscriptionTier: "starter",
+      })
+      .returning();
+
+    tenantId = tenant.id;
+
+    // Build a FRESH app so this describe block starts with a clean MemoryStore
+    // counter — the existing app above may have consumed some generalLimiter
+    // budget, but signupLimiter slots are not shared between app instances.
+    const freshApp = express();
+    freshApp.use(express.json());
+    freshApp.use(cookieParser());
+
+    const { registerRoutes } = await import("../routes");
+    await registerRoutes(freshApp);
+
+    floodAgent = supertest(freshApp);
+  }, 60_000);
+
+  afterAll(async () => {
+    if (tenantId) {
+      await db.delete(tenants).where(eq(tenants.id, tenantId));
+    }
+  }, 30_000);
+
+  it(
+    "first 15 requests with a valid slug are not 429, the 16th is 429 with the expected message, and RateLimit-Remaining decrements",
+    async () => {
+      const remainingValues: number[] = [];
+
+      // ── Fire the first 15 requests ─────────────────────────────────────────
+      // Use intentionally incomplete bodies (missing required fields) so no
+      // user rows are created in the database — but req.tenantId IS set by
+      // tenantMiddleware, so the signupLimiter counts each request.
+      for (let i = 0; i < 15; i++) {
+        const res = await floodAgent
+          .post("/api/auth/signup")
+          .set("X-Tenant-Slug", tenantSlug)
+          .send({ email: `flood-${i}-${randomSuffix()}@test.local` }); // intentionally incomplete
+
+        // The signupLimiter must not have triggered yet.
+        expect(res.status).not.toBe(429);
+
+        // RateLimit-Remaining must be present — the limiter IS counting (skip
+        // did not fire because req.tenantId is set).
+        const remaining = parseInt(res.headers["ratelimit-remaining"] ?? "", 10);
+        expect(remaining).not.toBeNaN();
+        remainingValues.push(remaining);
+      }
+
+      // ── Verify the header decremented across counted requests ──────────────
+      // remainingValues[0] should be the highest; each subsequent value should
+      // be strictly less than the previous one (each counted request
+      // decrements by 1).
+      for (let i = 1; i < remainingValues.length; i++) {
+        expect(remainingValues[i]).toBe(remainingValues[i - 1] - 1);
+      }
+
+      // The final remaining value after 15 requests must be 0 (budget
+      // exhausted).  express-rate-limit clamps at 0, never goes negative.
+      expect(remainingValues[remainingValues.length - 1]).toBe(0);
+
+      // ── 16th request: signupLimiter must fire 429 ─────────────────────────
+      const overLimit = await floodAgent
+        .post("/api/auth/signup")
+        .set("X-Tenant-Slug", tenantSlug)
+        .send({ email: `flood-16-${randomSuffix()}@test.local` });
+
+      expect(overLimit.status).toBe(429);
+
+      // The body must carry the signupLimiter's exact message — not a generic
+      // "too many requests" from the generalLimiter or any other limiter.
+      expect(overLimit.body.message).toBe(
+        "Too many signup attempts, please try again in 15 minutes.",
+      );
+
+      // Retry-After must be present on the 429 so clients can back off.
+      expect(overLimit.headers["retry-after"]).toBeDefined();
+    },
+    60_000,
+  );
 });
