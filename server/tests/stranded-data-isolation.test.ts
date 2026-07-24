@@ -46,6 +46,10 @@ let strandedAdminToken: string;
 let strandedGroomerId: string;
 let strandedGroomerToken: string;
 
+/** Stranded superior-manager — isSuperiorManager=true, isAdmin=true, tenantId=null */
+let strandedSuperiorManagerId: string;
+let strandedSuperiorManagerToken: string;
+
 let seededAppointmentId: number;
 let seededOrderId: number;
 let seededContactId: number;
@@ -159,6 +163,26 @@ beforeAll(async () => {
   strandedGroomerId = strandedGroomerRow.id;
   strandedGroomerToken = generateToken(strandedGroomerRow as any);
 
+  // Create a stranded superior-manager — isSuperiorManager=true, isAdmin=true, no tenantId
+  const strandedSuperiorManagerIdVal = "stranded-supman-" + sfx;
+  const [strandedSuperiorManagerRow] = await db
+    .insert(users)
+    .values({
+      id: strandedSuperiorManagerIdVal,
+      email: `stranded-supman-${sfx}@test.local`,
+      firstName: "StrandedSuperior",
+      lastName: "Manager",
+      tenantId: null,
+      password: "hashed-password-for-test",
+      isAdmin: true,
+      isGroomer: false,
+      isSuperiorManager: true,
+      tokenVersion: 0,
+    })
+    .returning();
+  strandedSuperiorManagerId = strandedSuperiorManagerRow.id;
+  strandedSuperiorManagerToken = generateToken(strandedSuperiorManagerRow as any);
+
   // Seed an appointment belonging to the real tenant / real user
   const [appt] = await db
     .insert(appointments)
@@ -256,6 +280,8 @@ afterAll(async () => {
     await db.delete(users).where(eq(users.id, strandedAdminId));
   if (strandedGroomerId)
     await db.delete(users).where(eq(users.id, strandedGroomerId));
+  if (strandedSuperiorManagerId)
+    await db.delete(users).where(eq(users.id, strandedSuperiorManagerId));
   if (realTenantId)
     await db.delete(tenants).where(eq(tenants.id, realTenantId));
 }, 30_000);
@@ -1068,6 +1094,28 @@ describe("GET /api/contacts/:id/history — stranded user cannot read contact hi
       .get(`/api/contacts/${seededContactId}/history`)
       .set("Authorization", `Bearer ${strandedGroomerToken}`);
 
+    expect(res.status).toBe(403);
+    const items = Array.isArray(res.body) ? res.body : [];
+    expect(items.length).toBe(0);
+  });
+
+  it("returns HTTP 403 for a stranded superior-manager (isSuperiorManager=true, no tenant)", async () => {
+    // The GET route does not have an early isSuperiorManager check — tenantMiddleware
+    // blocks the request before the handler executes, so the superior-manager flag
+    // provides no special bypass on this endpoint.
+    const res = await agent
+      .get(`/api/contacts/${seededContactId}/history`)
+      .set("Authorization", `Bearer ${strandedSuperiorManagerToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it("does NOT expose history data to the stranded superior-manager", async () => {
+    const res = await agent
+      .get(`/api/contacts/${seededContactId}/history`)
+      .set("Authorization", `Bearer ${strandedSuperiorManagerToken}`);
+
+    // Must be 403; body must not contain any history records
     expect(res.status).toBe(403);
     const items = Array.isArray(res.body) ? res.body : [];
     expect(items.length).toBe(0);
