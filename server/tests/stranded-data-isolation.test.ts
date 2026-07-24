@@ -1346,6 +1346,206 @@ describe("storage.updateContact — storage-layer guard", () => {
   });
 });
 
+// ─── Storage-layer unit tests — updateAppointmentIsHere ──────────────────────
+
+describe("storage.updateAppointmentIsHere — storage-layer guard", () => {
+  it("throws when tenantId is undefined", async () => {
+    await expect(
+      storage.updateAppointmentIsHere(seededAppointmentId, true, undefined)
+    ).rejects.toThrow("tenantId is required to update an appointment");
+  });
+
+  it("does NOT persist changes when tenantId is undefined", async () => {
+    const [before] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+    const originalIsHere = before?.isHere;
+
+    await expect(
+      storage.updateAppointmentIsHere(seededAppointmentId, !originalIsHere, undefined)
+    ).rejects.toThrow();
+
+    const [after] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+    expect(after?.isHere).toBe(originalIsHere);
+  });
+
+  it("succeeds and persists changes when called with the correct tenantId", async () => {
+    const result = await storage.updateAppointmentIsHere(
+      seededAppointmentId,
+      true,
+      realTenantId
+    );
+    expect(result).toBeDefined();
+    expect(result.id).toBe(seededAppointmentId);
+    expect(result.isHere).toBe(true);
+  });
+});
+
+// ─── Storage-layer unit tests — updateAppointmentIsPaid ──────────────────────
+
+describe("storage.updateAppointmentIsPaid — storage-layer guard", () => {
+  it("throws when tenantId is undefined", async () => {
+    await expect(
+      storage.updateAppointmentIsPaid(seededAppointmentId, true, undefined)
+    ).rejects.toThrow("tenantId is required to update an appointment");
+  });
+
+  it("does NOT persist changes when tenantId is undefined", async () => {
+    const [before] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+    const originalIsPaid = before?.isPaid;
+
+    await expect(
+      storage.updateAppointmentIsPaid(seededAppointmentId, !originalIsPaid, undefined)
+    ).rejects.toThrow();
+
+    const [after] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+    expect(after?.isPaid).toBe(originalIsPaid);
+  });
+
+  it("succeeds and persists changes when called with the correct tenantId", async () => {
+    const result = await storage.updateAppointmentIsPaid(
+      seededAppointmentId,
+      true,
+      realTenantId
+    );
+    expect(result).toBeDefined();
+    expect(result.id).toBe(seededAppointmentId);
+    expect(result.isPaid).toBe(true);
+  });
+});
+
+// ─── Storage-layer unit tests — updateAppointmentReadyForPayment ──────────────
+
+describe("storage.updateAppointmentReadyForPayment — storage-layer guard", () => {
+  it("throws when tenantId is undefined", async () => {
+    await expect(
+      storage.updateAppointmentReadyForPayment(seededAppointmentId, "50.00", true, undefined)
+    ).rejects.toThrow("tenantId is required to update an appointment");
+  });
+
+  it("does NOT persist changes when tenantId is undefined", async () => {
+    const [before] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+    const originalReadyForPayment = before?.readyForPayment;
+
+    await expect(
+      storage.updateAppointmentReadyForPayment(seededAppointmentId, "99.99", true, undefined)
+    ).rejects.toThrow();
+
+    const [after] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+    expect(after?.readyForPayment).toBe(originalReadyForPayment);
+    expect(after?.finalAmount).not.toBe("99.99");
+  });
+
+  it("succeeds and persists changes when called with the correct tenantId", async () => {
+    const result = await storage.updateAppointmentReadyForPayment(
+      seededAppointmentId,
+      "50.00",
+      true,
+      realTenantId
+    );
+    expect(result).toBeDefined();
+    expect(result.id).toBe(seededAppointmentId);
+    expect(result.readyForPayment).toBe(true);
+    expect(result.finalAmount).toBe("50.00");
+  });
+});
+
+// ─── Storage-layer unit tests — updateAppointmentPaidOnline ──────────────────
+
+describe("storage.updateAppointmentPaidOnline — storage-layer guard", () => {
+  it("throws when tenantId is undefined", async () => {
+    await expect(
+      storage.updateAppointmentPaidOnline(seededAppointmentId, "sess_fake", undefined)
+    ).rejects.toThrow("tenantId is required to update an appointment");
+  });
+
+  it("does NOT persist changes when tenantId is undefined", async () => {
+    const [before] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+    const originalPaidOnline = before?.paidOnline;
+
+    await expect(
+      storage.updateAppointmentPaidOnline(seededAppointmentId, "sess_hacked", undefined)
+    ).rejects.toThrow();
+
+    const [after] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+    expect(after?.paidOnline).toBe(originalPaidOnline);
+    expect(after?.groomingStripeSessionId).not.toBe("sess_hacked");
+  });
+
+  it("succeeds and persists changes when called with the correct tenantId", async () => {
+    const result = await storage.updateAppointmentPaidOnline(
+      seededAppointmentId,
+      "sess_legit",
+      realTenantId
+    );
+    expect(result).toBeDefined();
+    expect(result.id).toBe(seededAppointmentId);
+    expect(result.paidOnline).toBe(true);
+    expect(result.groomingStripeSessionId).toBe("sess_legit");
+  });
+});
+
+// ─── Storage-layer unit tests — updateAppointmentGroomingCompleted ────────────
+
+describe("storage.updateAppointmentGroomingCompleted — storage-layer guard", () => {
+  it("throws when tenantId is undefined", async () => {
+    await expect(
+      storage.updateAppointmentGroomingCompleted(seededAppointmentId, true, undefined)
+    ).rejects.toThrow("tenantId is required to update an appointment");
+  });
+
+  it("does NOT persist changes when tenantId is undefined", async () => {
+    const [before] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+    const originalGroomingCompleted = before?.groomingCompleted;
+
+    await expect(
+      storage.updateAppointmentGroomingCompleted(seededAppointmentId, !originalGroomingCompleted, undefined)
+    ).rejects.toThrow();
+
+    const [after] = await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.id, seededAppointmentId));
+    expect(after?.groomingCompleted).toBe(originalGroomingCompleted);
+  });
+
+  it("succeeds and persists changes when called with the correct tenantId", async () => {
+    const result = await storage.updateAppointmentGroomingCompleted(
+      seededAppointmentId,
+      true,
+      realTenantId
+    );
+    expect(result).toBeDefined();
+    expect(result.id).toBe(seededAppointmentId);
+    expect(result.groomingCompleted).toBe(true);
+  });
+});
+
 // ─── Route-level tests — DELETE /api/admin/appointments/:id ──────────────────
 
 describe("DELETE /api/admin/appointments/:id — stranded user cannot delete an appointment", () => {

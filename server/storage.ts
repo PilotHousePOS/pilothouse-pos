@@ -3020,10 +3020,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAppointmentIsHere(id: number, isHere: boolean, tenantId?: number): Promise<Appointment> {
+    if (tenantId === undefined) throw new Error("tenantId is required to update an appointment");
     // checkedIn is a permanent record — set to true when they arrive, never reset
     const setFields: any = { isHere, updatedAt: new Date() };
     if (isHere) setFields.checkedIn = true;
-    const where = tenantId ? and(eq(appointments.id, id), eq(appointments.tenantId, tenantId)) : eq(appointments.id, id);
+    const where = and(eq(appointments.id, id), eq(appointments.tenantId, tenantId));
     const [updated] = await db
       .update(appointments)
       .set(setFields)
@@ -3034,10 +3035,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAppointmentIsPaid(id: number, isPaid: boolean, tenantId?: number): Promise<Appointment> {
+    if (tenantId === undefined) throw new Error("tenantId is required to update an appointment");
     // Do NOT clear readyForPayment here — online double-payment is already blocked by isPaid=true check.
     // Clearing it caused the "Mark Ready" button to reappear after payment when groomer had already marked ready.
     const setFields: any = { isPaid, updatedAt: new Date() };
-    const where = tenantId ? and(eq(appointments.id, id), eq(appointments.tenantId, tenantId)) : eq(appointments.id, id);
+    const where = and(eq(appointments.id, id), eq(appointments.tenantId, tenantId));
     const [updated] = await db
       .update(appointments)
       .set(setFields)
@@ -3057,7 +3059,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAppointmentReadyForPayment(id: number, finalAmount: string, readyForPayment: boolean, tenantId?: number): Promise<Appointment> {
-    const where = tenantId ? and(eq(appointments.id, id), eq(appointments.tenantId, tenantId)) : eq(appointments.id, id);
+    if (tenantId === undefined) throw new Error("tenantId is required to update an appointment");
+    const where = and(eq(appointments.id, id), eq(appointments.tenantId, tenantId));
     const [updated] = await db
       .update(appointments)
       .set({ finalAmount, readyForPayment, updatedAt: new Date() })
@@ -3068,7 +3071,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAppointmentPaidOnline(id: number, sessionId: string, tenantId?: number): Promise<Appointment> {
-    const where = tenantId ? and(eq(appointments.id, id), eq(appointments.tenantId, tenantId)) : eq(appointments.id, id);
+    if (tenantId === undefined) throw new Error("tenantId is required to update an appointment");
+    const where = and(eq(appointments.id, id), eq(appointments.tenantId, tenantId));
     const [updated] = await db
       .update(appointments)
       .set({ isPaid: true, paidOnline: true, readyForPayment: false, groomingStripeSessionId: sessionId, updatedAt: new Date() })
@@ -3078,7 +3082,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAppointmentGroomingCompleted(id: number, groomingCompleted: boolean, tenantId?: number): Promise<Appointment> {
-    const where = tenantId ? and(eq(appointments.id, id), eq(appointments.tenantId, tenantId)) : eq(appointments.id, id);
+    if (tenantId === undefined) throw new Error("tenantId is required to update an appointment");
+    const where = and(eq(appointments.id, id), eq(appointments.tenantId, tenantId));
     const [updated] = await db
       .update(appointments)
       .set({ groomingCompleted, updatedAt: new Date() })
