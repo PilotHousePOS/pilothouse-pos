@@ -120,4 +120,95 @@ describe("authLimiter — window reset allows login attempts after expiry", () =
     },
     90_000,
   );
+
+  it(
+    "RateLimit-Remaining header equals max-1 (14) and RateLimit-Reset reflects a fresh window after rollover",
+    async () => {
+      const MAX_ATTEMPTS = 15; // mirrors authLimiter max
+      const WINDOW_MS = 15 * 60 * 1000;
+
+      // ── Preamble: advance time into a guaranteed-clean window ─────────────
+      // The previous test may have left the rate-limiter with a partially
+      // consumed window.  Jump forward by another full window so the MemoryStore
+      // treats all prior records as expired before we start counting.
+      vi.setSystemTime(new Date(Date.now() + WINDOW_MS + 1000));
+
+      // ── Phase 1: exhaust the rate-limit budget ────────────────────────────
+      for (let i = 0; i < MAX_ATTEMPTS; i++) {
+        const res = await agent
+          .post("/api/auth/login")
+          .send({
+            email: `budget-check-${i}@test.local`,
+            password: "WrongPassword1!",
+          });
+
+        expect(
+          res.status,
+          `attempt ${i + 1}/${MAX_ATTEMPTS} returned 429 before budget was exhausted`,
+        ).not.toBe(429);
+      }
+
+      // ── Phase 2: 16th request must be rate-limited ────────────────────────
+      const blockedRes = await agent
+        .post("/api/auth/login")
+        .send({
+          email: "budget-check-blocked@test.local",
+          password: "WrongPassword1!",
+        });
+      expect(blockedRes.status).toBe(429);
+
+      // ── Phase 3: advance the clock past the 15-minute window ──────────────
+      const afterWindowTime = Date.now() + WINDOW_MS + 1000;
+      vi.setSystemTime(new Date(afterWindowTime));
+
+      // ── Phase 4: first request after rollover — inspect rate-limit headers ─
+      const afterRes = await agent
+        .post("/api/auth/login")
+        .send({
+          email: "budget-check-after-rollover@test.local",
+          password: "WrongPassword1!",
+        });
+
+      expect(
+        afterRes.status,
+        `request after window rollover returned 429 — authLimiter window did not reset correctly`,
+      ).not.toBe(429);
+
+      // RateLimit-Remaining must equal max - 1 = 14 (one request consumed in
+      // the fresh window). A stale partial reset would produce a lower value.
+      const remaining = afterRes.headers["ratelimit-remaining"];
+      expect(
+        remaining,
+        `RateLimit-Remaining should be "14" after rollover but got "${remaining}"`,
+      ).toBe("14");
+
+      // RateLimit-Reset must be in the future relative to the time we advanced
+      // to, i.e. it reflects a new window starting at afterWindowTime rather
+      // than the old (already-expired) window end.
+      const resetHeader = afterRes.headers["ratelimit-reset"];
+      expect(
+        resetHeader,
+        "RateLimit-Reset header must be present after rollover",
+      ).toBeDefined();
+
+      // express-rate-limit with standardHeaders: true sets RateLimit-Reset to
+      // the number of seconds remaining until the current window expires.
+      // After a fresh window starts with one request consumed, the reset value
+      // should be a positive number of seconds (≤ window duration = 900 s).
+      const resetSeconds = Number(resetHeader);
+      expect(
+        isNaN(resetSeconds),
+        `RateLimit-Reset should be a number but got "${resetHeader}"`,
+      ).toBe(false);
+      expect(
+        resetSeconds,
+        `RateLimit-Reset should be > 0 (fresh window) but got ${resetSeconds}`,
+      ).toBeGreaterThan(0);
+      expect(
+        resetSeconds,
+        `RateLimit-Reset should be ≤ 900 s (one window) but got ${resetSeconds}`,
+      ).toBeLessThanOrEqual(900);
+    },
+    90_000,
+  );
 });
