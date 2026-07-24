@@ -95,7 +95,7 @@ export async function tenantMiddleware(
           if (NO_TENANT_ALLOWLIST.has(req.path)) {
             return next();
           }
-          res.status(403).json({ message: "Tenant not configured for this account. Contact support." });
+          res.status(403).json({ message: "Tenant not configured for this account. Contact support.", code: "STRANDED_ACCOUNT" });
           return;
         }
       }
@@ -158,6 +158,7 @@ export async function tenantMiddleware(
     res.status(400).json({
       message:
         "Missing tenant: include an X-Tenant-Slug header or ?tenant= query parameter.",
+      code: "MISSING_TENANT",
     });
     return;
   } catch {
