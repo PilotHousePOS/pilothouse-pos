@@ -6871,6 +6871,17 @@ export default function Admin() {
     'database', 'astro', 'orders', 'charge-accounts', 'specials',
     'applications', 'feedback', 'staff', 'settings',
   ];
+
+  // Two-level navigation: group definitions (order matters for display)
+  const TAB_GROUPS: { id: string; label: string; tabs: string[] }[] = [
+    { id: 'operations', label: 'Operations',          tabs: ['calendar', 'contacts', 'schedule', 'appointments', 'waitlist', 'boarding', 'time-clock'] },
+    { id: 'sales',      label: 'Sales',               tabs: ['pos-tracker', 'pos-reports', 'orders', 'charge-accounts', 'non-payment', 'estimates', 'invoicing'] },
+    { id: 'inventory',  label: 'Inventory & Services', tabs: ['inventory', 'inv-audit', 'grooming', 'specials', 'memberships'] },
+    { id: 'staff',      label: 'Staff',               tabs: ['groomers', 'staff', 'tasks', 'intake-forms'] },
+    { id: 'outreach',   label: 'Outreach',            tabs: ['email-center', 'sms-blasts', 'announcements', 'feedback'] },
+    { id: 'admin',      label: 'Admin',               tabs: ['users', 'database', 'astro', 'applications', 'settings'] },
+  ];
+
   const OPTIONAL_TABS: { id: string; label: string }[] = [
     { id: 'appointments',  label: 'Appointments'  },
     { id: 'non-payment',   label: 'Non-Payment'   },
@@ -6937,6 +6948,65 @@ export default function Admin() {
     return BASE_TAB_ORDER;
   });
   const [dragSrcValue, setDragSrcValue] = useState<string | null>(null);
+
+  // Controlled active tab — drives both the group row and the inner tab row
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    // Restore from session storage so refreshing keeps you on the same tab
+    try { return sessionStorage.getItem('admin-active-tab') || 'calendar'; } catch { return 'calendar'; }
+  });
+  const handleTabChange = useCallback((value: string) => {
+    setActiveTab(value);
+    try { sessionStorage.setItem('admin-active-tab', value); } catch {}
+  }, []);
+
+  // Derived: which group contains the active tab
+  const activeGroupId = useMemo(
+    () => TAB_GROUPS.find(g => g.tabs.includes(activeTab))?.id ?? 'operations',
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [activeTab],
+  );
+
+  // Extracted tab-visibility logic (used by both group row and inner row)
+  const isTabVisible = useCallback((v: string): boolean => {
+    if (OPTIONAL_TAB_IDS.includes(v) && !enabledOptionalTabs.includes(v)) return false;
+    const isEmp = !!typedUser?.isEmployee && !typedUser?.isAdmin;
+    const ep = employeePerms ?? {};
+    return ({
+      'appointments':    isEmp ? !!ep.canManageAppointments : true,
+      'non-payment':     isEmp ? false : true,
+      'calendar':        true,
+      'contacts':        isEmp ? !!ep.canManageCustomers : true,
+      'boarding':        isEmp ? !!ep.canManageBoarding && featureEnabled('boarding') : !!(typedUser?.isAdmin && featureEnabled('boarding')),
+      'schedule':        isEmp ? true : !!typedUser?.isAdmin,
+      'inventory':       isEmp ? !!ep.canManageInventory : true,
+      'inv-audit':       isEmp ? false : !!typedUser?.isAdmin,
+      'pos-tracker':     isEmp ? !!ep.canViewReports : !!typedUser?.isAdmin,
+      'pos-reports':     isEmp ? !!ep.canViewReports : !!typedUser?.isAdmin,
+      'grooming':        isEmp ? !!ep.canManageGrooming : !!typedUser?.isAdmin,
+      'groomers':        isEmp ? !!ep.canManageGrooming : true,
+      'users':           isEmp ? false : !!typedUser?.isAdmin,
+      'database':        isEmp ? false : !!typedUser?.isAdmin,
+      'astro':           isEmp ? false : !!typedUser?.isAdmin,
+      'email-center':    isEmp ? !!ep.canManageEmail : !!typedUser?.isAdmin,
+      'orders':          isEmp ? !!ep.canManageOrders : true,
+      'charge-accounts': isEmp ? !!ep.canManageChargeAccounts : !!typedUser?.isAdmin,
+      'specials':        isEmp ? !!ep.canManageSpecials : !!typedUser?.isAdmin,
+      'applications':    isEmp ? false : !!typedUser?.isAdmin,
+      'feedback':        isEmp ? false : !!typedUser?.isAdmin,
+      'settings':        isEmp ? !!ep.canAccessSettings : !!typedUser?.isAdmin,
+      'staff':           isEmp ? !!ep.canManageStaff : !!typedUser?.isAdmin,
+      'waitlist':        isEmp ? !!ep.canManageWaitlist : !!typedUser?.isAdmin,
+      'tasks':           true,
+      'announcements':   true,
+      'estimates':       isEmp ? !!ep.canManageEstimates : !!typedUser?.isAdmin,
+      'invoicing':       isEmp ? !!ep.canManageInvoicing : !!typedUser?.isAdmin,
+      'time-clock':      true,
+      'intake-forms':    isEmp ? false : !!typedUser?.isAdmin,
+      'sms-blasts':      isEmp ? !!ep.canManageSmsBlasts : !!typedUser?.isAdmin,
+      'memberships':     isEmp ? !!ep.canManageMemberships : !!typedUser?.isAdmin,
+    } as Record<string, boolean>)[v] ?? false;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typedUser, employeePerms, enabledOptionalTabs, featureEnabled]);
 
   const handleTabDragStart = useCallback((value: string) => (e: React.DragEvent) => {
     setDragSrcValue(value);
@@ -9468,111 +9538,111 @@ export default function Admin() {
       </div>
       </div>
 
-      <Tabs defaultValue="calendar" className="w-full">
-        <div className="overflow-x-auto pb-1 -mx-6 px-6">
-          <div className="flex items-center gap-1 min-w-max">
-          <TabsList className="inline-flex gap-1 h-auto p-1">
-            {tabOrder
-              .filter(v => {
-                // Optional tabs only show when the admin has enabled them
-                if (OPTIONAL_TAB_IDS.includes(v) && !enabledOptionalTabs.includes(v)) return false;
-                // Employees see only the tabs their permissions allow
-                const isEmp = !!typedUser?.isEmployee && !typedUser?.isAdmin;
-                const ep = employeePerms ?? {};
-                return ({
-                  'appointments':    isEmp ? !!ep.canManageAppointments : true,
-                  'non-payment':     isEmp ? false : true,
-                  'calendar':        true,
-                  'contacts':        isEmp ? !!ep.canManageCustomers : true,
-                  'boarding':        isEmp ? !!ep.canManageBoarding && featureEnabled('boarding') : !!(typedUser?.isAdmin && featureEnabled('boarding')),
-                  'schedule':        isEmp ? true : !!typedUser?.isAdmin,
-                  'inventory':       isEmp ? !!ep.canManageInventory : true,
-                  'inv-audit':       isEmp ? false : !!typedUser?.isAdmin,
-                  'pos-tracker':     isEmp ? !!ep.canViewReports : !!typedUser?.isAdmin,
-                  'pos-reports':     isEmp ? !!ep.canViewReports : !!typedUser?.isAdmin,
-                  'grooming':        isEmp ? !!ep.canManageGrooming : !!typedUser?.isAdmin,
-                  'groomers':        isEmp ? !!ep.canManageGrooming : true,
-                  'users':           isEmp ? false : !!typedUser?.isAdmin,
-                  'database':        isEmp ? false : !!typedUser?.isAdmin,
-                  'astro':           isEmp ? false : !!typedUser?.isAdmin,
-                  'email-center':    isEmp ? !!ep.canManageEmail : !!typedUser?.isAdmin,
-                  'orders':          isEmp ? !!ep.canManageOrders : true,
-                  'charge-accounts': isEmp ? !!ep.canManageChargeAccounts : !!typedUser?.isAdmin,
-                  'specials':        isEmp ? !!ep.canManageSpecials : !!typedUser?.isAdmin,
-                  'applications':    isEmp ? false : !!typedUser?.isAdmin,
-                  'feedback':        isEmp ? false : !!typedUser?.isAdmin,
-                  'settings':        isEmp ? !!ep.canAccessSettings : !!typedUser?.isAdmin,
-                  'staff':           isEmp ? !!ep.canManageStaff : !!typedUser?.isAdmin,
-                  'waitlist':        isEmp ? !!ep.canManageWaitlist : !!typedUser?.isAdmin,
-                  'tasks':           true,
-                  'announcements':   true,
-                  'estimates':       isEmp ? !!ep.canManageEstimates : !!typedUser?.isAdmin,
-                  'invoicing':       isEmp ? !!ep.canManageInvoicing : !!typedUser?.isAdmin,
-                  'time-clock':      true,
-                  'intake-forms':    isEmp ? false : !!typedUser?.isAdmin,
-                  'sms-blasts':      isEmp ? !!ep.canManageSmsBlasts : !!typedUser?.isAdmin,
-                  'memberships':     isEmp ? !!ep.canManageMemberships : !!typedUser?.isAdmin,
-                } as Record<string, boolean>)[v] ?? false;
-              })
-              .map(value => (
-                <TabsTrigger
-                  key={value}
-                  value={value}
-                  draggable
-                  onDragStart={handleTabDragStart(value)}
-                  onDragOver={handleTabDragOver(value)}
-                  onDragEnd={handleTabDragEnd}
-                  className={`flex-none text-xs py-3 px-3 whitespace-nowrap cursor-grab active:cursor-grabbing select-none relative transition-opacity ${dragSrcValue === value ? 'opacity-40' : ''}`}
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+        {/* ── Level 1: Group row ── */}
+        <div className="border-b border-gray-200 dark:border-gray-700 -mx-6 px-6">
+          <div className="flex items-center">
+            {TAB_GROUPS.map(group => {
+              // Hide group if no tabs are visible for this user
+              const visibleTabs = tabOrder.filter(t => group.tabs.includes(t) && isTabVisible(t));
+              if (visibleTabs.length === 0) return null;
+              const isActive = group.id === activeGroupId;
+              return (
+                <button
+                  key={group.id}
+                  onClick={() => {
+                    // If clicking a group that isn't active, jump to its first visible tab
+                    const first = visibleTabs.find(t => t !== activeTab) ?? visibleTabs[0];
+                    if (!isActive && first) handleTabChange(first);
+                  }}
+                  className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap -mb-px ${
+                    isActive
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-500'
+                  }`}
                 >
-                  {renderTabLabel(value)}
-                </TabsTrigger>
-              ))
-            }
-          </TabsList>
+                  {group.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-          {/* "+" button — admin only — opens optional-tab picker */}
-          {typedUser?.isAdmin && (
-            <div className="relative flex-none ml-1">
-              <button
-                onClick={() => setShowTabPicker(p => !p)}
-                className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-500 hover:text-gray-700 dark:text-gray-300 text-base font-bold transition-colors border border-gray-200 dark:border-gray-600"
-                title="Add / remove optional tabs"
-                aria-label="Manage optional tabs"
-              >
-                +
-              </button>
-              {showTabPicker && (
-                <>
-                  {/* Backdrop */}
-                  <div className="fixed inset-0 z-40" onClick={() => setShowTabPicker(false)} />
-                  {/* Picker panel */}
-                  <div className="absolute right-0 top-9 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl p-3 w-52">
-                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Optional Tabs</p>
-                    <div className="space-y-1">
-                      {OPTIONAL_TABS.map(({ id, label }) => {
-                        const active = enabledOptionalTabs.includes(id);
-                        // Respect existing role guards (boarding needs feature flag)
-                        const allowed = id === 'boarding' ? featureEnabled('boarding') : true;
-                        if (!allowed) return null;
-                        return (
-                          <button
-                            key={id}
-                            onClick={() => toggleOptionalTab(id)}
-                            className={`w-full flex items-center justify-between px-2 py-1.5 rounded text-sm transition-colors ${active ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
-                          >
-                            <span>{label}</span>
-                            <span className={`w-4 h-4 rounded border flex items-center justify-center text-xs font-bold ${active ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-300 dark:border-gray-500'}`}>
-                              {active ? '✓' : ''}
-                            </span>
-                          </button>
-                        );
-                      })}
+        {/* ── Level 2: Inner tab row for active group ── */}
+        <div className="overflow-x-auto pb-1 -mx-6 px-6 mt-1">
+          <div className="flex items-center gap-1 min-w-max">
+            <TabsList className="inline-flex gap-1 h-auto p-1">
+              {tabOrder
+                .filter(v => {
+                  const grp = TAB_GROUPS.find(g => g.id === activeGroupId);
+                  if (!grp?.tabs.includes(v)) return false;
+                  return isTabVisible(v);
+                })
+                .map(value => (
+                  <TabsTrigger
+                    key={value}
+                    value={value}
+                    draggable
+                    onDragStart={handleTabDragStart(value)}
+                    onDragOver={handleTabDragOver(value)}
+                    onDragEnd={handleTabDragEnd}
+                    className={`flex-none text-xs py-3 px-3 whitespace-nowrap cursor-grab active:cursor-grabbing select-none relative transition-opacity ${dragSrcValue === value ? 'opacity-40' : ''}`}
+                  >
+                    {renderTabLabel(value)}
+                  </TabsTrigger>
+                ))
+              }
+            </TabsList>
+
+            {/* "+" button — admin only — opens optional-tab picker grouped by section */}
+            {typedUser?.isAdmin && (
+              <div className="relative flex-none ml-1">
+                <button
+                  onClick={() => setShowTabPicker(p => !p)}
+                  className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-500 hover:text-gray-700 dark:text-gray-300 text-base font-bold transition-colors border border-gray-200 dark:border-gray-600"
+                  title="Add / remove optional tabs"
+                  aria-label="Manage optional tabs"
+                >
+                  +
+                </button>
+                {showTabPicker && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowTabPicker(false)} />
+                    <div className="absolute right-0 top-9 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl p-3 w-56 max-h-[70vh] overflow-y-auto">
+                      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Optional Tabs</p>
+                      <div className="space-y-3">
+                        {TAB_GROUPS.map(group => {
+                          const groupOptional = OPTIONAL_TABS.filter(t => group.tabs.includes(t.id));
+                          if (groupOptional.length === 0) return null;
+                          return (
+                            <div key={group.id}>
+                              <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1 px-2">{group.label}</p>
+                              {groupOptional.map(({ id, label }) => {
+                                const active = enabledOptionalTabs.includes(id);
+                                const allowed = id === 'boarding' ? featureEnabled('boarding') : true;
+                                if (!allowed) return null;
+                                return (
+                                  <button
+                                    key={id}
+                                    onClick={() => toggleOptionalTab(id)}
+                                    className={`w-full flex items-center justify-between px-2 py-1.5 rounded text-sm transition-colors ${active ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
+                                  >
+                                    <span>{label}</span>
+                                    <span className={`w-4 h-4 rounded border flex items-center justify-center text-xs font-bold ${active ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-300 dark:border-gray-500'}`}>
+                                      {active ? '✓' : ''}
+                                    </span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
