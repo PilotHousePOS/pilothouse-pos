@@ -4724,6 +4724,75 @@ function TrackedItemsSettingsPanel() {
 }
 
 // Loyalty Settings Panel Component
+const FEATURE_DEFS = [
+  { id: 'appointments',   label: 'Service Booking & Appointments', desc: 'Customers can book appointments online; staff schedules and service slots are managed here.' },
+  { id: 'loyalty',        label: 'Loyalty & Rewards Program',      desc: 'Points system, purchase tracking, and customer rewards.' },
+  { id: 'boarding',       label: 'Boarding & Check-In',            desc: 'Track overnight boarders, check-in/check-out, and occupancy records.' },
+  { id: 'hiring',         label: 'Job Application Portal',         desc: 'Accept and manage staff applications directly through your store page.' },
+  { id: 'emailMarketing', label: 'Email Marketing',                desc: 'Send campaigns, automated reminders, and promotional emails to customers.' },
+  { id: 'pets',           label: 'Pet Profiles',                   desc: 'Customers can add pets to their profile. Best for groomers, vet clinics, and pet stores.' },
+];
+
+function FeaturesPanel() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: tenantInfo, isLoading } = useQuery<{ enabledFeatures?: Record<string, any> }>({
+    queryKey: ['/api/tenants/current'],
+  });
+
+  const features: Record<string, any> = tenantInfo?.enabledFeatures ?? {};
+  // a feature is on unless explicitly set to false
+  const isOn = (id: string) => features[id] !== false;
+
+  const saveMutation = useMutation({
+    mutationFn: async (update: Record<string, boolean>) =>
+      apiRequest('PATCH', '/api/tenants/features', update),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/tenants/current'] });
+      toast({ title: 'Features updated' });
+    },
+    onError: () => toast({ title: 'Failed to save', variant: 'destructive' }),
+  });
+
+  const toggle = (id: string) => {
+    const next = !isOn(id);
+    saveMutation.mutate({ [id]: next });
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Settings className="w-5 h-5" />
+          Features
+        </CardTitle>
+        <p className="text-sm text-muted-foreground">Turn store features on or off. Changes take effect immediately.</p>
+      </CardHeader>
+      <CardContent className="space-y-1">
+        {isLoading ? (
+          <div className="py-4 text-center text-sm text-muted-foreground">Loading…</div>
+        ) : (
+          FEATURE_DEFS.map(({ id, label, desc }) => (
+            <div key={id} className="flex items-start justify-between gap-4 py-3 border-b last:border-0">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium leading-tight">{label}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+              </div>
+              <Switch
+                checked={isOn(id)}
+                onCheckedChange={() => toggle(id)}
+                disabled={saveMutation.isPending}
+                className="mt-0.5 flex-shrink-0"
+              />
+            </div>
+          ))
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function LoyaltySettingsPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -14827,6 +14896,7 @@ export default function Admin() {
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-6">
+          <FeaturesPanel />
           <StoreHoursPanel />
           <SettingsPanel />
           <TrackedItemsSettingsPanel />
