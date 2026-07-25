@@ -68,7 +68,7 @@ import { categorizeProduct, detectLiveAnimal } from './productCategorization';
 import { registerBillingRoutes } from './billingRoutes';
 // Shared-pool limiters MUST be imported from sharedLimiters.ts — never
 // re-created inline.  See server/sharedLimiters.ts for the full explanation.
-import { getRealIp, authLimiter, searchLimiter, checkoutLimiter, uploadLimiter } from './sharedLimiters';
+import { getRealIp, authLimiter, searchLimiter, checkoutLimiter, uploadLimiter, overridePinLimiter } from './sharedLimiters';
 
 // Helper: clean a name string — collapse extra spaces, trim
 function cleanName(name: string | undefined | null): string {
@@ -362,6 +362,14 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   app.use('/api/auth/forgot-password', authLimiter);
   app.use('/api/auth/reset-password', authLimiter);
   app.use('/api/auth/change-password', authLimiter);
+
+  // overridePinLimiter is imported from ./sharedLimiters (shared-pool singleton).
+  // The store override PIN is a 4-digit code; without a rate limit an attacker
+  // could enumerate all 10,000 combinations in seconds.  This limiter caps
+  // guesses at 10 per 15 minutes per real IP.  Always import this export —
+  // never create a new rateLimit() call inline for this route.
+  // See server/sharedLimiters.ts for the keyGenerator rationale (getRealIp).
+  app.use('/api/auth/admin-override', overridePinLimiter);
 
   // Separate limiter for customer signup that does NOT count requests that will
   // be immediately rejected with 400 due to a missing tenant context.

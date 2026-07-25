@@ -179,3 +179,28 @@ export const uploadLimiter = rateLimit({
   keyGenerator: getRealIp,
   message: { message: "Too many uploads, please wait a few minutes." },
 });
+
+// ─── overridePinLimiter — brute-force protection for the store override PIN ───
+//
+// Applied to /api/auth/admin-override.
+// The store override PIN is a 4-digit numeric code (10,000 combinations).
+// Without a rate limit a bad actor could exhaust all combinations in seconds.
+// This limiter caps attempts at 10 per 15 minutes per real IP, making an
+// exhaustive attack take ~250 hours.
+//
+// WHY keyGenerator: getRealIp EXISTS
+// ------------------------------------
+// Same rationale as authLimiter — see the comment block above that export.
+// Using req.ip (the leftmost XFF entry) would allow an attacker to spoof a
+// fresh IP on every request and bypass the limit entirely.
+//
+// ⚠  DO NOT create a second rateLimit() call for /api/auth/admin-override.
+//    Always import this export from sharedLimiters.ts.
+export const overridePinLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: getRealIp,
+  message: { message: "Too many override PIN attempts, please try again in 15 minutes." },
+});
