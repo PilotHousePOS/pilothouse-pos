@@ -15812,11 +15812,26 @@ CRITICAL RULES:
         }
       }
       const tenant = await storage.getTenant(tenantId);
-      if (!tenant?.adminOverridePin) {
-        return res.status(400).json({ message: "No override PIN configured. Ask the owner to set one in Staff Accounts." });
+      let matched = false;
+      if (tenant?.adminOverridePin) {
+        // Primary path: verify against the store-level override PIN
+        matched = await verifyPassword(String(pin), tenant.adminOverridePin);
+      } else {
+        // Fallback: if no store override PIN is set, accept any admin user's employee PIN
+        const adminUsers = await db.execute(
+          sql`SELECT employee_pin FROM users WHERE tenant_id = ${tenantId} AND is_admin = true AND employee_pin IS NOT NULL`
+        );
+        for (const row of (adminUsers.rows as any[])) {
+          if (row.employee_pin && await verifyPassword(String(pin), row.employee_pin)) {
+            matched = true;
+            break;
+          }
+        }
+        if (!matched && (adminUsers.rows as any[]).length === 0) {
+          return res.status(400).json({ message: "No override PIN configured. Ask the owner to set a store PIN or an admin PIN in Staff Accounts." });
+        }
       }
-      const match = await verifyPassword(String(pin), tenant.adminOverridePin);
-      if (!match) return res.status(401).json({ message: "Incorrect override PIN" });
+      if (!matched) return res.status(401).json({ message: "Incorrect override PIN" });
       // Log the override action
       const userId = req.user?.id || 'unknown';
       await db.execute(sql`
@@ -15859,6 +15874,50 @@ CRITICAL RULES:
       const tenant = await storage.getTenant(tenantId);
       const features = { ...(tenant?.enabledFeatures || {}) } as any;
       features.posOverrideRequirements = req.body;
+      await storage.updateTenant(tenantId, { enabledFeatures: features });
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // PUT /api/admin/tab-labels — save custom tab/section label overrides (owner/admin only)
+  app.put("/api/admin/tab-labels", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const tenantId: number | undefined = req.tenantId;
+      if (!tenantId) return res.status(400).json({ message: "No tenant context" });
+      const tenant = await storage.getTenant(tenantId);
+      const features = { ...(tenant?.enabledFeatures || {}) } as any;
+      features.tabLabels = req.body;
+      await storage.updateTenant(tenantId, { enabledFeatures: features });
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // GET /api/homepage-config — public, returns homepage config for the tenant
+  app.get("/api/homepage-config", async (req: any, res) => {
+    try {
+      const tenantId: number | undefined = req.tenantId;
+      if (!tenantId) return res.json({});
+      const tenant = await storage.getTenant(tenantId);
+      const features = (tenant?.enabledFeatures || {}) as any;
+      res.json(features.homepageConfig || {});
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // PUT /api/admin/homepage-config — owner (isAdmin) or employee with canEditHomepage
+  app.put("/api/admin/homepage-config", authMiddleware, async (req: any, res) => {
+    try {
+      const tenantId: number | undefined = req.tenantId;
+      if (!tenantId) return res.status(400).json({ message: "No tenant context" });
+      const user = req.user as any;
+      // Check permission: admin OR employee with canEditHomepage
+      if (!user?.isAdmin) {
+        if (!user?.isEmployee) return res.status(403).json({ message: "Access denied" });
+        const perms = await storage.getEmployeePermissions(user.id, tenantId);
+        if (!perms?.canEditHomepage) return res.status(403).json({ message: "Homepage editing not permitted for this account" });
+      }
+      const tenant = await storage.getTenant(tenantId);
+      const features = { ...(tenant?.enabledFeatures || {}) } as any;
+      features.homepageConfig = req.body;
       await storage.updateTenant(tenantId, { enabledFeatures: features });
       res.json({ success: true });
     } catch (e: any) { res.status(500).json({ message: e.message }); }

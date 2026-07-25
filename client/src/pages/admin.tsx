@@ -6862,6 +6862,9 @@ export default function Admin() {
   const tenantFeatures = tenantInfo?.enabledFeatures ?? {};
   // A feature is shown unless explicitly set to false (empty object = all enabled)
   const featureEnabled = (key: string) => tenantFeatures[key] !== false;
+  // Custom tab/section label overrides set by the owner
+  const tabLabels = ((tenantFeatures as any).tabLabels ?? {}) as Record<string, string>;
+  const tl = (key: string, def: string) => tabLabels[key] || def;
 
   // ── Draggable tab ordering ─────────────────────────────────────────────────
   // Base tabs always visible; optional tabs must be explicitly added by the admin
@@ -7059,7 +7062,7 @@ export default function Admin() {
       case 'grooming': return (
         <><span className="hidden lg:inline">Service Settings</span><span className="lg:hidden">Services</span></>
       );
-      case 'groomers': return 'Staff';
+      case 'groomers': return tl('groomers', 'Staff');
       case 'users': return 'Users';
       case 'database': return 'Database';
       case 'astro': return 'Loyalty';
@@ -7085,7 +7088,7 @@ export default function Admin() {
       case 'intake-forms': return 'Intake Forms';
       case 'sms-blasts': return 'SMS Blasts';
       case 'memberships': return 'Memberships';
-      case 'staff': return 'Staff Accounts';
+      case 'staff': return tl('staff', 'Staff Accounts');
       default: return value;
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -14224,7 +14227,7 @@ export default function Admin() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <CardTitle className="flex items-center gap-2">
                   <Users className="w-5 h-5" />
-                  Groomers ({groomersQuery.data?.length || 0})
+                  {tl('groomersHeading', tl('groomers', 'Staff'))} ({groomersQuery.data?.length || 0})
                 </CardTitle>
                 {typedUser?.isAdmin && (
                   <Button 

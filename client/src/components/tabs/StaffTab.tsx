@@ -75,6 +75,7 @@ const ADMIN_PERMS: { key: keyof EmployeePermissions; label: string; description:
   { key: "canManageMemberships",    label: "Memberships",            description: "Manage membership plans and subscribers" },
   { key: "canManageSpecials",       label: "Specials & Promotions",  description: "Create and manage promotions" },
   { key: "canManageChargeAccounts", label: "Charge Accounts",        description: "Manage customer charge accounts" },
+  { key: "canEditHomepage",         label: "Edit Homepage",           description: "Edit the title, text, colors, and cards on the customer-facing homepage" },
 ];
 
 const DEFAULT_PERMS: EmployeePermissions = {
@@ -133,10 +134,18 @@ export default function StaffTab({ typedUser }: Props) {
   const [overridePinSet, setOverridePinSet]     = useState("");
   const [overridePinSaving, setOverridePinSaving] = useState(false);
 
+  // Tab label editor state
+  const [labelDraft, setLabelDraft] = useState<Record<string, string> | null>(null);
+
   // queries
   const { data: employees = [], isLoading } = useQuery<User[]>({
     queryKey: ["/api/admin/employees"],
   });
+  const { data: tenantInfo } = useQuery<{ enabledFeatures?: any }>({
+    queryKey: ["/api/tenants/current"],
+    enabled: !typedUser?.isEmployee,
+  });
+  const savedTabLabels: Record<string, string> = tenantInfo?.enabledFeatures?.tabLabels ?? {};
   const { data: salesStats = [] } = useQuery<Array<{
     userId: string; firstName: string | null; lastName: string | null;
     orderCount: number; totalSales: string;
@@ -220,6 +229,16 @@ export default function StaffTab({ typedUser }: Props) {
     mutationFn: (data: object) => apiRequest("PUT", "/api/admin/pos-override-config", data),
     onSuccess: () => { refetchPosOverride(); toast({ title: "POS override settings saved" }); },
     onError: (e: any) => toast({ title: "Failed to save", description: e.message, variant: "destructive" }),
+  });
+
+  const saveLabelsMutation = useMutation({
+    mutationFn: (labels: Record<string, string>) => apiRequest("PUT", "/api/admin/tab-labels", labels),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["/api/tenants/current"] });
+      setLabelDraft(null);
+      toast({ title: "Labels saved", description: "Tab names updated." });
+    },
+    onError: (e: any) => toast({ title: "Failed to save labels", description: e.message, variant: "destructive" }),
   });
 
   const saveOverridePin = async () => {
@@ -426,7 +445,7 @@ export default function StaffTab({ typedUser }: Props) {
               </CardHeader>
               <CardContent>
                 <p className="text-xs text-muted-foreground mb-3">
-                  Set a 4-digit PIN employees must enter for manager overrides in the POS. Leave blank to disable override protection.
+                  Set a 4-digit PIN employees must enter for manager overrides in the POS. If left blank, any admin account's personal PIN will be accepted instead.
                 </p>
                 <div className="flex gap-2">
                   <Input
@@ -476,6 +495,84 @@ export default function StaffTab({ typedUser }: Props) {
                     </div>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* ── Rename Tabs & Labels (admin/owner only) ── */}
+          {!typedUser?.isEmployee && (
+            <Card className="mt-4">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Pencil className="h-4 w-4" />
+                    Rename Tabs &amp; Labels
+                  </CardTitle>
+                  {labelDraft === null && (
+                    <button
+                      onClick={() => setLabelDraft({ ...savedTabLabels })}
+                      className="text-xs text-blue-600 hover:underline font-medium"
+                    >
+                      Edit
+                    </button>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Customize the names shown on the Staff tabs and section headings. Leave blank to use the default name.
+                </p>
+                {labelDraft === null ? (
+                  /* Read-only preview */
+                  <div className="space-y-1.5 text-sm">
+                    {[
+                      { key: 'groomers',       def: 'Staff',          hint: '"Staff" tab label' },
+                      { key: 'staff',          def: 'Staff Accounts', hint: '"Staff Accounts" tab label' },
+                      { key: 'groomersHeading', def: 'Staff',         hint: 'Section heading inside the Staff tab' },
+                    ].map(({ key, def, hint }) => (
+                      <div key={key} className="flex items-center justify-between gap-2">
+                        <span className="text-muted-foreground text-xs">{hint}</span>
+                        <span className="font-medium">{savedTabLabels[key] || def}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  /* Edit mode */
+                  <div className="space-y-3">
+                    {[
+                      { key: 'groomers',        def: 'Staff',          label: '"Staff" tab' },
+                      { key: 'staff',           def: 'Staff Accounts', label: '"Staff Accounts" tab' },
+                      { key: 'groomersHeading', def: 'Staff',          label: 'Section heading (inside tab)' },
+                    ].map(({ key, def, label }) => (
+                      <div key={key}>
+                        <Label className="text-xs text-muted-foreground">{label}</Label>
+                        <Input
+                          placeholder={def}
+                          value={labelDraft[key] ?? ''}
+                          onChange={e => setLabelDraft(d => ({ ...d!, [key]: e.target.value }))}
+                        />
+                      </div>
+                    ))}
+                    <div className="flex gap-2 pt-1">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setLabelDraft(null)}
+                        className="flex-1"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        size="sm"
+                        disabled={saveLabelsMutation.isPending}
+                        onClick={() => saveLabelsMutation.mutate(labelDraft!)}
+                        className="flex-1"
+                      >
+                        {saveLabelsMutation.isPending ? "Saving…" : "Save"}
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}

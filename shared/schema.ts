@@ -1460,6 +1460,7 @@ export const employeePermissions = pgTable("employee_permissions", {
   canManageMemberships:  boolean("can_manage_memberships").default(false), // memberships
   canManageSpecials:     boolean("can_manage_specials").default(false),    // specials/promotions
   canManageChargeAccounts: boolean("can_manage_charge_accounts").default(false), // charge accounts
+  canEditHomepage:       boolean("can_edit_homepage").default(false),       // edit customer-facing homepage content
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
