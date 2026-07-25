@@ -636,6 +636,39 @@ async function runAppMigrations() {
       await migDb.execute(migSql.raw(`UPDATE tenants SET onboarding_step = 1 WHERE onboarding_step = 0`));
       await migDb.execute(migSql.raw(`INSERT INTO data_migrations (key) VALUES ('${backfillKey}')`));
     }
+    // One-time: create a clean Pro-tier test tenant for tgskipbusiness@gmail.com
+    const freshTenantKey = 'fresh_pro_tenant_skipbusiness_2026';
+    const freshCheck = await migDb.execute(migSql.raw(
+      `SELECT key FROM data_migrations WHERE key = '${freshTenantKey}'`
+    ));
+    if (!freshCheck.rows || freshCheck.rows.length === 0) {
+      // Advance the sequence past the current max id so the INSERT auto-generates a safe id
+      await migDb.execute(migSql.raw(
+        `SELECT setval(pg_get_serial_sequence('tenants', 'id'), GREATEST(MAX(id), 1)) FROM tenants`
+      ));
+      // Create the new blank tenant
+      await migDb.execute(migSql.raw(`
+        INSERT INTO tenants (name, slug, subscription_status, subscription_tier, onboarding_step, enabled_features)
+        VALUES ('My Business', 'my-business-skip', 'active', 'pro', 0, '{}'::jsonb)
+        ON CONFLICT (slug) DO NOTHING
+      `));
+      // Reassign tgskipbusiness@gmail.com to the new tenant as admin
+      await migDb.execute(migSql.raw(`
+        UPDATE users
+        SET tenant_id = (SELECT id FROM tenants WHERE slug = 'my-business-skip'),
+            is_admin = true
+        WHERE email = 'tgskipbusiness@gmail.com'
+          AND (SELECT id FROM tenants WHERE slug = 'my-business-skip') IS NOT NULL
+      `));
+      // Set as tenant owner
+      await migDb.execute(migSql.raw(`
+        UPDATE tenants
+        SET owner_id = (SELECT id FROM users WHERE email = 'tgskipbusiness@gmail.com')
+        WHERE slug = 'my-business-skip'
+      `));
+      await migDb.execute(migSql.raw(`INSERT INTO data_migrations (key) VALUES ('${freshTenantKey}')`));
+    }
+
     // Startup cleanup: remove zero-stock items from pending queue (POS tracker)
     await migDb.execute(migSql.raw(`DELETE FROM pos_pending_new_items WHERE pos_stock <= 0`));
 

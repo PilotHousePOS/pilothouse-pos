@@ -723,7 +723,7 @@ export default function Booking() {
       if (dateCleared) {
         toast({
           title: "Date Cleared",
-          description: "Cat grooming is only available Monday, Tuesday, and Thursday. Please select a new date.",
+          description: "Cat services are only available Monday, Tuesday, and Thursday. Please select a new date.",
           variant: "destructive",
         });
       }
@@ -856,7 +856,7 @@ export default function Booking() {
             <div className="flex items-start space-x-2">
               <div className="text-purple-600 font-bold text-lg">🐱</div>
               <div>
-                <h4 className="font-bold text-purple-800 mb-1">Cat Grooming — Limited Availability</h4>
+                <h4 className="font-bold text-purple-800 mb-1">Cat Services — Limited Availability</h4>
                 <p className="text-sm text-purple-700">
                   For the safety of your cat, we accept cats <strong>Monday, Tuesday, and Thursday only</strong>, and they must arrive <strong>by 9:00 AM</strong>. This minimizes exposure to dogs during peak hours.
                 </p>
@@ -994,7 +994,7 @@ export default function Booking() {
 
         {/* Groomer Selection */}
         <div>
-          <Label className="text-sm font-semibold text-gray-900 mb-3 block">Select Groomer (Optional)</Label>
+          <Label className="text-sm font-semibold text-gray-900 mb-3 block">Select Staff Member (Optional)</Label>
           <Select value={selectedGroomer || "none"} onValueChange={(value) => setSelectedGroomer(value === "none" ? "" : value)}>
             <SelectTrigger className="border-gray-300 rounded-xl" data-testid="select-groomer">
               <SelectValue placeholder="No preference" />
@@ -1006,14 +1006,14 @@ export default function Booking() {
                 const isFull = remaining <= 0;
                 return (
                   <SelectItem key={groomer.id} value={groomer.id.toString()}>
-                    {groomer.name}{groomer.specialties ? ` (${groomer.specialties})` : ''}{isFull ? ' - Full Grooms Full' : remaining < 5 ? ` - ${remaining} full groom${remaining !== 1 ? 's' : ''} left` : ''}
+                    {groomer.name}{groomer.specialties ? ` (${groomer.specialties})` : ''}{isFull ? ' - Fully Booked' : remaining < 5 ? ` - ${remaining} slot${remaining !== 1 ? 's' : ''} left` : ''}
                   </SelectItem>
                 );
               })}
             </SelectContent>
           </Select>
           <p className="text-xs text-gray-500 mt-1">
-            Choose a preferred groomer or leave as "No Preference". Each groomer can take up to 5 full grooms per day.
+            Choose a preferred staff member or leave as "No Preference".
           </p>
         </div>
 

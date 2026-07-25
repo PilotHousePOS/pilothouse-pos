@@ -74,8 +74,8 @@ export default function Support() {
 
           {[
             {
-              q: "How do I book a grooming appointment?",
-              a: "Open the app, tap 'Book' in the bottom navigation, and follow the steps to choose your pet, service, groomer, and date.",
+              q: "How do I book a service appointment?",
+              a: "Open the app, tap 'Book' in the bottom navigation, and follow the steps to choose the service, staff member, and date.",
             },
             {
               q: "How do I cancel or reschedule an appointment?",

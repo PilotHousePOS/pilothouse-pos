@@ -798,7 +798,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                   <div className="flex-1">
                     <p className="font-medium text-sm text-green-800 dark:text-green-200">No payment needed</p>
                     <p className="text-xs text-green-700 dark:text-green-300">
-                      Your Astro Loyalty reward covers this order completely!
+                      Your rewards cover this order completely!
                     </p>
                   </div>
                 </div>

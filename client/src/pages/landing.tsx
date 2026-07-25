@@ -110,7 +110,7 @@ export default function Landing() {
               icon: Calendar,
               color: 'from-purple-600 to-purple-800',
               title: 'Appointments',
-              desc: 'Service bookings with automated reminders and groomer scheduling.',
+              desc: 'Service bookings with automated reminders and staff scheduling.',
             },
             {
               icon: BarChart3,

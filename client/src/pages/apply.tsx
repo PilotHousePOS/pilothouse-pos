@@ -294,8 +294,8 @@ export default function Apply() {
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl><SelectTrigger><SelectValue placeholder="Select position" /></SelectTrigger></FormControl>
                       <SelectContent>
-                        <SelectItem value="Groomer">Groomer</SelectItem>
-                        <SelectItem value="Groomer's Assistant / Bather">Groomer's Assistant / Bather</SelectItem>
+                        <SelectItem value="Service Provider">Service Provider</SelectItem>
+                        <SelectItem value="Service Assistant">Service Assistant</SelectItem>
                         <SelectItem value="Retail Sales Associate">Retail Sales Associate</SelectItem>
                         <SelectItem value="Kennel Technician">Kennel Technician</SelectItem>
                         <SelectItem value="Cashier">Cashier</SelectItem>
@@ -628,7 +628,7 @@ export default function Apply() {
                   <FormLabel>
                     Please share any additional skills, certifications, or information relevant to your application
                   </FormLabel>
-                  <FormControl><Textarea {...field} rows={4} placeholder="e.g. Certified groomer, bilingual, experience with exotic animals..." /></FormControl>
+                  <FormControl><Textarea {...field} rows={4} placeholder="e.g. Certified service provider, bilingual, 5+ years experience..." /></FormControl>
                 </FormItem>
               )} />
             </SECTION>

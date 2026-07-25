@@ -65,7 +65,7 @@ export default function MyAppointments() {
       window.history.replaceState({}, "", "/my-appointments");
       apiRequest("POST", `/api/appointments/${appointmentId}/confirm-payment`, { sessionId })
         .then(() => {
-          toast({ title: "Payment Successful!", description: "Your grooming has been paid. Thank you!" });
+          toast({ title: "Payment Successful!", description: "Your service appointment has been paid. Thank you!" });
           queryClient.invalidateQueries({ queryKey: ["/api/user/appointments"] });
         })
         .catch(() => {
@@ -85,7 +85,7 @@ export default function MyAppointments() {
       setTipSelections(prev => { const n = { ...prev }; delete n[variables.appointmentId]; return n; });
       setCustomTips(prev => { const n = { ...prev }; delete n[variables.appointmentId]; return n; });
       if (data?.success && data?.charged) {
-        toast({ title: "Payment Successful!", description: "Your grooming appointment has been paid. Thank you!" });
+        toast({ title: "Payment Successful!", description: "Your service appointment has been paid. Thank you!" });
         queryClient.invalidateQueries({ queryKey: ["/api/user/appointments"] });
       } else if (data?.checkoutUrl) {
         window.location.href = data.checkoutUrl;
@@ -174,7 +174,7 @@ export default function MyAppointments() {
     const [y, m, d] = value.split('-').map(Number);
     const picked = new Date(y, m - 1, d);
     if (picked.getDay() === 0) {
-      toast({ title: "No Sundays", description: "Grooming is not available on Sundays.", variant: "destructive" });
+      toast({ title: "No Sundays", description: "Service appointments are not available on Sundays.", variant: "destructive" });
       setRescheduleDate("");
       return;
     }
@@ -281,11 +281,11 @@ export default function MyAppointments() {
             <div className="mt-3 pt-2 border-t space-y-3">
               <p className="text-sm text-gray-700 font-medium flex items-center gap-1">
                 <DollarSign className="w-4 h-4 text-green-600" />
-                Grooming complete — pay online now
+                Service complete — pay online now
               </p>
               {/* Tip selector */}
               <div>
-                <p className="text-xs text-gray-500 mb-1.5">Add a tip for your groomer? (optional)</p>
+                <p className="text-xs text-gray-500 mb-1.5">Add a tip for your service provider? (optional)</p>
                 <div className="flex gap-1.5 flex-wrap">
                   {['0', '5', '10', '15', 'custom'].map(opt => {
                     const isCustom = opt === 'custom';
@@ -477,7 +477,7 @@ export default function MyAppointments() {
         <div className="flex items-center pl-12">
           <div>
             <h1 className="text-2xl font-extrabold" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>My Appointments</h1>
-            <p className="text-sm font-semibold text-white" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.4)' }}>Manage your grooming appointments</p>
+            <p className="text-sm font-semibold text-white" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.4)' }}>Manage your service appointments</p>
           </div>
         </div>
       </div>
@@ -493,7 +493,7 @@ export default function MyAppointments() {
             <CardContent className="p-8 text-center">
               <Calendar className="w-16 h-16 mx-auto text-gray-300 mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No Appointments Yet</h3>
-              <p className="text-gray-500 mb-4">You haven't booked any grooming appointments.</p>
+              <p className="text-gray-500 mb-4">You haven't booked any service appointments.</p>
               <Button onClick={() => setLocation("/booking")} className="bg-brand-blue hover:bg-blue-600" data-testid="button-book-now">
                 Book Appointment
               </Button>

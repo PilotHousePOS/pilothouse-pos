@@ -32,16 +32,16 @@ export default function SmsConsent() {
             <li>
               <strong>Account Registration</strong> — During sign-up, customers provide their
               phone number and acknowledge they may receive transactional SMS messages
-              related to their orders and grooming appointments.
+              related to their orders and service appointments.
             </li>
             <li>
-              <strong>Grooming Appointment Booking</strong> — When booking a grooming
+              <strong>Service Appointment Booking</strong> — When booking a service
               appointment, customers provide their phone number and agree to receive
               appointment status updates via text.
             </li>
             <li>
               <strong>Guest Booking</strong> — Customers who book as guests provide their
-              phone number and agree to receive grooming status notifications for that
+              phone number and agree to receive service status notifications for that
               appointment.
             </li>
           </ul>
@@ -51,8 +51,8 @@ export default function SmsConsent() {
           <h2 className="font-bold text-base text-gray-900 mb-2">Types of Messages Sent</h2>
           <p>We send the following transactional SMS messages only — we do not send promotional or marketing texts:</p>
           <ul className="list-disc pl-5 mt-2 space-y-1">
-            <li>Grooming appointment confirmation and status updates</li>
-            <li>"Your pet is ready for pick-up" notifications</li>
+            <li>Service appointment confirmation and status updates</li>
+            <li>"Your service is ready" notifications</li>
             <li>Order status updates (order ready, out for delivery)</li>
             <li>Appointment reminders</li>
           </ul>

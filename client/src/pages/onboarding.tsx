@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CheckCircle, ArrowRight, Building2, CreditCard, Users, Sparkles, Star, Package, Loader2 } from "lucide-react";
+import {
+  CheckCircle, ArrowRight, Building2, CreditCard, Users, Sparkles, Star,
+  Package, Loader2, Calendar, Gift, Home, Briefcase, Mail,
+} from "lucide-react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -20,34 +23,33 @@ function broadcastBillingUpdate() {
     ch.postMessage({ type: "billing_updated" });
     ch.close();
   } catch {
-    // BroadcastChannel not supported — fall back to storage event
     try {
       localStorage.setItem("onboarding_billing_updated_at", String(Date.now()));
     } catch {}
   }
 }
 
-const STEPS = ['Business Details', 'Choose a Plan', 'Invite Staff'];
+const STEPS = ['Business Details', 'Choose a Plan', 'Your Features', 'Invite Staff'];
 
 function StepIndicator({ current }: { current: number }) {
   return (
-    <div className="flex items-center justify-center gap-2 mb-8">
+    <div className="flex items-center justify-center gap-1 mb-8">
       {STEPS.map((label, i) => (
-        <div key={i} className="flex items-center gap-2">
-          <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 text-sm font-bold transition-all ${
+        <div key={i} className="flex items-center gap-1">
+          <div className={`flex items-center justify-center w-7 h-7 rounded-full border-2 text-xs font-bold transition-all ${
             i < current
               ? 'bg-green-500 border-green-500 text-white'
               : i === current
               ? 'bg-brand-blue border-brand-blue text-white'
               : 'bg-transparent border-white/30 text-white/40'
           }`}>
-            {i < current ? <CheckCircle className="w-4 h-4" /> : i + 1}
+            {i < current ? <CheckCircle className="w-3.5 h-3.5" /> : i + 1}
           </div>
           <span className={`text-xs font-semibold hidden sm:block ${i === current ? 'text-white' : 'text-white/40'}`}>
             {label}
           </span>
           {i < STEPS.length - 1 && (
-            <div className={`w-8 h-0.5 mx-1 ${i < current ? 'bg-green-500' : 'bg-white/20'}`} />
+            <div className={`w-6 h-0.5 mx-1 ${i < current ? 'bg-green-500' : 'bg-white/20'}`} />
           )}
         </div>
       ))}
@@ -55,88 +57,59 @@ function StepIndicator({ current }: { current: number }) {
   );
 }
 
-// --- LocalStorage helpers for tracking completed onboarding steps ---
+// --- LocalStorage helpers ---
 
-/** Mark that the owner has explicitly completed Step 1 (Business Details) for this tenant. */
 function markStep1Done(tenantId: number) {
-  try {
-    localStorage.setItem(`onboarding_step1_done_${tenantId}`, 'true');
-  } catch {}
+  try { localStorage.setItem(`onboarding_step1_done_${tenantId}`, 'true'); } catch {}
 }
 
-/**
- * Returns true if localStorage says Step 1 was completed.
- * This is a fast-path cache only — server state always takes precedence.
- */
 function isStep1Done(tenantId: number): boolean {
-  try {
-    return localStorage.getItem(`onboarding_step1_done_${tenantId}`) === 'true';
-  } catch {
-    return false;
-  }
+  try { return localStorage.getItem(`onboarding_step1_done_${tenantId}`) === 'true'; } catch { return false; }
 }
 
-/**
- * Returns true when the tenant's server-side name/slug look like real business
- * details (i.e. something other than the generic fallback values produced at
- * account-creation time).  Used as a secondary server-side heuristic: if the
- * owner provided meaningful details at signup but never explicitly clicked
- * "Save & Continue" on the onboarding form, we still treat Step 1 as done so
- * they don't have to re-confirm details they already supplied.
- *
- * "Default" values that do NOT indicate completion:
- *   – empty/whitespace name
- *   – slug === 'business' (the code-level fallback when no name is available)
- */
+const DEFAULT_SLUGS = ['', 'business', 'my-business-skip', 'animal-house'];
+
 function hasNonDefaultBusinessDetails(name: string, slug: string): boolean {
   const trimmedName = name.trim();
   const trimmedSlug = slug.trim();
-  if (!trimmedName) return false;
-  if (!trimmedSlug || trimmedSlug === 'business') return false;
+  if (!trimmedName || ['My Business', 'Animal House'].includes(trimmedName)) return false;
+  if (DEFAULT_SLUGS.includes(trimmedSlug)) return false;
   return true;
 }
 
-// Step 1: Business Details
+// ─── Step 1: Business Details ────────────────────────────────────────────────
 function Step1({ tenantId, onNext }: { tenantId: number; onNext: () => void }) {
-  const { user } = useAuth();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Fetch current tenant data
-  const { data: tenantData } = useQuery<{ name: string; slug: string; id: number }>({
+  const { data: tenantData } = useQuery<{ id: number; name: string; slug: string }>({
     queryKey: ['/api/tenants/current'],
   });
-
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Populate from tenant data once loaded
-  const displayName = name || tenantData?.name || '';
-  const displaySlug = slug || tenantData?.slug || '';
-
-  const handleNameChange = (val: string) => {
-    setName(val);
-    if (!slug) {
-      // Auto-generate slug from name
-      setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''));
+  useEffect(() => {
+    if (tenantData) {
+      const defaultNames = ['', 'My Business', 'Animal House'];
+      const defaultSlugs = ['', 'business', 'animal-house', 'my-business-skip'];
+      if (!defaultNames.includes(tenantData.name)) setName(tenantData.name);
+      if (!defaultSlugs.includes(tenantData.slug)) setSlug(tenantData.slug);
     }
-  };
+  }, [tenantData]);
 
   const handleSave = async () => {
-    if (!displayName.trim()) {
-      toast({ title: "Business name is required", variant: "destructive" });
+    if (!name.trim()) {
+      toast({ title: "Please enter your business name.", variant: "destructive" });
       return;
     }
+    const autoSlug = slug.trim() || name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     setIsLoading(true);
     try {
-      await apiRequest('PATCH', '/api/tenants/current', { name: displayName.trim(), slug: displaySlug.trim(), onboardingStep: 1 });
-      // Also write the localStorage flag as a best-effort fallback for same-browser sessions
+      await apiRequest('PATCH', '/api/tenants/current', { name: name.trim(), slug: autoSlug, onboardingStep: 1 });
       markStep1Done(tenantId);
       onNext();
-    } catch (err) {
-      // apiRequest throws `${status}: ${message}` — extract just the message part
-      const raw = err instanceof Error ? err.message : "Failed to update business details";
-      const msg = raw.replace(/^\d+:\s*/, '') || "Failed to update business details";
+    } catch (err: any) {
+      const raw = err instanceof Error ? err.message : String(err);
+      const msg = raw.replace(/^\d+:\s*/, '') || "Failed to save business details";
       toast({ title: msg, variant: "destructive" });
     } finally {
       setIsLoading(false);
@@ -146,60 +119,59 @@ function Step1({ tenantId, onNext }: { tenantId: number; onNext: () => void }) {
   return (
     <div className="space-y-5">
       <div className="text-center mb-6">
-        <div className="w-14 h-14 bg-gradient-to-br from-brand-blue to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
+        <div className="w-14 h-14 bg-gradient-to-br from-brand-blue to-blue-700 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
           <Building2 className="w-7 h-7 text-white" />
         </div>
-        <h2 className="text-2xl font-black text-white">Confirm your business details</h2>
-        <p className="text-gray-400 mt-1 text-sm">You can change these at any time from Settings.</p>
+        <h2 className="text-2xl font-black text-white">Your business details</h2>
+        <p className="text-gray-400 mt-1 text-sm">This is how customers will find you.</p>
       </div>
 
       <div className="space-y-1.5">
         <Label className="text-white font-semibold">Business Name</Label>
         <Input
-          value={displayName}
-          onChange={e => handleNameChange(e.target.value)}
+          value={name}
+          onChange={e => setName(e.target.value)}
           placeholder="e.g. Main Street Coffee Shop"
           className="bg-white/10 border-white/30 text-white placeholder:text-gray-500"
         />
       </div>
-
       <div className="space-y-1.5">
-        <Label className="text-white font-semibold">Business Slug</Label>
-        <div className="flex items-center gap-2">
-          <span className="text-gray-500 text-sm whitespace-nowrap">pilothouse.app/</span>
-          <Input
-            value={displaySlug}
+        <Label className="text-white font-semibold">Your URL Slug <span className="text-gray-400 font-normal">(optional)</span></Label>
+        <div className="flex items-center gap-2 bg-white/10 border border-white/30 rounded-md px-3">
+          <span className="text-gray-400 text-sm whitespace-nowrap">pilothouse.app/</span>
+          <input
+            value={slug}
             onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-            placeholder="animal-house"
-            className="bg-white/10 border-white/30 text-white placeholder:text-gray-500"
+            placeholder="my-shop"
+            className="bg-transparent flex-1 py-2 text-white placeholder:text-gray-500 outline-none text-sm"
           />
         </div>
-        <p className="text-xs text-gray-500">Used in your shareable links. Letters, numbers, and hyphens only.</p>
+        <p className="text-xs text-gray-500">Leave blank to auto-generate from your business name.</p>
       </div>
 
       <Button
         onClick={handleSave}
         disabled={isLoading}
-        className="w-full bg-gradient-to-r from-brand-blue to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 rounded-xl"
+        className="w-full bg-gradient-to-r from-brand-blue to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-bold py-3 rounded-xl"
       >
-        {isLoading ? "Saving..." : (
-          <>Save & Continue <ArrowRight className="w-4 h-4 ml-2" /></>
-        )}
+        {isLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving…</> : <>Save & Continue <ArrowRight className="w-4 h-4 ml-2" /></>}
       </Button>
+
+      <button type="button" onClick={onNext} className="w-full text-center text-sm text-gray-400 hover:text-white transition-colors py-2">
+        Skip for now
+      </button>
     </div>
   );
 }
 
-// Step 2: Choose Plan
+// ─── Step 2: Choose Plan ─────────────────────────────────────────────────────
 function Step2({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) {
   const { toast } = useToast();
   const [selectedPlan, setSelectedPlan] = useState<'starter' | 'pro' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const { data: tenantData } = useQuery<{
-    id: number;
-    name: string;
-    slug: string;
+    id: number; name: string; slug: string;
     subscriptionStatus: string | null;
     subscriptionTier: string | null;
     trialEndsAt: string | null;
@@ -244,13 +216,10 @@ function Step2({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) {
         cancelUrl: `${window.location.origin}/onboarding?step=2`,
       });
       const { url } = await res.json();
-      if (url) {
-        window.location.href = url;
-      }
+      if (url) window.location.href = url;
     } catch (err) {
       const raw = err instanceof Error ? err.message : "Failed to start checkout";
-      const msg = raw.replace(/^\d+:\s*/, '') || "Failed to start checkout";
-      toast({ title: msg, variant: "destructive" });
+      toast({ title: raw.replace(/^\d+:\s*/, '') || "Failed to start checkout", variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -270,9 +239,7 @@ function Step2({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) {
         trialDaysLeft > 0 ? (
           <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-xl px-4 py-3 text-sm text-green-300 font-medium">
             <Sparkles className="w-4 h-4 text-green-400 flex-shrink-0" />
-            {trialDaysLeft === 1
-              ? '1 day left in your free trial'
-              : `${trialDaysLeft} days left in your free trial`}
+            {trialDaysLeft === 1 ? '1 day left in your free trial' : `${trialDaysLeft} days left in your free trial`}
           </div>
         ) : (
           <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-sm text-red-300 font-medium">
@@ -292,9 +259,7 @@ function Step2({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) {
               type="button"
               onClick={() => setSelectedPlan(plan.id)}
               className={`text-left rounded-2xl border-2 p-4 transition-all duration-200 ${
-                isSelected
-                  ? 'border-brand-blue bg-brand-blue/20'
-                  : 'border-white/20 bg-white/5 hover:border-white/40'
+                isSelected ? 'border-brand-blue bg-brand-blue/20' : 'border-white/20 bg-white/5 hover:border-white/40'
               }`}
             >
               <div className="flex items-start gap-4">
@@ -304,8 +269,8 @@ function Step2({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
                     <span className="font-bold text-white">{plan.name}</span>
-                    {plan.badge && (
-                      <span className="bg-brand-red text-white text-xs font-bold px-2 py-0.5 rounded-full">{plan.badge}</span>
+                    {(plan as any).badge && (
+                      <span className="bg-brand-red text-white text-xs font-bold px-2 py-0.5 rounded-full">{(plan as any).badge}</span>
                     )}
                     <span className="ml-auto text-white font-bold">{plan.price}</span>
                   </div>
@@ -329,24 +294,154 @@ function Step2({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) {
         disabled={isLoading || !selectedPlan}
         className="w-full bg-gradient-to-r from-brand-red to-brand-blue hover:from-red-600 hover:to-blue-600 text-white font-bold py-3 rounded-xl"
       >
-        {isLoading ? "Redirecting to checkout..." : (
-          <>Start with {selectedPlan ? plans.find(p => p.id === selectedPlan)?.name : 'selected plan'} <ArrowRight className="w-4 h-4 ml-2" /></>
-        )}
+        {isLoading ? "Redirecting to checkout…" : <>Start with {selectedPlan ? plans.find(p => p.id === selectedPlan)?.name : 'selected plan'} <ArrowRight className="w-4 h-4 ml-2" /></>}
       </Button>
 
-      <button
-        type="button"
-        onClick={onNext}
-        className="w-full text-center text-sm text-gray-400 hover:text-white transition-colors py-2"
-      >
+      <button type="button" onClick={onSkip} className="w-full text-center text-sm text-gray-400 hover:text-white transition-colors py-2">
         Skip for now — I'll choose a plan later
       </button>
     </div>
   );
 }
 
-// Step 3: Invite Staff
-function Step3({ onFinish }: { onFinish: () => void }) {
+// ─── Step 3: Choose Your Features ───────────────────────────────────────────
+interface Feature {
+  id: string;
+  name: string;
+  description: string;
+  Icon: React.ElementType;
+  color: string;
+  defaultOn: boolean;
+}
+
+const ALL_FEATURES: Feature[] = [
+  {
+    id: 'appointments',
+    name: 'Service Booking & Appointments',
+    description: 'Let customers book appointments online. Manage staff schedules and service slots.',
+    Icon: Calendar,
+    color: 'text-blue-400',
+    defaultOn: true,
+  },
+  {
+    id: 'loyalty',
+    name: 'Loyalty & Rewards Program',
+    description: 'Built-in points system, purchase tracking, and customer rewards.',
+    Icon: Gift,
+    color: 'text-purple-400',
+    defaultOn: true,
+  },
+  {
+    id: 'boarding',
+    name: 'Boarding & Check-In Management',
+    description: 'Track overnight boarders, check-in/check-out, and occupancy records.',
+    Icon: Home,
+    color: 'text-orange-400',
+    defaultOn: false,
+  },
+  {
+    id: 'hiring',
+    name: 'Job Application Portal',
+    description: 'Accept and manage staff applications directly through your store page.',
+    Icon: Briefcase,
+    color: 'text-green-400',
+    defaultOn: false,
+  },
+  {
+    id: 'emailMarketing',
+    name: 'Email Marketing',
+    description: 'Send campaigns, automated reminders, and promotional emails to customers.',
+    Icon: Mail,
+    color: 'text-cyan-400',
+    defaultOn: true,
+  },
+];
+
+function Step3Features({ onNext }: { onNext: () => void }) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [enabled, setEnabled] = useState<Record<string, boolean>>(
+    Object.fromEntries(ALL_FEATURES.map(f => [f.id, f.defaultOn]))
+  );
+  const [isSaving, setIsSaving] = useState(false);
+
+  const toggle = (id: string) => setEnabled(prev => ({ ...prev, [id]: !prev[id] }));
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await apiRequest('PATCH', '/api/tenants/features', { ...enabled, onboardingStep: 2 });
+      queryClient.invalidateQueries({ queryKey: ['/api/tenants/current'] });
+      onNext();
+    } catch (err: any) {
+      toast({ title: "Failed to save — continuing anyway.", variant: "destructive" });
+      onNext(); // don't block the user
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="text-center mb-5">
+        <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
+          <Sparkles className="w-7 h-7 text-white" />
+        </div>
+        <h2 className="text-2xl font-black text-white">Choose your features</h2>
+        <p className="text-gray-400 mt-1 text-sm">Toggle on the tools your business needs. You can change these anytime in Settings.</p>
+      </div>
+
+      <div className="space-y-2.5">
+        {ALL_FEATURES.map(feat => {
+          const { Icon } = feat;
+          const isOn = enabled[feat.id];
+          return (
+            <button
+              key={feat.id}
+              type="button"
+              onClick={() => toggle(feat.id)}
+              className={`w-full text-left rounded-xl border-2 p-3.5 transition-all duration-200 flex items-start gap-3 ${
+                isOn
+                  ? 'border-white/40 bg-white/10'
+                  : 'border-white/10 bg-white/3 opacity-60'
+              }`}
+            >
+              <Icon className={`w-5 h-5 mt-0.5 flex-shrink-0 ${isOn ? feat.color : 'text-white/30'}`} />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <span className={`text-sm font-semibold ${isOn ? 'text-white' : 'text-white/40'}`}>{feat.name}</span>
+                  <div className={`w-10 h-5 rounded-full flex-shrink-0 relative transition-colors duration-200 ${isOn ? 'bg-green-500' : 'bg-white/20'}`}>
+                    <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${isOn ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                  </div>
+                </div>
+                <p className={`text-xs mt-0.5 ${isOn ? 'text-gray-300' : 'text-white/30'}`}>{feat.description}</p>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl px-4 py-3 text-xs text-blue-200">
+        <strong>Pro tip:</strong> Start with what you need now — you can enable or disable features anytime from your admin settings.
+      </div>
+
+      <Button
+        onClick={handleSave}
+        disabled={isSaving}
+        className="w-full bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white font-bold py-3 rounded-xl"
+      >
+        {isSaving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving…</> : <>Save Features & Continue <ArrowRight className="w-4 h-4 ml-2" /></>}
+      </Button>
+
+      <button type="button" onClick={onNext} className="w-full text-center text-sm text-gray-400 hover:text-white transition-colors py-2">
+        Skip — use default settings
+      </button>
+    </div>
+  );
+}
+
+// ─── Step 4: Invite Staff ────────────────────────────────────────────────────
+function Step4({ onFinish }: { onFinish: () => void }) {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
 
@@ -392,11 +487,7 @@ function Step3({ onFinish }: { onFinish: () => void }) {
         Finish Setup & Go to Dashboard
       </Button>
 
-      <button
-        type="button"
-        onClick={onFinish}
-        className="w-full text-center text-sm text-gray-400 hover:text-white transition-colors py-2"
-      >
+      <button type="button" onClick={onFinish} className="w-full text-center text-sm text-gray-400 hover:text-white transition-colors py-2">
         Skip for now
       </button>
     </div>
@@ -419,6 +510,7 @@ interface TenantData {
   slug: string;
   subscriptionStatus: string | null;
   onboardingStep: number;
+  enabledFeatures?: Record<string, boolean>;
 }
 
 interface BillingStatus {
@@ -428,17 +520,12 @@ interface BillingStatus {
 }
 
 /**
- * Detect the first incomplete onboarding step from server state.
+ * Detect the first incomplete onboarding step.
  *
- * Step 0 — Business Details: skipped when any of the following hold:
- *   1. server-side onboardingStep >= 1 (explicit completion flag)
- *   2. tenant name/slug are non-default, indicating details were saved at signup
- *   3. localStorage fast-path cache says step 1 is done (same-browser optimisation)
- * Step 1 — Choose a Plan:    skipped when billing shows an active subscription.
- * Step 2 — Invite Staff:     always shown last; never auto-skipped.
- *
- * Server-side signals (1 & 2) are authoritative and survive storage clears,
- * browser switches, and incognito sessions.  localStorage (3) is a cache only.
+ * Step 0 — Business Details: skip when onboardingStep >= 1 or details look non-default.
+ * Step 1 — Choose a Plan:    skip when billing is active/cancelled.
+ * Step 2 — Choose Features:  skip when onboardingStep >= 2 (features already saved).
+ * Step 3 — Invite Staff:     always last, never auto-skipped.
  */
 function detectStartStep(
   tenantId: number,
@@ -447,18 +534,22 @@ function detectStartStep(
   tenantName: string,
   tenantSlug: string,
 ): number {
-  const subscriptionActive =
-    billingStatus === 'active' || billingStatus === 'cancelled';
-  if (subscriptionActive) return 2;
+  const subscriptionActive = billingStatus === 'active' || billingStatus === 'cancelled';
 
-  // Server is the source of truth — check both explicit flag and name/slug heuristic
-  if (
+  // If business details are done, skip step 0
+  const step0Done =
     serverOnboardingStep >= 1 ||
     hasNonDefaultBusinessDetails(tenantName, tenantSlug) ||
-    isStep1Done(tenantId)   // localStorage fast-path cache (same-browser only)
-  ) return 1;
+    isStep1Done(tenantId);
 
-  return 0;
+  if (!step0Done) return 0;
+
+  // Business details done — check plan
+  if (!subscriptionActive) return 1;
+
+  // Plan done — check if features were chosen
+  if (serverOnboardingStep >= 2) return 3; // features already chosen → invite staff
+  return 2; // need to choose features
 }
 
 export default function Onboarding() {
@@ -466,21 +557,14 @@ export default function Onboarding() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // ?step=3 is the Stripe checkout success redirect — map to internal step 2 (Invite Staff).
-  // No other URL step values are trusted as an override; page-level detection takes precedence.
+  // ?step=3 is the Stripe checkout success redirect → go to step 2 (Choose Features)
   const urlParams = new URLSearchParams(window.location.search);
   const rawUrlStep = parseInt(urlParams.get('step') || '-1', 10);
   const stripeReturn = rawUrlStep === 3;
 
-  // Detect "returning" user — someone who's been here before but didn't finish
   const isResuming = hasVisitedOnboardingBefore();
-
-  // Mark as visited so next time we show "Resume" state
   markOnboardingVisited();
 
-  // Always fetch tenant + billing to get the tenant ID and subscription state.
-  // For Stripe returns we still fetch (to get the tenant ID for localStorage), but we
-  // skip the step calculation and go straight to step 2.
   const { data: tenantData, isLoading: tenantLoading } = useQuery<TenantData>({
     queryKey: ['/api/tenants/current'],
     enabled: !!user,
@@ -493,10 +577,9 @@ export default function Onboarding() {
     staleTime: 0,
   });
 
-  // Compute the starting step once data has loaded.
   const detectedStep = (() => {
     if (tenantLoading || billingLoading || !tenantData) return null;
-    if (stripeReturn) return 2;
+    if (stripeReturn) return 2; // After Stripe checkout → Choose Features
     return detectStartStep(
       tenantData.id,
       billingData?.subscriptionStatus,
@@ -508,33 +591,19 @@ export default function Onboarding() {
 
   const [step, setStep] = useState<number | null>(null);
 
-  // Set the step exactly once when detection completes.
   useEffect(() => {
-    if (step === null && detectedStep !== null) {
-      setStep(detectedStep);
-    }
+    if (step === null && detectedStep !== null) setStep(detectedStep);
   }, [detectedStep, step]);
 
-  // ── Cross-tab reconciliation ─────────────────────────────────────────────
-  // After queries are invalidated (e.g. via BroadcastChannel from the Stripe
-  // return tab), re-derive the target step from fresh billing data and advance
-  // step forward if the server state has progressed.  Never regress step — we
-  // only move forward (monotonically) so in-progress user edits are preserved.
+  // Cross-tab sync: when subscription becomes active while on plan step, advance to features
   const subscriptionStatus = billingData?.subscriptionStatus;
   useEffect(() => {
     if (step === null || !tenantData) return;
-
-    // Subscription became active/cancelled — skip the plan step if we're still on it
-    const subscriptionActive =
-      subscriptionStatus === "active" || subscriptionStatus === "cancelled";
-    if (subscriptionActive && step < 2) {
-      setStep(2);
-    }
+    const subscriptionActive = subscriptionStatus === "active" || subscriptionStatus === "cancelled";
+    if (subscriptionActive && step === 1) setStep(2);
   }, [subscriptionStatus, step, tenantData]);
 
-  // ── Cross-tab sync ──────────────────────────────────────────────────────────
-  // When the Stripe checkout tab returns here with ?step=3, broadcast so that
-  // the original tab (still showing the plan step) can refresh immediately.
+  // Broadcast on Stripe return so other tabs refresh
   const broadcastedRef = useRef(false);
   useEffect(() => {
     if (stripeReturn && !broadcastedRef.current) {
@@ -543,9 +612,7 @@ export default function Onboarding() {
     }
   }, [stripeReturn]);
 
-  // Listen for billing-updated broadcasts from other tabs (e.g. the Stripe
-  // return tab) and invalidate the local React Query cache so this tab
-  // re-fetches without waiting for focus.
+  // Listen for billing-updated broadcasts
   useEffect(() => {
     if (!user) return;
 
@@ -554,24 +621,19 @@ export default function Onboarding() {
       queryClient.invalidateQueries({ queryKey: ['/api/tenants/current'] });
     };
 
-    // Primary: BroadcastChannel (Chrome / Firefox / Safari 15.4+)
     let channel: BroadcastChannel | null = null;
     try {
       channel = new BroadcastChannel(ONBOARDING_CHANNEL);
       channel.addEventListener("message", (e) => {
         if (e.data?.type === "billing_updated") invalidate();
       });
-    } catch {
-      channel = null;
-    }
+    } catch { channel = null; }
 
-    // Fallback: storage event (works even when BroadcastChannel is unavailable)
     const onStorage = (e: StorageEvent) => {
       if (e.key === "onboarding_billing_updated_at") invalidate();
     };
     window.addEventListener("storage", onStorage);
 
-    // Secondary fallback: re-fetch when this tab regains visibility
     const onVisibility = () => {
       if (document.visibilityState === "visible") invalidate();
     };
@@ -589,7 +651,6 @@ export default function Onboarding() {
     return null;
   }
 
-  // Spinner while we determine which step to start on
   if (step === null) {
     return (
       <div className="w-full min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex items-center justify-center">
@@ -599,7 +660,6 @@ export default function Onboarding() {
   }
 
   const handleFinish = () => {
-    // Clear the visited flag so the banner and resume state reset
     try { localStorage.removeItem(ONBOARDING_VISITED_KEY); } catch {}
     window.location.replace('/');
   };
@@ -648,7 +708,10 @@ export default function Onboarding() {
               />
             )}
             {step === 2 && (
-              <Step3 onFinish={handleFinish} />
+              <Step3Features onNext={() => setStep(3)} />
+            )}
+            {step === 3 && (
+              <Step4 onFinish={handleFinish} />
             )}
           </CardContent>
         </Card>

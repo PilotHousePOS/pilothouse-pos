@@ -142,9 +142,14 @@ export default function Profile() {
     enabled: !!currentUser,
   });
 
+  const { data: astroEnabled } = useQuery<{ enabled: boolean }>({
+    queryKey: ["/api/astro/status"],
+    enabled: !!currentUser,
+  });
+
   const { data: astroStatus, refetch: refetchAstro } = useQuery<any>({
     queryKey: ["/api/astro/my-status"],
-    enabled: !!currentUser,
+    enabled: !!currentUser && !!astroEnabled?.enabled,
   });
 
   const handleLinkAstro = async () => {
@@ -417,8 +422,8 @@ export default function Profile() {
         </div>
       )}
 
-      {/* Astro Loyalty Section */}
-      <div className="mb-8">
+      {/* Astro Loyalty Section — only shown when Astro credentials are configured */}
+      {astroEnabled?.enabled && <div className="mb-8">
         <Card className="border-2 border-purple-200 dark:border-purple-800 shadow-md">
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-4">
@@ -551,7 +556,7 @@ export default function Profile() {
             )}
           </CardContent>
         </Card>
-      </div>
+      </div>}
 
       {/* My Pets Section */}
       <div className="mb-8">

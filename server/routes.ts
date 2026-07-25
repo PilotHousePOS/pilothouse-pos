@@ -870,7 +870,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (!tenant) {
         return res.status(404).json({ message: "Tenant not found." });
       }
-      res.json({ id: tenant.id, name: tenant.name, slug: tenant.slug, subscriptionStatus: tenant.subscriptionStatus, subscriptionTier: tenant.subscriptionTier, trialEndsAt: tenant.trialEndsAt, onboardingStep: tenant.onboardingStep ?? 0 });
+      res.json({ id: tenant.id, name: tenant.name, slug: tenant.slug, subscriptionStatus: tenant.subscriptionStatus, subscriptionTier: tenant.subscriptionTier, trialEndsAt: tenant.trialEndsAt, onboardingStep: tenant.onboardingStep ?? 0, enabledFeatures: tenant.enabledFeatures ?? {} });
     } catch (error) {
       console.error('GET /api/tenants/current error:', error);
       res.status(500).json({ message: "Failed to fetch tenant." });
@@ -908,7 +908,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         }
       }
       const updated = await storage.updateTenant(dbUser.tenantId, updates as any);
-      res.json({ id: updated.id, name: updated.name, slug: updated.slug, onboardingStep: updated.onboardingStep ?? 0 });
+      res.json({ id: updated.id, name: updated.name, slug: updated.slug, onboardingStep: updated.onboardingStep ?? 0, enabledFeatures: updated.enabledFeatures ?? {} });
     } catch (error: any) {
       console.error('PATCH /api/tenants/current error:', error);
       // Detect a Postgres unique-constraint violation (23505) on the slug column.
@@ -921,6 +921,36 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(409).json({ message: "This slug is already taken. Please choose another." });
       }
       res.status(500).json({ message: "Failed to update business details." });
+    }
+  });
+
+  // PATCH /api/tenants/features — save enabled feature flags for the current tenant
+  app.patch('/api/tenants/features', authMiddleware, async (req: any, res) => {
+    try {
+      const dbUser = await storage.getUser(req.user?.id);
+      if (!dbUser?.tenantId) return res.status(404).json({ message: "No tenant found." });
+      if (!dbUser.isAdmin) return res.status(403).json({ message: "Admin access required." });
+
+      // Whitelist of valid feature keys
+      const VALID_FEATURES = ['appointments', 'loyalty', 'boarding', 'hiring', 'emailMarketing'];
+      const incoming = req.body ?? {};
+      const features: Record<string, boolean> = {};
+      for (const key of VALID_FEATURES) {
+        if (typeof incoming[key] === 'boolean') features[key] = incoming[key];
+      }
+
+      const updated = await storage.updateTenant(dbUser.tenantId, {
+        enabledFeatures: features,
+        // Advance onboarding step to 2 (features chosen) — never regress
+        ...((() => {
+          const step = req.body.onboardingStep;
+          return typeof step === 'number' && step === 2 ? { onboardingStep: 2 } : {};
+        })()),
+      } as any);
+      res.json({ enabledFeatures: updated.enabledFeatures ?? {}, onboardingStep: updated.onboardingStep ?? 0 });
+    } catch (err: any) {
+      console.error('PATCH /api/tenants/features error:', err);
+      res.status(500).json({ message: "Failed to save features." });
     }
   });
 
@@ -12863,6 +12893,12 @@ West Monroe LA 71291
   // ============================================
   // ASTRO LOYALTY INTEGRATION ROUTES
   // ============================================
+
+  // Public status: is Astro Loyalty configured for this deployment?
+  app.get("/api/astro/status", authMiddleware, async (_req, res) => {
+    const { isAstroEnabled } = await import('./astroLoyalty');
+    res.json({ enabled: isAstroEnabled() });
+  });
 
   // Test Astro API connection (Admin only)
   app.get("/api/admin/astro/test-connection", authMiddleware, async (req: any, res) => {

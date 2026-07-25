@@ -31,7 +31,7 @@ export function formatCategory(category: string | null | undefined): string {
     dogTreats: 'Dog Treats',
     catTreats: 'Cat Treats',
     treats: 'Treats',
-    grooming: 'Grooming',
+    grooming: 'Services',
     cleaning: 'Cleaning',
     bowls: 'Bowls',
     carriers: 'Carriers',

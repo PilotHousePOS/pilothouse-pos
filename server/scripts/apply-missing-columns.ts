@@ -42,6 +42,7 @@ const STATEMENTS = [
   `ALTER TABLE tenants ADD COLUMN IF NOT EXISTS trial_warning_email_sent_at TIMESTAMPTZ`,
   `ALTER TABLE tenants ADD COLUMN IF NOT EXISTS trial_owner_missing_alert_sent_at TIMESTAMPTZ`,
   `ALTER TABLE tenants ADD COLUMN IF NOT EXISTS onboarding_step INTEGER NOT NULL DEFAULT 0`,
+  `ALTER TABLE tenants ADD COLUMN IF NOT EXISTS enabled_features JSONB DEFAULT '{}'::jsonb`,
   // ── pets ───────────────────────────────────────────────────────────────────
   `ALTER TABLE pets ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
   // ── groomers ───────────────────────────────────────────────────────────────
