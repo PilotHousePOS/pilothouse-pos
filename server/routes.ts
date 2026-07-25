@@ -366,11 +366,20 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     legacyHeaders: false,
     keyGenerator: getRealIp,
     message: { message: "Too many requests, please try again later." },
-    // Exclude no-tenant signup attempts so a flood of misconfigured no-slug
-    // requests from one IP cannot exhaust the general budget and block
-    // unrelated API calls (e.g. browsing the store catalog).
-    // These requests always return 400 and carry no authentication risk.
-    skip: (req: any) => req.path === '/auth/signup' && !req.tenantId,
+    // Skip authenticated sessions entirely — the admin panel fires 30+ queries
+    // per page mount, so a legitimate owner navigating normally would exhaust
+    // a 200-request budget in minutes.  The general limiter exists to blunt
+    // unauthenticated abuse (scrapers, misconfigured clients); authenticated
+    // requests have already passed auth checks and are governed by the
+    // authLimiter / overridePinLimiter on sensitive endpoints instead.
+    // Also exclude no-tenant signup attempts to avoid blocking real signups
+    // when a misconfigured client hammers /api/auth/signup without a slug.
+    skip: (req: any) => {
+      const hasAuth = !!(req.cookies?.auth_token || req.headers.authorization);
+      if (hasAuth) return true;
+      if (req.path === '/auth/signup' && !req.tenantId) return true;
+      return false;
+    },
   });
   app.use('/api', generalLimiter);
 

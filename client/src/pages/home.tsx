@@ -499,14 +499,17 @@ export default function Home() {
   const isStaff = !!user && (typedUser?.isEmployee || typedUser?.isAdmin) && !typedUser?.isSuperiorManager;
   if (isStaff) return <StaffDashboard />;
 
-  // ── Online store off ── if the storefront is disabled the "/" route has
-  // nothing to show. Owners go straight to their admin panel; anyone else
-  // (unauthenticated visitors, customers) sees a minimal physical-store card.
-  const storeOff = tenantInfo !== undefined && !featureOn('onlineStore');
-  if (storeOff && typedUser?.isSuperiorManager) {
+  // ── Owner branch ── the owner's home is always /admin. Redirect immediately
+  // without waiting for tenant data — avoids firing 30+ admin queries on a page
+  // that will only be visible for one frame anyway.
+  if (typedUser?.isSuperiorManager) {
     setLocation('/admin');
     return null;
   }
+
+  // ── Online store off ── physical-only store with no public storefront.
+  // Show a minimal landing card for unauthenticated visitors / customers.
+  const storeOff = tenantInfo !== undefined && !featureOn('onlineStore');
   if (storeOff && !typedUser?.isSuperiorManager) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-gray-50 text-center gap-4">
