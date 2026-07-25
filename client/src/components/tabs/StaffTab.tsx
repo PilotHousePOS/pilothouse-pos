@@ -49,6 +49,13 @@ interface EmployeePermissions {
   canManageMemberships: boolean;
   canManageSpecials: boolean;
   canManageChargeAccounts: boolean;
+  // Feature-toggle permissions
+  canToggleAppointments: boolean;
+  canToggleLoyalty: boolean;
+  canToggleBoarding: boolean;
+  canToggleHiring: boolean;
+  canToggleEmailMarketing: boolean;
+  canTogglePets: boolean;
 }
 
 const BASIC_PERMS: { key: keyof EmployeePermissions; label: string; description: string }[] = [
@@ -75,7 +82,13 @@ const ADMIN_PERMS: { key: keyof EmployeePermissions; label: string; description:
   { key: "canManageMemberships",    label: "Memberships",            description: "Manage membership plans and subscribers" },
   { key: "canManageSpecials",       label: "Specials & Promotions",  description: "Create and manage promotions" },
   { key: "canManageChargeAccounts", label: "Charge Accounts",        description: "Manage customer charge accounts" },
-  { key: "canEditHomepage",         label: "Edit Homepage",           description: "Edit the title, text, colors, and cards on the customer-facing homepage" },
+  { key: "canEditHomepage",            label: "Edit Homepage",                    description: "Edit the title, text, colors, and cards on the customer-facing homepage" },
+  { key: "canToggleAppointments",      label: "Toggle Appointments Feature",      description: "Turn the Service Booking & Appointments feature on or off store-wide" },
+  { key: "canToggleLoyalty",           label: "Toggle Loyalty Feature",           description: "Turn the Loyalty & Rewards Program on or off store-wide" },
+  { key: "canToggleBoarding",          label: "Toggle Boarding Feature",          description: "Turn the Boarding & Check-In feature on or off store-wide" },
+  { key: "canToggleHiring",            label: "Toggle Hiring Feature",            description: "Turn the Job Application Portal on or off store-wide" },
+  { key: "canToggleEmailMarketing",    label: "Toggle Email Marketing Feature",   description: "Turn Email Marketing on or off store-wide" },
+  { key: "canTogglePets",              label: "Toggle Pet Profiles Feature",      description: "Turn Pet Profiles on or off store-wide" },
 ];
 
 const DEFAULT_PERMS: EmployeePermissions = {
@@ -86,6 +99,8 @@ const DEFAULT_PERMS: EmployeePermissions = {
   canManageStaff: false, canManageEmail: false, canManageWaitlist: false,
   canManageEstimates: false, canManageInvoicing: false, canManageSmsBlasts: false,
   canManageMemberships: false, canManageSpecials: false, canManageChargeAccounts: false,
+  canToggleAppointments: false, canToggleLoyalty: false, canToggleBoarding: false,
+  canToggleHiring: false, canToggleEmailMarketing: false, canTogglePets: false,
 };
 
 interface Props { typedUser: User | null }

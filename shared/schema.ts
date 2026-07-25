@@ -1461,6 +1461,13 @@ export const employeePermissions = pgTable("employee_permissions", {
   canManageSpecials:     boolean("can_manage_specials").default(false),    // specials/promotions
   canManageChargeAccounts: boolean("can_manage_charge_accounts").default(false), // charge accounts
   canEditHomepage:       boolean("can_edit_homepage").default(false),       // edit customer-facing homepage content
+  // ── Feature-toggle permissions (owner grants which features an admin can turn on/off) ──
+  canToggleAppointments:    boolean("can_toggle_appointments").default(false),
+  canToggleLoyalty:         boolean("can_toggle_loyalty").default(false),
+  canToggleBoarding:        boolean("can_toggle_boarding").default(false),
+  canToggleHiring:          boolean("can_toggle_hiring").default(false),
+  canToggleEmailMarketing:  boolean("can_toggle_email_marketing").default(false),
+  canTogglePets:            boolean("can_toggle_pets").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -963,6 +963,22 @@ async function runAppMigrations() {
       log('[migration] homepage_editor_perm_v1 complete');
     }
 
+    // ── Feature-toggle permissions migration ─────────────────────────────────
+    const featureTogglePermKey = 'feature_toggle_perms_v1';
+    if (!(await migDb.execute(migSql.raw(`SELECT key FROM data_migrations WHERE key = '${featureTogglePermKey}'`))).rows?.length) {
+      log('[migration] Running feature_toggle_perms_v1...');
+      await migDb.execute(migSql.raw(`
+        ALTER TABLE employee_permissions ADD COLUMN IF NOT EXISTS can_toggle_appointments   BOOLEAN DEFAULT FALSE;
+        ALTER TABLE employee_permissions ADD COLUMN IF NOT EXISTS can_toggle_loyalty        BOOLEAN DEFAULT FALSE;
+        ALTER TABLE employee_permissions ADD COLUMN IF NOT EXISTS can_toggle_boarding       BOOLEAN DEFAULT FALSE;
+        ALTER TABLE employee_permissions ADD COLUMN IF NOT EXISTS can_toggle_hiring         BOOLEAN DEFAULT FALSE;
+        ALTER TABLE employee_permissions ADD COLUMN IF NOT EXISTS can_toggle_email_marketing BOOLEAN DEFAULT FALSE;
+        ALTER TABLE employee_permissions ADD COLUMN IF NOT EXISTS can_toggle_pets           BOOLEAN DEFAULT FALSE;
+      `));
+      await migDb.execute(migSql.raw(`INSERT INTO data_migrations (key) VALUES ('${featureTogglePermKey}')`));
+      log('[migration] feature_toggle_perms_v1 complete');
+    }
+
     // Startup cleanup: remove zero-stock items from pending queue (POS tracker)
     await migDb.execute(migSql.raw(`DELETE FROM pos_pending_new_items WHERE pos_stock <= 0`));
 

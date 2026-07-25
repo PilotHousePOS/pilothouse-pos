@@ -4725,24 +4725,36 @@ function TrackedItemsSettingsPanel() {
 
 // Loyalty Settings Panel Component
 const FEATURE_DEFS = [
-  { id: 'appointments',   label: 'Service Booking & Appointments', desc: 'Customers can book appointments online; staff schedules and service slots are managed here.' },
-  { id: 'loyalty',        label: 'Loyalty & Rewards Program',      desc: 'Points system, purchase tracking, and customer rewards.' },
-  { id: 'boarding',       label: 'Boarding & Check-In',            desc: 'Track overnight boarders, check-in/check-out, and occupancy records.' },
-  { id: 'hiring',         label: 'Job Application Portal',         desc: 'Accept and manage staff applications directly through your store page.' },
-  { id: 'emailMarketing', label: 'Email Marketing',                desc: 'Send campaigns, automated reminders, and promotional emails to customers.' },
-  { id: 'pets',           label: 'Pet Profiles',                   desc: 'Customers can add pets to their profile. Best for groomers, vet clinics, and pet stores.' },
+  { id: 'appointments',   permKey: 'canToggleAppointments',   label: 'Service Booking & Appointments', desc: 'Customers can book appointments online; staff schedules and service slots are managed here.' },
+  { id: 'loyalty',        permKey: 'canToggleLoyalty',        label: 'Loyalty & Rewards Program',      desc: 'Points system, purchase tracking, and customer rewards.' },
+  { id: 'boarding',       permKey: 'canToggleBoarding',       label: 'Boarding & Check-In',            desc: 'Track overnight boarders, check-in/check-out, and occupancy records.' },
+  { id: 'hiring',         permKey: 'canToggleHiring',         label: 'Job Application Portal',         desc: 'Accept and manage staff applications directly through your store page.' },
+  { id: 'emailMarketing', permKey: 'canToggleEmailMarketing', label: 'Email Marketing',                desc: 'Send campaigns, automated reminders, and promotional emails to customers.' },
+  { id: 'pets',           permKey: 'canTogglePets',           label: 'Pet Profiles',                   desc: 'Customers can add pets to their profile. Best for groomers, vet clinics, and pet stores.' },
 ];
 
 function FeaturesPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const { data: authUser } = useQuery<any>({ queryKey: ['/api/auth/user'] });
   const { data: tenantInfo, isLoading } = useQuery<{ enabledFeatures?: Record<string, any> }>({
     queryKey: ['/api/tenants/current'],
   });
+  const { data: myPerms } = useQuery<Record<string, boolean>>({
+    queryKey: ['/api/employee/my-permissions'],
+    enabled: !!authUser?.isEmployee,
+    staleTime: 60_000,
+  });
+
+  // Superior managers (owners) see and can toggle everything.
+  // Regular admins only see rows they've been explicitly granted permission for.
+  const isOwner = !!authUser?.isSuperiorManager;
+  const canToggle = (permKey: string) => isOwner || !!myPerms?.[permKey];
+
+  const visibleFeatures = FEATURE_DEFS.filter(f => canToggle(f.permKey));
 
   const features: Record<string, any> = tenantInfo?.enabledFeatures ?? {};
-  // a feature is on unless explicitly set to false
   const isOn = (id: string) => features[id] !== false;
 
   const saveMutation = useMutation({
@@ -4755,10 +4767,9 @@ function FeaturesPanel() {
     onError: () => toast({ title: 'Failed to save', variant: 'destructive' }),
   });
 
-  const toggle = (id: string) => {
-    const next = !isOn(id);
-    saveMutation.mutate({ [id]: next });
-  };
+  const toggle = (id: string) => saveMutation.mutate({ [id]: !isOn(id) });
+
+  if (!isLoading && visibleFeatures.length === 0) return null;
 
   return (
     <Card>
@@ -4767,13 +4778,16 @@ function FeaturesPanel() {
           <Settings className="w-5 h-5" />
           Features
         </CardTitle>
-        <p className="text-sm text-muted-foreground">Turn store features on or off. Changes take effect immediately.</p>
+        <p className="text-sm text-muted-foreground">
+          Turn store features on or off. Changes take effect immediately.
+          {!isOwner && <span className="block mt-0.5 text-xs text-amber-600">You can only toggle features the owner has granted you access to.</span>}
+        </p>
       </CardHeader>
       <CardContent className="space-y-1">
         {isLoading ? (
           <div className="py-4 text-center text-sm text-muted-foreground">Loading…</div>
         ) : (
-          FEATURE_DEFS.map(({ id, label, desc }) => (
+          visibleFeatures.map(({ id, label, desc }) => (
             <div key={id} className="flex items-start justify-between gap-4 py-3 border-b last:border-0">
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium leading-tight">{label}</p>
