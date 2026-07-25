@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLocation } from "wouter";
 import { Bell, ShoppingCart, Heart, Star, ArrowRight, Sparkles, Eye, Search, Tag, ChevronLeft, ChevronRight, Briefcase, Pencil, Check, X } from "lucide-react";
+import StaffDashboard from "@/pages/StaffDashboard";
 import { getRecentlyViewedIds } from "@/lib/recentlyViewed";
 import animalHouseLogoPath from "@assets/Circle Mascot Logo_1750438195696.jpg";
 import { pushNotificationManager } from "@/lib/pushNotifications";
@@ -486,6 +487,18 @@ export default function Home() {
   // Card destinations
   const CARD_ROUTES = ["/supplies", "/booking", "/profile", "/orders"];
 
+  // Tenant feature flags (for gating sections on owner/customer view)
+  const { data: tenantInfo } = useQuery<{ enabledFeatures?: Record<string, any> }>({
+    queryKey: ["/api/tenants/current"],
+  });
+  const enabledFeatures = (tenantInfo as any)?.enabledFeatures ?? {};
+  const featureOn = (k: string) => enabledFeatures[k] !== false;
+
+  // ── Staff branch ── employees and admins (but not the owner) get a dedicated
+  // streamlined dashboard instead of the customer-facing homepage.
+  const isStaff = !!user && (typedUser?.isEmployee || typedUser?.isAdmin) && !typedUser?.isSuperiorManager;
+  if (isStaff) return <StaffDashboard />;
+
   return (
     <div className="pb-20 bg-gradient-to-b from-gray-50 to-white">
       {/* Header */}
@@ -507,10 +520,12 @@ export default function Home() {
             <button onClick={handleNotificationClick} className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${notificationsEnabled ? "text-brand-orange bg-orange-50" : "text-gray-500 hover:bg-gray-100"}`}>
               <Bell className="w-5 h-5" />
             </button>
-            <button onClick={() => setLocation("/cart")} className="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 relative">
-              <ShoppingCart className="w-5 h-5" />
-              {cartCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-brand-red text-white text-[10px] font-bold rounded-full flex items-center justify-center">{cartCount}</span>}
-            </button>
+            {featureOn('onlineStore') && (
+              <button onClick={() => setLocation("/cart")} className="w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 relative">
+                <ShoppingCart className="w-5 h-5" />
+                {cartCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-brand-red text-white text-[10px] font-bold rounded-full flex items-center justify-center">{cartCount}</span>}
+              </button>
+            )}
             {user ? (
               <button onClick={handleLogout} className="px-3 py-1.5 bg-brand-red text-white text-sm font-semibold rounded-xl hover:bg-red-700 transition-colors">Logout</button>
             ) : (
@@ -539,7 +554,7 @@ export default function Home() {
         </form>
       </div>
 
-      <SpecialsStrip />
+      {featureOn('onlineStore') && <SpecialsStrip />}
 
       {/* Hero Section */}
       <section className="px-6 py-6 relative">
@@ -568,8 +583,8 @@ export default function Home() {
         )}
       </section>
 
-      {/* Recently Viewed */}
-      {recentlyViewedSupplies.length > 0 && (
+      {/* Recently Viewed — only when online store is active */}
+      {featureOn('onlineStore') && recentlyViewedSupplies.length > 0 && (
         <section className="px-6 pb-8">
           <div className="flex items-center mb-4">
             <Eye className="w-5 h-5 text-gray-500 mr-2" />

@@ -4780,12 +4780,13 @@ function TrackedItemsSettingsPanel() {
 
 // Loyalty Settings Panel Component
 const FEATURE_DEFS = [
-  { id: 'appointments',   permKey: 'canToggleAppointments',   label: 'Service Booking & Appointments', desc: 'Customers can book appointments online; staff schedules and service slots are managed here.' },
-  { id: 'loyalty',        permKey: 'canToggleLoyalty',        label: 'Loyalty & Rewards Program',      desc: 'Points system, purchase tracking, and customer rewards.' },
-  { id: 'boarding',       permKey: 'canToggleBoarding',       label: 'Boarding & Check-In',            desc: 'Track overnight boarders, check-in/check-out, and occupancy records.' },
-  { id: 'hiring',         permKey: 'canToggleHiring',         label: 'Job Application Portal',         desc: 'Accept and manage staff applications directly through your store page.' },
-  { id: 'emailMarketing', permKey: 'canToggleEmailMarketing', label: 'Email Marketing',                desc: 'Send campaigns, automated reminders, and promotional emails to customers.' },
-  { id: 'pets',           permKey: 'canTogglePets',           label: 'Pet Profiles',                   desc: 'Customers can add pets to their profile. Best for groomers, vet clinics, and pet stores.' },
+  { id: 'appointments',   permKey: 'canToggleAppointments',   label: 'Service Booking & Appointments', desc: 'Customers can book appointments online; staff schedules and service slots are managed here.',  proOnly: false },
+  { id: 'boarding',       permKey: 'canToggleBoarding',       label: 'Boarding & Check-In',            desc: 'Track overnight boarders, check-in/check-out, and occupancy records.',                        proOnly: false },
+  { id: 'hiring',         permKey: 'canToggleHiring',         label: 'Job Application Portal',         desc: 'Accept and manage staff applications directly through your store page.',                     proOnly: false },
+  { id: 'onlineStore',    permKey: 'canToggleOnlineStore',    label: 'Online Storefront',              desc: 'Customers can browse products, add to cart, and place orders online.',                       proOnly: true  },
+  { id: 'loyalty',        permKey: 'canToggleLoyalty',        label: 'Loyalty & Rewards Program',      desc: 'Points system, purchase tracking, and customer rewards.',                                   proOnly: true  },
+  { id: 'emailMarketing', permKey: 'canToggleEmailMarketing', label: 'Email Marketing',                desc: 'Send campaigns, automated reminders, and promotional emails to customers.',                  proOnly: true  },
+  { id: 'pets',           permKey: 'canTogglePets',           label: 'Pet Profiles',                   desc: 'Customers can add pets to their profile. Best for groomers, vet clinics, and pet stores.',  proOnly: true  },
 ];
 
 function FeaturesPanel() {
@@ -4793,7 +4794,7 @@ function FeaturesPanel() {
   const queryClient = useQueryClient();
 
   const { data: authUser } = useQuery<any>({ queryKey: ['/api/auth/user'] });
-  const { data: tenantInfo, isLoading } = useQuery<{ enabledFeatures?: Record<string, any> }>({
+  const { data: tenantInfo, isLoading } = useQuery<{ enabledFeatures?: Record<string, any>; subscriptionTier?: string }>({
     queryKey: ['/api/tenants/current'],
   });
   const { data: myPerms } = useQuery<Record<string, boolean>>({
@@ -4805,9 +4806,17 @@ function FeaturesPanel() {
   // Superior managers (owners) see and can toggle everything.
   // Regular admins only see rows they've been explicitly granted permission for.
   const isOwner = !!authUser?.isSuperiorManager;
+  const isPro = tenantInfo?.subscriptionTier === 'pro' || tenantInfo?.subscriptionTier === 'enterprise';
   const canToggle = (permKey: string) => isOwner || !!myPerms?.[permKey];
 
-  const visibleFeatures = FEATURE_DEFS.filter(f => canToggle(f.permKey));
+  // Owners see all rows (including Pro-locked ones so they know what's available).
+  // Regular admins only see rows they've been granted permission for, and never see Pro-locked rows they can't use.
+  const visibleFeatures = FEATURE_DEFS.filter(f => {
+    if (!canToggle(f.permKey)) return false;
+    // Non-owners never see Pro-only rows (no point — they can't toggle them anyway)
+    if (f.proOnly && !isOwner) return false;
+    return true;
+  });
 
   const features: Record<string, any> = tenantInfo?.enabledFeatures ?? {};
   const isOn = (id: string) => features[id] !== false;
@@ -4822,7 +4831,10 @@ function FeaturesPanel() {
     onError: () => toast({ title: 'Failed to save', variant: 'destructive' }),
   });
 
-  const toggle = (id: string) => saveMutation.mutate({ [id]: !isOn(id) });
+  const toggle = (id: string) => {
+    if (!isPro) return; // shouldn't be reachable for proOnly features, but guard anyway
+    saveMutation.mutate({ [id]: !isOn(id) });
+  };
 
   if (!isLoading && visibleFeatures.length === 0) return null;
 
@@ -4842,20 +4854,35 @@ function FeaturesPanel() {
         {isLoading ? (
           <div className="py-4 text-center text-sm text-muted-foreground">Loading…</div>
         ) : (
-          visibleFeatures.map(({ id, label, desc }) => (
-            <div key={id} className="flex items-start justify-between gap-4 py-3 border-b last:border-0">
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium leading-tight">{label}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+          visibleFeatures.map(({ id, label, desc, proOnly }) => {
+            const locked = proOnly && !isPro;
+            return (
+              <div key={id} className={`flex items-start justify-between gap-4 py-3 border-b last:border-0 ${locked ? 'opacity-60' : ''}`}>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium leading-tight">{label}</p>
+                    {proOnly && (
+                      <span className="inline-flex items-center gap-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-amber-200 leading-none">
+                        <Zap className="w-2.5 h-2.5" />PRO
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+                  {locked && (
+                    <p className="text-xs text-amber-600 mt-1 font-medium">
+                      Upgrade to Pro to enable this feature.
+                    </p>
+                  )}
+                </div>
+                <Switch
+                  checked={locked ? false : isOn(id)}
+                  onCheckedChange={() => !locked && toggle(id)}
+                  disabled={saveMutation.isPending || locked}
+                  className="mt-0.5 flex-shrink-0"
+                />
               </div>
-              <Switch
-                checked={isOn(id)}
-                onCheckedChange={() => toggle(id)}
-                disabled={saveMutation.isPending}
-                className="mt-0.5 flex-shrink-0"
-              />
-            </div>
-          ))
+            );
+          })
         )}
       </CardContent>
     </Card>
@@ -7128,7 +7155,7 @@ export default function Admin() {
       'users':           isEmp ? false : !!typedUser?.isAdmin,
       'database':        isEmp ? false : !!typedUser?.isAdmin,
       'astro':           isEmp ? false : !!typedUser?.isAdmin,
-      'email-center':    isEmp ? !!ep.canManageEmail : !!typedUser?.isAdmin,
+      'email-center':    isEmp ? !!ep.canManageEmail && featureEnabled('emailMarketing') : !!(typedUser?.isAdmin && featureEnabled('emailMarketing')),
       'orders':          isEmp ? !!ep.canManageOrders : true,
       'charge-accounts': isEmp ? !!ep.canManageChargeAccounts : !!typedUser?.isAdmin,
       'specials':        isEmp ? !!ep.canManageSpecials : !!typedUser?.isAdmin,

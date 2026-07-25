@@ -27,7 +27,7 @@ import { sendPasswordResetEmail, sendVerificationEmail, sendContactChangeOtpEmai
 import { normalizePhoneNumber } from './phoneUtils';
 import { db, resetPool } from './db';
 import { eq, inArray, or, and, ilike, sql } from 'drizzle-orm';
-import { supplies, supplyCategories } from '@shared/schema';
+import { supplies, supplyCategories, tenants } from '@shared/schema';
 import OpenAI from 'openai';
 import sharp from 'sharp';
 import { expandProductAbbreviations } from './abbreviationExpansion';
@@ -283,6 +283,28 @@ async function resolveOptionalAuthUserId(req: any): Promise<string | undefined> 
  * Must be placed BEFORE any file-upload middleware so that file parsing
  * is skipped entirely for unauthenticated or non-admin callers.
  */
+/** Rejects requests from tenants not on the Pro (or higher) plan. */
+async function requireProPlan(req: any, res: any, next: any): Promise<void> {
+  try {
+    const tenantId: number | undefined = req.tenantId;
+    if (!tenantId) { next(); return; } // super-admin or no-tenant context — allow through
+    const [tenant] = await db
+      .select({ subscriptionTier: tenants.subscriptionTier })
+      .from(tenants)
+      .where(eq(tenants.id, tenantId))
+      .limit(1);
+    const tier = tenant?.subscriptionTier ?? 'starter';
+    if (tier !== 'pro' && tier !== 'enterprise') {
+      res.status(403).json({ error: 'PRO_REQUIRED', message: 'This feature requires a Pro subscription. Please upgrade to continue.' });
+      return;
+    }
+    next();
+  } catch (err) {
+    console.error('requireProPlan error:', err);
+    next(err);
+  }
+}
+
 async function requireAdminMiddleware(req: any, res: any, next: any): Promise<void> {
   const token = req.cookies?.auth_token || req.headers.authorization?.replace('Bearer ', '');
   if (!token) {
@@ -949,7 +971,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (!dbUser.isAdmin) return res.status(403).json({ message: "Admin access required." });
 
       // Whitelist of valid feature keys
-      const VALID_FEATURES = ['appointments', 'loyalty', 'boarding', 'hiring', 'emailMarketing', 'pets'];
+      const VALID_FEATURES = ['appointments', 'loyalty', 'boarding', 'hiring', 'emailMarketing', 'pets', 'onlineStore'];
       const incoming = req.body ?? {};
       const features: Record<string, boolean> = {};
       for (const key of VALID_FEATURES) {
@@ -3820,7 +3842,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   });
 
   // Cart routes
-  app.get("/api/cart", authMiddleware, async (req: any, res) => {
+  app.get("/api/cart", authMiddleware, requireProPlan, async (req: any, res) => {
     try {
       const userId = (req as any).user?.id;
       if (!userId) {
@@ -3834,7 +3856,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
-  app.post("/api/cart", authMiddleware, async (req: any, res) => {
+  app.post("/api/cart", authMiddleware, requireProPlan, async (req: any, res) => {
     try {
       const userId = (req as any).user?.id;
       if (!userId) {
@@ -3855,7 +3877,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
-  app.put("/api/cart/:id", authMiddleware, async (req: any, res) => {
+  app.put("/api/cart/:id", authMiddleware, requireProPlan, async (req: any, res) => {
     try {
       const userId = (req as any).user?.id;
       if (!userId) {
@@ -3874,7 +3896,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
-  app.delete("/api/cart/:id", authMiddleware, async (req: any, res) => {
+  app.delete("/api/cart/:id", authMiddleware, requireProPlan, async (req: any, res) => {
     try {
       const userId = (req as any).user?.id;
       if (!userId) {
@@ -14117,7 +14139,7 @@ West Monroe LA 71291
   });
 
   // Update loyalty settings (admin only)
-  app.put("/api/loyalty-settings", authMiddleware, async (req: any, res) => {
+  app.put("/api/loyalty-settings", authMiddleware, requireProPlan, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) {
         return res.status(403).json({ message: "Admin access required" });
@@ -14136,7 +14158,7 @@ West Monroe LA 71291
   });
 
   // Get user's loyalty status
-  app.get("/api/user/loyalty", authMiddleware, async (req: any, res) => {
+  app.get("/api/user/loyalty", authMiddleware, requireProPlan, async (req: any, res) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -14151,7 +14173,7 @@ West Monroe LA 71291
   });
 
   // Apply loyalty credit to order
-  app.post("/api/apply-loyalty-credit", authMiddleware, async (req: any, res) => {
+  app.post("/api/apply-loyalty-credit", authMiddleware, requireProPlan, async (req: any, res) => {
     try {
       const userId = req.user?.id;
       if (!userId) {

@@ -979,6 +979,17 @@ async function runAppMigrations() {
       log('[migration] feature_toggle_perms_v1 complete');
     }
 
+    // ── Online-store feature-toggle permission ────────────────────────────────
+    const onlineStorePermKey = 'feature_toggle_online_store_v1';
+    if (!(await migDb.execute(migSql.raw(`SELECT key FROM data_migrations WHERE key = '${onlineStorePermKey}'`))).rows?.length) {
+      log('[migration] Running feature_toggle_online_store_v1...');
+      await migDb.execute(migSql.raw(`
+        ALTER TABLE employee_permissions ADD COLUMN IF NOT EXISTS can_toggle_online_store BOOLEAN DEFAULT FALSE;
+      `));
+      await migDb.execute(migSql.raw(`INSERT INTO data_migrations (key) VALUES ('${onlineStorePermKey}')`));
+      log('[migration] feature_toggle_online_store_v1 complete');
+    }
+
     // Startup cleanup: remove zero-stock items from pending queue (POS tracker)
     await migDb.execute(migSql.raw(`DELETE FROM pos_pending_new_items WHERE pos_stock <= 0`));
 
