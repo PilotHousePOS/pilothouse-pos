@@ -678,6 +678,32 @@ async function runAppMigrations() {
       log('[migration] fresh_pro_tenant_v3 complete');
     }
 
+    // One-time: assign orphaned supply_categories (tenant_id IS NULL) to tenant 1
+    // and fix the unique constraint from (key) → (key, tenant_id)
+    const catFixKey = 'supply_categories_tenant_isolation_v1';
+    const catFixCheck = await migDb.execute(migSql.raw(
+      `SELECT key FROM data_migrations WHERE key = '${catFixKey}'`
+    ));
+    if (!catFixCheck.rows || catFixCheck.rows.length === 0) {
+      log('[migration] Fixing supply_categories tenant isolation...');
+      // Assign all un-owned categories to tenant 1 (Animal House)
+      await migDb.execute(migSql.raw(
+        `UPDATE supply_categories SET tenant_id = 1 WHERE tenant_id IS NULL`
+      ));
+      // Drop old single-column unique constraint if it exists, add composite one
+      await migDb.execute(migSql.raw(
+        `ALTER TABLE supply_categories DROP CONSTRAINT IF EXISTS supply_categories_key_key`
+      ));
+      await migDb.execute(migSql.raw(
+        `ALTER TABLE supply_categories DROP CONSTRAINT IF EXISTS supply_categories_key_tenant_id_key`
+      ));
+      await migDb.execute(migSql.raw(
+        `ALTER TABLE supply_categories ADD CONSTRAINT supply_categories_key_tenant_id_key UNIQUE (key, tenant_id)`
+      ));
+      await migDb.execute(migSql.raw(`INSERT INTO data_migrations (key) VALUES ('${catFixKey}')`));
+      log('[migration] supply_categories tenant isolation complete');
+    }
+
     // Startup cleanup: remove zero-stock items from pending queue (POS tracker)
     await migDb.execute(migSql.raw(`DELETE FROM pos_pending_new_items WHERE pos_stock <= 0`));
 

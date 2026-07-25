@@ -12037,69 +12037,61 @@ West Monroe LA 71291
     }
   });
 
-  // Ensure supply_categories table exists and is seeded
+  // Ensure supply_categories table exists (tenant_id column added via migration)
   (async () => {
     try {
       await db.execute(sql`
         CREATE TABLE IF NOT EXISTS supply_categories (
           id SERIAL PRIMARY KEY,
-          key VARCHAR(100) NOT NULL UNIQUE,
+          key VARCHAR(100) NOT NULL,
           label VARCHAR(100) NOT NULL,
-          created_at TIMESTAMP DEFAULT NOW()
+          tenant_id INTEGER REFERENCES tenants(id),
+          created_at TIMESTAMP DEFAULT NOW(),
+          UNIQUE (key, tenant_id)
         )
       `);
-      const existing = await db.execute(sql`SELECT COUNT(*) FROM supply_categories`);
-      if (Number((existing.rows[0] as any).count) === 0) {
-        await db.execute(sql`
-          INSERT INTO supply_categories (key, label) VALUES
-          ('food', 'Food (Generic)'),
-          ('treats', 'Treats (Generic)'),
-          ('dogFood', 'Dog Food'),
-          ('dogTreats', 'Dog Treats'),
-          ('catFood', 'Cat Food'),
-          ('catTreats', 'Cat Treats'),
-          ('catToys', 'Cat Toys'),
-          ('smallAnimalFood', 'Small Animal Food'),
-          ('smallAnimalTreats', 'Small Animal Treats'),
-          ('smallAnimalSupplies', 'Small Animal Supplies'),
-          ('toys', 'Toys'),
-          ('beds', 'Beds'),
-          ('leashesAndCollars', 'Leashes & Collars'),
-          ('healthcare', 'Healthcare'),
-          ('accessories', 'Accessories'),
-          ('aquatics', 'Aquatics'),
-          ('reptiles', 'Reptiles'),
-          ('birdSupplies', 'Bird Supplies'),
-          ('dogCages', 'Dog Cages/Houses')
-          ON CONFLICT (key) DO NOTHING
-        `);
-      }
     } catch (e) {
       console.error("Failed to initialize supply_categories table:", e);
     }
   })();
 
-  // List all supply categories
-  app.get("/api/admin/categories", authMiddleware, async (req: any, res) => {
+  // Public: list categories for the storefront (no auth, tenant-scoped via X-Tenant-Slug)
+  app.get("/api/categories", async (req: any, res) => {
     try {
-      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
-      const rows = await db.execute(sql`SELECT id, key, label FROM supply_categories ORDER BY label ASC`);
+      const tenantId = (req as any).tenantId;
+      if (!tenantId) return res.json([]);
+      const rows = await db.execute(sql`SELECT key, label FROM supply_categories WHERE tenant_id = ${tenantId} ORDER BY label ASC`);
       res.json(rows.rows);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch categories" });
     }
   });
 
-  // Create a new supply category
+  // Admin: list categories (tenant-scoped)
+  app.get("/api/admin/categories", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId = (req as any).tenantId;
+      if (!tenantId) return res.json([]);
+      const rows = await db.execute(sql`SELECT id, key, label FROM supply_categories WHERE tenant_id = ${tenantId} ORDER BY label ASC`);
+      res.json(rows.rows);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch categories" });
+    }
+  });
+
+  // Admin: create a new supply category (tenant-scoped)
   app.post("/api/admin/categories", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId = (req as any).tenantId;
+      if (!tenantId) return res.status(400).json({ message: "No tenant context" });
       const { key, label } = req.body;
       if (!key || !label) return res.status(400).json({ message: "key and label are required" });
       const safeKey = key.trim().replace(/[^a-zA-Z0-9_]/g, '');
       const safeLabel = label.trim().slice(0, 100);
       if (!safeKey) return res.status(400).json({ message: "Key must contain alphanumeric characters" });
-      await db.execute(sql`INSERT INTO supply_categories (key, label) VALUES (${safeKey}, ${safeLabel})`);
+      await db.execute(sql`INSERT INTO supply_categories (key, label, tenant_id) VALUES (${safeKey}, ${safeLabel}, ${tenantId})`);
       res.json({ key: safeKey, label: safeLabel });
     } catch (error: any) {
       if (error?.message?.includes('unique') || error?.message?.includes('duplicate')) {
@@ -12109,20 +12101,19 @@ West Monroe LA 71291
     }
   });
 
-  // Delete a supply category
+  // Admin: delete a supply category (tenant-scoped)
   app.delete("/api/admin/categories/:key", authMiddleware, async (req: any, res) => {
     try {
       if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
       const key = req.params.key;
       const tenantId = (req as any).tenantId;
-      const inUse = await db.execute(tenantId
-        ? sql`SELECT COUNT(*)::int AS count FROM supplies WHERE category = ${key} AND tenant_id = ${tenantId}`
-        : sql`SELECT COUNT(*)::int AS count FROM supplies WHERE category = ${key}`);
+      if (!tenantId) return res.status(400).json({ message: "No tenant context" });
+      const inUse = await db.execute(sql`SELECT COUNT(*)::int AS count FROM supplies WHERE category = ${key} AND tenant_id = ${tenantId}`);
       const count = Number((inUse.rows[0] as any).count);
       if (count > 0) {
         return res.status(409).json({ message: `Cannot delete — ${count} product(s) still use this category` });
       }
-      await db.execute(sql`DELETE FROM supply_categories WHERE key = ${key}`);
+      await db.execute(sql`DELETE FROM supply_categories WHERE key = ${key} AND tenant_id = ${tenantId}`);
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ message: "Failed to delete category" });

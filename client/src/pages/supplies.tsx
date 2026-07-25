@@ -148,9 +148,9 @@ export default function Supplies() {
     setCurrentPage(0);
   }, [selectedCategory, updateUrl]);
 
-  // Fetch tenant categories
+  // Fetch tenant categories (public endpoint — no auth required)
   const { data: categoryDefs = [] } = useQuery<{ key: string; label: string }[]>({
-    queryKey: ["/api/admin/categories"],
+    queryKey: ["/api/categories"],
     staleTime: 5 * 60 * 1000,
   });
 
