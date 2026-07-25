@@ -64,6 +64,8 @@ const STATEMENTS = [
   `ALTER TABLE appointment_history ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
   // ── job_applications ───────────────────────────────────────────────────────
   `ALTER TABLE job_applications ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
+  // ── grooming_schedule_entries ──────────────────────────────────────────────
+  `ALTER TABLE grooming_schedule_entries ADD COLUMN IF NOT EXISTS tenant_id INTEGER REFERENCES tenants(id)`,
 ];
 
 /**

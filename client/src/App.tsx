@@ -211,7 +211,8 @@ function NoTenantScreen() {
  */
 function TenantSlugSync() {
   const { user, isAuthenticated } = useAuth();
-  const { data: tenant } = useQuery<{ id: number; name: string; slug: string }>({
+  const [location, setLocation] = useLocation();
+  const { data: tenant } = useQuery<{ id: number; name: string; slug: string; onboardingStep?: number }>({
     queryKey: ["/api/tenants/current"],
     enabled: isAuthenticated,
     staleTime: 5 * 60 * 1000,
@@ -227,6 +228,18 @@ function TenantSlugSync() {
       setActiveTenantSlug(null);
     }
   }, [tenant?.slug, isAuthenticated]);
+
+  // Automatically redirect to onboarding when the tenant hasn't completed setup.
+  // onboardingStep === 0 means the owner has never filled in their business details.
+  useEffect(() => {
+    if (
+      isAuthenticated &&
+      tenant?.onboardingStep === 0 &&
+      location !== '/onboarding'
+    ) {
+      setLocation('/onboarding');
+    }
+  }, [isAuthenticated, tenant?.onboardingStep, location]);
 
   // Rendering nothing — this is a side-effect-only component.
   return null;

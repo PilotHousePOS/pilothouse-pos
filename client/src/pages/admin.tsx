@@ -6735,6 +6735,99 @@ export default function Admin() {
   // A feature is shown unless explicitly set to false (empty object = all enabled)
   const featureEnabled = (key: string) => tenantFeatures[key] !== false;
 
+  // ── Draggable tab ordering ─────────────────────────────────────────────────
+  const DEFAULT_TAB_ORDER = [
+    'appointments', 'non-payment', 'calendar', 'contacts', 'boarding',
+    'schedule', 'inventory', 'inv-audit', 'pos-tracker', 'pos-reports',
+    'grooming', 'groomers', 'users', 'database', 'astro', 'email-center',
+    'orders', 'charge-accounts', 'specials', 'applications', 'feedback', 'settings',
+  ];
+  const [tabOrder, setTabOrder] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('admin-tab-order');
+      if (saved) {
+        const parsed: string[] = JSON.parse(saved);
+        const extras = DEFAULT_TAB_ORDER.filter(v => !parsed.includes(v));
+        return [...parsed, ...extras];
+      }
+    } catch {}
+    return DEFAULT_TAB_ORDER;
+  });
+  const [dragSrcValue, setDragSrcValue] = useState<string | null>(null);
+
+  const handleTabDragStart = useCallback((value: string) => (e: React.DragEvent) => {
+    setDragSrcValue(value);
+    e.dataTransfer.effectAllowed = 'move';
+  }, []);
+
+  const handleTabDragOver = useCallback((value: string) => (e: React.DragEvent) => {
+    e.preventDefault();
+    setTabOrder(prev => {
+      if (!dragSrcValue || dragSrcValue === value) return prev;
+      const next = [...prev];
+      const from = next.indexOf(dragSrcValue);
+      const to = next.indexOf(value);
+      if (from === -1 || to === -1) return prev;
+      next.splice(from, 1);
+      next.splice(to, 0, dragSrcValue);
+      return next;
+    });
+  }, [dragSrcValue]);
+
+  const handleTabDragEnd = useCallback(() => {
+    setTabOrder(prev => {
+      try { localStorage.setItem('admin-tab-order', JSON.stringify(prev)); } catch {}
+      return prev;
+    });
+    setDragSrcValue(null);
+  }, []);
+
+  const renderTabLabel = useCallback((value: string): React.ReactNode => {
+    switch (value) {
+      case 'appointments': return 'Appointments';
+      case 'non-payment': return (
+        <>
+          Non-Payment
+          {nonPaymentCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
+              {nonPaymentCount > 9 ? '9+' : nonPaymentCount}
+            </span>
+          )}
+        </>
+      );
+      case 'calendar': return 'Calendar';
+      case 'contacts': return 'Contacts';
+      case 'boarding': return 'Boarding';
+      case 'schedule': return 'Schedule';
+      case 'inventory': return 'Inventory';
+      case 'inv-audit': return 'Audit Scanner';
+      case 'pos-tracker': return 'POS Tracker';
+      case 'pos-reports': return 'Sales Reports';
+      case 'grooming': return (
+        <><span className="hidden lg:inline">Service Settings</span><span className="lg:hidden">Services</span></>
+      );
+      case 'groomers': return 'Staff';
+      case 'users': return 'Users';
+      case 'database': return 'Database';
+      case 'astro': return 'Loyalty';
+      case 'email-center': return (
+        <><span className="hidden lg:inline">Email Center</span><span className="lg:hidden">Email</span></>
+      );
+      case 'orders': return (
+        <><span className="hidden lg:inline">Orders & Refunds</span><span className="lg:hidden">Orders</span></>
+      );
+      case 'charge-accounts': return (
+        <><span className="hidden lg:inline">Charge Account Reports</span><span className="lg:hidden">Charge Accts</span></>
+      );
+      case 'specials': return 'Specials';
+      case 'applications': return 'Applications';
+      case 'feedback': return 'Feedback';
+      case 'settings': return 'Settings';
+      default: return value;
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nonPaymentCount]);
+
   const bookingSelectedDateStr = bookingSelectedDate 
     ? `${bookingSelectedDate.getFullYear()}-${String(bookingSelectedDate.getMonth() + 1).padStart(2, '0')}-${String(bookingSelectedDate.getDate()).padStart(2, '0')}`
     : '';
@@ -9175,111 +9268,45 @@ export default function Admin() {
       <Tabs defaultValue="appointments" className="w-full">
         <div className="overflow-x-auto pb-1 -mx-6 px-6">
           <TabsList className="inline-flex gap-1 h-auto p-1 min-w-max">
-            <TabsTrigger value="appointments" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-              Appointments
-            </TabsTrigger>
-            <TabsTrigger value="non-payment" className="flex-none text-xs py-3 px-3 whitespace-nowrap relative">
-              Non-Payment
-              {nonPaymentCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
-                  {nonPaymentCount > 9 ? '9+' : nonPaymentCount}
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="calendar" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-              Calendar
-            </TabsTrigger>
-            <TabsTrigger value="contacts" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-              Contacts
-            </TabsTrigger>
-            {typedUser?.isAdmin && featureEnabled('boarding') && (
-              <TabsTrigger value="boarding" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                Boarding
-              </TabsTrigger>
-            )}
-            {typedUser?.isAdmin && (
-              <TabsTrigger value="schedule" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                Schedule
-              </TabsTrigger>
-            )}
-            <TabsTrigger value="inventory" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-              Inventory
-            </TabsTrigger>
-            {typedUser?.isAdmin && (
-              <TabsTrigger value="inv-audit" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                Audit Scanner
-              </TabsTrigger>
-            )}
-            {typedUser?.isAdmin && (
-              <TabsTrigger value="pos-tracker" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                POS Tracker
-              </TabsTrigger>
-            )}
-            {typedUser?.isAdmin && (
-              <TabsTrigger value="pos-reports" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                Sales Reports
-              </TabsTrigger>
-            )}
-            {typedUser?.isAdmin && (
-              <TabsTrigger value="grooming" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                <span className="hidden lg:inline">Service Settings</span>
-                <span className="lg:hidden">Services</span>
-              </TabsTrigger>
-            )}
-            <TabsTrigger value="groomers" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-              Staff
-            </TabsTrigger>
-            {typedUser?.isAdmin && (
-              <TabsTrigger value="users" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                Users
-              </TabsTrigger>
-            )}
-            {typedUser?.isAdmin && (
-              <TabsTrigger value="database" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                Database
-              </TabsTrigger>
-            )}
-            {typedUser?.isAdmin && (
-              <TabsTrigger value="astro" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                Loyalty
-              </TabsTrigger>
-            )}
-            {typedUser?.isAdmin && (
-              <TabsTrigger value="email-center" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                <span className="hidden lg:inline">Email Center</span>
-                <span className="lg:hidden">Email</span>
-              </TabsTrigger>
-            )}
-            <TabsTrigger value="orders" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-              <span className="hidden lg:inline">Orders & Refunds</span>
-              <span className="lg:hidden">Orders</span>
-            </TabsTrigger>
-            {typedUser?.isAdmin && (
-              <TabsTrigger value="charge-accounts" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                <span className="hidden lg:inline">Charge Account Reports</span>
-                <span className="lg:hidden">Charge Accts</span>
-              </TabsTrigger>
-            )}
-            {typedUser?.isAdmin && (
-              <TabsTrigger value="specials" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                Specials
-              </TabsTrigger>
-            )}
-            {typedUser?.isAdmin && (
-              <TabsTrigger value="applications" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                Applications
-              </TabsTrigger>
-            )}
-            {typedUser?.isAdmin && (
-              <TabsTrigger value="feedback" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                Feedback
-              </TabsTrigger>
-            )}
-            {typedUser?.isAdmin && (
-              <TabsTrigger value="settings" className="flex-none text-xs py-3 px-3 whitespace-nowrap">
-                Settings
-              </TabsTrigger>
-            )}
+            {tabOrder
+              .filter(v => ({
+                'appointments': true,
+                'non-payment': true,
+                'calendar': true,
+                'contacts': true,
+                'boarding': !!(typedUser?.isAdmin && featureEnabled('boarding')),
+                'schedule': !!typedUser?.isAdmin,
+                'inventory': true,
+                'inv-audit': !!typedUser?.isAdmin,
+                'pos-tracker': !!typedUser?.isAdmin,
+                'pos-reports': !!typedUser?.isAdmin,
+                'grooming': !!typedUser?.isAdmin,
+                'groomers': true,
+                'users': !!typedUser?.isAdmin,
+                'database': !!typedUser?.isAdmin,
+                'astro': !!typedUser?.isAdmin,
+                'email-center': !!typedUser?.isAdmin,
+                'orders': true,
+                'charge-accounts': !!typedUser?.isAdmin,
+                'specials': !!typedUser?.isAdmin,
+                'applications': !!typedUser?.isAdmin,
+                'feedback': !!typedUser?.isAdmin,
+                'settings': !!typedUser?.isAdmin,
+              } as Record<string, boolean>)[v])
+              .map(value => (
+                <TabsTrigger
+                  key={value}
+                  value={value}
+                  draggable
+                  onDragStart={handleTabDragStart(value)}
+                  onDragOver={handleTabDragOver(value)}
+                  onDragEnd={handleTabDragEnd}
+                  className={`flex-none text-xs py-3 px-3 whitespace-nowrap cursor-grab active:cursor-grabbing select-none relative transition-opacity ${dragSrcValue === value ? 'opacity-40' : ''}`}
+                >
+                  {renderTabLabel(value)}
+                </TabsTrigger>
+              ))
+            }
           </TabsList>
         </div>
 
