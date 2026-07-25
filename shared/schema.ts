@@ -34,7 +34,8 @@ export const tenants = pgTable("tenants", {
   trialWarningEmailSentAt: timestamp("trial_warning_email_sent_at"), // Set when the 3-day trial warning email is sent
   trialOwnerMissingAlertSentAt: timestamp("trial_owner_missing_alert_sent_at"), // Set when the owner-missing alert is sent; prevents repeated daily alerts
   onboardingStep: integer("onboarding_step").default(0).notNull(), // Highest onboarding step completed (0=none, 1=business details done, 2=features chosen)
-  enabledFeatures: jsonb("enabled_features").$type<Record<string, boolean>>().default({}), // Feature flags: appointments, loyalty, boarding, hiring, emailMarketing
+  enabledFeatures: jsonb("enabled_features").$type<Record<string, any>>().default({}), // Feature flags + posOverrideRequirements etc.
+  adminOverridePin: varchar("admin_override_pin", { length: 255 }), // bcrypt-hashed 4-digit PIN for POS manager overrides
   createdAt: timestamp("created_at").defaultNow(),
 });
 

@@ -929,6 +929,29 @@ async function runAppMigrations() {
       log('[migration] employee_pin_system_v1 complete');
     }
 
+    // ── POS Override system migration ─────────────────────────────────────────
+    const posOverrideKey = 'pos_override_system_v1';
+    const posOverrideExists = await migDb.execute(
+      migSql.raw(`SELECT key FROM data_migrations WHERE key = '${posOverrideKey}'`)
+    );
+    if (posOverrideExists.rows.length === 0) {
+      log('[migration] Running pos_override_system_v1...');
+      await migDb.execute(migSql.raw(`
+        ALTER TABLE tenants ADD COLUMN IF NOT EXISTS admin_override_pin VARCHAR(255);
+        CREATE TABLE IF NOT EXISTS override_audit_log (
+          id SERIAL PRIMARY KEY,
+          tenant_id INTEGER REFERENCES tenants(id),
+          actor_user_id VARCHAR(255) NOT NULL,
+          action VARCHAR(100) NOT NULL,
+          purpose VARCHAR(100),
+          created_at TIMESTAMP DEFAULT NOW()
+        );
+      `));
+      await migDb.execute(migSql.raw(`CREATE INDEX IF NOT EXISTS override_audit_log_tenant_idx ON override_audit_log (tenant_id)`));
+      await migDb.execute(migSql.raw(`INSERT INTO data_migrations (key) VALUES ('${posOverrideKey}')`));
+      log('[migration] pos_override_system_v1 complete');
+    }
+
     // Startup cleanup: remove zero-stock items from pending queue (POS tracker)
     await migDb.execute(migSql.raw(`DELETE FROM pos_pending_new_items WHERE pos_stock <= 0`));
 

@@ -1,14 +1,23 @@
 import { useState, useEffect } from "react";
 import { getActiveTenantSlug, queryClient } from "@/lib/queryClient";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Heart, AlertCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Heart, AlertCircle, LogIn, ChevronLeft, Delete } from "lucide-react";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+
+interface RosterEmployee {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  employeeCode: string | null;
+}
 
 export default function Auth() {
   const [, setLocation] = useLocation();
@@ -18,6 +27,60 @@ export default function Auth() {
   const [resendingVerification, setResendingVerification] = useState(false);
   const [signupError, setSignupError] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // Employee sign-in tab state
+  const [activeTab, setActiveTab] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('tab') === 'employee' ? 'employee' : 'signin';
+  });
+  const [empSelected, setEmpSelected] = useState<RosterEmployee | null>(null);
+  const [empPin, setEmpPin] = useState("");
+  const [empError, setEmpError] = useState("");
+  const [empLoading, setEmpLoading] = useState(false);
+
+  const { data: empRoster = [], isLoading: rosterLoading } = useQuery<RosterEmployee[]>({
+    queryKey: ["/api/employee/roster"],
+    enabled: activeTab === "employee",
+    staleTime: 30_000,
+  });
+
+  const handleEmpDigit = async (d: string) => {
+    if (empPin.length >= 4 || empLoading) return;
+    const next = empPin + d;
+    setEmpPin(next);
+    setEmpError("");
+    if (next.length === 4 && empSelected?.employeeCode) {
+      setEmpLoading(true);
+      try {
+        const slug = getActiveTenantSlug();
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (slug) headers['X-Tenant-Slug'] = slug;
+        const res = await fetch('/api/auth/employee-pin-login', {
+          method: 'POST',
+          credentials: 'include',
+          headers,
+          body: JSON.stringify({ employeeCode: empSelected.employeeCode, pin: next }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.token) localStorage.setItem('token', data.token);
+          queryClient.setQueryData(["/api/auth/user"], data);
+          window.location.replace('/admin');
+        } else {
+          setEmpError("Incorrect PIN. Try again.");
+          setEmpPin("");
+        }
+      } catch {
+        setEmpError("Sign-in failed. Please try again.");
+        setEmpPin("");
+      } finally {
+        setEmpLoading(false);
+      }
+    }
+  };
+
+  const handleEmpBack = () => { setEmpPin(prev => prev.slice(0, -1)); setEmpError(""); };
+  const empDigits = ["1","2","3","4","5","6","7","8","9","","0","⌫"];
 
   // Detect missing tenant slug — sign-up requires it, sign-in does not.
   const tenantSlugFromUrl = new URLSearchParams(window.location.search).get('tenant');
@@ -391,13 +454,16 @@ export default function Auth() {
               * regardless of whether the request succeeds, errors, or is
               * abandoned while the user is on a different tab.
               */}
-            <Tabs defaultValue="signin" className="w-full" onValueChange={() => { setSignupError(null); }}>
-              <TabsList className="grid w-full grid-cols-2 bg-white/10">
-                <TabsTrigger value="signin" className="text-white data-[state=active]:bg-brand-blue data-[state=active]:text-white">
+            <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); setSignupError(null); setEmpSelected(null); setEmpPin(""); setEmpError(""); }} className="w-full">
+              <TabsList className="grid w-full grid-cols-3 bg-white/10">
+                <TabsTrigger value="signin" className="text-white data-[state=active]:bg-brand-blue data-[state=active]:text-white text-xs">
                   Sign In
                 </TabsTrigger>
-                <TabsTrigger value="signup" className="text-white data-[state=active]:bg-brand-red data-[state=active]:text-white">
+                <TabsTrigger value="signup" className="text-white data-[state=active]:bg-brand-red data-[state=active]:text-white text-xs">
                   Sign Up
+                </TabsTrigger>
+                <TabsTrigger value="employee" className="text-white data-[state=active]:bg-slate-600 data-[state=active]:text-white text-xs">
+                  Staff Sign-In
                 </TabsTrigger>
               </TabsList>
               
@@ -443,6 +509,80 @@ export default function Auth() {
                 </form>
               </TabsContent>
               
+              {/* ── Employee Sign-In Tab ── */}
+              <TabsContent value="employee" className="mt-6">
+                {!empSelected ? (
+                  <div className="space-y-2">
+                    <div className="text-center mb-4">
+                      <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-2">
+                        <LogIn className="h-6 w-6 text-white" />
+                      </div>
+                      <p className="text-gray-300 text-sm">Select your name, then enter your PIN</p>
+                    </div>
+                    {rosterLoading ? (
+                      <p className="text-center text-gray-400 text-sm py-6">Loading staff…</p>
+                    ) : empRoster.length === 0 ? (
+                      <div className="text-center text-gray-400 py-6 space-y-2">
+                        <p className="text-sm">No employee accounts found.</p>
+                        <p className="text-xs text-gray-500">Ask your manager to create your account, or make sure you're using the store's sign-in link.</p>
+                      </div>
+                    ) : (
+                      empRoster.map(emp => (
+                        <button
+                          key={emp.id}
+                          onClick={() => { setEmpSelected(emp); setEmpPin(""); setEmpError(""); }}
+                          className="w-full flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl px-4 py-3 text-left transition-all"
+                        >
+                          <div className="w-9 h-9 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center shrink-0">
+                            <span className="text-blue-300 font-semibold text-sm">{(emp.firstName?.[0] ?? "?").toUpperCase()}</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-white font-medium truncate">{emp.firstName} {emp.lastName}</p>
+                            <p className="text-gray-400 text-xs">{emp.employeeCode}</p>
+                          </div>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <div className="flex items-center gap-2 mb-5">
+                      <button onClick={() => { setEmpSelected(null); setEmpPin(""); setEmpError(""); }} className="text-gray-400 hover:text-white transition-colors">
+                        <ChevronLeft className="h-5 w-5" />
+                      </button>
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
+                          <span className="text-blue-300 font-semibold text-xs">{(empSelected.firstName?.[0] ?? "?").toUpperCase()}</span>
+                        </div>
+                        <p className="text-white font-medium">{empSelected.firstName} {empSelected.lastName}</p>
+                        <Badge variant="outline" className="text-gray-400 border-gray-600 text-xs">{empSelected.employeeCode}</Badge>
+                      </div>
+                    </div>
+                    {/* PIN dots */}
+                    <div className="flex justify-center gap-4 mb-5">
+                      {[0,1,2,3].map(i => (
+                        <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all ${i < empPin.length ? "bg-blue-400 border-blue-400 scale-110" : "bg-transparent border-gray-500"}`} />
+                      ))}
+                    </div>
+                    {empError && <p className="text-center text-red-400 text-sm mb-3 animate-pulse">{empError}</p>}
+                    {/* Keypad */}
+                    <div className="grid grid-cols-3 gap-3">
+                      {empDigits.map((d, i) => {
+                        if (d === "") return <div key={i} />;
+                        return (
+                          <button key={i} onClick={() => d === "⌫" ? handleEmpBack() : handleEmpDigit(d)}
+                            disabled={empLoading}
+                            className={`h-14 rounded-2xl text-xl font-semibold transition-all active:scale-95 ${d === "⌫" ? "bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white" : "bg-white/10 hover:bg-white/20 text-white"} border border-white/10 hover:border-white/20 disabled:opacity-50`}>
+                            {d === "⌫" ? <Delete className="h-5 w-5 mx-auto" /> : d}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {empLoading && <p className="text-center text-gray-400 text-sm mt-3 animate-pulse">Verifying…</p>}
+                  </div>
+                )}
+              </TabsContent>
+
               <TabsContent value="signup" className="space-y-4 mt-6">
                 {missingTenantForSignup ? (
                   <div className="text-center space-y-4 py-4">

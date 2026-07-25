@@ -20,7 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import {
   UserPlus, Pencil, Trash2, ShieldCheck, TrendingUp,
-  KeyRound, Shield, Copy, Check,
+  KeyRound, Shield, Copy, Check, Lock, Settings2,
 } from "lucide-react";
 import type { User } from "@shared/schema";
 
@@ -127,6 +127,12 @@ export default function StaffTab({ typedUser }: Props) {
   const [newPin, setNewPin] = useState("");
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
+  // Override PIN panel state
+  const [overridePin, setOverridePin]           = useState("");
+  const [overrideSuccess, setOverrideSuccess]   = useState(false);
+  const [overridePinSet, setOverridePinSet]     = useState("");
+  const [overridePinSaving, setOverridePinSaving] = useState(false);
+
   // queries
   const { data: employees = [], isLoading } = useQuery<User[]>({
     queryKey: ["/api/admin/employees"],
@@ -189,6 +195,49 @@ export default function StaffTab({ typedUser }: Props) {
     },
     onError: (e: any) => toast({ title: "Failed to set PIN", description: e.message, variant: "destructive" }),
   });
+
+  // Override PIN verification mutation (for the employee panel)
+  const overrideMutation = useMutation({
+    mutationFn: (pin: string) => apiRequest("POST", "/api/auth/admin-override", { pin, action: "staff_tab_override" }),
+    onSuccess: () => {
+      setOverrideSuccess(true);
+      setOverridePin("");
+      setTimeout(() => setOverrideSuccess(false), 10_000);
+    },
+    onError: () => toast({ title: "Incorrect override PIN", variant: "destructive" }),
+  });
+
+  // POS override config query + mutation (admin only)
+  const { data: posOverrideConfig = {}, refetch: refetchPosOverride } = useQuery<{
+    requirePinForRefund?: boolean; requirePinForVoid?: boolean;
+    requirePinForDiscount?: boolean; requirePinForDrawer?: boolean;
+  }>({
+    queryKey: ["/api/admin/pos-override-config"],
+    enabled: !typedUser?.isEmployee,
+  });
+
+  const posOverrideMutation = useMutation({
+    mutationFn: (data: object) => apiRequest("PUT", "/api/admin/pos-override-config", data),
+    onSuccess: () => { refetchPosOverride(); toast({ title: "POS override settings saved" }); },
+    onError: (e: any) => toast({ title: "Failed to save", description: e.message, variant: "destructive" }),
+  });
+
+  const saveOverridePin = async () => {
+    if (overridePinSet.length !== 4) return;
+    setOverridePinSaving(true);
+    try {
+      const res = await apiRequest("PUT", "/api/admin/override-pin", { pin: overridePinSet });
+      if (res.ok) { setOverridePinSet(""); toast({ title: "Override PIN set" }); }
+      else { const d = await res.json(); toast({ title: d.message || "Failed", variant: "destructive" }); }
+    } finally { setOverridePinSaving(false); }
+  };
+
+  const POS_OVERRIDE_OPTIONS = [
+    { key: "requirePinForRefund",   label: "Refunds",           description: "Employee must request manager override to issue a refund" },
+    { key: "requirePinForVoid",     label: "Voids",             description: "Employee must request manager override to void a transaction" },
+    { key: "requirePinForDiscount", label: "Manual Discounts",  description: "Employee must request override before applying a manual discount" },
+    { key: "requirePinForDrawer",   label: "Open Drawer",       description: "Employee must request override to manually open the cash drawer" },
+  ] as const;
 
   // handlers
   const openPerms = async (emp: User) => {
@@ -319,15 +368,117 @@ export default function StaffTab({ typedUser }: Props) {
             </Table>
           )}
 
-          {/* Employee sign-in info */}
+          {/* How sign-in works — updated info box */}
           <div className="mt-4 rounded-lg bg-blue-50 border border-blue-100 p-3 text-sm text-blue-800">
             <p className="font-medium mb-1">How employee sign-in works</p>
             <p className="text-blue-700 text-xs leading-relaxed">
-              Employees go to <code className="bg-blue-100 px-1 rounded">/employee-login</code> at the start of their shift,
-              select their name, and enter their 4-digit PIN. All sales and changes they make are tracked to their account.
-              The PIN entry page is a separate, kiosk-friendly URL you can bookmark on your POS device.
+              Employees sign in on the store's <strong>Sign In page</strong> — tap the <strong>Staff Sign-In</strong> tab,
+              select their name, and enter their 4-digit PIN. All sales and changes are tracked to their account.
             </p>
           </div>
+
+          {/* ── Manager / Owner Override panel (employee sessions only) ── */}
+          {typedUser?.isEmployee && (
+            <Card className="mt-4 border-amber-200 bg-amber-50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-amber-600" />
+                  Manager / Owner Override
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Need a manager to approve an action? Enter the store override PIN. Every use is logged.
+                </p>
+                {overrideSuccess ? (
+                  <p className="text-sm text-green-700 font-medium">✓ Override confirmed. Manager may now sign in on the Sign In page.</p>
+                ) : (
+                  <div className="flex gap-2">
+                    <Input
+                      type="password"
+                      inputMode="numeric"
+                      maxLength={4}
+                      value={overridePin}
+                      onChange={e => setOverridePin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                      placeholder="••••"
+                      className="text-center text-xl tracking-widest font-mono max-w-[100px]"
+                    />
+                    <Button
+                      onClick={() => overridePin.length === 4 && overrideMutation.mutate(overridePin)}
+                      disabled={overridePin.length !== 4 || overrideMutation.isPending}
+                    >
+                      {overrideMutation.isPending ? "Verifying…" : "Verify & Log"}
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* ── Set Override PIN (admin/owner sessions only) ── */}
+          {!typedUser?.isEmployee && (
+            <Card className="mt-4">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <KeyRound className="h-4 w-4" />
+                  Store Override PIN
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Set a 4-digit PIN employees must enter for manager overrides in the POS. Leave blank to disable override protection.
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    type="password"
+                    inputMode="numeric"
+                    maxLength={4}
+                    value={overridePinSet}
+                    onChange={e => setOverridePinSet(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                    placeholder="New 4-digit PIN"
+                    className="text-center text-xl tracking-widest font-mono max-w-[140px]"
+                  />
+                  <Button
+                    onClick={saveOverridePin}
+                    disabled={overridePinSet.length !== 4 || overridePinSaving}
+                  >
+                    {overridePinSaving ? "Saving…" : "Set PIN"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* ── POS Override Requirements (admin/owner sessions only) ── */}
+          {!typedUser?.isEmployee && (
+            <Card className="mt-4">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Settings2 className="h-4 w-4" />
+                  POS Override Requirements
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Choose which POS actions require employees to enter the store override PIN before proceeding.
+                </p>
+                <div className="space-y-1">
+                  {POS_OVERRIDE_OPTIONS.map(({ key, label, description }) => (
+                    <div key={key} className="flex items-start justify-between gap-4 py-2">
+                      <div>
+                        <p className="text-sm font-medium">{label}</p>
+                        <p className="text-xs text-muted-foreground">{description}</p>
+                      </div>
+                      <Switch
+                        checked={!!(posOverrideConfig as any)?.[key]}
+                        onCheckedChange={v => posOverrideMutation.mutate({ ...posOverrideConfig, [key]: v })}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         {/* ── Sales by Employee ── */}

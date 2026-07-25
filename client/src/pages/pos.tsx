@@ -2,13 +2,22 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   ChevronLeft, DollarSign, CreditCard, Search, Settings, X,
   ChevronUp, ChevronDown, Pencil, Trash2, Plus, Check, GripVertical,
+  Lock, Unlock, Delete,
 } from "lucide-react";
+
+interface PosOverrideConfig {
+  requirePinForRefund?: boolean;
+  requirePinForVoid?: boolean;
+  requirePinForDiscount?: boolean;
+  requirePinForDrawer?: boolean;
+}
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -161,6 +170,70 @@ export default function PosPage() {
   const [customPrice, setCustomPrice]         = useState("");
   const [orderNumber]                         = useState(genOrderNumber);
   const [clock, setClock]                     = useState(new Date());
+
+  // ── Auth + override PIN state ──
+  const { user } = useAuth();
+  const typedUser = user as any;
+  const isEmployee = !!typedUser?.isEmployee;
+
+  const [showOverridePinModal, setShowOverridePinModal] = useState(false);
+  const [overrideTarget, setOverrideTarget]             = useState<'settings' | 'pos'>("pos");
+  const [overridePinEntry, setOverridePinEntry]         = useState("");
+  const [overridePinError, setOverridePinError]         = useState("");
+  const [overridePinLoading, setOverridePinLoading]     = useState(false);
+  const [adminOverrideActive, setAdminOverrideActive]   = useState(false);
+
+  const openOverride = (target: 'settings' | 'pos') => {
+    setOverrideTarget(target);
+    setOverridePinEntry("");
+    setOverridePinError("");
+    setShowOverridePinModal(true);
+  };
+
+  const handleOverrideDigit = async (d: string) => {
+    if (overridePinEntry.length >= 4 || overridePinLoading) return;
+    const next = overridePinEntry + d;
+    setOverridePinEntry(next);
+    setOverridePinError("");
+    if (next.length === 4) {
+      setOverridePinLoading(true);
+      try {
+        const res = await apiRequest("POST", "/api/auth/admin-override", {
+          pin: next,
+          action: overrideTarget === 'settings' ? 'pos_settings_access' : 'pos_action_override',
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setShowOverridePinModal(false);
+          if (overrideTarget === 'settings') {
+            setShowSettings(true);
+          } else {
+            setAdminOverrideActive(true);
+          }
+        } else {
+          setOverridePinError(data.message || "Incorrect PIN");
+          setOverridePinEntry("");
+        }
+      } catch {
+        setOverridePinError("Override check failed");
+        setOverridePinEntry("");
+      } finally {
+        setOverridePinLoading(false);
+      }
+    }
+  };
+  const handleOverrideBack = () => { setOverridePinEntry(prev => prev.slice(0, -1)); setOverridePinError(""); };
+  const overrideDigits = ["1","2","3","4","5","6","7","8","9","","0","⌫"];
+
+  // POS override configuration (which actions require PIN) — readable by all authenticated users
+  const { data: posOverrideConfig = {} } = useQuery<PosOverrideConfig>({
+    queryKey: ["/api/admin/pos-override-config"],
+    staleTime: 5 * 60_000,
+  });
+
+  // Helper: does this employee need an active override for a given action?
+  const needsOverride = (flag: keyof PosOverrideConfig) =>
+    isEmployee && !!posOverrideConfig[flag] && !adminOverrideActive;
 
   // ── Settings state ──
   const [showSettings, setShowSettings]         = useState(false);
@@ -424,10 +497,10 @@ export default function PosPage() {
             <div className="text-xs text-gray-400">{dateStr}</div>
           </div>
           <button
-            onClick={() => setShowSettings(true)}
+            onClick={() => isEmployee ? openOverride('settings') : setShowSettings(true)}
             className="flex items-center gap-1.5 text-xs bg-gray-700 hover:bg-gray-600 px-2.5 py-1.5 rounded text-gray-300 border border-gray-600"
           >
-            <Settings className="h-3.5 w-3.5" /> Settings
+            {isEmployee ? <Lock className="h-3.5 w-3.5" /> : <Settings className="h-3.5 w-3.5" />} Settings
           </button>
         </div>
       </div>
@@ -584,6 +657,45 @@ export default function PosPage() {
           <button disabled className="bg-gray-700 text-gray-500 rounded py-3 text-xs text-center cursor-not-allowed">Print Order</button>
           <button disabled className="bg-gray-700 text-gray-500 rounded py-3 text-xs text-center cursor-not-allowed">Print Sale</button>
           <button onClick={() => setShowSearch(true)} className="bg-indigo-700 hover:bg-indigo-600 text-white rounded py-3 text-xs font-bold text-center">Find Items</button>
+
+          {/* Employee-only: admin override toggle */}
+          {isEmployee && (
+            <button
+              onClick={() => adminOverrideActive ? setAdminOverrideActive(false) : openOverride('pos')}
+              className={`${adminOverrideActive ? "bg-amber-600 hover:bg-amber-500 ring-1 ring-amber-400" : "bg-gray-700 hover:bg-gray-600"} text-white rounded py-3 text-xs font-bold text-center flex items-center justify-center gap-1 transition-all`}
+              title={adminOverrideActive ? "Override active — tap to clear" : "Request manager override"}
+            >
+              {adminOverrideActive ? <Unlock className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
+              {adminOverrideActive ? "Unlocked" : "Override"}
+            </button>
+          )}
+
+          {/* Refund — gated per posOverrideConfig.requirePinForRefund for employees */}
+          <button
+            onClick={() => {
+              if (needsOverride('requirePinForRefund')) { openOverride('pos'); return; }
+              setAdminOverrideActive(false); // clear override after use
+            }}
+            disabled={!orderItems.length}
+            className={`${needsOverride('requirePinForRefund') ? "bg-gray-700 text-gray-400" : "bg-orange-700 hover:bg-orange-600 disabled:bg-gray-700 disabled:text-gray-500 text-white"} rounded py-3 text-xs font-bold text-center flex items-center justify-center gap-1`}
+            title={needsOverride('requirePinForRefund') ? "Manager override required" : "Issue refund"}
+          >
+            {needsOverride('requirePinForRefund') && <Lock className="h-3 w-3" />} Refund
+          </button>
+
+          {/* Void — gated per posOverrideConfig.requirePinForVoid for employees */}
+          <button
+            onClick={() => {
+              if (needsOverride('requirePinForVoid')) { openOverride('pos'); return; }
+              setAdminOverrideActive(false);
+            }}
+            disabled={!orderItems.length}
+            className={`${needsOverride('requirePinForVoid') ? "bg-gray-700 text-gray-400" : "bg-red-800 hover:bg-red-700 disabled:bg-gray-700 disabled:text-gray-500 text-white"} rounded py-3 text-xs font-bold text-center flex items-center justify-center gap-1`}
+            title={needsOverride('requirePinForVoid') ? "Manager override required" : "Void transaction"}
+          >
+            {needsOverride('requirePinForVoid') && <Lock className="h-3 w-3" />} Void
+          </button>
+
           <div className="flex-1" />
           <button onClick={removeLastLine} disabled={!orderItems.length} className="bg-yellow-700 hover:bg-yellow-600 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded py-3 text-xs font-bold text-center">Remove Line</button>
           <button onClick={clearAll} disabled={!orderItems.length} className="bg-red-700 hover:bg-red-600 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded py-3 text-xs font-bold text-center">Clear All</button>
@@ -605,6 +717,47 @@ export default function PosPage() {
           <Search className="h-4 w-4" /> Scan / Search
         </button>
       </div>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          ADMIN OVERRIDE PIN MODAL
+      ═══════════════════════════════════════════════════════════════════════ */}
+      {showOverridePinModal && (
+        <div className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-xs shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Lock className="h-5 w-5 text-amber-400" />
+                <span className="font-bold text-lg">Manager Override</span>
+              </div>
+              <button onClick={() => setShowOverridePinModal(false)} className="text-gray-400 hover:text-white p-1"><X className="h-5 w-5" /></button>
+            </div>
+            <p className="text-gray-400 text-sm mb-4 text-center">
+              {overrideTarget === 'settings' ? "Enter the store PIN to access POS Settings." : "Enter the store PIN to unlock restricted actions."}
+            </p>
+            {/* PIN dots */}
+            <div className="flex justify-center gap-4 mb-4">
+              {[0,1,2,3].map(i => (
+                <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all ${i < overridePinEntry.length ? "bg-amber-400 border-amber-400 scale-110" : "bg-transparent border-gray-500"}`} />
+              ))}
+            </div>
+            {overridePinError && <p className="text-center text-red-400 text-sm mb-3 animate-pulse">{overridePinError}</p>}
+            {/* Keypad */}
+            <div className="grid grid-cols-3 gap-2">
+              {overrideDigits.map((d, i) => {
+                if (d === "") return <div key={i} />;
+                return (
+                  <button key={i} onClick={() => d === "⌫" ? handleOverrideBack() : handleOverrideDigit(d)}
+                    disabled={overridePinLoading}
+                    className={`h-13 py-3 rounded-xl text-lg font-semibold transition-all active:scale-95 ${d === "⌫" ? "bg-white/5 hover:bg-white/10 text-gray-400" : "bg-white/10 hover:bg-white/20 text-white"} border border-white/10 disabled:opacity-50`}>
+                    {d === "⌫" ? <Delete className="h-4 w-4 mx-auto" /> : d}
+                  </button>
+                );
+              })}
+            </div>
+            {overridePinLoading && <p className="text-center text-gray-400 text-xs mt-3 animate-pulse">Verifying…</p>}
+          </div>
+        </div>
+      )}
 
       {/* ═══════════════════════════════════════════════════════════════════════
           POS SETTINGS OVERLAY

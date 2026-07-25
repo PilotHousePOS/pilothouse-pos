@@ -36,7 +36,7 @@ import { getBaseUrl } from './utils';
 
 // Strip sensitive fields from user objects before sending to client
 function sanitizeUser(user: any) {
-  const { password, stripeCustomerId, stripeDefaultPaymentMethod, ...safeUser } = user;
+  const { password, stripeCustomerId, stripeDefaultPaymentMethod, employeePin, ...safeUser } = user;
   return safeUser;
 }
 
@@ -15783,6 +15783,66 @@ CRITICAL RULES:
       const token = generateToken(emp);
       setAuthCookie(res, token);
       res.json({ ...sanitizeUser(emp), token });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // POST /api/auth/admin-override — verify override PIN, log the action
+  app.post("/api/auth/admin-override", authMiddleware, async (req: any, res) => {
+    try {
+      const { pin, action, purpose } = req.body;
+      if (!pin || !action) return res.status(400).json({ message: "PIN and action are required" });
+      const tenantId: number | undefined = req.tenantId;
+      if (!tenantId) return res.status(400).json({ message: "No tenant context" });
+      const tenant = await storage.getTenant(tenantId);
+      if (!tenant?.adminOverridePin) {
+        return res.status(400).json({ message: "No override PIN configured. Ask the owner to set one in Staff Accounts." });
+      }
+      const match = await verifyPassword(String(pin), tenant.adminOverridePin);
+      if (!match) return res.status(401).json({ message: "Incorrect override PIN" });
+      // Log the override action
+      const userId = req.user?.id || 'unknown';
+      await db.execute(sql`
+        INSERT INTO override_audit_log (tenant_id, actor_user_id, action, purpose, created_at)
+        VALUES (${tenantId}, ${userId}, ${action}, ${purpose || null}, NOW())
+      `);
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // PUT /api/admin/override-pin — owner/admin sets the store override PIN
+  app.put("/api/admin/override-pin", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const { pin } = req.body;
+      if (!pin || !/^\d{4}$/.test(String(pin))) return res.status(400).json({ message: "PIN must be exactly 4 digits" });
+      const tenantId: number | undefined = req.tenantId;
+      if (!tenantId) return res.status(400).json({ message: "No tenant context" });
+      const hashed = await hashPassword(String(pin));
+      await db.execute(sql`UPDATE tenants SET admin_override_pin = ${hashed} WHERE id = ${tenantId}`);
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // GET /api/admin/pos-override-config — get POS override requirements (readable by all authenticated tenant users, inc. employees)
+  app.get("/api/admin/pos-override-config", authMiddleware, async (req: any, res) => {
+    try {
+      const tenantId: number | undefined = req.tenantId;
+      if (!tenantId) return res.status(400).json({ message: "No tenant context" });
+      const tenant = await storage.getTenant(tenantId);
+      const features = (tenant?.enabledFeatures || {}) as any;
+      res.json(features.posOverrideRequirements || {});
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // PUT /api/admin/pos-override-config — save POS override requirements
+  app.put("/api/admin/pos-override-config", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const tenantId: number | undefined = req.tenantId;
+      if (!tenantId) return res.status(400).json({ message: "No tenant context" });
+      const tenant = await storage.getTenant(tenantId);
+      const features = { ...(tenant?.enabledFeatures || {}) } as any;
+      features.posOverrideRequirements = req.body;
+      await storage.updateTenant(tenantId, { enabledFeatures: features });
+      res.json({ success: true });
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 
