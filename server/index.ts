@@ -704,6 +704,21 @@ async function runAppMigrations() {
       log('[migration] supply_categories tenant isolation complete');
     }
 
+    // One-time: reset hiring_open to false for tenants that inherited the default "true"
+    // without an admin ever explicitly enabling it (i.e. the default was wrong).
+    const hiringFixKey = 'hiring_open_default_false_v1';
+    const hiringFixCheck = await migDb.execute(migSql.raw(
+      `SELECT key FROM data_migrations WHERE key = '${hiringFixKey}'`
+    ));
+    if (!hiringFixCheck.rows || hiringFixCheck.rows.length === 0) {
+      // Set hiring_open = false for all tenants except tenant 1 (Animal House keeps its existing setting)
+      await migDb.execute(migSql.raw(
+        `UPDATE grooming_settings SET value = 'false' WHERE setting = 'hiring_open' AND tenant_id != 1`
+      ));
+      await migDb.execute(migSql.raw(`INSERT INTO data_migrations (key) VALUES ('${hiringFixKey}')`));
+      log('[migration] hiring_open_default_false_v1 complete');
+    }
+
     // Startup cleanup: remove zero-stock items from pending queue (POS tracker)
     await migDb.execute(migSql.raw(`DELETE FROM pos_pending_new_items WHERE pos_stock <= 0`));
 

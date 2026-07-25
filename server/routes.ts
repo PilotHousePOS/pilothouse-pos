@@ -14391,10 +14391,10 @@ West Monroe LA 71291
   app.get("/api/settings/hiring-open", async (req: any, res) => {
     try {
       const setting = await storage.getGroomingSetting("hiring_open", (req as any).tenantId);
-      const open = setting ? setting.value === "true" : true; // default open
+      const open = setting ? setting.value === "true" : false; // default closed
       res.json({ open });
     } catch (error) {
-      res.json({ open: true });
+      res.json({ open: false });
     }
   });
 

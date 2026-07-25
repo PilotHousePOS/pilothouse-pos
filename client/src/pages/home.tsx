@@ -279,7 +279,7 @@ export default function Home() {
   const { data: hiringData } = useQuery<{ open: boolean }>({
     queryKey: ['/api/settings/hiring-open'],
   });
-  const hiringOpen = hiringData?.open ?? true;
+  const hiringOpen = hiringData?.open ?? false;
 
   const supplies = (suppliesData as any)?.items || [];
   const featuredSupplies = supplies.slice(0, 3);
