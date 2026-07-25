@@ -6767,6 +6767,27 @@ West Monroe LA 71291
     }
   });
 
+  // Customer self-check-in: marks their own appointment as arrived (isHere = true)
+  app.patch("/api/appointments/:id/arrive", authMiddleware, async (req: any, res) => {
+    try {
+      const tenantId: number | undefined = (req as any).tenantId;
+      const id = parseInt(req.params.id);
+      const userId = req.user?.id;
+
+      // Verify the appointment belongs to this user
+      const appt = await storage.getAppointment(id, tenantId);
+      if (!appt) return res.status(404).json({ message: "Appointment not found" });
+      if (appt.userId !== userId) return res.status(403).json({ message: "Not your appointment" });
+      if (appt.status === "cancelled") return res.status(400).json({ message: "Appointment is cancelled" });
+
+      const updated = await storage.updateAppointmentIsHere(id, true, tenantId);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error on customer self-check-in:", error);
+      res.status(500).json({ message: "Failed to check in" });
+    }
+  });
+
   app.patch("/api/appointments/:id/is-here", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);

@@ -9281,98 +9281,108 @@ export default function Admin() {
             </CardContent>
           </Card>
         )}
-        <Card>
-          <CardContent className="p-3 text-center flex flex-col items-center justify-center">
-            <Package className="w-6 h-6 mb-1 text-brand-orange" />
-            <div className="text-xl font-bold leading-tight">{suppliesTotal}</div>
-            <div className="text-xs text-gray-500 leading-tight">Total Supplies</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-3 text-center flex flex-col items-center justify-center">
-            <ShoppingBag className="w-6 h-6 mb-1 text-brand-red" />
-            <div className="text-xl font-bold leading-tight">{pendingOrdersCount}</div>
-            <div className="text-xs text-gray-500 leading-tight">Pending Orders</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-3 text-center flex flex-col items-center justify-center">
-            <CalendarIcon className="w-6 h-6 mb-1 text-green-600" />
-            <div className="text-xl font-bold leading-tight">{pendingAppointments}</div>
-            <div className="text-xs text-gray-500 leading-tight">Pending Appts</div>
-          </CardContent>
-        </Card>
-        <Card className={filterByHere ? 'ring-2 ring-blue-600' : ''}>
-          <CardContent className="p-3 text-center flex flex-col items-center justify-center relative">
-            <div 
-              className="cursor-pointer flex flex-col items-center justify-center w-full"
-              onClick={() => {
-                setFilterByHere(!filterByHere);
-                if (!filterByHere) {
-                  setShowApprovedAppointments(true);
-                }
-              }}
-              data-testid="card-customers-here"
-            >
-              <Users className="w-6 h-6 mb-1 text-blue-600" />
-              <div className="text-xl font-bold leading-tight" data-testid="dashboard-customers-here">{customersHere}</div>
-              <div className="text-xs text-gray-500 leading-tight mb-1">Here Now</div>
-            </div>
-            {typedUser?.isAdmin && customersHere > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  showDeleteConfirmation(
-                    'Reset All "Here" Statuses',
-                    'This will reset ALL "Here" statuses across all appointments. This action cannot be undone.',
-                    `${customersHere} appointment(s)`,
-                    () => resetAllHereMutation.mutate()
-                  );
-                }}
-                disabled={resetAllHereMutation.isPending}
-                className="text-xs h-6 px-2"
-                data-testid="button-reset-all-here"
-              >
-                {resetAllHereMutation.isPending ? 'Resetting...' : 'Reset All'}
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-        <Card className={nonPaymentCount > 0 ? "border-red-300" : ""}>
-          <CardContent className="p-3 text-center flex flex-col items-center justify-center relative">
-            <AlertTriangle className={`w-6 h-6 mb-1 ${nonPaymentCount > 0 ? "text-red-600" : "text-gray-400"}`} />
-            <div className={`text-xl font-bold leading-tight ${nonPaymentCount > 0 ? "text-red-600" : ""}`} data-testid="dashboard-non-payment">{nonPaymentCount}</div>
-            <div className="text-xs text-gray-500 leading-tight">Non-Payment</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-3 text-center flex flex-col items-center justify-center relative">
-            <DollarSign className="w-6 h-6 mb-1 text-green-600" />
-            <div className="text-xl font-bold leading-tight" data-testid="dashboard-customers-paid">{customersPaid}</div>
-            <div className="text-xs text-gray-500 leading-tight mb-1">Paid Today</div>
-            {typedUser?.isAdmin && customersPaid > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
+        {suppliesTotal > 0 && (
+          <Card>
+            <CardContent className="p-3 text-center flex flex-col items-center justify-center">
+              <Package className="w-6 h-6 mb-1 text-brand-orange" />
+              <div className="text-xl font-bold leading-tight">{suppliesTotal}</div>
+              <div className="text-xs text-gray-500 leading-tight">Total Supplies</div>
+            </CardContent>
+          </Card>
+        )}
+        {pendingOrdersCount > 0 && (
+          <Card>
+            <CardContent className="p-3 text-center flex flex-col items-center justify-center">
+              <ShoppingBag className="w-6 h-6 mb-1 text-brand-red" />
+              <div className="text-xl font-bold leading-tight">{pendingOrdersCount}</div>
+              <div className="text-xs text-gray-500 leading-tight">Pending Orders</div>
+            </CardContent>
+          </Card>
+        )}
+        {pendingAppointments > 0 && (
+          <Card>
+            <CardContent className="p-3 text-center flex flex-col items-center justify-center">
+              <CalendarIcon className="w-6 h-6 mb-1 text-green-600" />
+              <div className="text-xl font-bold leading-tight">{pendingAppointments}</div>
+              <div className="text-xs text-gray-500 leading-tight">Pending Appts</div>
+            </CardContent>
+          </Card>
+        )}
+        {customersHere > 0 && (
+          <Card className={`border-blue-400 ${filterByHere ? 'ring-2 ring-blue-600' : ''}`}>
+            <CardContent className="p-3 text-center flex flex-col items-center justify-center relative">
+              <div
+                className="cursor-pointer flex flex-col items-center justify-center w-full"
                 onClick={() => {
-                  showDeleteConfirmation(
-                    'Reset All "Paid" Statuses',
-                    'This will reset ALL "Paid" statuses across all appointments. This action cannot be undone.',
-                    `${customersPaid} appointment(s)`,
-                    () => resetAllPaidMutation.mutate()
-                  );
+                  setFilterByHere(!filterByHere);
+                  if (!filterByHere) setShowApprovedAppointments(true);
                 }}
-                disabled={resetAllPaidMutation.isPending}
-                className="text-xs h-6 px-2"
-                data-testid="button-reset-all-paid"
+                data-testid="card-customers-here"
               >
-                {resetAllPaidMutation.isPending ? 'Resetting...' : 'Reset All'}
-              </Button>
-            )}
-          </CardContent>
-        </Card>
+                <Users className="w-6 h-6 mb-1 text-blue-600" />
+                <div className="text-xl font-bold leading-tight text-blue-700" data-testid="dashboard-customers-here">{customersHere}</div>
+                <div className="text-xs text-blue-600 font-medium leading-tight mb-1">Here Now</div>
+              </div>
+              {typedUser?.isAdmin && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    showDeleteConfirmation(
+                      'Reset All "Here" Statuses',
+                      'This will reset ALL "Here" statuses across all appointments. This action cannot be undone.',
+                      `${customersHere} appointment(s)`,
+                      () => resetAllHereMutation.mutate()
+                    );
+                  }}
+                  disabled={resetAllHereMutation.isPending}
+                  className="text-xs h-6 px-2"
+                  data-testid="button-reset-all-here"
+                >
+                  {resetAllHereMutation.isPending ? 'Resetting...' : 'Reset All'}
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        )}
+        {nonPaymentCount > 0 && (
+          <Card className="border-red-300">
+            <CardContent className="p-3 text-center flex flex-col items-center justify-center relative">
+              <AlertTriangle className="w-6 h-6 mb-1 text-red-600" />
+              <div className="text-xl font-bold leading-tight text-red-600" data-testid="dashboard-non-payment">{nonPaymentCount}</div>
+              <div className="text-xs text-gray-500 leading-tight">Non-Payment</div>
+            </CardContent>
+          </Card>
+        )}
+        {customersPaid > 0 && (
+          <Card>
+            <CardContent className="p-3 text-center flex flex-col items-center justify-center relative">
+              <DollarSign className="w-6 h-6 mb-1 text-green-600" />
+              <div className="text-xl font-bold leading-tight" data-testid="dashboard-customers-paid">{customersPaid}</div>
+              <div className="text-xs text-gray-500 leading-tight mb-1">Paid Today</div>
+              {typedUser?.isAdmin && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    showDeleteConfirmation(
+                      'Reset All "Paid" Statuses',
+                      'This will reset ALL "Paid" statuses across all appointments. This action cannot be undone.',
+                      `${customersPaid} appointment(s)`,
+                      () => resetAllPaidMutation.mutate()
+                    );
+                  }}
+                  disabled={resetAllPaidMutation.isPending}
+                  className="text-xs h-6 px-2"
+                  data-testid="button-reset-all-paid"
+                >
+                  {resetAllPaidMutation.isPending ? 'Resetting...' : 'Reset All'}
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
       </div>
 

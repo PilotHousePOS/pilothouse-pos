@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Calendar, Clock, Dog, CheckCircle, XCircle, AlertCircle, CreditCard, DollarSign, X, RefreshCw } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Dog, CheckCircle, XCircle, AlertCircle, CreditCard, DollarSign, X, RefreshCw, MapPin } from "lucide-react";
 import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +25,9 @@ export default function MyAppointments() {
   const { data: appointments, isLoading } = useQuery<Appointment[]>({
     queryKey: ["/api/user/appointments"],
   });
+
+  // Today's date string (YYYY-MM-DD) for the "I've Arrived" check-in button
+  const todayStr = useMemo(() => new Date().toLocaleDateString('en-CA'), []);
 
   const { data: groomingSettings } = useQuery<any[]>({
     queryKey: ["/api/grooming-settings"],
@@ -74,6 +77,16 @@ export default function MyAppointments() {
         });
     }
   }, []);
+
+  // Self check-in: customer taps "I've Arrived" to mark themselves as here
+  const arriveMutation = useMutation({
+    mutationFn: (id: number) => apiRequest("PATCH", `/api/appointments/${id}/arrive`, {}),
+    onSuccess: () => {
+      toast({ title: "Checked in!", description: "The team has been notified you've arrived." });
+      queryClient.invalidateQueries({ queryKey: ["/api/user/appointments"] });
+    },
+    onError: () => toast({ title: "Error", description: "Could not check in. Please try again.", variant: "destructive" }),
+  });
 
   const payOnlineMutation = useMutation({
     mutationFn: async ({ appointmentId, tipAmount }: { appointmentId: number; tipAmount?: string }) => {
@@ -427,6 +440,29 @@ export default function MyAppointments() {
                 <Button size="sm" variant="outline" className="text-xs" onClick={() => setCancellingId(null)}>
                   Keep
                 </Button>
+              </div>
+            </div>
+          )}
+
+          {/* I've Arrived self-check-in — today's upcoming appointments only */}
+          {canAct && !isRescheduling && !isCancelling && apt.appointmentDate === todayStr && !apt.isHere && (
+            <div className="mt-3 pt-2 border-t">
+              <Button
+                size="sm"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs"
+                onClick={() => arriveMutation.mutate(apt.id)}
+                disabled={arriveMutation.isPending}
+              >
+                <MapPin className="w-3 h-3 mr-1.5" />
+                {arriveMutation.isPending ? "Checking in…" : "I've Arrived"}
+              </Button>
+            </div>
+          )}
+          {canAct && !isRescheduling && !isCancelling && apt.appointmentDate === todayStr && apt.isHere && (
+            <div className="mt-3 pt-2 border-t">
+              <div className="flex items-center justify-center gap-1.5 text-xs text-blue-600 font-medium py-1">
+                <CheckCircle className="w-3.5 h-3.5" />
+                Checked in — the team knows you're here
               </div>
             </div>
           )}
