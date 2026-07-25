@@ -499,6 +499,40 @@ export default function Home() {
   const isStaff = !!user && (typedUser?.isEmployee || typedUser?.isAdmin) && !typedUser?.isSuperiorManager;
   if (isStaff) return <StaffDashboard />;
 
+  // ── Online store off ── if the storefront is disabled the "/" route has
+  // nothing to show. Owners go straight to their admin panel; anyone else
+  // (unauthenticated visitors, customers) sees a minimal physical-store card.
+  const storeOff = tenantInfo !== undefined && !featureOn('onlineStore');
+  if (storeOff && typedUser?.isSuperiorManager) {
+    setLocation('/admin');
+    return null;
+  }
+  if (storeOff && !typedUser?.isSuperiorManager) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-gray-50 text-center gap-4">
+        <img src={animalHouseLogoPath} alt="Logo" className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg" />
+        <h1 className="text-2xl font-bold text-gray-900">{hc.brandName}</h1>
+        <p className="text-gray-500 text-sm max-w-xs">
+          This business operates in-store only. Visit us in person or call to book an appointment.
+        </p>
+        {featureOn('appointments') && (
+          <button
+            onClick={() => setLocation('/booking')}
+            className="mt-2 px-6 py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-800 transition-colors"
+          >
+            Book an Appointment
+          </button>
+        )}
+        {user ? (
+          <button onClick={handleLogout} className="text-sm text-gray-400 hover:text-red-500 mt-2">Sign out</button>
+        ) : (
+          <button onClick={() => setLocation('/auth')} className="text-sm text-gray-400 hover:text-gray-600 mt-2">Staff sign-in</button>
+        )}
+        <StoreFooter />
+      </div>
+    );
+  }
+
   return (
     <div className="pb-20 bg-gradient-to-b from-gray-50 to-white">
       {/* Header */}
