@@ -4616,6 +4616,103 @@ function StoreHoursPanel() {
   );
 }
 
+// Tracked Items Settings Panel Component
+function TrackedItemsSettingsPanel() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: settings = [] } = useQuery<any[]>({
+    queryKey: ["/api/admin/grooming-settings"],
+  });
+
+  const [enabled, setEnabled] = useState(false);
+  const [label, setLabel] = useState("Pets");
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    const s = settings as any[];
+    const e = s.find((x: any) => x.setting === "tracked_items_enabled")?.value;
+    const l = s.find((x: any) => x.setting === "tracked_items_label")?.value;
+    if (e !== undefined) setEnabled(e === "true");
+    if (l) setLabel(l);
+  }, [settings]);
+
+  const save = async () => {
+    setIsSaving(true);
+    try {
+      await Promise.all([
+        fetch("/api/admin/grooming-settings", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ setting: "tracked_items_enabled", value: String(enabled) }),
+        }),
+        fetch("/api/admin/grooming-settings", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ setting: "tracked_items_label", value: label.trim() || "Pets" }),
+        }),
+      ]);
+      await queryClient.invalidateQueries({ queryKey: ["/api/admin/grooming-settings"] });
+      toast({ title: "Saved", description: "Tracked items settings updated." });
+    } catch {
+      toast({ title: "Error", description: "Failed to save settings.", variant: "destructive" });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Package className="w-5 h-5" />
+          Alternate Supply Tracking
+        </CardTitle>
+        <CardDescription>
+          Enable an optional section to track items not listed in Supplies — such as pets, vehicles, or equipment.
+          When active, a count card appears on the dashboard and the section shows in the store inventory view.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between rounded-lg border p-4">
+          <div>
+            <p className="font-medium text-sm">Enable Tracked Items</p>
+            <p className="text-xs text-gray-500 mt-0.5">Show this section in the inventory and dashboard</p>
+          </div>
+          <button
+            onClick={() => setEnabled(v => !v)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${enabled ? "bg-brand-blue" : "bg-gray-300 dark:bg-gray-600"}`}
+          >
+            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${enabled ? "translate-x-6" : "translate-x-1"}`} />
+          </button>
+        </div>
+
+        {enabled && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Item Type Name</label>
+            <input
+              className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue dark:bg-gray-800 dark:border-gray-600"
+              placeholder="e.g. Pets, Vehicles, Equipment, Bikes"
+              value={label}
+              onChange={e => setLabel(e.target.value)}
+              maxLength={40}
+            />
+            <p className="text-xs text-gray-500">
+              This label is used everywhere — dashboard card, section header, and button text.
+            </p>
+          </div>
+        )}
+
+        <Button onClick={save} disabled={isSaving} className="w-full sm:w-auto">
+          {isSaving ? "Saving…" : "Save"}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
 // Loyalty Settings Panel Component
 function LoyaltySettingsPanel() {
   const { toast } = useToast();
@@ -6603,6 +6700,10 @@ export default function Admin() {
     queryKey: ["/api/admin/grooming-settings"],
     enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
+
+  // Tracked items feature flags (derived from grooming settings)
+  const trackedItemsEnabled = (groomingSettings as any[]).find((s: any) => s.setting === "tracked_items_enabled")?.value === "true";
+  const trackedItemsLabel   = (groomingSettings as any[]).find((s: any) => s.setting === "tracked_items_label")?.value || "Pets";
 
   // Fetch available slots for calendar display (next 60 days)
   const { data: availableSlots = {} } = useQuery({
@@ -9171,6 +9272,15 @@ export default function Admin() {
             </CardContent>
           </Card>
         )}
+        {trackedItemsEnabled && (
+          <Card>
+            <CardContent className="p-3 text-center flex flex-col items-center justify-center">
+              <Package className="w-6 h-6 mb-1 text-brand-blue" />
+              <div className="text-xl font-bold leading-tight">{petsTotal}</div>
+              <div className="text-xs text-gray-500 leading-tight">Total {trackedItemsLabel}</div>
+            </CardContent>
+          </Card>
+        )}
         <Card>
           <CardContent className="p-3 text-center flex flex-col items-center justify-center">
             <Package className="w-6 h-6 mb-1 text-brand-orange" />
@@ -9580,13 +9690,13 @@ export default function Admin() {
             </Card>
           )}
 
-          {/* Pets Section */}
-          <Card>
+          {/* Tracked Items Section (optional feature — enable in Settings → Alternate Supply Tracking) */}
+          {trackedItemsEnabled && <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
-                  <PawPrint className="w-5 h-5" />
-                  Pets ({petsTotal}{petSearchQuery.trim() ? ` found` : ` total`})
+                  <Package className="w-5 h-5" />
+                  {trackedItemsLabel} ({petsTotal}{petSearchQuery.trim() ? ` found` : ` total`})
                 </CardTitle>
                 {/* Mobile: Custom Modal, Desktop: Dialog */}
                 {typedUser?.isAdmin && (
@@ -9597,7 +9707,7 @@ export default function Admin() {
                       onClick={() => setIsAddPetOpen(true)}
                     >
                       <Plus className="w-4 h-4 mr-2" />
-                      Add Pet
+                      Add {trackedItemsLabel.replace(/s$/i, "")}
                     </Button>
                   </div>
                 )}
@@ -9607,13 +9717,13 @@ export default function Admin() {
                       <DialogTrigger asChild>
                         <Button size="sm" className="bg-brand-blue hover:bg-blue-600">
                           <Plus className="w-4 h-4 mr-2" />
-                          Add Pet
+                          Add {trackedItemsLabel.replace(/s$/i, "")}
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                         <DialogHeader>
-                          <DialogTitle>Add New Pet</DialogTitle>
-                          <DialogDescription>Add a new pet to your inventory.</DialogDescription>
+                          <DialogTitle>Add {trackedItemsLabel.replace(/s$/i, "")}</DialogTitle>
+                          <DialogDescription>Add a new {trackedItemsLabel.replace(/s$/i, "").toLowerCase()} to your inventory.</DialogDescription>
                         </DialogHeader>
                         <AddPetForm onSubmit={(data) => createPetMutation.mutate(data)} />
                       </DialogContent>
@@ -9787,7 +9897,7 @@ export default function Admin() {
                 </div>
               )}
             </CardContent>
-          </Card>
+          </Card>}
 
           {/* Supplies Section */}
           <Card>
@@ -14491,6 +14601,7 @@ export default function Admin() {
         <TabsContent value="settings" className="space-y-6">
           <StoreHoursPanel />
           <SettingsPanel />
+          <TrackedItemsSettingsPanel />
           <LoyaltySettingsPanel />
           <LegalPagesPanel />
         </TabsContent>
