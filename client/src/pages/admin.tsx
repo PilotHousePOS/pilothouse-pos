@@ -6847,22 +6847,68 @@ export default function Admin() {
   const featureEnabled = (key: string) => tenantFeatures[key] !== false;
 
   // ── Draggable tab ordering ─────────────────────────────────────────────────
-  const DEFAULT_TAB_ORDER = [
-    'appointments', 'non-payment', 'calendar', 'contacts', 'boarding',
-    'schedule', 'inventory', 'inv-audit', 'pos-tracker', 'pos-reports',
-    'grooming', 'groomers', 'users', 'database', 'astro', 'email-center',
-    'orders', 'charge-accounts', 'specials', 'applications', 'feedback', 'settings',
+  // Base tabs always visible; optional tabs must be explicitly added by the admin
+  const BASE_TAB_ORDER = [
+    'calendar', 'contacts', 'schedule', 'inventory', 'inv-audit',
+    'pos-tracker', 'pos-reports', 'grooming', 'groomers', 'users',
+    'database', 'astro', 'orders', 'charge-accounts', 'specials',
+    'applications', 'feedback', 'settings',
   ];
+  const OPTIONAL_TABS: { id: string; label: string }[] = [
+    { id: 'appointments',  label: 'Appointments'  },
+    { id: 'non-payment',   label: 'Non-Payment'   },
+    { id: 'email-center',  label: 'Email Center'  },
+    { id: 'boarding',      label: 'Boarding'       },
+  ];
+  const OPTIONAL_TAB_IDS = OPTIONAL_TABS.map(t => t.id);
+
+  const [enabledOptionalTabs, setEnabledOptionalTabs] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('admin-optional-tabs');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return [];
+  });
+
+  const [showTabPicker, setShowTabPicker] = useState(false);
+
+  const toggleOptionalTab = useCallback((id: string) => {
+    setEnabledOptionalTabs(prev => {
+      const next = prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id];
+      try { localStorage.setItem('admin-optional-tabs', JSON.stringify(next)); } catch {}
+      // Also keep tabOrder in sync: add when enabling, remove when disabling
+      setTabOrder(order => {
+        let updated = order.filter(t => !OPTIONAL_TAB_IDS.includes(t)); // strip all optional
+        const nowEnabled = next; // which optional tabs are now on
+        const optionalInOrder = nowEnabled.filter(t => order.includes(t));
+        const optionalNew = nowEnabled.filter(t => !order.includes(t));
+        // Rebuild: base tabs (in their saved order) + already-ordered optional + newly added
+        updated = [...order.filter(t => !OPTIONAL_TAB_IDS.includes(t) || nowEnabled.includes(t)), ...optionalNew];
+        // If disabling, just strip it
+        if (!next.includes(id)) updated = updated.filter(t => t !== id);
+        try { localStorage.setItem('admin-tab-order', JSON.stringify(updated)); } catch {}
+        return updated;
+      });
+      return next;
+    });
+  }, []);
+
+  const DEFAULT_TAB_ORDER = BASE_TAB_ORDER; // kept for compat with drag-save code
   const [tabOrder, setTabOrder] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('admin-tab-order');
+      const savedOpt = localStorage.getItem('admin-optional-tabs');
+      const optEnabled: string[] = savedOpt ? JSON.parse(savedOpt) : [];
       if (saved) {
         const parsed: string[] = JSON.parse(saved);
-        const extras = DEFAULT_TAB_ORDER.filter(v => !parsed.includes(v));
-        return [...parsed, ...extras];
+        // Ensure all base tabs are present; add any missing ones
+        const extras = BASE_TAB_ORDER.filter(v => !parsed.includes(v));
+        // Strip optional tabs that are no longer enabled
+        const filtered = parsed.filter(v => !OPTIONAL_TAB_IDS.includes(v) || optEnabled.includes(v));
+        return [...filtered, ...extras];
       }
     } catch {}
-    return DEFAULT_TAB_ORDER;
+    return BASE_TAB_ORDER;
   });
   const [dragSrcValue, setDragSrcValue] = useState<string | null>(null);
 
@@ -9386,34 +9432,39 @@ export default function Admin() {
       </div>
       </div>
 
-      <Tabs defaultValue="appointments" className="w-full">
+      <Tabs defaultValue="calendar" className="w-full">
         <div className="overflow-x-auto pb-1 -mx-6 px-6">
-          <TabsList className="inline-flex gap-1 h-auto p-1 min-w-max">
+          <div className="flex items-center gap-1 min-w-max">
+          <TabsList className="inline-flex gap-1 h-auto p-1">
             {tabOrder
-              .filter(v => ({
-                'appointments': true,
-                'non-payment': true,
-                'calendar': true,
-                'contacts': true,
-                'boarding': !!(typedUser?.isAdmin && featureEnabled('boarding')),
-                'schedule': !!typedUser?.isAdmin,
-                'inventory': true,
-                'inv-audit': !!typedUser?.isAdmin,
-                'pos-tracker': !!typedUser?.isAdmin,
-                'pos-reports': !!typedUser?.isAdmin,
-                'grooming': !!typedUser?.isAdmin,
-                'groomers': true,
-                'users': !!typedUser?.isAdmin,
-                'database': !!typedUser?.isAdmin,
-                'astro': !!typedUser?.isAdmin,
-                'email-center': !!typedUser?.isAdmin,
-                'orders': true,
-                'charge-accounts': !!typedUser?.isAdmin,
-                'specials': !!typedUser?.isAdmin,
-                'applications': !!typedUser?.isAdmin,
-                'feedback': !!typedUser?.isAdmin,
-                'settings': !!typedUser?.isAdmin,
-              } as Record<string, boolean>)[v])
+              .filter(v => {
+                // Optional tabs only show when the admin has enabled them
+                if (OPTIONAL_TAB_IDS.includes(v) && !enabledOptionalTabs.includes(v)) return false;
+                return ({
+                  'appointments':   true,
+                  'non-payment':    true,
+                  'calendar':       true,
+                  'contacts':       true,
+                  'boarding':       !!(typedUser?.isAdmin && featureEnabled('boarding')),
+                  'schedule':       !!typedUser?.isAdmin,
+                  'inventory':      true,
+                  'inv-audit':      !!typedUser?.isAdmin,
+                  'pos-tracker':    !!typedUser?.isAdmin,
+                  'pos-reports':    !!typedUser?.isAdmin,
+                  'grooming':       !!typedUser?.isAdmin,
+                  'groomers':       true,
+                  'users':          !!typedUser?.isAdmin,
+                  'database':       !!typedUser?.isAdmin,
+                  'astro':          !!typedUser?.isAdmin,
+                  'email-center':   !!typedUser?.isAdmin,
+                  'orders':         true,
+                  'charge-accounts':!!typedUser?.isAdmin,
+                  'specials':       !!typedUser?.isAdmin,
+                  'applications':   !!typedUser?.isAdmin,
+                  'feedback':       !!typedUser?.isAdmin,
+                  'settings':       !!typedUser?.isAdmin,
+                } as Record<string, boolean>)[v] ?? false;
+              })
               .map(value => (
                 <TabsTrigger
                   key={value}
@@ -9429,6 +9480,51 @@ export default function Admin() {
               ))
             }
           </TabsList>
+
+          {/* "+" button — admin only — opens optional-tab picker */}
+          {typedUser?.isAdmin && (
+            <div className="relative flex-none ml-1">
+              <button
+                onClick={() => setShowTabPicker(p => !p)}
+                className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-500 hover:text-gray-700 dark:text-gray-300 text-base font-bold transition-colors border border-gray-200 dark:border-gray-600"
+                title="Add / remove optional tabs"
+                aria-label="Manage optional tabs"
+              >
+                +
+              </button>
+              {showTabPicker && (
+                <>
+                  {/* Backdrop */}
+                  <div className="fixed inset-0 z-40" onClick={() => setShowTabPicker(false)} />
+                  {/* Picker panel */}
+                  <div className="absolute right-0 top-9 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl p-3 w-52">
+                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Optional Tabs</p>
+                    <div className="space-y-1">
+                      {OPTIONAL_TABS.map(({ id, label }) => {
+                        const active = enabledOptionalTabs.includes(id);
+                        // Respect existing role guards (boarding needs feature flag)
+                        const allowed = id === 'boarding' ? featureEnabled('boarding') : true;
+                        if (!allowed) return null;
+                        return (
+                          <button
+                            key={id}
+                            onClick={() => toggleOptionalTab(id)}
+                            className={`w-full flex items-center justify-between px-2 py-1.5 rounded text-sm transition-colors ${active ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
+                          >
+                            <span>{label}</span>
+                            <span className={`w-4 h-4 rounded border flex items-center justify-center text-xs font-bold ${active ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-300 dark:border-gray-500'}`}>
+                              {active ? '✓' : ''}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+          </div>
         </div>
 
         <TabsContent value="inventory" className="space-y-6">
