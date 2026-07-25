@@ -69,6 +69,8 @@ export const users = pgTable("users", {
   isSuperiorManager: boolean("is_superior_manager").default(false),
   isChargeAccount: boolean("is_charge_account").default(false),
   isEmployee: boolean("is_employee").default(false), // Tenant staff account created by admin
+  employeeCode: varchar("employee_code", { length: 20 }), // Short unique code per tenant e.g. "E01"
+  employeePin: varchar("employee_pin", { length: 255 }), // bcrypt-hashed 4-digit PIN
   totalSpent: decimal("total_spent", { precision: 10, scale: 2 }).default("0"),
   loyaltyCredits: decimal("loyalty_credits", { precision: 10, scale: 2 }).default("0"),
   stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
@@ -1447,6 +1449,16 @@ export const employeePermissions = pgTable("employee_permissions", {
   canManageBoarding:     boolean("can_manage_boarding").default(false),
   // Store settings (dangerous — off by default)
   canAccessSettings:     boolean("can_access_settings").default(false),
+  // ── Admin-level extended permissions (only active when user.isAdmin = true) ──
+  canManageStaff:        boolean("can_manage_staff").default(false),       // manage employee accounts
+  canManageEmail:        boolean("can_manage_email").default(false),       // email center
+  canManageWaitlist:     boolean("can_manage_waitlist").default(false),    // waitlist tab
+  canManageEstimates:    boolean("can_manage_estimates").default(false),   // estimates tab
+  canManageInvoicing:    boolean("can_manage_invoicing").default(false),   // invoicing tab
+  canManageSmsBlasts:    boolean("can_manage_sms_blasts").default(false),  // SMS blasts
+  canManageMemberships:  boolean("can_manage_memberships").default(false), // memberships
+  canManageSpecials:     boolean("can_manage_specials").default(false),    // specials/promotions
+  canManageChargeAccounts: boolean("can_manage_charge_accounts").default(false), // charge accounts
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

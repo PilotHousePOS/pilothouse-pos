@@ -183,9 +183,11 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>;
   updateUserAdmin(id: string, isAdmin: boolean): Promise<User>;
   // Employee operations
-  createEmployee(data: { tenantId: number; email: string; password: string; firstName: string; lastName: string; phoneNumber?: string }): Promise<User>;
+  createEmployee(data: { tenantId: number; email: string; password: string; firstName: string; lastName: string; phoneNumber?: string; makeAdmin?: boolean }): Promise<User>;
   getEmployees(tenantId: number): Promise<User[]>;
-  updateEmployee(id: string, data: Partial<{ firstName: string; lastName: string; email: string; password: string; phoneNumber: string }>, tenantId: number): Promise<User>;
+  updateEmployee(id: string, data: Partial<{ firstName: string; lastName: string; email: string; password: string; phoneNumber: string; isAdmin: boolean }>, tenantId: number): Promise<User>;
+  setEmployeePin(userId: string, tenantId: number, pin: string): Promise<void>;
+  authenticateEmployeeByPin(tenantId: number, employeeCode: string, pin: string): Promise<User | null>;
   deleteEmployee(id: string, tenantId: number): Promise<void>;
   getEmployeePermissions(userId: string, tenantId: number): Promise<EmployeePermissions | undefined>;
   upsertEmployeePermissions(userId: string, tenantId: number, perms: Partial<Omit<InsertEmployeePermissions, 'userId' | 'tenantId' | 'id' | 'createdAt' | 'updatedAt'>>): Promise<EmployeePermissions>;
@@ -5680,10 +5682,12 @@ export class DatabaseStorage implements IStorage {
    */
 
   // ── Employee operations ──────────────────────────────────────────────────
-  async createEmployee(data: { tenantId: number; email: string; password: string; firstName: string; lastName: string; phoneNumber?: string }): Promise<User> {
+  async createEmployee(data: { tenantId: number; email: string; password: string; firstName: string; lastName: string; phoneNumber?: string; makeAdmin?: boolean }): Promise<User> {
     const bcrypt = await import("bcryptjs");
     const hashed = await bcrypt.hash(data.password, 10);
     const id = `emp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    // Auto-generate a unique employee code for the tenant
+    const code = await this._nextEmployeeCode(data.tenantId);
     const [user] = await db.insert(users).values({
       id,
       email: data.email,
@@ -5692,18 +5696,29 @@ export class DatabaseStorage implements IStorage {
       lastName: data.lastName,
       phoneNumber: data.phoneNumber,
       tenantId: data.tenantId,
-      isAdmin: false,
+      isAdmin: !!data.makeAdmin,
       isEmployee: true,
       emailVerified: true,
+      employeeCode: code,
     }).returning();
     return user;
+  }
+
+  /** Generate next sequential employee code for a tenant, e.g. E01, E02, … */
+  private async _nextEmployeeCode(tenantId: number): Promise<string> {
+    const existing = await db.select({ code: users.employeeCode })
+      .from(users)
+      .where(and(eq(users.tenantId, tenantId), isNotNull(users.employeeCode)));
+    const nums = existing.map(r => parseInt((r.code ?? '').replace(/\D/g, '') || '0', 10)).filter(n => !isNaN(n));
+    const next = (nums.length ? Math.max(...nums) : 0) + 1;
+    return `E${String(next).padStart(2, '0')}`;
   }
 
   async getEmployees(tenantId: number): Promise<User[]> {
     return db.select().from(users).where(and(eq(users.tenantId, tenantId), eq(users.isEmployee, true))).orderBy(asc(users.firstName));
   }
 
-  async updateEmployee(id: string, data: Partial<{ firstName: string; lastName: string; email: string; password: string; phoneNumber: string }>, tenantId: number): Promise<User> {
+  async updateEmployee(id: string, data: Partial<{ firstName: string; lastName: string; email: string; password: string; phoneNumber: string; isAdmin: boolean }>, tenantId: number): Promise<User> {
     const update: any = { ...data, updatedAt: new Date() };
     if (data.password) {
       const bcrypt = await import("bcryptjs");
@@ -5714,6 +5729,20 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db.update(users).set(update).where(and(eq(users.id, id), eq(users.tenantId, tenantId), eq(users.isEmployee, true))).returning();
     if (!user) throw new Error("Employee not found");
     return user;
+  }
+
+  async setEmployeePin(userId: string, tenantId: number, pin: string): Promise<void> {
+    const bcrypt = await import("bcryptjs");
+    const hashed = await bcrypt.hash(pin, 10);
+    await db.update(users).set({ employeePin: hashed, updatedAt: new Date() }).where(and(eq(users.id, userId), eq(users.tenantId, tenantId), eq(users.isEmployee, true)));
+  }
+
+  async authenticateEmployeeByPin(tenantId: number, employeeCode: string, pin: string): Promise<User | null> {
+    const [emp] = await db.select().from(users).where(and(eq(users.tenantId, tenantId), eq(users.employeeCode, employeeCode.toUpperCase()), eq(users.isEmployee, true)));
+    if (!emp || !emp.employeePin) return null;
+    const bcrypt = await import("bcryptjs");
+    const valid = await bcrypt.compare(pin, emp.employeePin);
+    return valid ? emp : null;
   }
 
   async deleteEmployee(id: string, tenantId: number): Promise<void> {

@@ -15741,5 +15741,50 @@ CRITICAL RULES:
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 
+  // POST /api/admin/employees/:id/set-pin — owner sets/resets employee PIN (admin only)
+  app.post("/api/admin/employees/:id/set-pin", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number = req.tenantId;
+      const { pin } = req.body;
+      if (!pin || !/^\d{4}$/.test(String(pin))) return res.status(400).json({ message: "PIN must be exactly 4 digits" });
+      await storage.setEmployeePin(req.params.id, tenantId, String(pin));
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // GET /api/employee/roster — public-ish: list employees for PIN sign-in (by tenant slug, no auth needed)
+  // Returns only id, firstName, lastName, employeeCode — no sensitive fields
+  app.get("/api/employee/roster", async (req: any, res) => {
+    try {
+      const tenantId: number | undefined = req.tenantId;
+      if (!tenantId) return res.status(400).json({ message: "Tenant required" });
+      const emps = await storage.getEmployees(tenantId);
+      res.json(emps.map(e => ({
+        id: e.id,
+        firstName: e.firstName,
+        lastName: e.lastName,
+        employeeCode: e.employeeCode,
+      })));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // POST /api/auth/employee-pin-login — PIN-based employee login, creates full JWT session
+  app.post("/api/auth/employee-pin-login", async (req: any, res) => {
+    try {
+      const tenantId: number | undefined = req.tenantId;
+      if (!tenantId) return res.status(400).json({ message: "Tenant required" });
+      const { employeeCode, pin } = req.body;
+      if (!employeeCode || !pin) return res.status(400).json({ message: "Employee code and PIN are required" });
+      const emp = await storage.authenticateEmployeeByPin(tenantId, String(employeeCode), String(pin));
+      if (!emp) return res.status(401).json({ message: "Invalid employee code or PIN" });
+      // Auto clock-in via time clock (if not already clocked in today)
+      const token = generateToken(emp);
+      setAuthCookie(res, token);
+      res.json({ ...sanitizeUser(emp), token });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
   // Server is now created externally in index.ts
 }

@@ -905,6 +905,30 @@ async function runAppMigrations() {
       log('[migration] employee_system_v1 complete');
     }
 
+    // ── Employee PIN + extended permissions migration ────────────────────────
+    const empPinKey = 'employee_pin_system_v1';
+    const empPinExists = await migDb.execute(
+      migSql.raw(`SELECT key FROM data_migrations WHERE key = '${empPinKey}'`)
+    );
+    if (empPinExists.rows.length === 0) {
+      log('[migration] Running employee_pin_system_v1...');
+      await migDb.execute(migSql.raw(`
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS employee_code VARCHAR(20);
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS employee_pin  VARCHAR(255);
+        ALTER TABLE employee_permissions ADD COLUMN IF NOT EXISTS can_manage_staff          BOOLEAN DEFAULT FALSE;
+        ALTER TABLE employee_permissions ADD COLUMN IF NOT EXISTS can_manage_email          BOOLEAN DEFAULT FALSE;
+        ALTER TABLE employee_permissions ADD COLUMN IF NOT EXISTS can_manage_waitlist       BOOLEAN DEFAULT FALSE;
+        ALTER TABLE employee_permissions ADD COLUMN IF NOT EXISTS can_manage_estimates      BOOLEAN DEFAULT FALSE;
+        ALTER TABLE employee_permissions ADD COLUMN IF NOT EXISTS can_manage_invoicing      BOOLEAN DEFAULT FALSE;
+        ALTER TABLE employee_permissions ADD COLUMN IF NOT EXISTS can_manage_sms_blasts     BOOLEAN DEFAULT FALSE;
+        ALTER TABLE employee_permissions ADD COLUMN IF NOT EXISTS can_manage_memberships    BOOLEAN DEFAULT FALSE;
+        ALTER TABLE employee_permissions ADD COLUMN IF NOT EXISTS can_manage_specials       BOOLEAN DEFAULT FALSE;
+        ALTER TABLE employee_permissions ADD COLUMN IF NOT EXISTS can_manage_charge_accounts BOOLEAN DEFAULT FALSE;
+      `));
+      await migDb.execute(migSql.raw(`INSERT INTO data_migrations (key) VALUES ('${empPinKey}')`));
+      log('[migration] employee_pin_system_v1 complete');
+    }
+
     // Startup cleanup: remove zero-stock items from pending queue (POS tracker)
     await migDb.execute(migSql.raw(`DELETE FROM pos_pending_new_items WHERE pos_stock <= 0`));
 

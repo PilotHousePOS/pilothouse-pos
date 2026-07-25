@@ -86,6 +86,7 @@ const Booking = safeLazy(() => import("@/pages/booking"), "booking");
 const Profile = safeLazy(() => import("@/pages/profile"), "profile");
 const Settings = safeLazy(() => import("@/pages/settings"), "settings");
 const Admin = safeLazy(() => import("@/pages/admin"), "admin");
+const EmployeeLogin = safeLazy(() => import("@/pages/employee-login"), "employee-login");
 const PosPage = safeLazy(() => import("@/pages/pos"), "pos");
 const OrderHistory = safeLazy(() => import("@/pages/order-history"), "order-history");
 const OrderConfirmation = safeLazy(() => import("@/pages/order-confirmation"), "order-confirmation");
@@ -272,6 +273,7 @@ function Router() {
       <PaywallGuard>
         <Suspense fallback={<PageLoader />}>
           <Switch>
+            <Route path="/employee-login" component={EmployeeLogin} />
             <Route path="/forgot-password" component={ForgotPassword} />
             <Route path="/reset-password" component={ResetPassword} />
             <Route path="/verify-email" component={VerifyEmail} />
