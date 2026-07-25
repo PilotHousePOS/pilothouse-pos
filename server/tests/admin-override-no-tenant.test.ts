@@ -45,7 +45,7 @@
  * and is confirmed present via a source-code inspection assertion.
  */
 
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 import express from "express";
 import cookieParser from "cookie-parser";
 import supertest from "supertest";
@@ -632,6 +632,176 @@ describe("POST /api/auth/admin-override — super-admin bypasses membership guar
       const membershipIdx = handlerWindow.indexOf("actingUser.tenantId !== tenantId");
       // The membership check must come after the super-admin exemption open brace.
       expect(membershipIdx).toBeGreaterThan(exemptionIdx);
+    },
+  );
+});
+
+// ─── Suite: overridePinLimiter window resets after 15 minutes ─────────────────
+
+describe("POST /api/auth/admin-override — PIN limiter window resets after 15 minutes", () => {
+  /**
+   * The overridePinLimiter caps guesses at 10 per 15-minute window.
+   * This suite confirms that when the window expires the counter is cleared,
+   * so a legitimately locked-out manager can retry after 15 minutes.
+   *
+   * Strategy: exhaust the 10-attempt budget on a unique IP, then use
+   * vi.useFakeTimers() to advance Date.now() past the 15-minute mark.
+   * express-rate-limit's MemoryStore compares the stored resetTime against
+   * Date.now() on every request; once the fake clock is past resetTime the
+   * store treats the record as expired and issues a fresh counter.
+   */
+
+  let windowTenantId: number;
+  let windowTenantSlug: string;
+  let windowStrandedUserId: string;
+  let windowStrandedToken: string;
+  let windowAgent: ReturnType<typeof supertest>;
+
+  // Unique rightmost XFF entry so this suite's limiter bucket is fully
+  // isolated from every other suite's bucket.
+  let windowUniqueIp: string;
+
+  beforeAll(async () => {
+    const sfx = randomSuffix();
+    windowTenantSlug = `pin-window-reset-${sfx}`;
+    windowUniqueIp = `10.88.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+
+    // Create a real tenant so tenantMiddleware resolves the slug and lets
+    // requests reach the overridePinLimiter (no PIN configured — the handler
+    // will 400, but the limiter counts requests before that).
+    const [windowTenant] = await db
+      .insert(tenants)
+      .values({
+        name: `Pin Window Reset Store ${sfx}`,
+        slug: windowTenantSlug,
+      })
+      .returning();
+
+    windowTenantId = windowTenant.id;
+
+    // Stranded employee: valid JWT, tenantId = null in DB.
+    const [windowStranded] = await db
+      .insert(users)
+      .values({
+        id: `pin-window-${sfx}`,
+        email: `pin-window-${sfx}@test.local`,
+        firstName: "Window",
+        lastName: "Tester",
+        password: "hashed-for-test",
+        tenantId: null,
+        isAdmin: false,
+        isSuperAdmin: false,
+        tokenVersion: 0,
+      })
+      .returning();
+
+    windowStrandedUserId = windowStranded.id;
+    windowStrandedToken = generateToken(windowStranded as any);
+
+    const app = await buildTestApp();
+    windowAgent = supertest(app);
+  }, 60_000);
+
+  afterAll(async () => {
+    // Always restore real timers, even if the test threw.
+    vi.useRealTimers();
+
+    if (windowStrandedUserId) {
+      await db
+        .update(contacts)
+        .set({ linkedUserId: null })
+        .where(eq(contacts.linkedUserId, windowStrandedUserId));
+      await db.delete(users).where(eq(users.id, windowStrandedUserId));
+    }
+    if (windowTenantId) {
+      await db.execute(
+        sql`DELETE FROM override_audit_log WHERE tenant_id = ${windowTenantId}`,
+      );
+      await db.delete(tenants).where(eq(tenants.id, windowTenantId));
+    }
+  }, 30_000);
+
+  it(
+    "allows a fresh attempt after the 15-minute window expires (counter resets)",
+    async () => {
+      // ── Phase 1: exhaust the 10-attempt budget (real timers) ──────────────
+      // Send 10 requests to consume the full per-IP budget.  Each request
+      // carries the unique rightmost XFF so they all share one limiter bucket.
+      for (let i = 0; i < 10; i++) {
+        const res = await windowAgent
+          .post("/api/auth/admin-override")
+          .set("Cookie", `auth_token=${windowStrandedToken}`)
+          .set("X-Tenant-Slug", windowTenantSlug)
+          .set("X-Forwarded-For", `192.0.2.${i}, ${windowUniqueIp}`)
+          .send({ pin: String(1000 + i).padStart(4, "0"), action: "open_drawer" });
+
+        // Each pre-exhaustion request must be rejected by the handler (not
+        // the limiter) — the limiter budget is not yet exhausted.
+        expect(res.status).toBeGreaterThanOrEqual(400);
+        expect(res.status).not.toBe(429);
+      }
+
+      // ── Phase 2: confirm the budget is now exhausted ───────────────────────
+      const blockedRes = await windowAgent
+        .post("/api/auth/admin-override")
+        .set("Cookie", `auth_token=${windowStrandedToken}`)
+        .set("X-Tenant-Slug", windowTenantSlug)
+        .set("X-Forwarded-For", `192.0.2.99, ${windowUniqueIp}`)
+        .send({ pin: "9999", action: "open_drawer" });
+
+      expect(blockedRes.status).toBe(429);
+
+      // ── Phase 3: advance fake clock past the 15-minute window ─────────────
+      // Only fake Date — NOT setTimeout/setInterval.  express-rate-limit's
+      // MemoryStore uses Date.now() to compare against the stored resetTime;
+      // once Date.now() is past resetTime the store resets the counter.
+      // Leaving real setTimeout/setInterval in place keeps the HTTP machinery
+      // (supertest keepalive, Node TCP stack) fully functional so the next
+      // request doesn't hang.
+      vi.useFakeTimers({ toFake: ["Date"] });
+      vi.advanceTimersByTime(15 * 60 * 1000 + 1_000);
+
+      // ── Phase 4: confirm the counter has reset — first post-window request
+      //            must not be 429 ──────────────────────────────────────────
+      const afterWindowRes = await windowAgent
+        .post("/api/auth/admin-override")
+        .set("Cookie", `auth_token=${windowStrandedToken}`)
+        .set("X-Tenant-Slug", windowTenantSlug)
+        .set("X-Forwarded-For", `192.0.2.100, ${windowUniqueIp}`)
+        .send({ pin: "1111", action: "open_drawer" });
+
+      // The limiter window has expired — this request must NOT be rate-limited.
+      // The handler may still reject it for other reasons (no PIN configured,
+      // membership guard) but it must not be 429.
+      expect(afterWindowRes.status).not.toBe(429);
+      expect(afterWindowRes.status).toBeGreaterThanOrEqual(400);
+      expect(afterWindowRes.status).toBeLessThan(500);
+
+      // Restore real timers so subsequent suites / cleanup run normally.
+      vi.useRealTimers();
+    },
+    30_000,
+  );
+
+  it(
+    "the overridePinLimiter windowMs is set to 15 minutes (900 000 ms) in source",
+    () => {
+      // Source-code inspection: confirm the windowMs value so the behaviour
+      // tested above cannot drift from the documented 15-minute window without
+      // a test failure.
+      const limitersPath = path.resolve(__dirname, "../sharedLimiters.ts");
+      const source = fs.readFileSync(limitersPath, "utf8");
+
+      const limiterStart = source.indexOf("overridePinLimiter = rateLimit(");
+      expect(limiterStart).toBeGreaterThan(0);
+
+      // Extract the rateLimit() call block (500 chars is more than enough).
+      const limiterBlock = source.slice(limiterStart, limiterStart + 500);
+
+      // windowMs must be exactly 15 * 60 * 1000.
+      expect(limiterBlock).toContain("15 * 60 * 1000");
+      // max must be 10.
+      expect(limiterBlock).toContain("max: 10");
     },
   );
 });
