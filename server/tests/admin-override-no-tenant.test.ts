@@ -33,7 +33,13 @@
  *    the foreign tenant via the slug, but the handler's membership guard returns
  *    403 before the PIN is verified — no audit log entry is written.
  *
- *  - In all cases no PIN is looked up and no success response is returned.
+ *  - Super-admin with no tenantId + store slug + correct PIN: tenantMiddleware
+ *    resolves the tenant via the slug and sets req.isSuperAdmin = true. The
+ *    handler's membership guard is skipped. The PIN is verified and 200 is
+ *    returned. An override_audit_log entry is written for that tenant.
+ *
+ *  - In all cases no PIN is looked up and no success response is returned for
+ *    non-super-admin callers without a matching tenant.
  *
  * The handler's own `if (!tenantId)` guard (line 15803) provides defense-in-depth
  * and is confirmed present via a source-code inspection assertion.
@@ -468,6 +474,164 @@ describe("POST /api/auth/admin-override — cross-tenant audit log pollution", (
       expect(handlerWindow).toContain("You do not have access to this store's override PIN.");
       // Super-admins must be exempt.
       expect(handlerWindow).toContain("isSuperAdmin");
+    },
+  );
+});
+
+// ─── Suite: super-admin exemption from membership guard ──────────────────────
+
+describe("POST /api/auth/admin-override — super-admin bypasses membership guard", () => {
+  /**
+   * A super-admin has isSuperAdmin = true in the DB and no tenant of their own.
+   * When they supply X-Tenant-Slug for a store they do not belong to,
+   * tenantMiddleware resolves the slug and sets req.isSuperAdmin = true.
+   * The handler skips the membership guard and verifies the PIN directly.
+   * A 200 is returned and an override_audit_log entry is written.
+   */
+
+  const SA_PIN = "8472"; // plaintext PIN used for the super-admin's target store
+
+  let saTenantId: number;
+  let saTenantSlug: string;
+  let saUserId: string;
+  let saToken: string;
+  let saAgent: ReturnType<typeof supertest>;
+
+  beforeAll(async () => {
+    const sfx = randomSuffix();
+    saTenantSlug = `sa-target-store-${sfx}`;
+
+    // Hash the PIN the same way the real PUT /api/admin/override-pin route does.
+    const hashedPin = await hashPassword(SA_PIN);
+
+    // Create a tenant with a configured override PIN.
+    const [saTenant] = await db
+      .insert(tenants)
+      .values({
+        name: `SA Target Store ${sfx}`,
+        slug: saTenantSlug,
+        adminOverridePin: hashedPin,
+      })
+      .returning();
+
+    saTenantId = saTenant.id;
+
+    // Create a super-admin user with no tenantId — they do not belong to the
+    // target store, which is the cross-tenant access scenario being tested.
+    const [saUser] = await db
+      .insert(users)
+      .values({
+        id: `super-admin-ov-${sfx}`,
+        email: `super-admin-ov-${sfx}@test.local`,
+        firstName: "Super",
+        lastName: "Admin",
+        password: "hashed-for-test",
+        tenantId: null, // ← no matching tenant
+        isAdmin: true,
+        isSuperAdmin: true,
+        tokenVersion: 0,
+      })
+      .returning();
+
+    saUserId = saUser.id;
+    saToken = generateToken(saUser as any);
+
+    const app = await buildTestApp();
+    saAgent = supertest(app);
+  }, 60_000);
+
+  afterAll(async () => {
+    if (saUserId) {
+      await db
+        .update(contacts)
+        .set({ linkedUserId: null })
+        .where(eq(contacts.linkedUserId, saUserId));
+      await db.delete(users).where(eq(users.id, saUserId));
+    }
+    if (saTenantId) {
+      // Clean up audit log rows written by the super-admin during the test.
+      await db.execute(
+        sql`DELETE FROM override_audit_log WHERE tenant_id = ${saTenantId} AND actor_user_id = ${saUserId}`,
+      );
+      await db.delete(tenants).where(eq(tenants.id, saTenantId));
+    }
+  }, 30_000);
+
+  it(
+    "returns 200 when a super-admin supplies a valid store slug and correct PIN",
+    async () => {
+      // The super-admin has no tenantId in the DB. They pass X-Tenant-Slug so
+      // tenantMiddleware resolves the target tenant and sets req.isSuperAdmin = true.
+      // The handler's membership guard (`if (!req.isSuperAdmin)`) is skipped, the
+      // PIN is verified against the stored hash, and 200 is returned.
+      const res = await saAgent
+        .post("/api/auth/admin-override")
+        .set("Cookie", `auth_token=${saToken}`)
+        .set("X-Tenant-Slug", saTenantSlug)
+        .send({ pin: SA_PIN, action: "void_transaction", purpose: "super-admin test" });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+    },
+    15_000,
+  );
+
+  it(
+    "writes an override_audit_log entry for the target tenant after a successful super-admin override",
+    async () => {
+      // After the successful 200 in the previous test, the handler must have
+      // inserted a row into override_audit_log for the target tenant.
+      const rows = await db.execute(
+        sql`SELECT id, action, actor_user_id FROM override_audit_log
+            WHERE tenant_id = ${saTenantId} AND actor_user_id = ${saUserId}`,
+      );
+      expect(rows.rows.length).toBeGreaterThanOrEqual(1);
+      // The logged action must match what was sent.
+      const loggedActions = rows.rows.map((r: any) => r.action);
+      expect(loggedActions).toContain("void_transaction");
+    },
+    15_000,
+  );
+
+  it(
+    "returns 401 when a super-admin supplies the correct slug but an incorrect PIN",
+    async () => {
+      // The membership guard is still skipped for super-admins, but the PIN
+      // verification itself must still catch a wrong PIN.
+      const res = await saAgent
+        .post("/api/auth/admin-override")
+        .set("Cookie", `auth_token=${saToken}`)
+        .set("X-Tenant-Slug", saTenantSlug)
+        .send({ pin: "0000", action: "open_drawer" });
+
+      expect(res.status).toBe(401);
+      expect(res.body.message).toContain("Incorrect override PIN");
+    },
+    15_000,
+  );
+
+  it(
+    "the membership guard exempts isSuperAdmin callers in source code",
+    () => {
+      // Source-code inspection: confirm the isSuperAdmin exemption wrapping the
+      // membership guard is present and has not been accidentally removed.
+      const routesPath = path.resolve(__dirname, "../routes.ts");
+      const source = fs.readFileSync(routesPath, "utf8");
+
+      const handlerStart = source.indexOf('"/api/auth/admin-override"');
+      expect(handlerStart).toBeGreaterThan(0);
+
+      // Extract a generous window after the handler declaration (3000 chars).
+      const handlerWindow = source.slice(handlerStart, handlerStart + 3000);
+
+      // The exemption must be an explicit isSuperAdmin guard wrapping the
+      // membership check — not just a comment.
+      expect(handlerWindow).toContain("if (!req.isSuperAdmin)");
+      // The membership guard must be nested inside that block.
+      const exemptionIdx = handlerWindow.indexOf("if (!req.isSuperAdmin)");
+      const membershipIdx = handlerWindow.indexOf("actingUser.tenantId !== tenantId");
+      // The membership check must come after the super-admin exemption open brace.
+      expect(membershipIdx).toBeGreaterThan(exemptionIdx);
     },
   );
 });
