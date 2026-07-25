@@ -108,6 +108,15 @@ import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import AdminNotifications from "@/components/admin-notifications";
 import EmailCenter from "@/components/admin/EmailCenter";
+import WaitlistTab from "@/components/tabs/WaitlistTab";
+import TasksTab from "@/components/tabs/TasksTab";
+import AnnouncementsTab from "@/components/tabs/AnnouncementsTab";
+import EstimatesTab from "@/components/tabs/EstimatesTab";
+import InvoicingTab from "@/components/tabs/InvoicingTab";
+import TimeClockTab from "@/components/tabs/TimeClockTab";
+import IntakeFormsTab from "@/components/tabs/IntakeFormsTab";
+import SMSBlastsTab from "@/components/tabs/SMSBlastsTab";
+import MembershipsTab from "@/components/tabs/MembershipsTab";
 import { safeGoBack } from "@/lib/navigation";
 import { capitalizeWords } from "@/lib/stringUtils";
 import { formatCategory } from "@/lib/formatCategory";
@@ -6859,6 +6868,15 @@ export default function Admin() {
     { id: 'non-payment',   label: 'Non-Payment'   },
     { id: 'email-center',  label: 'Email Center'  },
     { id: 'boarding',      label: 'Boarding'       },
+    { id: 'waitlist',      label: 'Waitlist'       },
+    { id: 'tasks',         label: 'Tasks'          },
+    { id: 'announcements', label: 'Announcements'  },
+    { id: 'estimates',     label: 'Estimates'      },
+    { id: 'invoicing',     label: 'Invoicing'      },
+    { id: 'time-clock',    label: 'Time Clock'     },
+    { id: 'intake-forms',  label: 'Intake Forms'   },
+    { id: 'sms-blasts',    label: 'SMS Blasts'     },
+    { id: 'memberships',   label: 'Memberships'    },
   ];
   const OPTIONAL_TAB_IDS = OPTIONAL_TABS.map(t => t.id);
 
@@ -6980,6 +6998,15 @@ export default function Admin() {
       case 'applications': return 'Applications';
       case 'feedback': return 'Feedback';
       case 'settings': return 'Settings';
+      case 'waitlist': return 'Waitlist';
+      case 'tasks': return 'Tasks';
+      case 'announcements': return 'Announcements';
+      case 'estimates': return 'Estimates';
+      case 'invoicing': return 'Invoicing';
+      case 'time-clock': return 'Time Clock';
+      case 'intake-forms': return 'Intake Forms';
+      case 'sms-blasts': return 'SMS Blasts';
+      case 'memberships': return 'Memberships';
       default: return value;
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -9463,6 +9490,15 @@ export default function Admin() {
                   'applications':   !!typedUser?.isAdmin,
                   'feedback':       !!typedUser?.isAdmin,
                   'settings':       !!typedUser?.isAdmin,
+                  'waitlist':       !!typedUser?.isAdmin,
+                  'tasks':          !!typedUser?.isAdmin,
+                  'announcements':  !!typedUser?.isAdmin,
+                  'estimates':      !!typedUser?.isAdmin,
+                  'invoicing':      !!typedUser?.isAdmin,
+                  'time-clock':     true,
+                  'intake-forms':   !!typedUser?.isAdmin,
+                  'sms-blasts':     !!typedUser?.isAdmin,
+                  'memberships':    !!typedUser?.isAdmin,
                 } as Record<string, boolean>)[v] ?? false;
               })
               .map(value => (
@@ -14825,6 +14861,43 @@ export default function Admin() {
             </div>
           )}
         </TabsContent>
+
+        <TabsContent value="waitlist" className="space-y-4">
+          <WaitlistTab typedUser={typedUser} />
+        </TabsContent>
+
+        <TabsContent value="tasks" className="space-y-4">
+          <TasksTab typedUser={typedUser} />
+        </TabsContent>
+
+        <TabsContent value="announcements" className="space-y-4">
+          <AnnouncementsTab typedUser={typedUser} />
+        </TabsContent>
+
+        <TabsContent value="estimates" className="space-y-4">
+          <EstimatesTab typedUser={typedUser} />
+        </TabsContent>
+
+        <TabsContent value="invoicing" className="space-y-4">
+          <InvoicingTab typedUser={typedUser} />
+        </TabsContent>
+
+        <TabsContent value="time-clock" className="space-y-4">
+          <TimeClockTab typedUser={typedUser} />
+        </TabsContent>
+
+        <TabsContent value="intake-forms" className="space-y-4">
+          <IntakeFormsTab typedUser={typedUser} />
+        </TabsContent>
+
+        <TabsContent value="sms-blasts" className="space-y-4">
+          <SMSBlastsTab typedUser={typedUser} />
+        </TabsContent>
+
+        <TabsContent value="memberships" className="space-y-4">
+          <MembershipsTab typedUser={typedUser} />
+        </TabsContent>
+
       </Tabs>
 
       {/* SMS Confirmation Dialog for Grooming Completed */}
