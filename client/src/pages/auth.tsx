@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getActiveTenantSlug, queryClient } from "@/lib/queryClient";
+import { getActiveTenantSlug, setActiveTenantSlug, queryClient } from "@/lib/queryClient";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,9 +38,39 @@ export default function Auth() {
   const [empError, setEmpError] = useState("");
   const [empLoading, setEmpLoading] = useState(false);
 
+  // Store code — needed on a fresh device where no slug is saved in localStorage yet.
+  // Once entered it's persisted so subsequent visits don't need it again.
+  const [knownSlug, setKnownSlug] = useState<string | null>(() => getActiveTenantSlug());
+  const [storeCodeInput, setStoreCodeInput] = useState("");
+  const [storeCodeError, setStoreCodeError] = useState("");
+  const [storeCodeLoading, setStoreCodeLoading] = useState(false);
+
+  const handleStoreCodeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const code = storeCodeInput.trim().toLowerCase();
+    if (!code) return;
+    setStoreCodeLoading(true);
+    setStoreCodeError("");
+    try {
+      const res = await fetch(`/api/tenants/slug-check?slug=${encodeURIComponent(code)}`);
+      const data = await res.json();
+      // slug-check returns { available: true } when the slug is NOT taken (i.e. no store found)
+      if (!res.ok || data.available) {
+        setStoreCodeError("Store not found. Check the code with your manager.");
+      } else {
+        setActiveTenantSlug(code);
+        setKnownSlug(code);
+      }
+    } catch {
+      setStoreCodeError("Could not reach the server. Check your connection.");
+    } finally {
+      setStoreCodeLoading(false);
+    }
+  };
+
   const { data: empRoster = [], isLoading: rosterLoading } = useQuery<RosterEmployee[]>({
-    queryKey: ["/api/employee/roster"],
-    enabled: activeTab === "employee",
+    queryKey: ["/api/employee/roster", knownSlug],
+    enabled: activeTab === "employee" && !!knownSlug,
     staleTime: 30_000,
   });
 
@@ -511,13 +541,49 @@ export default function Auth() {
               
               {/* ── Employee Sign-In Tab ── */}
               <TabsContent value="employee" className="mt-6">
-                {!empSelected ? (
+                {/* Step 0 — fresh device: ask for store code before showing roster */}
+                {!knownSlug ? (
+                  <div className="space-y-4">
+                    <div className="text-center mb-2">
+                      <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-2">
+                        <LogIn className="h-6 w-6 text-white" />
+                      </div>
+                      <p className="text-white font-medium">Enter your store code</p>
+                      <p className="text-gray-400 text-xs mt-1">Your manager can give you this. You only need to do this once on a new device.</p>
+                    </div>
+                    <form onSubmit={handleStoreCodeSubmit} className="space-y-3">
+                      <Input
+                        value={storeCodeInput}
+                        onChange={e => { setStoreCodeInput(e.target.value); setStoreCodeError(""); }}
+                        placeholder="e.g. paw-palace"
+                        className="bg-white/10 border-white/30 text-white placeholder:text-gray-400 text-center tracking-widest"
+                        autoCapitalize="none"
+                        autoCorrect="off"
+                        spellCheck={false}
+                      />
+                      {storeCodeError && <p className="text-red-400 text-xs text-center">{storeCodeError}</p>}
+                      <Button
+                        type="submit"
+                        disabled={!storeCodeInput.trim() || storeCodeLoading}
+                        className="w-full bg-slate-600 hover:bg-slate-500 text-white"
+                      >
+                        {storeCodeLoading ? "Checking…" : "Continue"}
+                      </Button>
+                    </form>
+                  </div>
+                ) : !empSelected ? (
                   <div className="space-y-2">
                     <div className="text-center mb-4">
                       <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-2">
                         <LogIn className="h-6 w-6 text-white" />
                       </div>
                       <p className="text-gray-300 text-sm">Select your name, then enter your PIN</p>
+                      <button
+                        className="text-xs text-gray-500 hover:text-gray-300 underline mt-1"
+                        onClick={() => { setActiveTenantSlug(null); setKnownSlug(null); setStoreCodeInput(""); }}
+                      >
+                        Wrong store? Change store code
+                      </button>
                     </div>
                     {rosterLoading ? (
                       <p className="text-center text-gray-400 text-sm py-6">Loading staff…</p>

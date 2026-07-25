@@ -1067,6 +1067,22 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         });
       }
 
+      // If a specific store's login page sent its slug, make sure this account
+      // belongs to that store.  This prevents an employee of Store A from
+      // accidentally authenticating on Store B's login URL.
+      // We only enforce when a slug IS provided — generic login (no slug) is
+      // always allowed so employees on a fresh device can still sign in.
+      const requestedSlug = (req.headers['x-tenant-slug'] as string | undefined)?.trim();
+      if (requestedSlug && !user.isSuperAdmin) {
+        const requestedTenant = await storage.getTenantBySlug(requestedSlug);
+        if (requestedTenant && user.tenantId !== requestedTenant.id) {
+          return res.status(403).json({
+            message: "This account doesn't belong to this store. Please use your own store's sign-in link.",
+            code: "WRONG_TENANT",
+          });
+        }
+      }
+
       // Generate JWT token
       const token = generateToken(user);
       setAuthCookie(res, token);
