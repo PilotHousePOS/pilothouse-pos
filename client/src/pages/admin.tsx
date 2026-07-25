@@ -12485,7 +12485,7 @@ export default function Admin() {
                               <Badge className="text-xs bg-yellow-400 text-black border border-yellow-500">Superior Manager</Badge>
                             )}
                             {userItem.isAdmin && (
-                              <Badge variant="default" className="text-xs">Admin</Badge>
+                              <Badge variant="default" className="text-xs">Owner</Badge>
                             )}
                             {userItem.isGroomer && (
                               <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700">Groomer</Badge>
@@ -12503,15 +12503,15 @@ export default function Admin() {
                         </div>
                         <div className="flex flex-col gap-2 sm:min-w-[140px]">
                           <div className="flex items-center justify-between gap-3">
-                            <span className="text-sm font-medium">Admin</span>
+                            <span className="text-sm font-medium">Owner</span>
                             <Switch
                               checked={userItem.isAdmin}
                               onCheckedChange={(checked) => {
                                 showDeleteConfirmation(
-                                  checked ? 'Grant Admin Access' : 'Remove Admin Access',
+                                  checked ? 'Grant Owner Access' : 'Remove Owner Access',
                                   checked
-                                    ? `This will give ${userItem.firstName} ${userItem.lastName} full admin privileges.`
-                                    : `This will remove admin privileges from ${userItem.firstName} ${userItem.lastName}.`,
+                                    ? `This will give ${userItem.firstName} ${userItem.lastName} full owner privileges.`
+                                    : `This will remove owner privileges from ${userItem.firstName} ${userItem.lastName}.`,
                                   '',
                                   () => updateAdminMutation.mutate({ userId: userItem.id, isAdmin: checked }),
                                   checked ? 'Yes, Grant Access' : 'Yes, Remove Access',

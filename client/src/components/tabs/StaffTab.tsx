@@ -445,7 +445,7 @@ export default function StaffTab({ typedUser }: Props) {
               </CardHeader>
               <CardContent>
                 <p className="text-xs text-muted-foreground mb-3">
-                  Set a 4-digit PIN employees must enter for manager overrides in the POS. If left blank, any admin account's personal PIN will be accepted instead.
+                  Set a 4-digit Owner PIN for POS overrides. Both this PIN and any admin account's personal PIN are always accepted — the Owner PIN gives you a private code that's separate from your managers'.
                 </p>
                 <div className="flex gap-2">
                   <Input

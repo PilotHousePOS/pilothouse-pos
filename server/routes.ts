@@ -15822,23 +15822,30 @@ CRITICAL RULES:
       }
       const tenant = await storage.getTenant(tenantId);
       let matched = false;
+      let hasSomePinConfigured = false;
+
+      // 1. Check the store-wide Owner PIN (highest authority)
       if (tenant?.adminOverridePin) {
-        // Primary path: verify against the store-level override PIN
+        hasSomePinConfigured = true;
         matched = await verifyPassword(String(pin), tenant.adminOverridePin);
-      } else {
-        // Fallback: if no store override PIN is set, accept any admin user's employee PIN
-        const adminUsers = await db.execute(
+      }
+
+      // 2. Always also check any admin/manager employee PINs (even when a store PIN exists)
+      if (!matched) {
+        const adminPinRows = await db.execute(
           sql`SELECT employee_pin FROM users WHERE tenant_id = ${tenantId} AND is_admin = true AND employee_pin IS NOT NULL`
         );
-        for (const row of (adminUsers.rows as any[])) {
+        if ((adminPinRows.rows as any[]).length > 0) hasSomePinConfigured = true;
+        for (const row of (adminPinRows.rows as any[])) {
           if (row.employee_pin && await verifyPassword(String(pin), row.employee_pin)) {
             matched = true;
             break;
           }
         }
-        if (!matched && (adminUsers.rows as any[]).length === 0) {
-          return res.status(400).json({ message: "No override PIN configured. Ask the owner to set a store PIN or an admin PIN in Staff Accounts." });
-        }
+      }
+
+      if (!hasSomePinConfigured) {
+        return res.status(400).json({ message: "No override PIN configured. Ask the owner to set a store PIN or set an admin PIN in Staff Accounts." });
       }
       if (!matched) return res.status(401).json({ message: "Incorrect override PIN" });
       // Log the override action
