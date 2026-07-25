@@ -204,3 +204,56 @@ export const overridePinLimiter = rateLimit({
   keyGenerator: getRealIp,
   message: { message: "Too many override PIN attempts, please try again in 15 minutes." },
 });
+
+// ─── overridePinSlugLimiter — per-store distributed-attack cap ───────────────
+//
+// Supplemental to overridePinLimiter.  Applied to /api/auth/admin-override
+// alongside (not instead of) the per-IP limiter above.
+//
+// PROBLEM: A distributed attacker controlling N machines can rotate real IPs,
+// making N guesses per machine while each individual IP stays under the 10-
+// attempt per-IP cap.  With 10 machines the attacker gets 100 total guesses
+// against a single store with no single IP ever being rate-limited.
+//
+// SOLUTION: Key this limiter on the tenant slug from the X-Tenant-Slug request
+// header.  All guesses against the same store — regardless of which IP they
+// arrive from — share a single 10-attempt / 15-minute budget per store.  A
+// distributed attacker exhausts this per-store cap just as fast as a single-IP
+// attacker would, closing the distributed-rotation bypass entirely.
+//
+// WHY SLUG, NOT TENANT ID
+// ------------------------
+// The limiter runs before tenantMiddleware resolves the slug to a database ID.
+// Using the raw slug string is safe: an attacker cannot enumerate valid slugs
+// faster than they can enumerate PINs, and a wrong slug is rejected by
+// tenantMiddleware before the PIN check runs.
+//
+// ISOLATION BETWEEN STORES
+// -------------------------
+// Each store's slug forms its own independent bucket.  Exhausting the budget
+// for store-A does NOT affect store-B's budget.  Legitimate users on unrelated
+// stores are never blocked by an attack on a different store.
+//
+// INTERACTION WITH overridePinLimiter
+// ------------------------------------
+// Both limiters are registered on /api/auth/admin-override (see routes.ts).
+// A request is rate-limited when EITHER budget is exhausted — whichever fires
+// first.  This means the effective cap is min(per-IP budget, per-slug budget),
+// giving defence-in-depth across both attack vectors.
+//
+// ⚠  DO NOT create a second rateLimit() call for /api/auth/admin-override.
+//    Always import this export from sharedLimiters.ts.
+// Regression test: server/tests/admin-override-no-tenant.test.ts
+//   (suite "overridePinSlugLimiter blocks distributed slug-injection attack")
+export const overridePinSlugLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req: Request): string => {
+    const slug = req.headers["x-tenant-slug"];
+    if (Array.isArray(slug)) return slug[0] || "no-slug";
+    return slug || "no-slug";
+  },
+  message: { message: "Too many override PIN attempts for this store, please try again in 15 minutes." },
+});

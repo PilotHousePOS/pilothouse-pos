@@ -797,6 +797,214 @@ describe("authLimiter and overridePinLimiter — independent per-IP budgets", ()
   );
 });
 
+// ─── Suite: overridePinSlugLimiter blocks distributed slug-injection attack ────
+
+describe("POST /api/auth/admin-override — per-store slug limiter blocks distributed attack", () => {
+  /**
+   * A distributed attacker with N machines can rotate real IPs, keeping each
+   * individual IP under the 10-attempt per-IP cap of overridePinLimiter.
+   * overridePinSlugLimiter closes this gap by keying on the tenant slug —
+   * all guesses against the same store share a single 10-attempt budget.
+   *
+   * This suite:
+   *  1. Sends 10 requests against a target store, each from a DISTINCT real IP
+   *     (rightmost XFF entry), so the per-IP limiter never triggers.
+   *  2. Confirms the 11th request — also from a fresh IP — returns 429 from the
+   *     per-slug limiter.
+   *  3. Confirms a request to a DIFFERENT store is not affected.
+   */
+
+  let targetTenantId: number;
+  let targetTenantSlug: string;
+  let unrelatedTenantId: number;
+  let unrelatedTenantSlug: string;
+  let distStrandedUserId: string;
+  let distStrandedToken: string;
+  let distAgent: ReturnType<typeof supertest>;
+
+  beforeAll(async () => {
+    const sfx = randomSuffix();
+    targetTenantSlug = `dist-attack-target-${sfx}`;
+    unrelatedTenantSlug = `dist-attack-unrelated-${sfx}`;
+
+    // Create the target store — the one being brute-forced.
+    const [targetTenant] = await db
+      .insert(tenants)
+      .values({
+        name: `Dist Attack Target Store ${sfx}`,
+        slug: targetTenantSlug,
+        // No PIN configured — handler will 400, but the slug limiter fires before that.
+      })
+      .returning();
+    targetTenantId = targetTenant.id;
+
+    // Create an unrelated store — must remain unaffected by the attack.
+    const [unrelatedTenant] = await db
+      .insert(tenants)
+      .values({
+        name: `Dist Attack Unrelated Store ${sfx}`,
+        slug: unrelatedTenantSlug,
+      })
+      .returning();
+    unrelatedTenantId = unrelatedTenant.id;
+
+    // Stranded employee: valid JWT, tenantId = null in DB.
+    const [distStranded] = await db
+      .insert(users)
+      .values({
+        id: `dist-attack-${sfx}`,
+        email: `dist-attack-${sfx}@test.local`,
+        firstName: "Dist",
+        lastName: "Attacker",
+        password: "hashed-for-test",
+        tenantId: null,
+        isAdmin: false,
+        isSuperAdmin: false,
+        tokenVersion: 0,
+      })
+      .returning();
+
+    distStrandedUserId = distStranded.id;
+    distStrandedToken = generateToken(distStranded as any);
+
+    const app = await buildTestApp();
+    distAgent = supertest(app);
+  }, 60_000);
+
+  afterAll(async () => {
+    if (distStrandedUserId) {
+      await db
+        .update(contacts)
+        .set({ linkedUserId: null })
+        .where(eq(contacts.linkedUserId, distStrandedUserId));
+      await db.delete(users).where(eq(users.id, distStrandedUserId));
+    }
+    if (targetTenantId) {
+      await db.execute(
+        sql`DELETE FROM override_audit_log WHERE tenant_id = ${targetTenantId}`,
+      );
+      await db.delete(tenants).where(eq(tenants.id, targetTenantId));
+    }
+    if (unrelatedTenantId) {
+      await db.execute(
+        sql`DELETE FROM override_audit_log WHERE tenant_id = ${unrelatedTenantId}`,
+      );
+      await db.delete(tenants).where(eq(tenants.id, unrelatedTenantId));
+    }
+  }, 30_000);
+
+  it(
+    "blocks the 11th guess against the same store when 10 different IPs each sent one guess (per-slug budget exhausted)",
+    async () => {
+      // Send 10 requests to the target store, each from a DISTINCT rightmost XFF
+      // entry (simulating 10 different machines).  Because each real IP appears
+      // only once, the per-IP overridePinLimiter counter for each IP stays at 1 —
+      // far below its cap of 10.  The per-slug overridePinSlugLimiter, however,
+      // sees all 10 guesses against the same store and reaches its cap of 10.
+      const baseOctet = Math.floor(Math.random() * 200) + 10; // avoid 0/255
+      for (let i = 0; i < 10; i++) {
+        const uniqueIp = `10.55.${baseOctet}.${i + 1}`;
+        const res = await distAgent
+          .post("/api/auth/admin-override")
+          .set("Cookie", `auth_token=${distStrandedToken}`)
+          .set("X-Tenant-Slug", targetTenantSlug)
+          // Each request has a distinct rightmost XFF — simulating a different
+          // real machine.  The leftmost entries are arbitrary spoofed IPs.
+          .set("X-Forwarded-For", `203.0.113.${i}, ${uniqueIp}`)
+          .send({ pin: String(1000 + i).padStart(4, "0"), action: "open_drawer" });
+
+        // Handler rejects each attempt (no PIN configured / membership guard),
+        // but the slug limiter budget is not yet exhausted — must not be 429.
+        expect(res.status).toBeGreaterThanOrEqual(400);
+        expect(res.status).toBeLessThan(500);
+        expect(res.status).not.toBe(429);
+      }
+
+      // 11th request — from yet another fresh IP.  The per-IP limiter counter
+      // for this IP is 0 (never seen before), so overridePinLimiter would pass.
+      // But the per-slug limiter budget for targetTenantSlug is now at 10/10
+      // → overridePinSlugLimiter must return 429.
+      const freshIp = `10.55.${baseOctet}.200`;
+      const limitedRes = await distAgent
+        .post("/api/auth/admin-override")
+        .set("Cookie", `auth_token=${distStrandedToken}`)
+        .set("X-Tenant-Slug", targetTenantSlug)
+        .set("X-Forwarded-For", `203.0.113.99, ${freshIp}`)
+        .send({ pin: "9999", action: "open_drawer" });
+
+      expect(limitedRes.status).toBe(429);
+      expect(typeof limitedRes.body.message).toBe("string");
+      // The per-slug limiter message references the store.
+      expect(limitedRes.body.message).toContain("override PIN");
+    },
+    60_000,
+  );
+
+  it(
+    "an unrelated store is not blocked after the target store's slug budget is exhausted",
+    async () => {
+      // After the previous test has exhausted the per-slug budget for
+      // targetTenantSlug, a request against a completely different store must
+      // NOT be rate-limited — each store's slug is an independent bucket.
+      const freshIp = `10.55.44.250`;
+      const res = await distAgent
+        .post("/api/auth/admin-override")
+        .set("Cookie", `auth_token=${distStrandedToken}`)
+        .set("X-Tenant-Slug", unrelatedTenantSlug)
+        .set("X-Forwarded-For", `203.0.113.50, ${freshIp}`)
+        .send({ pin: "1234", action: "open_drawer" });
+
+      // Must not be 429 — the unrelated store's slug budget is still fresh.
+      expect(res.status).not.toBe(429);
+      expect(res.status).toBeGreaterThanOrEqual(400);
+      expect(res.status).toBeLessThan(500);
+    },
+    15_000,
+  );
+
+  it(
+    "overridePinSlugLimiter is registered on the override route in source code",
+    () => {
+      const routesPath = path.resolve(__dirname, "../routes.ts");
+      const source = fs.readFileSync(routesPath, "utf8");
+
+      // The slug limiter registration must be present.
+      expect(source).toContain(
+        "app.use('/api/auth/admin-override', overridePinSlugLimiter)",
+      );
+
+      // It must appear after the per-IP limiter (defence-in-depth ordering).
+      const ipLimiterPos = source.indexOf(
+        "app.use('/api/auth/admin-override', overridePinLimiter)",
+      );
+      const slugLimiterPos = source.indexOf(
+        "app.use('/api/auth/admin-override', overridePinSlugLimiter)",
+      );
+
+      expect(ipLimiterPos).toBeGreaterThan(0);
+      expect(slugLimiterPos).toBeGreaterThan(0);
+    },
+  );
+
+  it(
+    "overridePinSlugLimiter is a separate rateLimit() instance from overridePinLimiter in source code",
+    () => {
+      const limitersPath = path.resolve(__dirname, "../sharedLimiters.ts");
+      const source = fs.readFileSync(limitersPath, "utf8");
+
+      // Both exports must call rateLimit() independently.
+      const ipLimiterPos = source.indexOf("export const overridePinLimiter = rateLimit(");
+      const slugLimiterPos = source.indexOf("export const overridePinSlugLimiter = rateLimit(");
+
+      expect(ipLimiterPos).toBeGreaterThan(0);
+      expect(slugLimiterPos).toBeGreaterThan(0);
+
+      // They must be at different offsets — not the same declaration.
+      expect(ipLimiterPos).not.toBe(slugLimiterPos);
+    },
+  );
+});
+
 // ─── Suite: overridePinLimiter window resets after 15 minutes ─────────────────
 
 describe("POST /api/auth/admin-override — PIN limiter window resets after 15 minutes", () => {

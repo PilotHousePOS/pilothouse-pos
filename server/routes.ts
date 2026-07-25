@@ -68,7 +68,7 @@ import { categorizeProduct, detectLiveAnimal } from './productCategorization';
 import { registerBillingRoutes } from './billingRoutes';
 // Shared-pool limiters MUST be imported from sharedLimiters.ts — never
 // re-created inline.  See server/sharedLimiters.ts for the full explanation.
-import { getRealIp, authLimiter, searchLimiter, checkoutLimiter, uploadLimiter, overridePinLimiter } from './sharedLimiters';
+import { getRealIp, authLimiter, searchLimiter, checkoutLimiter, uploadLimiter, overridePinLimiter, overridePinSlugLimiter } from './sharedLimiters';
 
 // Helper: clean a name string — collapse extra spaces, trim
 function cleanName(name: string | undefined | null): string {
@@ -370,6 +370,15 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   // never create a new rateLimit() call inline for this route.
   // See server/sharedLimiters.ts for the keyGenerator rationale (getRealIp).
   app.use('/api/auth/admin-override', overridePinLimiter);
+
+  // overridePinSlugLimiter supplements overridePinLimiter with a per-store cap.
+  // A distributed attacker rotating real IPs can evade the per-IP limiter by
+  // staying under the 10-attempt cap on each machine.  Keying on the tenant
+  // slug ensures that all guesses against the same store — regardless of the
+  // source IP — share a single 10-attempt / 15-minute budget, closing the
+  // distributed-rotation bypass entirely.
+  // See server/sharedLimiters.ts for the full rationale and regression test ref.
+  app.use('/api/auth/admin-override', overridePinSlugLimiter);
 
   // Separate limiter for customer signup that does NOT count requests that will
   // be immediately rejected with 400 due to a missing tenant context.
