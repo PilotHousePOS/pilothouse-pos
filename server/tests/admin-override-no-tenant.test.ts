@@ -194,6 +194,153 @@ describe("POST /api/auth/admin-override — no tenant context", () => {
   );
 });
 
+// ─── Suite: overridePinLimiter blocks slug-injection brute-force ──────────────
+
+describe("POST /api/auth/admin-override — PIN limiter blocks stranded employee with slug injection", () => {
+  // A stranded employee who knows a valid store slug can bypass the
+  // tenantMiddleware 403 (because the slug resolves a real tenant) and reach
+  // the overridePinLimiter.  This suite confirms the limiter fires and returns
+  // 429 after 10 attempts — before the PIN check or membership guard matter.
+
+  let slugTenantId: number;
+  let slugTenantSlug: string;
+  let slugStrandedToken: string;
+  let slugStrandedUserId: string;
+  let slugAgent: ReturnType<typeof supertest>;
+
+  // Unique rightmost XFF entry so this suite's counter is isolated from every
+  // other test.  getRealIp reads the RIGHTMOST X-Forwarded-For entry — the
+  // one that cannot be spoofed by the client — so using a dedicated value here
+  // keeps the limiter bucket separate from real traffic and other suites.
+  let uniqueRealIp: string;
+
+  beforeAll(async () => {
+    const sfx = randomSuffix();
+    slugTenantSlug = `slug-inject-store-${sfx}`;
+    uniqueRealIp = `10.99.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+
+    // Create a real tenant — the slug must resolve so tenantMiddleware passes
+    // and the overridePinLimiter gets a chance to fire.
+    const [slugTenant] = await db
+      .insert(tenants)
+      .values({
+        name: `Slug Inject Store ${sfx}`,
+        slug: slugTenantSlug,
+        // No adminOverridePin set — the handler would 400 anyway, but the limiter
+        // fires before the handler is reached after the budget is exhausted.
+      })
+      .returning();
+
+    slugTenantId = slugTenant.id;
+
+    // Stranded employee: valid JWT, tenantId = null in DB.
+    const [slugStranded] = await db
+      .insert(users)
+      .values({
+        id: `slug-inject-${sfx}`,
+        email: `slug-inject-${sfx}@test.local`,
+        firstName: "Slug",
+        lastName: "Injector",
+        password: "hashed-for-test",
+        tenantId: null,
+        isAdmin: false,
+        isSuperAdmin: false,
+        tokenVersion: 0,
+      })
+      .returning();
+
+    slugStrandedUserId = slugStranded.id;
+    slugStrandedToken = generateToken(slugStranded as any);
+
+    const app = await buildTestApp();
+    slugAgent = supertest(app);
+  }, 60_000);
+
+  afterAll(async () => {
+    if (slugStrandedUserId) {
+      await db
+        .update(contacts)
+        .set({ linkedUserId: null })
+        .where(eq(contacts.linkedUserId, slugStrandedUserId));
+      await db.delete(users).where(eq(users.id, slugStrandedUserId));
+    }
+    if (slugTenantId) {
+      await db.execute(
+        sql`DELETE FROM override_audit_log WHERE tenant_id = ${slugTenantId}`,
+      );
+      await db.delete(tenants).where(eq(tenants.id, slugTenantId));
+    }
+  }, 30_000);
+
+  it(
+    "blocks a stranded employee with a valid slug after 10 attempts (429 before handler logic)",
+    async () => {
+      // Send 10 requests to exhaust the per-IP PIN limiter budget.
+      // Each one carries:
+      //  • A valid auth cookie (stranded user)
+      //  • X-Tenant-Slug pointing at a real store → tenantMiddleware passes
+      //  • A forged X-Forwarded-For whose RIGHTMOST entry is uniqueRealIp
+      //    (getRealIp reads the rightmost entry, so all 10 share one bucket)
+      //
+      // The handler rejects each of these early (no PIN configured or
+      // membership guard), but the limiter COUNTS them because they pass
+      // tenantMiddleware successfully.
+      const responses: number[] = [];
+      for (let i = 0; i < 10; i++) {
+        const res = await slugAgent
+          .post("/api/auth/admin-override")
+          .set("Cookie", `auth_token=${slugStrandedToken}`)
+          .set("X-Tenant-Slug", slugTenantSlug)
+          .set("X-Forwarded-For", `192.0.2.${i}, ${uniqueRealIp}`)
+          .send({ pin: String(1000 + i).padStart(4, "0"), action: "open_drawer" });
+
+        responses.push(res.status);
+        // Each attempt must be rejected by the handler (4xx) — never a success.
+        expect(res.status).toBeGreaterThanOrEqual(400);
+        expect(res.status).toBeLessThan(500);
+        expect(res.status).not.toBe(429); // limiter not yet exhausted
+      }
+
+      // 11th request: the limiter budget is now exhausted → must be 429.
+      const limitedRes = await slugAgent
+        .post("/api/auth/admin-override")
+        .set("Cookie", `auth_token=${slugStrandedToken}`)
+        .set("X-Tenant-Slug", slugTenantSlug)
+        .set("X-Forwarded-For", `192.0.2.99, ${uniqueRealIp}`)
+        .send({ pin: "9999", action: "open_drawer" });
+
+      expect(limitedRes.status).toBe(429);
+      // The rate-limit message must be present.
+      expect(typeof limitedRes.body.message).toBe("string");
+      expect(limitedRes.body.message).toContain("override PIN");
+    },
+    30_000,
+  );
+
+  it(
+    "the 429 response arrives before any PIN lookup or membership guard (limiter fires first)",
+    () => {
+      // Source-code inspection: confirm the overridePinLimiter is registered as
+      // app-level middleware BEFORE the route handler, so the budget check
+      // happens before authMiddleware or the handler's own guards.
+      const routesPath = path.resolve(__dirname, "../routes.ts");
+      const source = fs.readFileSync(routesPath, "utf8");
+
+      // The limiter registration must appear before the route handler.
+      const limiterPos = source.indexOf(
+        "app.use('/api/auth/admin-override', overridePinLimiter)",
+      );
+      const handlerPos = source.indexOf('"/api/auth/admin-override"');
+
+      expect(limiterPos).toBeGreaterThan(0);
+      expect(handlerPos).toBeGreaterThan(0);
+      // Middleware must be registered at a lower offset (earlier in file) than
+      // the handler declaration.
+      expect(limiterPos).toBeLessThan(handlerPos);
+    },
+  );
+});
+
 // ─── Suite: cross-tenant audit log pollution ──────────────────────────────────
 
 describe("POST /api/auth/admin-override — cross-tenant audit log pollution", () => {
