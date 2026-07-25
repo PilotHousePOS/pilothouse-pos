@@ -44,6 +44,26 @@
  * attempts. The 16th request is confirmed to be 429. vi.setSystemTime() then
  * advances the clock by 15 minutes + 1 ms so the MemoryStore window expires.
  * The next request must return non-429, proving the counter was reset.
+ *
+ * Test 3 — shared pool: exhausting budget via /register blocks /login
+ * --------------------------------------------------------------------
+ * authLimiter is applied to both /api/auth/login and /api/auth/register using
+ * the SAME rateLimit() instance (imported from sharedLimiters.ts). Both routes
+ * therefore share one per-IP budget counter.
+ *
+ * An attacker who is blocked on /api/auth/login cannot reset their counter by
+ * switching to /api/auth/register — the shared pool is already exhausted.
+ * Conversely, exhausting the budget via register also immediately blocks login.
+ *
+ * Test design
+ * -----------
+ * A unique IP (203.0.113.3, distinct from previous tests) sends AUTH_LIMITER_MAX
+ * requests to /api/auth/register. All are allowed through by the limiter (the
+ * handler itself returns 400 because no valid tenant context exists in the test
+ * environment, or 409/422 for other reasons — any non-429 is acceptable here).
+ * The next /api/auth/register confirms the pool is exhausted (429). A subsequent
+ * POST to /api/auth/login from the same IP must also return 429, proving that
+ * the two routes share the same counter and switching endpoints cannot reset it.
  */
 
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
@@ -239,6 +259,133 @@ describe("authLimiter — per-IP counter resets after the 15-minute window expir
           `not be 429 (counter should have reset) but got ${afterReset.status} — ` +
           `the authLimiter window may not be resetting, permanently locking users out`,
       ).not.toBe(429);
+    },
+    90_000,
+  );
+});
+
+// ─── Shared-pool cross-endpoint test ──────────────────────────────────────────
+//
+// Uses a distinct real IP (203.0.113.3) so this test starts with a fresh
+// per-IP bucket and is not affected by the tests above.
+//
+// TENANT-MIDDLEWARE INTERACTION
+// -----------------------------
+// tenantMiddleware is mounted at app.use('/api', ...) and runs before
+// authLimiter.  For unauthenticated no-slug requests it only allows a narrow
+// allowlist of paths through — /api/auth/register is intentionally NOT on that
+// list (customer registration must be store-scoped).  Without intervention,
+// tenantMiddleware would short-circuit register requests with 400 before
+// authLimiter has a chance to count them.
+//
+// Setting ALLOW_TENANT_FALLBACK=true makes tenantMiddleware assign tenantId=1
+// and call next() for every request regardless of slug, so authLimiter is
+// reached.  This flag is designed for single-tenant and test environments and
+// is the same technique used in auth-limiter-shared-pool.test.ts.
+
+describe("authLimiter — exhausting the budget via /register also blocks /login (shared pool)", () => {
+  it(
+    "blocks a login attempt after the per-IP budget is fully consumed by register requests",
+    async () => {
+      // A fresh IP distinct from those used in the tests above.
+      // This guarantees an independent counter so the tests cannot interfere.
+      const SHARED_POOL_IP = "203.0.113.3"; // TEST-NET-3, never a real client IP
+      const AUTH_LIMITER_MAX = 15;
+
+      // Enable the tenant fallback so tenantMiddleware calls next() for all
+      // paths, allowing /api/auth/register requests to reach authLimiter.
+      // Restore the original value after the test regardless of outcome.
+      const originalFallback = process.env.ALLOW_TENANT_FALLBACK;
+      process.env.ALLOW_TENANT_FALLBACK = "true";
+
+      try {
+        // ── Phase 1: exhaust the budget via /api/auth/register ─────────────────
+        // Send AUTH_LIMITER_MAX requests to /register from SHARED_POOL_IP.
+        // With ALLOW_TENANT_FALLBACK=true tenantMiddleware calls next(), so
+        // authLimiter runs and counts each request.  The limiter must allow all
+        // AUTH_LIMITER_MAX through (the handler itself returns a non-429 status
+        // — typically 400 for an invalid/duplicate body, or 409/422 for
+        // validation errors — any non-429 is acceptable here).
+        // A 429 before the budget is exhausted would indicate test isolation
+        // failure (another test consumed this IP's counter).
+        for (let i = 1; i <= AUTH_LIMITER_MAX; i++) {
+          const res = await agent
+            .post("/api/auth/register")
+            .set("X-Forwarded-For", SHARED_POOL_IP)
+            .send({
+              email: `shared-pool-register-${i}@test.local`,
+              password: "WrongPassword1!",
+              firstName: "Test",
+              lastName: "User",
+            });
+
+          expect(
+            res.status,
+            `register attempt ${i}/${AUTH_LIMITER_MAX} from ${SHARED_POOL_IP} ` +
+              `returned 429 before the budget was exhausted — another test may have ` +
+              `consumed this IP's budget, or the limiter window is shorter than expected`,
+          ).not.toBe(429);
+        }
+
+        // ── Phase 2: confirm the register budget is now exhausted ──────────────
+        // The AUTH_LIMITER_MAX + 1 register request must be blocked with 429.
+        const blockedRegister = await agent
+          .post("/api/auth/register")
+          .set("X-Forwarded-For", SHARED_POOL_IP)
+          .send({
+            email: "shared-pool-register-blocked@test.local",
+            password: "WrongPassword1!",
+            firstName: "Test",
+            lastName: "User",
+          });
+
+        expect(
+          blockedRegister.status,
+          `request ${AUTH_LIMITER_MAX + 1} to /register from ${SHARED_POOL_IP} should be 429 ` +
+            `(budget exhausted) but got ${blockedRegister.status} — the authLimiter may ` +
+            `not be counting register requests against the shared budget`,
+        ).toBe(429);
+
+        // ── Phase 3: confirm login is also blocked from the same IP ────────────
+        // The shared authLimiter pool is exhausted by the register requests above.
+        // A subsequent POST to /api/auth/login from the same IP must return 429
+        // without any additional register calls — proving the two routes truly
+        // share one counter and switching endpoints cannot reset it.
+        //
+        // /api/auth/login IS on tenantMiddleware's allowlist, so this request
+        // reaches authLimiter regardless of the ALLOW_TENANT_FALLBACK flag.
+        //
+        // If authLimiter were accidentally split into two separate rateLimit()
+        // instances (one for /login, one for /register), login would have its
+        // own fresh budget (0/15 used) and this request would return 401, not 429.
+        const blockedLogin = await agent
+          .post("/api/auth/login")
+          .set("X-Forwarded-For", SHARED_POOL_IP)
+          .send({
+            email: "shared-pool-login-blocked@test.local",
+            password: "WrongPassword1!",
+          });
+
+        expect(
+          blockedLogin.status,
+          `login attempt from ${SHARED_POOL_IP} after register exhausted the shared pool ` +
+            `should be 429 but got ${blockedLogin.status} — authLimiter may have been split ` +
+            `into two independent instances, allowing an attacker to bypass the login block ` +
+            `by first exhausting the register endpoint`,
+        ).toBe(429);
+
+        expect(
+          blockedLogin.body?.message,
+          "429 login response body should carry the authLimiter message",
+        ).toMatch(/too many login attempts/i);
+      } finally {
+        // Always restore the env var so subsequent tests see the original value.
+        if (originalFallback === undefined) {
+          delete process.env.ALLOW_TENANT_FALLBACK;
+        } else {
+          process.env.ALLOW_TENANT_FALLBACK = originalFallback;
+        }
+      }
     },
     90_000,
   );
