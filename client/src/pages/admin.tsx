@@ -6526,6 +6526,16 @@ export default function Admin() {
     refetchOnWindowFocus: true,
   });
 
+  // Hoisted early so renderTabLabel useCallback can reference it without TDZ error
+  const todayDateStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+  const nonPaymentCount = (appointments as any[]).filter((a: any) =>
+    (a.status === 'confirmed' || a.status === 'completed') &&
+    !a.isPaid &&
+    !a.paidOnline &&
+    a.checkedIn === true &&
+    a.appointmentDate <= todayDateStr
+  ).length;
+
   const { data: unapprovedAppointments = [] } = useQuery<any[]>({
     queryKey: ["/api/admin/appointments/unapproved"],
     enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
@@ -8886,7 +8896,6 @@ export default function Admin() {
   const customersHere = appointmentsHere.length;
 
   // Calculate customers paid TODAY - only count today's appointments with isPaid = true
-  const todayDateStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' }); // YYYY-MM-DD in CST
   const appointmentsPaid = (appointments as any[]).filter((a: any) => 
     (a.status === 'confirmed' || a.status === 'completed') &&
     a.isPaid === true &&
@@ -8903,7 +8912,6 @@ export default function Admin() {
     a.checkedIn === true &&
     a.appointmentDate <= todayDateStr
   ).sort((a: any, b: any) => b.appointmentDate.localeCompare(a.appointmentDate));
-  const nonPaymentCount = nonPaymentAppointments.length;
 
   // Appointments pagination handlers
   const handleAppointmentsTouchStart = (e: React.TouchEvent) => {
