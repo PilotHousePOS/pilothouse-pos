@@ -82,51 +82,16 @@ const COLOR_PALETTE = [
   { hex: "#111827", name: "Black" },
 ];
 
-const DB_CATEGORIES = [
-  { value: "dogFood", label: "Dog Food" },
-  { value: "catFood", label: "Cat Food" },
-  { value: "dogTreats", label: "Dog Treats" },
-  { value: "catTreats", label: "Cat Treats" },
-  { value: "accessories", label: "Accessories" },
-  { value: "leashesAndCollars", label: "Leashes & Collars" },
-  { value: "toys", label: "Toys" },
-  { value: "beds", label: "Beds" },
-  { value: "healthcare", label: "Healthcare" },
-  { value: "aquatics", label: "Aquatics" },
-  { value: "reptiles", label: "Reptiles" },
-  { value: "birdSupplies", label: "Bird Supplies" },
-  { value: "smallAnimalSupplies", label: "Small Animals" },
-  { value: "other", label: "Other / Custom" },
-];
+// DB_CATEGORIES is now loaded dynamically from the tenant's supply_categories.
+// The fallback list below is only used if the fetch hasn't resolved yet.
+const FALLBACK_DB_CATEGORIES: { value: string; label: string }[] = [];
 
+// Minimal default — the server builds the real default from supply_categories
 const DEFAULT_CONFIG: PosConfig = {
   categories: [
-    {
-      id: "grooming", label: "Grooming", color: "#1d4ed8", isService: true,
-      services: [
-        { id: "bath-only",    label: "Bath Only",    price: null, color: "#0284c7" },
-        { id: "full-grooming",label: "Full Grooming", price: null, color: "#0e7490" },
-        { id: "nail-clip",    label: "Nail Clip",     price: 15,   color: "#2563eb" },
-        { id: "nail-grind",   label: "Nail Grind",    price: 20,   color: "#2563eb" },
-        { id: "tooth-brush",  label: "Tooth Brush",   price: 15,   color: "#2563eb" },
-      ],
-    },
-    { id: "dogFood",             label: "Dog Food",             color: "#c2410c", dbCategory: "dogFood" },
-    { id: "catFood",             label: "Cat Food",             color: "#7e22ce", dbCategory: "catFood" },
-    { id: "dogTreats",           label: "Dog Treats",           color: "#b45309", dbCategory: "dogTreats" },
-    { id: "catTreats",           label: "Cat Treats",           color: "#be185d", dbCategory: "catTreats" },
-    { id: "accessories",         label: "Accessories",          color: "#166534", dbCategory: "accessories" },
-    { id: "leashesAndCollars",   label: "Leashes & Collars",    color: "#991b1b", dbCategory: "leashesAndCollars" },
-    { id: "toys",                label: "Toys",                 color: "#ca8a04", dbCategory: "toys" },
-    { id: "beds",                label: "Beds",                 color: "#0f766e", dbCategory: "beds" },
-    { id: "healthcare",          label: "Healthcare",           color: "#065f46", dbCategory: "healthcare" },
-    { id: "aquatics",            label: "Aquatic Fish/Plant",   color: "#0369a1", dbCategory: "aquatics" },
-    { id: "reptiles",            label: "Live Reptiles/Feeders",color: "#4d7c0f", dbCategory: "reptiles" },
-    { id: "birdSupplies",        label: "Bird Supplies",        color: "#6d28d9", dbCategory: "birdSupplies" },
-    { id: "smallAnimalSupplies", label: "Live Small Animals",   color: "#ea580c", dbCategory: "smallAnimalSupplies" },
-    { id: "tips",       label: "Tips",       color: "#4b5563", isSpecial: true },
-    { id: "misc",       label: "Misc.",      color: "#374151", isSpecial: true },
-    { id: "giftCards",  label: "Gift Cards", color: "#be123c", isSpecial: true },
+    { id: "tips",      label: "Tips",       color: "#4b5563", isSpecial: true },
+    { id: "misc",      label: "Misc.",      color: "#374151", isSpecial: true },
+    { id: "giftCards", label: "Gift Cards", color: "#be123c", isSpecial: true },
   ],
   tipAmounts: [1, 2, 3, 4, 5, 10, 15, 20],
   giftCardAmounts: [10, 15, 20, 25, 50, 75, 100],
@@ -262,6 +227,15 @@ export default function PosPage() {
     },
     onError: () => toast({ title: "Error", description: "Failed to save layout", variant: "destructive" }),
   });
+
+  // ── Tenant supply categories (for the "Inventory Category" picker in settings) ──
+  const { data: tenantCategories = [] } = useQuery<{ key: string; label: string }[]>({
+    queryKey: ["/api/admin/categories"],
+    staleTime: 5 * 60 * 1000,
+  });
+  const dbCategories = tenantCategories.length > 0
+    ? tenantCategories.map(c => ({ value: c.key, label: c.label }))
+    : FALLBACK_DB_CATEGORIES;
 
   // ── Totals ──
   const subtotal = orderItems.reduce((s, i) => s + i.price * i.quantity, 0);
@@ -773,7 +747,8 @@ export default function PosPage() {
                           onChange={e => setEditDraft({ ...editDraft, dbCategory: e.target.value })}
                           className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
                         >
-                          {DB_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                          {dbCategories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                          <option value="other">Other / Custom</option>
                         </select>
                         <div className="text-xs text-gray-500 mt-1">Items are loaded from the matching inventory category.</div>
                       </div>

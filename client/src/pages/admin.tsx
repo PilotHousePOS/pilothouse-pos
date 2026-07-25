@@ -9173,13 +9173,6 @@ export default function Admin() {
         )}
         <Card>
           <CardContent className="p-3 text-center flex flex-col items-center justify-center">
-            <PawPrint className="w-6 h-6 mb-1 text-brand-blue" />
-            <div className="text-xl font-bold leading-tight">{petsTotal}</div>
-            <div className="text-xs text-gray-500 leading-tight">Total Pets</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-3 text-center flex flex-col items-center justify-center">
             <Package className="w-6 h-6 mb-1 text-brand-orange" />
             <div className="text-xl font-bold leading-tight">{suppliesTotal}</div>
             <div className="text-xs text-gray-500 leading-tight">Total Supplies</div>

@@ -3491,11 +3491,38 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   // POS Layout settings (persisted as JSON in grooming_settings table)
   app.get("/api/pos/layout", requireAdminMiddleware, async (req: any, res) => {
     try {
-      const row = await storage.getGroomingSetting("pos_layout", (req as any).tenantId);
+      const tenantId = (req as any).tenantId;
+      const row = await storage.getGroomingSetting("pos_layout", tenantId);
       if (row) {
         res.json(JSON.parse(row.value));
       } else {
-        res.json(null); // client uses default
+        // Build a sensible default from the tenant's own supply_categories
+        // so new tenants never see another tenant's pet-store categories.
+        const catRows = await db.execute(
+          sql`SELECT key, label FROM supply_categories WHERE tenant_id = ${tenantId} ORDER BY label ASC`
+        );
+        const NEUTRAL_COLORS = [
+          "#1d4ed8","#c2410c","#7e22ce","#b45309","#be185d",
+          "#166534","#991b1b","#ca8a04","#0f766e","#065f46",
+          "#0369a1","#4d7c0f","#6d28d9","#ea580c",
+        ];
+        const productCats = (catRows.rows as any[]).map((r: any, i: number) => ({
+          id: r.key,
+          label: r.label,
+          color: NEUTRAL_COLORS[i % NEUTRAL_COLORS.length],
+          dbCategory: r.key,
+        }));
+        const defaultConfig = {
+          categories: [
+            ...productCats,
+            { id: "tips",      label: "Tips",       color: "#4b5563", isSpecial: true },
+            { id: "misc",      label: "Misc.",       color: "#374151", isSpecial: true },
+            { id: "giftCards", label: "Gift Cards",  color: "#be123c", isSpecial: true },
+          ],
+          tipAmounts: [1, 2, 3, 4, 5, 10, 15, 20],
+          giftCardAmounts: [10, 15, 20, 25, 50, 75, 100],
+        };
+        res.json(defaultConfig);
       }
     } catch (e: any) {
       res.status(500).json({ message: e.message });
