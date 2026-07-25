@@ -176,15 +176,28 @@ export default function PosPage() {
   const typedUser = user as any;
   const isEmployee = !!typedUser?.isEmployee;
 
+  // Per-action override tracking: each key is a PosOverrideConfig flag unlocked for this session slot
+  const [unlockedActions, setUnlockedActions] = useState<Set<keyof PosOverrideConfig>>(new Set());
+
   const [showOverridePinModal, setShowOverridePinModal] = useState(false);
   const [overrideTarget, setOverrideTarget]             = useState<'settings' | 'pos'>("pos");
+  // Which specific action this override is for (null = settings access)
+  const [overridePurpose, setOverridePurpose]           = useState<keyof PosOverrideConfig | null>(null);
   const [overridePinEntry, setOverridePinEntry]         = useState("");
   const [overridePinError, setOverridePinError]         = useState("");
   const [overridePinLoading, setOverridePinLoading]     = useState(false);
-  const [adminOverrideActive, setAdminOverrideActive]   = useState(false);
 
-  const openOverride = (target: 'settings' | 'pos') => {
+  // Human-readable labels for each override purpose (shown in the PIN modal and audit log)
+  const PURPOSE_LABELS: Record<keyof PosOverrideConfig, string> = {
+    requirePinForRefund:   "Refund override",
+    requirePinForVoid:     "Void override",
+    requirePinForDiscount: "Discount override",
+    requirePinForDrawer:   "Open Drawer override",
+  };
+
+  const openOverride = (target: 'settings' | 'pos', purpose?: keyof PosOverrideConfig) => {
     setOverrideTarget(target);
+    setOverridePurpose(purpose ?? null);
     setOverridePinEntry("");
     setOverridePinError("");
     setShowOverridePinModal(true);
@@ -198,17 +211,24 @@ export default function PosPage() {
     if (next.length === 4) {
       setOverridePinLoading(true);
       try {
+        // Build an action string that names the specific purpose so the audit log is accurate
+        const auditAction = overrideTarget === 'settings'
+          ? 'pos_settings_access'
+          : overridePurpose
+            ? `pos_action_override_${overridePurpose}`
+            : 'pos_action_override';
         const res = await apiRequest("POST", "/api/auth/admin-override", {
           pin: next,
-          action: overrideTarget === 'settings' ? 'pos_settings_access' : 'pos_action_override',
+          action: auditAction,
         });
         const data = await res.json();
         if (res.ok && data.success) {
           setShowOverridePinModal(false);
           if (overrideTarget === 'settings') {
             setShowSettings(true);
-          } else {
-            setAdminOverrideActive(true);
+          } else if (overridePurpose) {
+            // Unlock only the specific action that was requested
+            setUnlockedActions(prev => { const next = new Set(Array.from(prev)); next.add(overridePurpose!); return next; });
           }
         } else {
           setOverridePinError(data.message || "Incorrect PIN");
@@ -231,9 +251,15 @@ export default function PosPage() {
     staleTime: 5 * 60_000,
   });
 
-  // Helper: does this employee need an active override for a given action?
+  // Helper: does this employee still need an override for a given action?
+  // Returns false if the action has already been unlocked this session.
   const needsOverride = (flag: keyof PosOverrideConfig) =>
-    isEmployee && !!posOverrideConfig[flag] && !adminOverrideActive;
+    isEmployee && !!posOverrideConfig[flag] && !unlockedActions.has(flag);
+
+  // Consume (clear) a per-action unlock after the action is performed
+  const consumeOverride = (flag: keyof PosOverrideConfig) => {
+    setUnlockedActions(prev => { const next = new Set(prev); next.delete(flag); return next; });
+  };
 
   // ── Settings state ──
   const [showSettings, setShowSettings]         = useState(false);
@@ -658,42 +684,71 @@ export default function PosPage() {
           <button disabled className="bg-gray-700 text-gray-500 rounded py-3 text-xs text-center cursor-not-allowed">Print Sale</button>
           <button onClick={() => setShowSearch(true)} className="bg-indigo-700 hover:bg-indigo-600 text-white rounded py-3 text-xs font-bold text-center">Find Items</button>
 
-          {/* Employee-only: admin override toggle */}
-          {isEmployee && (
-            <button
-              onClick={() => adminOverrideActive ? setAdminOverrideActive(false) : openOverride('pos')}
-              className={`${adminOverrideActive ? "bg-amber-600 hover:bg-amber-500 ring-1 ring-amber-400" : "bg-gray-700 hover:bg-gray-600"} text-white rounded py-3 text-xs font-bold text-center flex items-center justify-center gap-1 transition-all`}
-              title={adminOverrideActive ? "Override active — tap to clear" : "Request manager override"}
-            >
-              {adminOverrideActive ? <Unlock className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
-              {adminOverrideActive ? "Unlocked" : "Override"}
-            </button>
-          )}
-
           {/* Refund — gated per posOverrideConfig.requirePinForRefund for employees */}
           <button
             onClick={() => {
-              if (needsOverride('requirePinForRefund')) { openOverride('pos'); return; }
-              setAdminOverrideActive(false); // clear override after use
+              if (needsOverride('requirePinForRefund')) {
+                openOverride('pos', 'requirePinForRefund');
+                return;
+              }
+              consumeOverride('requirePinForRefund');
+              // TODO: open refund flow
             }}
             disabled={!orderItems.length}
-            className={`${needsOverride('requirePinForRefund') ? "bg-gray-700 text-gray-400" : "bg-orange-700 hover:bg-orange-600 disabled:bg-gray-700 disabled:text-gray-500 text-white"} rounded py-3 text-xs font-bold text-center flex items-center justify-center gap-1`}
-            title={needsOverride('requirePinForRefund') ? "Manager override required" : "Issue refund"}
+            className={`${needsOverride('requirePinForRefund') ? "bg-gray-700 text-gray-400" : unlockedActions.has('requirePinForRefund') ? "bg-amber-600 hover:bg-amber-500 text-white ring-1 ring-amber-400" : "bg-orange-700 hover:bg-orange-600 disabled:bg-gray-700 disabled:text-gray-500 text-white"} rounded py-3 text-xs font-bold text-center flex items-center justify-center gap-1 transition-all`}
+            title={needsOverride('requirePinForRefund') ? "Manager override required" : unlockedActions.has('requirePinForRefund') ? "Override active — tap to proceed" : "Issue refund"}
           >
-            {needsOverride('requirePinForRefund') && <Lock className="h-3 w-3" />} Refund
+            {needsOverride('requirePinForRefund') ? <Lock className="h-3 w-3" /> : unlockedActions.has('requirePinForRefund') ? <Unlock className="h-3 w-3" /> : null} Refund
           </button>
 
           {/* Void — gated per posOverrideConfig.requirePinForVoid for employees */}
           <button
             onClick={() => {
-              if (needsOverride('requirePinForVoid')) { openOverride('pos'); return; }
-              setAdminOverrideActive(false);
+              if (needsOverride('requirePinForVoid')) {
+                openOverride('pos', 'requirePinForVoid');
+                return;
+              }
+              consumeOverride('requirePinForVoid');
+              // TODO: open void flow
             }}
             disabled={!orderItems.length}
-            className={`${needsOverride('requirePinForVoid') ? "bg-gray-700 text-gray-400" : "bg-red-800 hover:bg-red-700 disabled:bg-gray-700 disabled:text-gray-500 text-white"} rounded py-3 text-xs font-bold text-center flex items-center justify-center gap-1`}
-            title={needsOverride('requirePinForVoid') ? "Manager override required" : "Void transaction"}
+            className={`${needsOverride('requirePinForVoid') ? "bg-gray-700 text-gray-400" : unlockedActions.has('requirePinForVoid') ? "bg-amber-600 hover:bg-amber-500 text-white ring-1 ring-amber-400" : "bg-red-800 hover:bg-red-700 disabled:bg-gray-700 disabled:text-gray-500 text-white"} rounded py-3 text-xs font-bold text-center flex items-center justify-center gap-1 transition-all`}
+            title={needsOverride('requirePinForVoid') ? "Manager override required" : unlockedActions.has('requirePinForVoid') ? "Override active — tap to proceed" : "Void transaction"}
           >
-            {needsOverride('requirePinForVoid') && <Lock className="h-3 w-3" />} Void
+            {needsOverride('requirePinForVoid') ? <Lock className="h-3 w-3" /> : unlockedActions.has('requirePinForVoid') ? <Unlock className="h-3 w-3" /> : null} Void
+          </button>
+
+          {/* Discount — gated per posOverrideConfig.requirePinForDiscount for employees */}
+          <button
+            onClick={() => {
+              if (needsOverride('requirePinForDiscount')) {
+                openOverride('pos', 'requirePinForDiscount');
+                return;
+              }
+              consumeOverride('requirePinForDiscount');
+              // TODO: open discount flow
+            }}
+            disabled={!orderItems.length}
+            className={`${needsOverride('requirePinForDiscount') ? "bg-gray-700 text-gray-400" : unlockedActions.has('requirePinForDiscount') ? "bg-amber-600 hover:bg-amber-500 text-white ring-1 ring-amber-400" : "bg-purple-700 hover:bg-purple-600 disabled:bg-gray-700 disabled:text-gray-500 text-white"} rounded py-3 text-xs font-bold text-center flex items-center justify-center gap-1 transition-all`}
+            title={needsOverride('requirePinForDiscount') ? "Manager override required" : unlockedActions.has('requirePinForDiscount') ? "Override active — tap to proceed" : "Apply discount"}
+          >
+            {needsOverride('requirePinForDiscount') ? <Lock className="h-3 w-3" /> : unlockedActions.has('requirePinForDiscount') ? <Unlock className="h-3 w-3" /> : null} Discount
+          </button>
+
+          {/* Open Drawer — gated per posOverrideConfig.requirePinForDrawer for employees */}
+          <button
+            onClick={() => {
+              if (needsOverride('requirePinForDrawer')) {
+                openOverride('pos', 'requirePinForDrawer');
+                return;
+              }
+              consumeOverride('requirePinForDrawer');
+              // TODO: open cash drawer
+            }}
+            className={`${needsOverride('requirePinForDrawer') ? "bg-gray-700 text-gray-400" : unlockedActions.has('requirePinForDrawer') ? "bg-amber-600 hover:bg-amber-500 text-white ring-1 ring-amber-400" : "bg-teal-700 hover:bg-teal-600 text-white"} rounded py-3 text-xs font-bold text-center flex items-center justify-center gap-1 transition-all`}
+            title={needsOverride('requirePinForDrawer') ? "Manager override required" : unlockedActions.has('requirePinForDrawer') ? "Override active — tap to open" : "Open cash drawer"}
+          >
+            {needsOverride('requirePinForDrawer') ? <Lock className="h-3 w-3" /> : unlockedActions.has('requirePinForDrawer') ? <Unlock className="h-3 w-3" /> : null} Drawer
           </button>
 
           <div className="flex-1" />
@@ -727,12 +782,22 @@ export default function PosPage() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <Lock className="h-5 w-5 text-amber-400" />
-                <span className="font-bold text-lg">Manager Override</span>
+                <span className="font-bold text-lg">
+                  {overrideTarget === 'settings'
+                    ? "Manager Override"
+                    : overridePurpose
+                      ? PURPOSE_LABELS[overridePurpose]
+                      : "Manager Override"}
+                </span>
               </div>
               <button onClick={() => setShowOverridePinModal(false)} className="text-gray-400 hover:text-white p-1"><X className="h-5 w-5" /></button>
             </div>
             <p className="text-gray-400 text-sm mb-4 text-center">
-              {overrideTarget === 'settings' ? "Enter the store PIN to access POS Settings." : "Enter the store PIN to unlock restricted actions."}
+              {overrideTarget === 'settings'
+                ? "Enter the store PIN to access POS Settings."
+                : overridePurpose
+                  ? `Enter the store PIN to allow: ${PURPOSE_LABELS[overridePurpose]}.`
+                  : "Enter the store PIN to unlock restricted actions."}
             </p>
             {/* PIN dots */}
             <div className="flex justify-center gap-4 mb-4">
