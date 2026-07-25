@@ -15801,6 +15801,16 @@ CRITICAL RULES:
       if (!pin || !action) return res.status(400).json({ message: "PIN and action are required" });
       const tenantId: number | undefined = req.tenantId;
       if (!tenantId) return res.status(400).json({ message: "No tenant context" });
+      // Defense-in-depth: confirm the authenticated user actually belongs to this
+      // tenant.  Without this check a stranded admin who knows a foreign store's
+      // slug and PIN could write override_audit_log entries for that store.
+      // Super-admins are exempt — they may act across tenants.
+      if (!req.isSuperAdmin) {
+        const actingUser = await storage.getUser(req.user?.id);
+        if (!actingUser || actingUser.tenantId !== tenantId) {
+          return res.status(403).json({ message: "You do not have access to this store's override PIN." });
+        }
+      }
       const tenant = await storage.getTenant(tenantId);
       if (!tenant?.adminOverridePin) {
         return res.status(400).json({ message: "No override PIN configured. Ask the owner to set one in Staff Accounts." });

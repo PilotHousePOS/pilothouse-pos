@@ -13,6 +13,10 @@
  *       `if (!tenantId) return res.status(400).json({ message: "No tenant context" });`
  *     This fires when tenantMiddleware somehow passes without setting req.tenantId.
  *
+ *  3. A membership guard prevents a stranded admin who knows a foreign store's
+ *     slug and PIN from writing override_audit_log entries for that store:
+ *       `if (!actingUser || actingUser.tenantId !== tenantId) → 403`
+ *
  * Middleware execution order for POST /api/auth/admin-override:
  *   tenantMiddleware → overridePinLimiter → authMiddleware → route handler
  *
@@ -25,7 +29,11 @@
  *    authenticated user with no tenant and returns 403 "Tenant not configured" —
  *    again the PIN check is never reached.
  *
- *  - In both cases no PIN is looked up and no success response is returned.
+ *  - Stranded admin with a foreign slug + correct PIN: tenantMiddleware resolves
+ *    the foreign tenant via the slug, but the handler's membership guard returns
+ *    403 before the PIN is verified — no audit log entry is written.
+ *
+ *  - In all cases no PIN is looked up and no success response is returned.
  *
  * The handler's own `if (!tenantId)` guard (line 15803) provides defense-in-depth
  * and is confirmed present via a source-code inspection assertion.
@@ -36,9 +44,10 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import supertest from "supertest";
 import { db } from "../db";
-import { users, contacts } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { users, contacts, tenants } from "@shared/schema";
+import { eq, sql } from "drizzle-orm";
 import { generateToken } from "../auth";
+import { hashPassword } from "../passwordUtils";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -181,6 +190,137 @@ describe("POST /api/auth/admin-override — no tenant context", () => {
       expect(handlerWindow).toContain("No tenant context");
       // It must return a 400 status for the missing-tenant case.
       expect(handlerWindow).toContain("status(400)");
+    },
+  );
+});
+
+// ─── Suite: cross-tenant audit log pollution ──────────────────────────────────
+
+describe("POST /api/auth/admin-override — cross-tenant audit log pollution", () => {
+  const PIN = "7391"; // plaintext PIN used for this test's foreign tenant
+
+  let foreignTenantId: number;
+  let foreignTenantSlug: string;
+  let strandedAdminUserId: string;
+  let strandedAdminToken: string;
+  let localAgent: ReturnType<typeof supertest>;
+
+  beforeAll(async () => {
+    const sfx = randomSuffix();
+    foreignTenantSlug = `foreign-store-${sfx}`;
+
+    // Hash the PIN the same way the real PUT /api/admin/override-pin route does.
+    const hashedPin = await hashPassword(PIN);
+
+    // Create a foreign tenant with a configured override PIN.
+    const [foreignTenant] = await db
+      .insert(tenants)
+      .values({
+        name: `Foreign Store ${sfx}`,
+        slug: foreignTenantSlug,
+        adminOverridePin: hashedPin,
+      })
+      .returning();
+
+    foreignTenantId = foreignTenant.id;
+
+    // Create a stranded admin: valid JWT, but tenantId is null in DB.
+    // They used to belong to some other store (now gone) and know the foreign
+    // store's slug and PIN — perhaps from prior employment.
+    const [strandedAdmin] = await db
+      .insert(users)
+      .values({
+        id: `stranded-admin-ov-${sfx}`,
+        email: `stranded-admin-ov-${sfx}@test.local`,
+        firstName: "Stranded",
+        lastName: "Admin",
+        password: "hashed-for-test",
+        tenantId: null, // ← stranded: no current tenant
+        isAdmin: true,
+        isSuperAdmin: false,
+        tokenVersion: 0,
+      })
+      .returning();
+
+    strandedAdminUserId = strandedAdmin.id;
+    strandedAdminToken = generateToken(strandedAdmin as any);
+
+    const app = await buildTestApp();
+    localAgent = supertest(app);
+  }, 60_000);
+
+  afterAll(async () => {
+    if (strandedAdminUserId) {
+      await db
+        .update(contacts)
+        .set({ linkedUserId: null })
+        .where(eq(contacts.linkedUserId, strandedAdminUserId));
+      await db.delete(users).where(eq(users.id, strandedAdminUserId));
+    }
+    if (foreignTenantId) {
+      // Clean up any stray audit log rows first (should be none, but defensive).
+      await db.execute(
+        sql`DELETE FROM override_audit_log WHERE tenant_id = ${foreignTenantId}`,
+      );
+      await db.delete(tenants).where(eq(tenants.id, foreignTenantId));
+    }
+  }, 30_000);
+
+  it(
+    "rejects a stranded admin supplying a foreign store's slug + correct PIN with 403",
+    async () => {
+      // The stranded admin passes X-Tenant-Slug for the foreign store.
+      // tenantMiddleware resolves the foreign tenant from the slug and sets
+      // req.tenantId to foreignTenantId.  The handler's membership guard then
+      // detects that actingUser.tenantId (null) !== foreignTenantId and rejects
+      // the request before the PIN is ever verified.
+      const res = await localAgent
+        .post("/api/auth/admin-override")
+        .set("Cookie", `auth_token=${strandedAdminToken}`)
+        .set("X-Tenant-Slug", foreignTenantSlug)
+        .send({ pin: PIN, action: "void_transaction" });
+
+      expect(res.status).toBe(403);
+      expect(typeof res.body.message).toBe("string");
+      expect(res.body.message.length).toBeGreaterThan(0);
+    },
+    15_000,
+  );
+
+  it(
+    "leaves no override_audit_log entries for the foreign tenant after the rejected attempt",
+    async () => {
+      // Confirm the audit log is clean — the rejected request must not have
+      // produced any rows for the foreign tenant.
+      const rows = await db.execute(
+        sql`SELECT id FROM override_audit_log WHERE tenant_id = ${foreignTenantId} AND actor_user_id = ${strandedAdminUserId}`,
+      );
+      expect(rows.rows.length).toBe(0);
+    },
+    15_000,
+  );
+
+  it(
+    "the handler has a membership guard that returns 403 when the user does not belong to the resolved tenant",
+    () => {
+      // Source-code inspection: confirm the membership guard exists in the
+      // admin-override route handler so it is not accidentally removed in a
+      // future refactor.
+      const routesPath = path.resolve(__dirname, "../routes.ts");
+      const source = fs.readFileSync(routesPath, "utf8");
+
+      const handlerStart = source.indexOf('"/api/auth/admin-override"');
+      expect(handlerStart).toBeGreaterThan(0);
+
+      // Extract a generous window after the handler declaration (3000 chars).
+      const handlerWindow = source.slice(handlerStart, handlerStart + 3000);
+
+      // The membership guard must be present.
+      expect(handlerWindow).toContain("actingUser.tenantId !== tenantId");
+      // It must return 403 for the cross-tenant case.
+      expect(handlerWindow).toContain("You do not have access to this store's override PIN.");
+      // Super-admins must be exempt.
+      expect(handlerWindow).toContain("isSuperAdmin");
     },
   );
 });
