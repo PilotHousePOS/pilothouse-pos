@@ -636,6 +636,167 @@ describe("POST /api/auth/admin-override — super-admin bypasses membership guar
   );
 });
 
+// ─── Suite: authLimiter and overridePinLimiter use independent per-IP budgets ──
+
+describe("authLimiter and overridePinLimiter — independent per-IP budgets", () => {
+  /**
+   * authLimiter (15 req / 15 min) and overridePinLimiter (10 req / 15 min) are
+   * two separate rateLimit() instances exported from sharedLimiters.ts.  Because
+   * express-rate-limit ties each counter to the MemoryStore created by its
+   * rateLimit() call, the two limiters maintain fully independent per-IP budgets.
+   *
+   * This suite confirms that independence: exhausting the authLimiter budget on
+   * /api/auth/login does NOT consume any of the overridePinLimiter budget, so a
+   * subsequent admin-override request from the same real IP is not 429.
+   */
+
+  let isolatedTenantId: number;
+  let isolatedTenantSlug: string;
+  let isolatedAgent: ReturnType<typeof supertest>;
+
+  // A dedicated rightmost XFF entry keeps this suite's limiter buckets fully
+  // isolated from every other suite.  getRealIp reads the rightmost entry, so
+  // all requests here share the same bucket — and no other suite shares it.
+  let isolatedRealIp: string;
+
+  beforeAll(async () => {
+    const sfx = randomSuffix();
+    isolatedTenantSlug = `auth-pin-isolation-${sfx}`;
+    isolatedRealIp = `10.77.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+
+    // Create a real tenant so tenantMiddleware resolves the slug and requests
+    // actually reach the overridePinLimiter (no PIN configured — the handler
+    // will reject, but that happens AFTER the limiter counts the request).
+    const [isolatedTenant] = await db
+      .insert(tenants)
+      .values({
+        name: `Auth Pin Isolation Store ${sfx}`,
+        slug: isolatedTenantSlug,
+      })
+      .returning();
+
+    isolatedTenantId = isolatedTenant.id;
+
+    const app = await buildTestApp();
+    isolatedAgent = supertest(app);
+  }, 60_000);
+
+  afterAll(async () => {
+    if (isolatedTenantId) {
+      await db.execute(
+        sql`DELETE FROM override_audit_log WHERE tenant_id = ${isolatedTenantId}`,
+      );
+      await db.delete(tenants).where(eq(tenants.id, isolatedTenantId));
+    }
+  }, 30_000);
+
+  it(
+    "exhausting the authLimiter (15 login attempts) does not consume the overridePinLimiter budget",
+    async () => {
+      // ── Phase 1: exhaust the authLimiter on /api/auth/login ───────────────
+      // The authLimiter allows 15 attempts per 15-minute window.  Send 15
+      // requests from the same real IP (rightmost XFF entry) to fill the budget.
+      // Each request will be rejected by the login handler (invalid credentials)
+      // but still counted by the authLimiter.
+      for (let i = 0; i < 15; i++) {
+        await isolatedAgent
+          .post("/api/auth/login")
+          .set("X-Forwarded-For", `203.0.113.${i}, ${isolatedRealIp}`)
+          .send({ email: `nobody-${i}@example.invalid`, password: "wrong" });
+      }
+
+      // ── Phase 2: confirm the authLimiter budget is now exhausted ──────────
+      // The 16th login request from the same real IP must be rate-limited.
+      const loginBlockedRes = await isolatedAgent
+        .post("/api/auth/login")
+        .set("X-Forwarded-For", `203.0.113.99, ${isolatedRealIp}`)
+        .send({ email: "nobody@example.invalid", password: "wrong" });
+
+      expect(loginBlockedRes.status).toBe(429);
+
+      // ── Phase 3: send an admin-override request from the same real IP ─────
+      // The overridePinLimiter is a completely separate rateLimit() instance
+      // with its own MemoryStore.  The authLimiter exhaustion above has NOT
+      // touched the overridePinLimiter counter at all.  The override request
+      // must therefore NOT be 429 — it may be rejected for other reasons
+      // (no PIN configured, membership guard) but never because of a budget
+      // shared with the login limiter.
+      const overrideRes = await isolatedAgent
+        .post("/api/auth/admin-override")
+        .set("X-Forwarded-For", `203.0.113.99, ${isolatedRealIp}`)
+        .set("X-Tenant-Slug", isolatedTenantSlug)
+        .send({ pin: "1234", action: "open_drawer" });
+
+      // Must not be 429 — the overridePinLimiter counter is still at zero.
+      expect(overrideRes.status).not.toBe(429);
+      // Must be a 4xx (handler rejects for other reasons) but NOT a rate-limit.
+      expect(overrideRes.status).toBeGreaterThanOrEqual(400);
+      expect(overrideRes.status).toBeLessThan(500);
+    },
+    30_000,
+  );
+
+  it(
+    "authLimiter and overridePinLimiter are distinct rateLimit() instances in source",
+    () => {
+      // Source-code inspection: confirm the two limiters are separate named
+      // exports — not one instance aliased under two names, which would make
+      // them share a MemoryStore and thus a per-IP counter.
+      const limitersPath = path.resolve(__dirname, "../sharedLimiters.ts");
+      const source = fs.readFileSync(limitersPath, "utf8");
+
+      // Both exports must call rateLimit() independently.
+      const authLimiterPos = source.indexOf("export const authLimiter = rateLimit(");
+      const overrideLimiterPos = source.indexOf("export const overridePinLimiter = rateLimit(");
+
+      expect(authLimiterPos).toBeGreaterThan(0);
+      expect(overrideLimiterPos).toBeGreaterThan(0);
+
+      // They must be at different offsets — not the same declaration.
+      expect(authLimiterPos).not.toBe(overrideLimiterPos);
+
+      // Neither must reference the other (no aliasing like
+      // `export const overridePinLimiter = authLimiter`).
+      const authBlock = source.slice(authLimiterPos, authLimiterPos + 300);
+      const overrideBlock = source.slice(overrideLimiterPos, overrideLimiterPos + 300);
+
+      expect(authBlock).not.toContain("overridePinLimiter");
+      expect(overrideBlock).not.toContain("authLimiter");
+    },
+  );
+
+  it(
+    "authLimiter is registered on login routes; overridePinLimiter is registered on the override route — separately",
+    () => {
+      // Source-code inspection: confirm the two limiters are wired to different
+      // routes in routes.ts.  If someone accidentally passed authLimiter to the
+      // admin-override route (or vice-versa) the budgets would be shared.
+      const routesPath = path.resolve(__dirname, "../routes.ts");
+      const source = fs.readFileSync(routesPath, "utf8");
+
+      // authLimiter must be on a login route.
+      expect(source).toContain(
+        "app.use('/api/auth/login', authLimiter)",
+      );
+
+      // overridePinLimiter must be on the override route.
+      expect(source).toContain(
+        "app.use('/api/auth/admin-override', overridePinLimiter)",
+      );
+
+      // overridePinLimiter must NOT appear on any login-family route.
+      expect(source).not.toContain(
+        "app.use('/api/auth/login', overridePinLimiter)",
+      );
+
+      // authLimiter must NOT appear on the override route.
+      expect(source).not.toContain(
+        "app.use('/api/auth/admin-override', authLimiter)",
+      );
+    },
+  );
+});
+
 // ─── Suite: overridePinLimiter window resets after 15 minutes ─────────────────
 
 describe("POST /api/auth/admin-override — PIN limiter window resets after 15 minutes", () => {
