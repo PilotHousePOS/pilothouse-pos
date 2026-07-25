@@ -5855,12 +5855,12 @@ West Monroe LA 71291
             isOpen: bathAvailable > 0 || groomAvailable > 0
           };
         } else {
-          // No limits set for this day = closed
+          // No limits set for this day = unlimited (treat as open, no cap applied)
           availableSlots[dateStr] = {
-            bathAvailable: 0,
-            groomAvailable: 0,
-            totalAvailable: 0,
-            isOpen: false
+            bathAvailable: -1,
+            groomAvailable: -1,
+            totalAvailable: -1,
+            isOpen: true
           };
         }
         

@@ -16,8 +16,8 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { safeGoBack } from "@/lib/navigation";
 
 const DEFAULT_SERVICES = [
-  { id: 'grooming-full', name: 'Full Grooming', description: 'Complete grooming service', price: '35' },
-  { id: 'grooming-bath', name: 'Bath Only', description: 'Professional bath and dry', price: '20' },
+  { id: 'grooming-full', name: 'Full Service', description: '', price: '35' },
+  { id: 'grooming-bath', name: 'Basic Service', description: '', price: '20' },
 ];
 
 export default function Booking() {
@@ -29,18 +29,7 @@ export default function Booking() {
     queryKey: ["/api/service-prices"],
   });
 
-  // Build services list with dynamic prices (supports ranges like "40-80")
-  const SERVICES = servicePrices ? [
-    { id: 'grooming-full', name: 'Full Grooming', description: 'Complete grooming service', price: servicePrices.fullGrooming },
-    { id: 'grooming-bath', name: 'Bath Only', description: 'Professional bath and dry', price: servicePrices.bathOnly },
-  ] : DEFAULT_SERVICES;
 
-  const ADD_ONS = [
-    { id: 'nail-grind', label: 'Nail Grind', price: servicePrices?.nailGrind || '15', priceVaries: false },
-    { id: 'teeth-brushing', label: 'Brush Teeth', price: servicePrices?.teethBrushing || '10', priceVaries: false },
-    { id: 'furminator', label: 'Furminator — Size dependent. Price determined upon arrival.', price: servicePrices?.furminator || '20', priceVaries: true },
-    { id: 'scent-package', label: 'Scent Package', price: servicePrices?.scentPackage || '5', priceVaries: false },
-  ];
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedGroomer, setSelectedGroomer] = useState('');
@@ -53,7 +42,7 @@ export default function Booking() {
     addOns: string[];
   }>>([{
     name: '',
-    type: 'dog',
+    type: '',
     serviceType: 'grooming-full',
     notes: '',
     groomerId: '',
@@ -102,6 +91,25 @@ export default function Booking() {
     retry: false,
     enabled: !!currentUser && !(currentUser as any)?.isAdmin && !(currentUser as any)?.isGroomer,
   });
+
+  // Build services list using admin-configurable names + dynamic prices (must be after groomingSettings)
+  const gs = (groomingSettings as any[]);
+  const service1Name = gs.find((s: any) => s.setting === 'service1_name')?.value || 'Full Service';
+  const service2Name = gs.find((s: any) => s.setting === 'service2_name')?.value || 'Basic Service';
+  const SERVICES = [
+    { id: 'grooming-full', name: service1Name, description: '', price: (servicePrices as any)?.fullGrooming || '35' },
+    { id: 'grooming-bath', name: service2Name, description: '', price: (servicePrices as any)?.bathOnly || '20' },
+  ];
+  const addon1Name = gs.find((s: any) => s.setting === 'addon1_name')?.value || '';
+  const addon2Name = gs.find((s: any) => s.setting === 'addon2_name')?.value || '';
+  const addon3Name = gs.find((s: any) => s.setting === 'addon3_name')?.value || '';
+  const addon4Name = gs.find((s: any) => s.setting === 'addon4_name')?.value || '';
+  const ADD_ONS = [
+    addon1Name && { id: 'nail-grind', label: addon1Name, price: (servicePrices as any)?.nailGrind || '15', priceVaries: false },
+    addon2Name && { id: 'teeth-brushing', label: addon2Name, price: (servicePrices as any)?.teethBrushing || '10', priceVaries: false },
+    addon3Name && { id: 'furminator', label: addon3Name, price: (servicePrices as any)?.furminator || '20', priceVaries: true },
+    addon4Name && { id: 'scent-package', label: addon4Name, price: (servicePrices as any)?.scentPackage || '5', priceVaries: false },
+  ].filter(Boolean) as { id: string; label: string; price: string; priceVaries: boolean }[];
 
   // Fetch all special dates for calendar availability checking
   const { data: allSpecialDates = [] } = useQuery({
@@ -270,21 +278,6 @@ export default function Booking() {
   };
 
   // Check if a date is available for booking
-  // True when at least one pet in the form is a cat
-  const hasCat = pets.some(p => p.type === 'cat');
-
-  // Returns true if a time string (e.g. "9:15 AM") is strictly after 9:00 AM
-  const isTimeAfter9AM = (timeStr: string) => {
-    const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
-    if (!match) return false;
-    const hour = parseInt(match[1]);
-    const minute = parseInt(match[2]);
-    const period = match[3].toUpperCase();
-    if (period === 'PM') return true;
-    if (hour > 9) return true;
-    if (hour === 9 && minute > 0) return true;
-    return false;
-  };
 
   const isDateAvailable = (date: Date) => {
     // Block past dates using Central Time
@@ -319,9 +312,6 @@ export default function Booking() {
     
     if (blockedList.includes(dateString)) return false;
 
-    // Cats are only accepted Mon (1), Tue (2), Thu (4)
-    if (hasCat && ![1, 2, 4].includes(date.getDay())) return false;
-    
     // Check advance booking limit
     const advanceBookingDays = parseInt(settings.find(s => s.setting === 'advance_booking_days')?.value || '30');
     const maxDate = new Date();
@@ -422,7 +412,7 @@ export default function Booking() {
       setSelectedDate(new Date());
       setSelectedTime('');
       setSelectedGroomer('');
-      setPets([{ name: '', type: 'dog', serviceType: 'grooming-full', notes: '', groomerId: '', addOns: [] }]);
+      setPets([{ name: '', type: '', serviceType: 'grooming-full', notes: '', groomerId: '', addOns: [] }]);
       setOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
       setSmsConsent(false);
       setContactSearch('');
@@ -529,7 +519,7 @@ export default function Booking() {
       setSelectedDate(new Date());
       setSelectedTime('');
       setSelectedGroomer('');
-      setPets([{ name: '', type: 'dog', serviceType: 'grooming-full', notes: '', groomerId: '', addOns: [] }]);
+      setPets([{ name: '', type: '', serviceType: 'grooming-full', notes: '', groomerId: '', addOns: [] }]);
       setOwnerInfo({ firstName: '', lastName: '', phoneNumber: '' });
       setContactSearch('');
       setIsRecurring(false);
@@ -554,9 +544,8 @@ export default function Booking() {
       if (!ownerInfo.lastName) missing.push("last name");
       if (!ownerInfo.phoneNumber) missing.push("phone number");
       if (invalidPet) {
-        if (!invalidPet.name) missing.push("pet name");
-        if (!invalidPet.type) missing.push("animal type");
-        if (!invalidPet.serviceType) missing.push("service type (Full Grooming or Bath Only)");
+        if (!invalidPet.name) missing.push("name");
+        if (!invalidPet.serviceType) missing.push("service type");
       }
       toast({
         title: "Missing Information",
@@ -631,7 +620,7 @@ export default function Booking() {
       }
     }
     
-    const uniqueAppointmentDates = [...appointmentDateSet];
+    const uniqueAppointmentDates = Array.from(appointmentDateSet);
 
     const baseAppointmentData = {
       appointmentTime: selectedTime,
@@ -678,14 +667,14 @@ export default function Booking() {
   };
 
   const addPet = () => {
-    setPets([...pets, { name: '', type: 'dog', serviceType: 'grooming-full', notes: '', groomerId: '', addOns: [] }]);
+    setPets([...pets, { name: '', type: '', serviceType: 'grooming-full', notes: '', groomerId: '', addOns: [] }]);
   };
 
   const removePet = (index: number) => {
     if (pets.length === 1) {
       toast({
         title: "Cannot Remove",
-        description: "You must have at least one pet for the appointment.",
+        description: "You must have at least one item for the appointment.",
         variant: "destructive",
       });
       return;
@@ -696,40 +685,10 @@ export default function Booking() {
   const updatePet = (index: number, field: string, value: string) => {
     const updated = [...pets];
     const changes: Record<string, any> = { [field]: value };
-    // When pet type changes to cat, force Bath Only and clear add-ons
-    if (field === 'type' && value === 'cat') {
-      changes.serviceType = 'grooming-bath';
-      changes.addOns = [];
-    }
     updated[index] = { ...updated[index], ...changes };
     setPets(updated);
   };
 
-  // When hasCat changes to true, clear any date/time that's now invalid for cats
-  useEffect(() => {
-    if (hasCat) {
-      let dateCleared = false;
-      if (selectedDate) {
-        const day = selectedDate.getDay();
-        if (![1, 2, 4].includes(day)) {
-          setSelectedDate(undefined);
-          setSelectedTime('');
-          dateCleared = true;
-        }
-      }
-      if (!dateCleared && selectedTime && isTimeAfter9AM(selectedTime)) {
-        setSelectedTime('');
-      }
-      if (dateCleared) {
-        toast({
-          title: "Date Cleared",
-          description: "Cat services are only available Monday, Tuesday, and Thursday. Please select a new date.",
-          variant: "destructive",
-        });
-      }
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasCat]);
 
   const togglePetAddOn = (index: number, addOnId: string) => {
     const updated = [...pets];
@@ -789,17 +748,19 @@ export default function Booking() {
                       const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
                       const slots = (availableSlots as any)[dateStr];
                       const isAvailable = isDateAvailable(date);
-                      const totalSlots = slots ? slots.totalAvailable : 0;
+                      const totalSlots = slots?.totalAvailable ?? null;
+                      const isUnlimited = totalSlots === -1;
+                      const isFull = !isUnlimited && totalSlots === 0 && slots != null;
                       
                       return (
                         <div className="flex flex-col items-center">
                           <span>{date.getDate()}</span>
-                          {isAvailable && totalSlots > 0 && (
+                          {isAvailable && !isUnlimited && totalSlots !== null && totalSlots > 0 && (
                             <span className="text-[10px] text-green-600 font-medium leading-none">
                               {totalSlots} left
                             </span>
                           )}
-                          {isAvailable && totalSlots === 0 && slots && (
+                          {isAvailable && isFull && (
                             <span className="text-[10px] text-red-500 font-medium leading-none">
                               Full
                             </span>
@@ -813,27 +774,12 @@ export default function Booking() {
             </Card>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex-1">
               <p className="text-sm text-blue-700">
-                <strong>Note:</strong> The slots shown left open include baths and grooms. It may say 10 left and the slots open are baths not grooms or vice versa.
+                <strong>Note:</strong> Slot counts shown are estimates based on configured daily limits. Days with no limit set are open for booking.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Important Notice */}
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div className="flex items-start space-x-2">
-            <div className="text-yellow-600 font-bold text-lg">⚠️</div>
-            <div>
-              <h4 className="font-bold text-yellow-800 mb-2">IMPORTANT NOTICE</h4>
-              <p className="text-sm text-yellow-700">
-                <strong>NO Poodles, Doodles, German Shepherds, or Large Breed Dogs after 12:00 PM!</strong>
-              </p>
-              <p className="text-xs text-yellow-600 mt-1">
-                If you schedule for after 12:00 PM with a large dog, you will be asked to reschedule when you arrive.
-              </p>
-            </div>
-          </div>
-        </div>
 
         {/* Special Date Notice */}
         {specialDate && (
@@ -850,50 +796,27 @@ export default function Booking() {
           </div>
         )}
 
-        {/* Cat-only notice */}
-        {hasCat && (
-          <div className="bg-purple-50 border border-purple-300 rounded-lg p-4">
-            <div className="flex items-start space-x-2">
-              <div className="text-purple-600 font-bold text-lg">🐱</div>
-              <div>
-                <h4 className="font-bold text-purple-800 mb-1">Cat Services — Limited Availability</h4>
-                <p className="text-sm text-purple-700">
-                  For the safety of your cat, we accept cats <strong>Monday, Tuesday, and Thursday only</strong>, and they must arrive <strong>by 9:00 AM</strong>. This minimizes exposure to dogs during peak hours.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Time Slots */}
         <div>
           <Label className="text-sm font-semibold text-gray-900 mb-3 block">Available Times</Label>
           <div className="grid grid-cols-3 gap-3">
-            {availableTimeSlots.map((time) => {
-              const disabledForCat = hasCat && isTimeAfter9AM(time);
-              return (
-                <Button
-                  key={time}
-                  type="button"
-                  variant={selectedTime === time ? "default" : "outline"}
-                  disabled={disabledForCat}
-                  className={`py-2 px-3 text-sm ${
-                    selectedTime === time
-                      ? 'bg-brand-blue text-white'
-                      : disabledForCat
-                      ? 'border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed line-through opacity-60'
-                      : 'border-gray-300 text-gray-900 hover:bg-gray-50'
-                  }`}
-                  onClick={() => { if (!disabledForCat) setSelectedTime(time); }}
-                >
-                  {time}
-                </Button>
-              );
-            })}
+            {availableTimeSlots.map((time: string) => (
+              <Button
+                key={time}
+                type="button"
+                variant={selectedTime === time ? "default" : "outline"}
+                className={`py-2 px-3 text-sm ${
+                  selectedTime === time
+                    ? 'bg-brand-blue text-white'
+                    : 'border-gray-300 text-gray-900 hover:bg-gray-50'
+                }`}
+                onClick={() => setSelectedTime(time)}
+              >
+                {time}
+              </Button>
+            ))}
           </div>
-          {hasCat && (
-            <p className="text-xs text-purple-600 mt-2">Times after 9:00 AM are unavailable for cats.</p>
-          )}
         </div>
 
         {/* Recurring Appointment Options */}
@@ -1006,7 +929,7 @@ export default function Booking() {
                 const isFull = remaining <= 0;
                 return (
                   <SelectItem key={groomer.id} value={groomer.id.toString()}>
-                    {groomer.name}{groomer.specialties ? ` (${groomer.specialties})` : ''}{isFull ? ' - Fully Booked' : remaining < 5 ? ` - ${remaining} slot${remaining !== 1 ? 's' : ''} left` : ''}
+                    {groomer.name}{groomer.specialties ? ` (${groomer.specialties})` : ''}{isFull ? ' — Fully Booked' : remaining < 5 ? ` — ${remaining} slot${remaining !== 1 ? 's' : ''} left` : ''}
                   </SelectItem>
                 );
               })}
@@ -1115,7 +1038,7 @@ export default function Booking() {
         {/* Pet Information - Multiple Pets */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <Label className="text-sm font-semibold text-gray-900">Pet Information</Label>
+            <Label className="text-sm font-semibold text-gray-900">Service Details</Label>
             <Button
               type="button"
               onClick={addPet}
@@ -1124,7 +1047,7 @@ export default function Booking() {
               className="text-brand-blue border-brand-blue hover:bg-brand-blue hover:text-white"
               data-testid="button-add-pet"
             >
-              + Add Another Pet
+              + Add Another
             </Button>
           </div>
           
@@ -1159,7 +1082,7 @@ export default function Booking() {
                     }}
                   >
                     <SelectTrigger className="border-gray-300 rounded-xl bg-blue-50" data-testid={`select-saved-pet-${index}`}>
-                      <SelectValue placeholder="Or choose from your saved pets" />
+                      <SelectValue placeholder="Or choose from saved records" />
                     </SelectTrigger>
                     <SelectContent>
                       {savedPets.map((p: any) => (
@@ -1173,43 +1096,33 @@ export default function Booking() {
 
                 <Input
                   type="text"
-                  placeholder="Pet Name *"
+                  placeholder="Name *"
                   value={pet.name}
                   onChange={(e) => updatePet(index, 'name', e.target.value)}
                   className="border-gray-300 rounded-xl"
                   data-testid={`input-pet-name-${index}`}
                 />
                 
-                <Select value={pet.type} onValueChange={(value) => updatePet(index, 'type', value)}>
-                  <SelectTrigger className="border-gray-300 rounded-xl" data-testid={`select-pet-type-${index}`}>
-                    <SelectValue placeholder="Select Pet Type *" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="dog">Dog</SelectItem>
-                    <SelectItem value="cat">Cat</SelectItem>
-                    <SelectItem value="bird">Bird</SelectItem>
-                    <SelectItem value="fish">Fish</SelectItem>
-                    <SelectItem value="reptile">Reptile</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Input
+                  type="text"
+                  placeholder="Type / Category (optional)"
+                  value={pet.type}
+                  onChange={(e) => updatePet(index, 'type', e.target.value)}
+                  className="border-gray-300 rounded-xl"
+                  data-testid={`input-pet-type-${index}`}
+                />
                 
                 <div>
                   <Label className="text-xs text-gray-600 mb-2 block">Service Type *</Label>
-                  {pet.type === 'cat' && (
-                    <p className="text-xs text-purple-600 mb-2">Cats receive Bath Only service.</p>
-                  )}
                   <RadioGroup value={pet.serviceType} onValueChange={(value) => updatePet(index, 'serviceType', value)}>
                     <div className="space-y-2">
-                      {SERVICES.filter(s => pet.type !== 'cat' || s.id === 'grooming-bath').map((service) => (
+                      {SERVICES.map((service) => (
                         <div key={service.id} className="flex items-center space-x-3 p-2 border rounded-lg hover:bg-gray-50">
                           <RadioGroupItem value={service.id} id={`${service.id}-${index}`} data-testid={`radio-service-${service.id}-${index}`} />
                           <Label htmlFor={`${service.id}-${index}`} className="flex-1 cursor-pointer">
                             <div className="font-medium text-gray-900">{service.name} ${service.price}</div>
                             <div className="text-xs text-gray-500">
-                              (Prices will vary. This is an estimated price. Price is determined by size upon arrival.)
-                              {service.id === 'grooming-full' && <span> (Hair cut, Bath, and Nail Clip)</span>}
-                              {service.id === 'grooming-bath' && <span> (Bath, and Nail Clip)</span>}
+                              {service.description || 'Prices may vary. Final price determined upon arrival.'}
                             </div>
                           </Label>
                         </div>
@@ -1250,7 +1163,7 @@ export default function Booking() {
                 )}
 
                 <div>
-                  <Label className="text-xs text-gray-600 mb-2 block">Groomer for this Pet (Optional)</Label>
+                  <Label className="text-xs text-gray-600 mb-2 block">Staff Member for this Item (Optional)</Label>
                   <Select 
                     value={pet.groomerId || "default"} 
                     onValueChange={(value) => updatePet(index, 'groomerId', value === "default" ? "" : value)}
@@ -1267,14 +1180,14 @@ export default function Booking() {
                         const isFull = remaining <= 0;
                         return (
                           <SelectItem key={groomer.id} value={groomer.id.toString()}>
-                            {groomer.name}{groomer.specialties ? ` (${groomer.specialties})` : ''}{isFull ? ' - Full Grooms Full' : remaining < 5 ? ` - ${remaining} full groom${remaining !== 1 ? 's' : ''} left` : ''}
+                            {groomer.name}{groomer.specialties ? ` (${groomer.specialties})` : ''}{isFull ? ' — Fully Booked' : remaining < 5 ? ` — ${remaining} slot${remaining !== 1 ? 's' : ''} left` : ''}
                           </SelectItem>
                         );
                       })}
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-gray-500 mt-1">
-                    Override appointment-level groomer for this specific pet
+                    Override appointment-level staff member for this specific item
                   </p>
                 </div>
                 

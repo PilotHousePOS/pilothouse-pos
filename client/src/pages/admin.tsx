@@ -13441,92 +13441,103 @@ export default function Admin() {
 
               {/* Service Prices */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Service Prices</h3>
-                <p className="text-sm text-gray-600">Set estimated prices for grooming services. Use a range like "40-80" or single price like "35". These are displayed to customers with a note that prices may vary.</p>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Full Grooming Price ($)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g., 40-80 or 35"
-                      defaultValue={groomingSettings.find((s: any) => s.setting === 'full_grooming_price')?.value || '35'}
-                      className="w-full p-2 border rounded"
-                      onBlur={(e) => updateGroomingSettingMutation.mutate({
-                        setting: 'full_grooming_price',
-                        value: e.target.value
-                      })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Bath Only Price ($)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g., 20-30 or 20"
-                      defaultValue={groomingSettings.find((s: any) => s.setting === 'bath_only_price')?.value || '20'}
-                      className="w-full p-2 border rounded"
-                      onBlur={(e) => updateGroomingSettingMutation.mutate({
-                        setting: 'bath_only_price',
-                        value: e.target.value
-                      })}
-                    />
-                  </div>
-                </div>
-                <div className="border border-blue-200 bg-blue-50 rounded-lg p-4 mt-2">
-                  <h4 className="text-base font-semibold text-blue-800 mb-3">Add-On Service Prices ($)</h4>
-                  <p className="text-xs text-blue-600 mb-3">These prices are shown to customers as optional add-ons during booking.</p>
+                <p className="text-sm text-gray-600">Set the name and estimated price for each service. Use a range like "40-80" or a single price like "35". Prices shown to customers as estimates — final price determined on arrival.</p>
+
+                {/* Service 1 */}
+                <div className="border rounded-lg p-4 space-y-3">
+                  <h4 className="text-sm font-semibold text-gray-800">Service 1 (Primary)</h4>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-2">Nail Grind</label>
+                      <label className="block text-sm font-medium mb-2">Service Name</label>
                       <input
                         type="text"
-                        placeholder="e.g., 15"
-                        defaultValue={groomingSettings.find((s: any) => s.setting === 'addon_nail_grind_price')?.value || '15'}
-                        className="w-full p-2 border rounded bg-white"
+                        placeholder="e.g., Full Service, Full Groom, Lawn Mow"
+                        defaultValue={groomingSettings.find((s: any) => s.setting === 'service1_name')?.value || 'Full Service'}
+                        className="w-full p-2 border rounded"
                         onBlur={(e) => updateGroomingSettingMutation.mutate({
-                          setting: 'addon_nail_grind_price',
+                          setting: 'service1_name',
                           value: e.target.value
                         })}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Brush Teeth</label>
+                      <label className="block text-sm font-medium mb-2">Price ($)</label>
                       <input
                         type="text"
-                        placeholder="e.g., 10"
-                        defaultValue={groomingSettings.find((s: any) => s.setting === 'addon_teeth_brushing_price')?.value || '10'}
-                        className="w-full p-2 border rounded bg-white"
+                        placeholder="e.g., 40-80 or 35"
+                        defaultValue={groomingSettings.find((s: any) => s.setting === 'full_grooming_price')?.value || '35'}
+                        className="w-full p-2 border rounded"
                         onBlur={(e) => updateGroomingSettingMutation.mutate({
-                          setting: 'addon_teeth_brushing_price',
+                          setting: 'full_grooming_price',
+                          value: e.target.value
+                        })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Service 2 */}
+                <div className="border rounded-lg p-4 space-y-3">
+                  <h4 className="text-sm font-semibold text-gray-800">Service 2 (Secondary)</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Service Name</label>
+                      <input
+                        type="text"
+                        placeholder="e.g., Basic Service, Bath Only, Edge Trim"
+                        defaultValue={groomingSettings.find((s: any) => s.setting === 'service2_name')?.value || 'Basic Service'}
+                        className="w-full p-2 border rounded"
+                        onBlur={(e) => updateGroomingSettingMutation.mutate({
+                          setting: 'service2_name',
                           value: e.target.value
                         })}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Furminator</label>
+                      <label className="block text-sm font-medium mb-2">Price ($)</label>
                       <input
                         type="text"
-                        placeholder="e.g., 20"
-                        defaultValue={groomingSettings.find((s: any) => s.setting === 'addon_furminator_price')?.value || '20'}
-                        className="w-full p-2 border rounded bg-white"
+                        placeholder="e.g., 20-30 or 20"
+                        defaultValue={groomingSettings.find((s: any) => s.setting === 'bath_only_price')?.value || '20'}
+                        className="w-full p-2 border rounded"
                         onBlur={(e) => updateGroomingSettingMutation.mutate({
-                          setting: 'addon_furminator_price',
+                          setting: 'bath_only_price',
                           value: e.target.value
                         })}
                       />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Scent Package</label>
-                      <input
-                        type="text"
-                        placeholder="e.g., 5"
-                        defaultValue={groomingSettings.find((s: any) => s.setting === 'addon_scent_package_price')?.value || '5'}
-                        className="w-full p-2 border rounded bg-white"
-                        onBlur={(e) => updateGroomingSettingMutation.mutate({
-                          setting: 'addon_scent_package_price',
-                          value: e.target.value
-                        })}
-                      />
-                    </div>
+                  </div>
+                </div>
+
+                {/* Add-Ons */}
+                <div className="border border-blue-200 bg-blue-50 rounded-lg p-4">
+                  <h4 className="text-base font-semibold text-blue-800 mb-2">Add-On Services</h4>
+                  <p className="text-xs text-blue-600 mb-3">Set a name and price for each add-on. Leave the name blank to hide that add-on from the booking form.</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    {([
+                      { nameKey: 'addon1_name', priceKey: 'addon_nail_grind_price', defaultName: 'Nail Grind', defaultPrice: '15', placeholder: 'e.g., Nail Grind, Edge Detail' },
+                      { nameKey: 'addon2_name', priceKey: 'addon_teeth_brushing_price', defaultName: 'Brush Teeth', defaultPrice: '10', placeholder: 'e.g., Brush Teeth, Interior Wipe' },
+                      { nameKey: 'addon3_name', priceKey: 'addon_furminator_price', defaultName: 'Furminator', defaultPrice: '20', placeholder: 'e.g., Furminator, Tire Shine' },
+                      { nameKey: 'addon4_name', priceKey: 'addon_scent_package_price', defaultName: 'Scent Package', defaultPrice: '5', placeholder: 'e.g., Scent Package, Air Freshener' },
+                    ] as const).map((addon, i) => (
+                      <div key={i} className="bg-white rounded p-3 space-y-2">
+                        <label className="block text-xs font-semibold text-gray-700">Add-On {i + 1}</label>
+                        <input
+                          type="text"
+                          placeholder={addon.placeholder}
+                          defaultValue={groomingSettings.find((s: any) => s.setting === addon.nameKey)?.value || addon.defaultName}
+                          className="w-full p-2 border rounded text-sm"
+                          onBlur={(e) => updateGroomingSettingMutation.mutate({ setting: addon.nameKey, value: e.target.value })}
+                        />
+                        <input
+                          type="text"
+                          placeholder={`Price e.g., ${addon.defaultPrice}`}
+                          defaultValue={groomingSettings.find((s: any) => s.setting === addon.priceKey)?.value || addon.defaultPrice}
+                          className="w-full p-2 border rounded text-sm"
+                          onBlur={(e) => updateGroomingSettingMutation.mutate({ setting: addon.priceKey, value: e.target.value })}
+                        />
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
