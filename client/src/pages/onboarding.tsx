@@ -403,18 +403,18 @@ function Step3Features({ onNext }: { onNext: () => void }) {
               className={`w-full text-left rounded-xl border-2 p-3.5 transition-all duration-200 flex items-start gap-3 ${
                 isOn
                   ? 'border-white/40 bg-white/10'
-                  : 'border-white/10 bg-white/3 opacity-60'
+                  : 'border-white/10 bg-white/5 hover:bg-white/8'
               }`}
             >
-              <Icon className={`w-5 h-5 mt-0.5 flex-shrink-0 ${isOn ? feat.color : 'text-white/30'}`} />
+              <Icon className={`w-5 h-5 mt-0.5 flex-shrink-0 ${isOn ? feat.color : 'text-white/40'}`} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                  <span className={`text-sm font-semibold ${isOn ? 'text-white' : 'text-white/40'}`}>{feat.name}</span>
+                  <span className={`text-sm font-semibold ${isOn ? 'text-white' : 'text-white/70'}`}>{feat.name}</span>
                   <div className={`w-10 h-5 rounded-full flex-shrink-0 relative transition-colors duration-200 ${isOn ? 'bg-green-500' : 'bg-white/20'}`}>
                     <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${isOn ? 'translate-x-5' : 'translate-x-0.5'}`} />
                   </div>
                 </div>
-                <p className={`text-xs mt-0.5 ${isOn ? 'text-gray-300' : 'text-white/30'}`}>{feat.description}</p>
+                <p className={`text-xs mt-0.5 ${isOn ? 'text-gray-300' : 'text-white/50'}`}>{feat.description}</p>
               </div>
             </button>
           );
