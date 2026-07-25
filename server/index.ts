@@ -637,36 +637,45 @@ async function runAppMigrations() {
       await migDb.execute(migSql.raw(`INSERT INTO data_migrations (key) VALUES ('${backfillKey}')`));
     }
     // One-time: create a clean Pro-tier test tenant for tgskipbusiness@gmail.com
-    const freshTenantKey = 'fresh_pro_tenant_skipbusiness_2026';
+    // v3: force-reassigns even if tenant already existed from a prior partial run
+    const freshTenantKey = 'fresh_pro_tenant_skipbusiness_v4';
     const freshCheck = await migDb.execute(migSql.raw(
       `SELECT key FROM data_migrations WHERE key = '${freshTenantKey}'`
     ));
     if (!freshCheck.rows || freshCheck.rows.length === 0) {
+      log('[migration] Running fresh_pro_tenant_v3...');
       // Advance the sequence past the current max id so the INSERT auto-generates a safe id
       await migDb.execute(migSql.raw(
         `SELECT setval(pg_get_serial_sequence('tenants', 'id'), GREATEST(MAX(id), 1)) FROM tenants`
       ));
-      // Create the new blank tenant
+      // Ensure the tenant exists (idempotent)
       await migDb.execute(migSql.raw(`
         INSERT INTO tenants (name, slug, subscription_status, subscription_tier, onboarding_step, enabled_features)
         VALUES ('My Business', 'my-business-skip', 'active', 'pro', 0, '{}'::jsonb)
         ON CONFLICT (slug) DO NOTHING
       `));
-      // Reassign tgskipbusiness@gmail.com to the new tenant as admin
-      await migDb.execute(migSql.raw(`
+      const tenantRow = await migDb.execute(migSql.raw(
+        `SELECT id FROM tenants WHERE slug = 'my-business-skip'`
+      ));
+      const newTenantId = tenantRow.rows?.[0]?.id;
+      log(`[migration] my-business-skip tenant id = ${newTenantId}`);
+      if (!newTenantId) throw new Error('fresh_pro_tenant: tenant not found after insert');
+      // Reassign tgskipbusiness@gmail.com (case-insensitive — email stored with capital T)
+      const userUpdate = await migDb.execute(migSql.raw(`
         UPDATE users
-        SET tenant_id = (SELECT id FROM tenants WHERE slug = 'my-business-skip'),
-            is_admin = true
-        WHERE email = 'tgskipbusiness@gmail.com'
-          AND (SELECT id FROM tenants WHERE slug = 'my-business-skip') IS NOT NULL
+        SET tenant_id = ${newTenantId}, is_admin = true
+        WHERE LOWER(email) = LOWER('tgskipbusiness@gmail.com')
+        RETURNING id, email, tenant_id
       `));
+      log(`[migration] user reassigned: ${JSON.stringify(userUpdate.rows)}`);
       // Set as tenant owner
       await migDb.execute(migSql.raw(`
         UPDATE tenants
         SET owner_id = (SELECT id FROM users WHERE email = 'tgskipbusiness@gmail.com')
-        WHERE slug = 'my-business-skip'
+        WHERE id = ${newTenantId}
       `));
       await migDb.execute(migSql.raw(`INSERT INTO data_migrations (key) VALUES ('${freshTenantKey}')`));
+      log('[migration] fresh_pro_tenant_v3 complete');
     }
 
     // Startup cleanup: remove zero-stock items from pending queue (POS tracker)

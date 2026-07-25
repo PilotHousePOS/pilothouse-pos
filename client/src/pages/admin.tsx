@@ -13338,7 +13338,7 @@ export default function Admin() {
         <TabsContent value="grooming">
           <Card>
             <CardHeader>
-              <CardTitle>Grooming Appointment Settings</CardTitle>
+              <CardTitle>Service Appointment Settings</CardTitle>
               <CardDescription>
                 Configure appointment restrictions, time slots, and capacity limits
               </CardDescription>
