@@ -1260,3 +1260,164 @@ export const auditLog = pgTable("audit_log", {
 export const insertAuditLogSchema = createInsertSchema(auditLog).omit({ id: true, createdAt: true });
 export type AuditLog = typeof auditLog.$inferSelect;
 export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
+
+// ─── Waitlist ─────────────────────────────────────────────────────────────────
+export const waitlistEntries = pgTable("waitlist_entries", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
+  name: text("name").notNull(),
+  email: text("email"),
+  phone: text("phone"),
+  serviceType: text("service_type"),
+  notes: text("notes"),
+  status: text("status").default("waiting").notNull(), // waiting | notified | cancelled
+  createdAt: timestamp("created_at").defaultNow(),
+  notifiedAt: timestamp("notified_at"),
+});
+export type WaitlistEntry = typeof waitlistEntries.$inferSelect;
+export type InsertWaitlistEntry = typeof waitlistEntries.$inferInsert;
+
+// ─── Internal Tasks ───────────────────────────────────────────────────────────
+export const internalTasks = pgTable("internal_tasks", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
+  title: text("title").notNull(),
+  description: text("description"),
+  assignedTo: text("assigned_to").references(() => users.id),
+  dueDate: text("due_date"),
+  priority: text("priority").default("medium").notNull(), // low | medium | high
+  status: text("status").default("todo").notNull(),       // todo | in-progress | done
+  createdBy: text("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+export type InternalTask = typeof internalTasks.$inferSelect;
+export type InsertInternalTask = typeof internalTasks.$inferInsert;
+
+// ─── Announcements ────────────────────────────────────────────────────────────
+export const announcements = pgTable("announcements", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
+  title: text("title").notNull(),
+  body: text("body").notNull(),
+  createdBy: text("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  expiresAt: timestamp("expires_at"),
+  isPinned: boolean("is_pinned").default(false),
+});
+export type Announcement = typeof announcements.$inferSelect;
+export type InsertAnnouncement = typeof announcements.$inferInsert;
+
+// ─── Estimates / Quotes ───────────────────────────────────────────────────────
+export const estimates = pgTable("estimates", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
+  contactId: integer("contact_id"),
+  title: text("title").notNull(),
+  lineItems: jsonb("line_items").$type<Array<{ description: string; qty: number; unitPrice: number }>>().default([]),
+  notes: text("notes"),
+  status: text("status").default("draft").notNull(), // draft | sent | accepted | declined | converted
+  total: text("total").default("0"),
+  createdAt: timestamp("created_at").defaultNow(),
+  sentAt: timestamp("sent_at"),
+  expiresAt: timestamp("expires_at"),
+});
+export type Estimate = typeof estimates.$inferSelect;
+export type InsertEstimate = typeof estimates.$inferInsert;
+
+// ─── Invoices ─────────────────────────────────────────────────────────────────
+export const invoices = pgTable("invoices", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
+  contactId: integer("contact_id"),
+  invoiceNumber: text("invoice_number").notNull(),
+  lineItems: jsonb("line_items").$type<Array<{ description: string; qty: number; unitPrice: number }>>().default([]),
+  notes: text("notes"),
+  status: text("status").default("draft").notNull(), // draft | sent | paid | overdue
+  total: text("total").default("0"),
+  dueDate: text("due_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+  sentAt: timestamp("sent_at"),
+  paidAt: timestamp("paid_at"),
+});
+export type Invoice = typeof invoices.$inferSelect;
+export type InsertInvoice = typeof invoices.$inferInsert;
+
+// ─── Time Clock ───────────────────────────────────────────────────────────────
+export const timeClockEntries = pgTable("time_clock_entries", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
+  userId: text("user_id").references(() => users.id),
+  clockIn: timestamp("clock_in").notNull(),
+  clockOut: timestamp("clock_out"),
+  breakMinutes: integer("break_minutes").default(0),
+  notes: text("notes"),
+});
+export type TimeClockEntry = typeof timeClockEntries.$inferSelect;
+export type InsertTimeClockEntry = typeof timeClockEntries.$inferInsert;
+
+// ─── Intake Forms ─────────────────────────────────────────────────────────────
+export const intakeForms = pgTable("intake_forms", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
+  title: text("title").notNull(),
+  fields: jsonb("fields").$type<Array<{ id: string; type: string; label: string; required: boolean; options?: string[] }>>().default([]),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+export type IntakeForm = typeof intakeForms.$inferSelect;
+export type InsertIntakeForm = typeof intakeForms.$inferInsert;
+
+export const intakeFormResponses = pgTable("intake_form_responses", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
+  formId: integer("form_id").references(() => intakeForms.id),
+  userId: text("user_id").references(() => users.id),
+  appointmentId: integer("appointment_id"),
+  responses: jsonb("responses").$type<Record<string, string>>().default({}),
+  submittedAt: timestamp("submitted_at").defaultNow(),
+});
+export type IntakeFormResponse = typeof intakeFormResponses.$inferSelect;
+export type InsertIntakeFormResponse = typeof intakeFormResponses.$inferInsert;
+
+// ─── SMS Blasts ───────────────────────────────────────────────────────────────
+export const smsBlasts = pgTable("sms_blasts", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
+  message: text("message").notNull(),
+  segment: text("segment").default("all").notNull(), // all | contacts | loyalty
+  recipientCount: integer("recipient_count").default(0),
+  sentBy: text("sent_by").references(() => users.id),
+  sentAt: timestamp("sent_at").defaultNow(),
+  status: text("status").default("sent").notNull(), // sent | failed
+});
+export type SmsBlast = typeof smsBlasts.$inferSelect;
+export type InsertSmsBlast = typeof smsBlasts.$inferInsert;
+
+// ─── Membership Plans & Subscriptions ────────────────────────────────────────
+export const membershipPlans = pgTable("membership_plans", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
+  name: text("name").notNull(),
+  description: text("description"),
+  price: text("price").notNull(),
+  billingInterval: text("billing_interval").default("monthly").notNull(), // monthly | yearly
+  visitCredits: integer("visit_credits").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+export type MembershipPlan = typeof membershipPlans.$inferSelect;
+export type InsertMembershipPlan = typeof membershipPlans.$inferInsert;
+
+export const memberSubscriptions = pgTable("member_subscriptions", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
+  userId: text("user_id").references(() => users.id),
+  planId: integer("plan_id").references(() => membershipPlans.id),
+  status: text("status").default("active").notNull(), // active | cancelled | paused
+  startedAt: timestamp("started_at").defaultNow(),
+  endsAt: timestamp("ends_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+export type MemberSubscription = typeof memberSubscriptions.$inferSelect;
+export type InsertMemberSubscription = typeof memberSubscriptions.$inferInsert;

@@ -719,6 +719,158 @@ async function runAppMigrations() {
       log('[migration] hiring_open_default_false_v1 complete');
     }
 
+    // Create tables for all nine optional-tab features (idempotent via IF NOT EXISTS)
+    const optTablesKey = 'optional_tabs_tables_v1';
+    const optTablesCheck = await migDb.execute(migSql.raw(
+      `SELECT key FROM data_migrations WHERE key = '${optTablesKey}'`
+    ));
+    if (!optTablesCheck.rows || optTablesCheck.rows.length === 0) {
+      log('[migration] Creating optional-tab tables...');
+      await migDb.execute(migSql.raw(`
+        CREATE TABLE IF NOT EXISTS waitlist_entries (
+          id SERIAL PRIMARY KEY,
+          tenant_id INTEGER REFERENCES tenants(id),
+          name TEXT NOT NULL,
+          email TEXT,
+          phone TEXT,
+          service_type TEXT,
+          notes TEXT,
+          status TEXT NOT NULL DEFAULT 'waiting',
+          created_at TIMESTAMP DEFAULT NOW(),
+          notified_at TIMESTAMP
+        )
+      `));
+      await migDb.execute(migSql.raw(`
+        CREATE TABLE IF NOT EXISTS internal_tasks (
+          id SERIAL PRIMARY KEY,
+          tenant_id INTEGER REFERENCES tenants(id),
+          title TEXT NOT NULL,
+          description TEXT,
+          assigned_to TEXT REFERENCES users(id),
+          due_date TEXT,
+          priority TEXT NOT NULL DEFAULT 'medium',
+          status TEXT NOT NULL DEFAULT 'todo',
+          created_by TEXT REFERENCES users(id),
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
+        )
+      `));
+      await migDb.execute(migSql.raw(`
+        CREATE TABLE IF NOT EXISTS announcements (
+          id SERIAL PRIMARY KEY,
+          tenant_id INTEGER REFERENCES tenants(id),
+          title TEXT NOT NULL,
+          body TEXT NOT NULL,
+          created_by TEXT REFERENCES users(id),
+          created_at TIMESTAMP DEFAULT NOW(),
+          expires_at TIMESTAMP,
+          is_pinned BOOLEAN DEFAULT FALSE
+        )
+      `));
+      await migDb.execute(migSql.raw(`
+        CREATE TABLE IF NOT EXISTS estimates (
+          id SERIAL PRIMARY KEY,
+          tenant_id INTEGER REFERENCES tenants(id),
+          contact_id INTEGER,
+          title TEXT NOT NULL,
+          line_items JSONB DEFAULT '[]',
+          notes TEXT,
+          status TEXT NOT NULL DEFAULT 'draft',
+          total TEXT DEFAULT '0',
+          created_at TIMESTAMP DEFAULT NOW(),
+          sent_at TIMESTAMP,
+          expires_at TIMESTAMP
+        )
+      `));
+      await migDb.execute(migSql.raw(`
+        CREATE TABLE IF NOT EXISTS invoices (
+          id SERIAL PRIMARY KEY,
+          tenant_id INTEGER REFERENCES tenants(id),
+          contact_id INTEGER,
+          invoice_number TEXT NOT NULL,
+          line_items JSONB DEFAULT '[]',
+          notes TEXT,
+          status TEXT NOT NULL DEFAULT 'draft',
+          total TEXT DEFAULT '0',
+          due_date TEXT,
+          created_at TIMESTAMP DEFAULT NOW(),
+          sent_at TIMESTAMP,
+          paid_at TIMESTAMP
+        )
+      `));
+      await migDb.execute(migSql.raw(`
+        CREATE TABLE IF NOT EXISTS time_clock_entries (
+          id SERIAL PRIMARY KEY,
+          tenant_id INTEGER REFERENCES tenants(id),
+          user_id TEXT REFERENCES users(id),
+          clock_in TIMESTAMP NOT NULL,
+          clock_out TIMESTAMP,
+          break_minutes INTEGER DEFAULT 0,
+          notes TEXT
+        )
+      `));
+      await migDb.execute(migSql.raw(`
+        CREATE TABLE IF NOT EXISTS intake_forms (
+          id SERIAL PRIMARY KEY,
+          tenant_id INTEGER REFERENCES tenants(id),
+          title TEXT NOT NULL,
+          fields JSONB DEFAULT '[]',
+          is_active BOOLEAN DEFAULT TRUE,
+          created_at TIMESTAMP DEFAULT NOW()
+        )
+      `));
+      await migDb.execute(migSql.raw(`
+        CREATE TABLE IF NOT EXISTS intake_form_responses (
+          id SERIAL PRIMARY KEY,
+          tenant_id INTEGER REFERENCES tenants(id),
+          form_id INTEGER REFERENCES intake_forms(id),
+          user_id TEXT REFERENCES users(id),
+          appointment_id INTEGER,
+          responses JSONB DEFAULT '{}',
+          submitted_at TIMESTAMP DEFAULT NOW()
+        )
+      `));
+      await migDb.execute(migSql.raw(`
+        CREATE TABLE IF NOT EXISTS sms_blasts (
+          id SERIAL PRIMARY KEY,
+          tenant_id INTEGER REFERENCES tenants(id),
+          message TEXT NOT NULL,
+          segment TEXT NOT NULL DEFAULT 'all',
+          recipient_count INTEGER DEFAULT 0,
+          sent_by TEXT REFERENCES users(id),
+          sent_at TIMESTAMP DEFAULT NOW(),
+          status TEXT NOT NULL DEFAULT 'sent'
+        )
+      `));
+      await migDb.execute(migSql.raw(`
+        CREATE TABLE IF NOT EXISTS membership_plans (
+          id SERIAL PRIMARY KEY,
+          tenant_id INTEGER REFERENCES tenants(id),
+          name TEXT NOT NULL,
+          description TEXT,
+          price TEXT NOT NULL,
+          billing_interval TEXT NOT NULL DEFAULT 'monthly',
+          visit_credits INTEGER DEFAULT 0,
+          is_active BOOLEAN DEFAULT TRUE,
+          created_at TIMESTAMP DEFAULT NOW()
+        )
+      `));
+      await migDb.execute(migSql.raw(`
+        CREATE TABLE IF NOT EXISTS member_subscriptions (
+          id SERIAL PRIMARY KEY,
+          tenant_id INTEGER REFERENCES tenants(id),
+          user_id TEXT REFERENCES users(id),
+          plan_id INTEGER REFERENCES membership_plans(id),
+          status TEXT NOT NULL DEFAULT 'active',
+          started_at TIMESTAMP DEFAULT NOW(),
+          ends_at TIMESTAMP,
+          created_at TIMESTAMP DEFAULT NOW()
+        )
+      `));
+      await migDb.execute(migSql.raw(`INSERT INTO data_migrations (key) VALUES ('${optTablesKey}')`));
+      log('[migration] optional_tabs_tables_v1 complete');
+    }
+
     // Startup cleanup: remove zero-stock items from pending queue (POS tracker)
     await migDb.execute(migSql.raw(`DELETE FROM pos_pending_new_items WHERE pos_stock <= 0`));
 

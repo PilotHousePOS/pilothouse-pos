@@ -119,6 +119,39 @@ import {
   type JobApplication,
   type InsertJobApplication,
   appointmentItems,
+  waitlistEntries,
+  internalTasks,
+  announcements,
+  estimates,
+  invoices,
+  timeClockEntries,
+  intakeForms,
+  intakeFormResponses,
+  smsBlasts,
+  membershipPlans,
+  memberSubscriptions,
+  type WaitlistEntry,
+  type InsertWaitlistEntry,
+  type InternalTask,
+  type InsertInternalTask,
+  type Announcement,
+  type InsertAnnouncement,
+  type Estimate,
+  type InsertEstimate,
+  type Invoice,
+  type InsertInvoice,
+  type TimeClockEntry,
+  type InsertTimeClockEntry,
+  type IntakeForm,
+  type InsertIntakeForm,
+  type IntakeFormResponse,
+  type InsertIntakeFormResponse,
+  type SmsBlast,
+  type InsertSmsBlast,
+  type MembershipPlan,
+  type InsertMembershipPlan,
+  type MemberSubscription,
+  type InsertMemberSubscription,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, and, or, not, ilike, lt, lte, isNull, isNotNull, count, sql, inArray, ne, notInArray } from "drizzle-orm";
@@ -531,6 +564,73 @@ export interface IStorage {
   // Audit Log operations
   createAuditLog(entry: InsertAuditLog): Promise<AuditLog>;
   getAuditLogs(params: { targetTenantId?: number; actorUserId?: string; limit?: number; offset?: number }): Promise<{ entries: AuditLog[]; total: number }>;
+
+  // Waitlist
+  getWaitlistEntries(tenantId?: number): Promise<WaitlistEntry[]>;
+  createWaitlistEntry(data: InsertWaitlistEntry): Promise<WaitlistEntry>;
+  updateWaitlistEntry(id: number, data: Partial<InsertWaitlistEntry>, tenantId?: number): Promise<WaitlistEntry>;
+  deleteWaitlistEntry(id: number, tenantId?: number): Promise<void>;
+
+  // Internal Tasks
+  getInternalTasks(tenantId?: number): Promise<InternalTask[]>;
+  getInternalTasksForUser(userId: string, tenantId?: number): Promise<InternalTask[]>;
+  createInternalTask(data: InsertInternalTask): Promise<InternalTask>;
+  updateInternalTask(id: number, data: Partial<InsertInternalTask>, tenantId?: number): Promise<InternalTask>;
+  deleteInternalTask(id: number, tenantId?: number): Promise<void>;
+
+  // Announcements
+  getAnnouncements(tenantId?: number): Promise<Announcement[]>;
+  createAnnouncement(data: InsertAnnouncement): Promise<Announcement>;
+  updateAnnouncement(id: number, data: Partial<InsertAnnouncement>, tenantId?: number): Promise<Announcement>;
+  deleteAnnouncement(id: number, tenantId?: number): Promise<void>;
+
+  // Estimates
+  getEstimates(tenantId?: number): Promise<Estimate[]>;
+  getEstimate(id: number, tenantId?: number): Promise<Estimate | undefined>;
+  createEstimate(data: InsertEstimate): Promise<Estimate>;
+  updateEstimate(id: number, data: Partial<InsertEstimate>, tenantId?: number): Promise<Estimate>;
+  deleteEstimate(id: number, tenantId?: number): Promise<void>;
+
+  // Invoices
+  getInvoices(tenantId?: number): Promise<Invoice[]>;
+  getInvoice(id: number, tenantId?: number): Promise<Invoice | undefined>;
+  createInvoice(data: InsertInvoice): Promise<Invoice>;
+  updateInvoice(id: number, data: Partial<InsertInvoice>, tenantId?: number): Promise<Invoice>;
+  deleteInvoice(id: number, tenantId?: number): Promise<void>;
+  getNextInvoiceNumber(tenantId: number): Promise<string>;
+
+  // Time Clock
+  getTimeClockEntries(tenantId?: number, userId?: string): Promise<TimeClockEntry[]>;
+  getOpenTimeClockEntry(userId: string, tenantId?: number): Promise<TimeClockEntry | undefined>;
+  clockIn(userId: string, tenantId: number): Promise<TimeClockEntry>;
+  clockOut(userId: string, tenantId?: number): Promise<TimeClockEntry>;
+  updateTimeClockEntry(id: number, data: Partial<InsertTimeClockEntry>, tenantId?: number): Promise<TimeClockEntry>;
+  deleteTimeClockEntry(id: number, tenantId?: number): Promise<void>;
+
+  // Intake Forms
+  getIntakeForms(tenantId?: number): Promise<IntakeForm[]>;
+  getActiveIntakeForms(tenantId?: number): Promise<IntakeForm[]>;
+  createIntakeForm(data: InsertIntakeForm): Promise<IntakeForm>;
+  updateIntakeForm(id: number, data: Partial<InsertIntakeForm>, tenantId?: number): Promise<IntakeForm>;
+  deleteIntakeForm(id: number, tenantId?: number): Promise<void>;
+  createIntakeFormResponse(data: InsertIntakeFormResponse): Promise<IntakeFormResponse>;
+  getIntakeFormResponses(formId: number, tenantId?: number): Promise<IntakeFormResponse[]>;
+
+  // SMS Blasts
+  getSmsBlasts(tenantId?: number): Promise<SmsBlast[]>;
+  createSmsBlast(data: InsertSmsBlast): Promise<SmsBlast>;
+
+  // Membership Plans
+  getMembershipPlans(tenantId?: number): Promise<MembershipPlan[]>;
+  createMembershipPlan(data: InsertMembershipPlan): Promise<MembershipPlan>;
+  updateMembershipPlan(id: number, data: Partial<InsertMembershipPlan>, tenantId?: number): Promise<MembershipPlan>;
+  deleteMembershipPlan(id: number, tenantId?: number): Promise<void>;
+
+  // Member Subscriptions
+  getMemberSubscriptions(tenantId?: number): Promise<MemberSubscription[]>;
+  createMemberSubscription(data: InsertMemberSubscription): Promise<MemberSubscription>;
+  updateMemberSubscription(id: number, data: Partial<InsertMemberSubscription>, tenantId?: number): Promise<MemberSubscription>;
+  deleteMemberSubscription(id: number, tenantId?: number): Promise<void>;
 }
 
 /**
@@ -5289,6 +5389,259 @@ export class DatabaseStorage implements IStorage {
   async getTenant(id: number): Promise<Tenant | undefined> {
     const [tenant] = await db.select().from(tenants).where(eq(tenants.id, id));
     return tenant;
+  }
+
+  // ─── Waitlist ───────────────────────────────────────────────────────────────
+  async getWaitlistEntries(tenantId?: number): Promise<WaitlistEntry[]> {
+    const q = db.select().from(waitlistEntries);
+    if (tenantId) return q.where(eq(waitlistEntries.tenantId, tenantId)).orderBy(desc(waitlistEntries.createdAt));
+    return q.orderBy(desc(waitlistEntries.createdAt));
+  }
+  async createWaitlistEntry(data: InsertWaitlistEntry): Promise<WaitlistEntry> {
+    const [e] = await db.insert(waitlistEntries).values(data).returning();
+    return e;
+  }
+  async updateWaitlistEntry(id: number, data: Partial<InsertWaitlistEntry>, tenantId?: number): Promise<WaitlistEntry> {
+    requireTenantId(tenantId, 'update waitlist entry');
+    const [e] = await db.update(waitlistEntries).set(data).where(and(eq(waitlistEntries.id, id), eq(waitlistEntries.tenantId, tenantId))).returning();
+    if (!e) throw new Error('Waitlist entry not found');
+    return e;
+  }
+  async deleteWaitlistEntry(id: number, tenantId?: number): Promise<void> {
+    requireTenantId(tenantId, 'delete waitlist entry');
+    await db.delete(waitlistEntries).where(and(eq(waitlistEntries.id, id), eq(waitlistEntries.tenantId, tenantId)));
+  }
+
+  // ─── Internal Tasks ─────────────────────────────────────────────────────────
+  async getInternalTasks(tenantId?: number): Promise<InternalTask[]> {
+    const q = db.select().from(internalTasks);
+    if (tenantId) return q.where(eq(internalTasks.tenantId, tenantId)).orderBy(desc(internalTasks.createdAt));
+    return q.orderBy(desc(internalTasks.createdAt));
+  }
+  async getInternalTasksForUser(userId: string, tenantId?: number): Promise<InternalTask[]> {
+    const conditions = [eq(internalTasks.assignedTo, userId)];
+    if (tenantId) conditions.push(eq(internalTasks.tenantId, tenantId));
+    return db.select().from(internalTasks).where(and(...conditions)).orderBy(desc(internalTasks.createdAt));
+  }
+  async createInternalTask(data: InsertInternalTask): Promise<InternalTask> {
+    const [t] = await db.insert(internalTasks).values(data).returning();
+    return t;
+  }
+  async updateInternalTask(id: number, data: Partial<InsertInternalTask>, tenantId?: number): Promise<InternalTask> {
+    requireTenantId(tenantId, 'update task');
+    const [t] = await db.update(internalTasks).set({ ...data, updatedAt: new Date() }).where(and(eq(internalTasks.id, id), eq(internalTasks.tenantId, tenantId))).returning();
+    if (!t) throw new Error('Task not found');
+    return t;
+  }
+  async deleteInternalTask(id: number, tenantId?: number): Promise<void> {
+    requireTenantId(tenantId, 'delete task');
+    await db.delete(internalTasks).where(and(eq(internalTasks.id, id), eq(internalTasks.tenantId, tenantId)));
+  }
+
+  // ─── Announcements ──────────────────────────────────────────────────────────
+  async getAnnouncements(tenantId?: number): Promise<Announcement[]> {
+    const q = db.select().from(announcements);
+    if (tenantId) return q.where(eq(announcements.tenantId, tenantId)).orderBy(desc(announcements.isPinned), desc(announcements.createdAt));
+    return q.orderBy(desc(announcements.isPinned), desc(announcements.createdAt));
+  }
+  async createAnnouncement(data: InsertAnnouncement): Promise<Announcement> {
+    const [a] = await db.insert(announcements).values(data).returning();
+    return a;
+  }
+  async updateAnnouncement(id: number, data: Partial<InsertAnnouncement>, tenantId?: number): Promise<Announcement> {
+    requireTenantId(tenantId, 'update announcement');
+    const [a] = await db.update(announcements).set(data).where(and(eq(announcements.id, id), eq(announcements.tenantId, tenantId))).returning();
+    if (!a) throw new Error('Announcement not found');
+    return a;
+  }
+  async deleteAnnouncement(id: number, tenantId?: number): Promise<void> {
+    requireTenantId(tenantId, 'delete announcement');
+    await db.delete(announcements).where(and(eq(announcements.id, id), eq(announcements.tenantId, tenantId)));
+  }
+
+  // ─── Estimates ──────────────────────────────────────────────────────────────
+  async getEstimates(tenantId?: number): Promise<Estimate[]> {
+    const q = db.select().from(estimates);
+    if (tenantId) return q.where(eq(estimates.tenantId, tenantId)).orderBy(desc(estimates.createdAt));
+    return q.orderBy(desc(estimates.createdAt));
+  }
+  async getEstimate(id: number, tenantId?: number): Promise<Estimate | undefined> {
+    const conditions = [eq(estimates.id, id)];
+    if (tenantId) conditions.push(eq(estimates.tenantId, tenantId));
+    const [e] = await db.select().from(estimates).where(and(...conditions));
+    return e;
+  }
+  async createEstimate(data: InsertEstimate): Promise<Estimate> {
+    const [e] = await db.insert(estimates).values(data).returning();
+    return e;
+  }
+  async updateEstimate(id: number, data: Partial<InsertEstimate>, tenantId?: number): Promise<Estimate> {
+    requireTenantId(tenantId, 'update estimate');
+    const [e] = await db.update(estimates).set(data).where(and(eq(estimates.id, id), eq(estimates.tenantId, tenantId))).returning();
+    if (!e) throw new Error('Estimate not found');
+    return e;
+  }
+  async deleteEstimate(id: number, tenantId?: number): Promise<void> {
+    requireTenantId(tenantId, 'delete estimate');
+    await db.delete(estimates).where(and(eq(estimates.id, id), eq(estimates.tenantId, tenantId)));
+  }
+
+  // ─── Invoices ────────────────────────────────────────────────────────────────
+  async getInvoices(tenantId?: number): Promise<Invoice[]> {
+    const q = db.select().from(invoices);
+    if (tenantId) return q.where(eq(invoices.tenantId, tenantId)).orderBy(desc(invoices.createdAt));
+    return q.orderBy(desc(invoices.createdAt));
+  }
+  async getInvoice(id: number, tenantId?: number): Promise<Invoice | undefined> {
+    const conditions = [eq(invoices.id, id)];
+    if (tenantId) conditions.push(eq(invoices.tenantId, tenantId));
+    const [inv] = await db.select().from(invoices).where(and(...conditions));
+    return inv;
+  }
+  async createInvoice(data: InsertInvoice): Promise<Invoice> {
+    const [inv] = await db.insert(invoices).values(data).returning();
+    return inv;
+  }
+  async updateInvoice(id: number, data: Partial<InsertInvoice>, tenantId?: number): Promise<Invoice> {
+    requireTenantId(tenantId, 'update invoice');
+    const [inv] = await db.update(invoices).set(data).where(and(eq(invoices.id, id), eq(invoices.tenantId, tenantId))).returning();
+    if (!inv) throw new Error('Invoice not found');
+    return inv;
+  }
+  async deleteInvoice(id: number, tenantId?: number): Promise<void> {
+    requireTenantId(tenantId, 'delete invoice');
+    await db.delete(invoices).where(and(eq(invoices.id, id), eq(invoices.tenantId, tenantId)));
+  }
+  async getNextInvoiceNumber(tenantId: number): Promise<string> {
+    const year = new Date().getFullYear();
+    const [row] = await db.select({ cnt: count() }).from(invoices).where(eq(invoices.tenantId, tenantId));
+    const seq = (Number(row?.cnt ?? 0) + 1).toString().padStart(4, '0');
+    return `INV-${year}-${seq}`;
+  }
+
+  // ─── Time Clock ─────────────────────────────────────────────────────────────
+  async getTimeClockEntries(tenantId?: number, userId?: string): Promise<TimeClockEntry[]> {
+    const conditions: any[] = [];
+    if (tenantId) conditions.push(eq(timeClockEntries.tenantId, tenantId));
+    if (userId) conditions.push(eq(timeClockEntries.userId, userId));
+    const q = db.select().from(timeClockEntries);
+    if (conditions.length) return q.where(and(...conditions)).orderBy(desc(timeClockEntries.clockIn));
+    return q.orderBy(desc(timeClockEntries.clockIn));
+  }
+  async getOpenTimeClockEntry(userId: string, tenantId?: number): Promise<TimeClockEntry | undefined> {
+    const conditions: any[] = [eq(timeClockEntries.userId, userId), isNull(timeClockEntries.clockOut)];
+    if (tenantId) conditions.push(eq(timeClockEntries.tenantId, tenantId));
+    const [e] = await db.select().from(timeClockEntries).where(and(...conditions));
+    return e;
+  }
+  async clockIn(userId: string, tenantId: number): Promise<TimeClockEntry> {
+    const [e] = await db.insert(timeClockEntries).values({ userId, tenantId, clockIn: new Date() }).returning();
+    return e;
+  }
+  async clockOut(userId: string, tenantId?: number): Promise<TimeClockEntry> {
+    const conditions: any[] = [eq(timeClockEntries.userId, userId), isNull(timeClockEntries.clockOut)];
+    if (tenantId) conditions.push(eq(timeClockEntries.tenantId, tenantId));
+    const [e] = await db.update(timeClockEntries).set({ clockOut: new Date() }).where(and(...conditions)).returning();
+    if (!e) throw new Error('No open clock-in entry found');
+    return e;
+  }
+  async updateTimeClockEntry(id: number, data: Partial<InsertTimeClockEntry>, tenantId?: number): Promise<TimeClockEntry> {
+    requireTenantId(tenantId, 'update time clock entry');
+    const [e] = await db.update(timeClockEntries).set(data).where(and(eq(timeClockEntries.id, id), eq(timeClockEntries.tenantId, tenantId))).returning();
+    if (!e) throw new Error('Time clock entry not found');
+    return e;
+  }
+  async deleteTimeClockEntry(id: number, tenantId?: number): Promise<void> {
+    requireTenantId(tenantId, 'delete time clock entry');
+    await db.delete(timeClockEntries).where(and(eq(timeClockEntries.id, id), eq(timeClockEntries.tenantId, tenantId)));
+  }
+
+  // ─── Intake Forms ────────────────────────────────────────────────────────────
+  async getIntakeForms(tenantId?: number): Promise<IntakeForm[]> {
+    const q = db.select().from(intakeForms);
+    if (tenantId) return q.where(eq(intakeForms.tenantId, tenantId)).orderBy(desc(intakeForms.createdAt));
+    return q.orderBy(desc(intakeForms.createdAt));
+  }
+  async getActiveIntakeForms(tenantId?: number): Promise<IntakeForm[]> {
+    const conditions: any[] = [eq(intakeForms.isActive, true)];
+    if (tenantId) conditions.push(eq(intakeForms.tenantId, tenantId));
+    return db.select().from(intakeForms).where(and(...conditions)).orderBy(desc(intakeForms.createdAt));
+  }
+  async createIntakeForm(data: InsertIntakeForm): Promise<IntakeForm> {
+    const [f] = await db.insert(intakeForms).values(data).returning();
+    return f;
+  }
+  async updateIntakeForm(id: number, data: Partial<InsertIntakeForm>, tenantId?: number): Promise<IntakeForm> {
+    requireTenantId(tenantId, 'update intake form');
+    const [f] = await db.update(intakeForms).set(data).where(and(eq(intakeForms.id, id), eq(intakeForms.tenantId, tenantId))).returning();
+    if (!f) throw new Error('Intake form not found');
+    return f;
+  }
+  async deleteIntakeForm(id: number, tenantId?: number): Promise<void> {
+    requireTenantId(tenantId, 'delete intake form');
+    await db.delete(intakeForms).where(and(eq(intakeForms.id, id), eq(intakeForms.tenantId, tenantId)));
+  }
+  async createIntakeFormResponse(data: InsertIntakeFormResponse): Promise<IntakeFormResponse> {
+    const [r] = await db.insert(intakeFormResponses).values(data).returning();
+    return r;
+  }
+  async getIntakeFormResponses(formId: number, tenantId?: number): Promise<IntakeFormResponse[]> {
+    const conditions: any[] = [eq(intakeFormResponses.formId, formId)];
+    if (tenantId) conditions.push(eq(intakeFormResponses.tenantId, tenantId));
+    return db.select().from(intakeFormResponses).where(and(...conditions)).orderBy(desc(intakeFormResponses.submittedAt));
+  }
+
+  // ─── SMS Blasts ──────────────────────────────────────────────────────────────
+  async getSmsBlasts(tenantId?: number): Promise<SmsBlast[]> {
+    const q = db.select().from(smsBlasts);
+    if (tenantId) return q.where(eq(smsBlasts.tenantId, tenantId)).orderBy(desc(smsBlasts.sentAt));
+    return q.orderBy(desc(smsBlasts.sentAt));
+  }
+  async createSmsBlast(data: InsertSmsBlast): Promise<SmsBlast> {
+    const [b] = await db.insert(smsBlasts).values(data).returning();
+    return b;
+  }
+
+  // ─── Membership Plans ────────────────────────────────────────────────────────
+  async getMembershipPlans(tenantId?: number): Promise<MembershipPlan[]> {
+    const q = db.select().from(membershipPlans);
+    if (tenantId) return q.where(eq(membershipPlans.tenantId, tenantId)).orderBy(asc(membershipPlans.createdAt));
+    return q.orderBy(asc(membershipPlans.createdAt));
+  }
+  async createMembershipPlan(data: InsertMembershipPlan): Promise<MembershipPlan> {
+    const [p] = await db.insert(membershipPlans).values(data).returning();
+    return p;
+  }
+  async updateMembershipPlan(id: number, data: Partial<InsertMembershipPlan>, tenantId?: number): Promise<MembershipPlan> {
+    requireTenantId(tenantId, 'update membership plan');
+    const [p] = await db.update(membershipPlans).set(data).where(and(eq(membershipPlans.id, id), eq(membershipPlans.tenantId, tenantId))).returning();
+    if (!p) throw new Error('Membership plan not found');
+    return p;
+  }
+  async deleteMembershipPlan(id: number, tenantId?: number): Promise<void> {
+    requireTenantId(tenantId, 'delete membership plan');
+    await db.delete(membershipPlans).where(and(eq(membershipPlans.id, id), eq(membershipPlans.tenantId, tenantId)));
+  }
+
+  // ─── Member Subscriptions ────────────────────────────────────────────────────
+  async getMemberSubscriptions(tenantId?: number): Promise<MemberSubscription[]> {
+    const q = db.select().from(memberSubscriptions);
+    if (tenantId) return q.where(eq(memberSubscriptions.tenantId, tenantId)).orderBy(desc(memberSubscriptions.startedAt));
+    return q.orderBy(desc(memberSubscriptions.startedAt));
+  }
+  async createMemberSubscription(data: InsertMemberSubscription): Promise<MemberSubscription> {
+    const [s] = await db.insert(memberSubscriptions).values(data).returning();
+    return s;
+  }
+  async updateMemberSubscription(id: number, data: Partial<InsertMemberSubscription>, tenantId?: number): Promise<MemberSubscription> {
+    requireTenantId(tenantId, 'update member subscription');
+    const [s] = await db.update(memberSubscriptions).set(data).where(and(eq(memberSubscriptions.id, id), eq(memberSubscriptions.tenantId, tenantId))).returning();
+    if (!s) throw new Error('Member subscription not found');
+    return s;
+  }
+  async deleteMemberSubscription(id: number, tenantId?: number): Promise<void> {
+    requireTenantId(tenantId, 'delete member subscription');
+    await db.delete(memberSubscriptions).where(and(eq(memberSubscriptions.id, id), eq(memberSubscriptions.tenantId, tenantId)));
   }
 
   async getTenantBySlug(slug: string): Promise<Tenant | undefined> {

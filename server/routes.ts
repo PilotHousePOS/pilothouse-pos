@@ -15081,5 +15081,569 @@ CRITICAL RULES:
     }
   });
 
+  // ─── Waitlist Routes (admin-only) ─────────────────────────────────────────
+  app.get("/api/admin/waitlist", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number | undefined = req.tenantId;
+      res.json(await storage.getWaitlistEntries(tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.post("/api/admin/waitlist", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (!tenantId) return;
+      const { name, email, phone, serviceType, notes } = req.body;
+      if (!name) return res.status(400).json({ message: "name is required" });
+      const entry = await storage.createWaitlistEntry({ tenantId, name, email, phone, serviceType, notes });
+      res.json(entry);
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.patch("/api/admin/waitlist/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      const updates: any = { ...req.body };
+      if (updates.status === "notified" && !updates.notifiedAt) updates.notifiedAt = new Date();
+      res.json(await storage.updateWaitlistEntry(id, updates, tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.delete("/api/admin/waitlist/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      await storage.deleteWaitlistEntry(id, tenantId);
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // ─── Internal Task Routes ──────────────────────────────────────────────────
+  // GET: admins see all tasks; staff see only tasks assigned to them (explicit policy)
+  app.get("/api/admin/tasks", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      const tenantId: number | undefined = req.tenantId;
+      const tasks = user?.isAdmin
+        ? await storage.getInternalTasks(tenantId)
+        : await storage.getInternalTasksForUser(req.user?.id, tenantId);
+      res.json(tasks);
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // POST / PATCH / DELETE: admin-only (only admins create and assign tasks)
+  app.post("/api/admin/tasks", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (!tenantId) return;
+      const { title, description, assignedTo, dueDate, priority } = req.body;
+      if (!title) return res.status(400).json({ message: "title is required" });
+      const task = await storage.createInternalTask({ tenantId, title, description, assignedTo, dueDate, priority: priority || "medium", createdBy: req.user?.id });
+      res.json(task);
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // PATCH: admins can edit any field; staff can only update the status of tasks assigned to them
+  app.patch("/api/admin/tasks/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      if (!user?.isAdmin) {
+        // Staff may only update the status on tasks assigned to them
+        const assignedTasks = await storage.getInternalTasksForUser(req.user?.id, tenantId);
+        const isAssigned = assignedTasks.some(t => t.id === id);
+        if (!isAssigned) return res.status(403).json({ message: "You can only update tasks assigned to you" });
+        // Limit updatable fields for non-admins
+        const { status } = req.body;
+        if (!status) return res.status(400).json({ message: "Staff may only update task status" });
+        return res.json(await storage.updateInternalTask(id, { status }, tenantId));
+      }
+      res.json(await storage.updateInternalTask(id, req.body, tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.delete("/api/admin/tasks/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      await storage.deleteInternalTask(id, tenantId);
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // ─── Announcement Routes (admin-only) ──────────────────────────────────────
+  app.get("/api/admin/announcements", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number | undefined = req.tenantId;
+      res.json(await storage.getAnnouncements(tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.post("/api/admin/announcements", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (!tenantId) return;
+      const { title, body, expiresAt, isPinned } = req.body;
+      if (!title || !body) return res.status(400).json({ message: "title and body are required" });
+      const a = await storage.createAnnouncement({ tenantId, title, body, createdBy: req.user?.id, expiresAt: expiresAt ? new Date(expiresAt) : undefined, isPinned: !!isPinned });
+      res.json(a);
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.patch("/api/admin/announcements/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      const updates: any = { ...req.body };
+      if (updates.expiresAt) updates.expiresAt = new Date(updates.expiresAt);
+      res.json(await storage.updateAnnouncement(id, updates, tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.delete("/api/admin/announcements/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      await storage.deleteAnnouncement(id, tenantId);
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // ─── Estimate / Quote Routes (admin-only) ──────────────────────────────────
+  app.get("/api/admin/estimates", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number | undefined = req.tenantId;
+      res.json(await storage.getEstimates(tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.post("/api/admin/estimates", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (!tenantId) return;
+      const { title, contactId, lineItems, notes, expiresAt } = req.body;
+      if (!title) return res.status(400).json({ message: "title is required" });
+      const items: Array<{ description: string; qty: number; unitPrice: number }> = lineItems || [];
+      const total = items.reduce((s, i) => s + i.qty * i.unitPrice, 0).toFixed(2);
+      const e = await storage.createEstimate({ tenantId, title, contactId: contactId || null, lineItems: items, notes, total, expiresAt: expiresAt ? new Date(expiresAt) : undefined });
+      res.json(e);
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.patch("/api/admin/estimates/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      const updates: any = { ...req.body };
+      if (updates.lineItems) {
+        updates.total = updates.lineItems.reduce((s: number, i: any) => s + i.qty * i.unitPrice, 0).toFixed(2);
+      }
+      res.json(await storage.updateEstimate(id, updates, tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.delete("/api/admin/estimates/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      await storage.deleteEstimate(id, tenantId);
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // Convert estimate → mark converted (frontend creates order separately)
+  app.post("/api/admin/estimates/:id/convert", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      res.json(await storage.updateEstimate(id, { status: "converted" }, tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // ─── Invoice Routes (admin-only) ──────────────────────────────────────────
+  app.get("/api/admin/invoices", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number | undefined = req.tenantId;
+      res.json(await storage.getInvoices(tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.post("/api/admin/invoices", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (!tenantId) return;
+      const { contactId, lineItems, notes, dueDate } = req.body;
+      const invoiceNumber = await storage.getNextInvoiceNumber(tenantId);
+      const items: Array<{ description: string; qty: number; unitPrice: number }> = lineItems || [];
+      const total = items.reduce((s, i) => s + i.qty * i.unitPrice, 0).toFixed(2);
+      const inv = await storage.createInvoice({ tenantId, contactId: contactId || null, invoiceNumber, lineItems: items, notes, total, dueDate, status: "draft" });
+      res.json(inv);
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.patch("/api/admin/invoices/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      const updates: any = { ...req.body };
+      if (updates.lineItems) {
+        updates.total = updates.lineItems.reduce((s: number, i: any) => s + i.qty * i.unitPrice, 0).toFixed(2);
+      }
+      if (updates.status === "paid" && !updates.paidAt) updates.paidAt = new Date();
+      if (updates.status === "sent" && !updates.sentAt) updates.sentAt = new Date();
+      res.json(await storage.updateInvoice(id, updates, tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.delete("/api/admin/invoices/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      await storage.deleteInvoice(id, tenantId);
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // ─── Time Clock Routes ─────────────────────────────────────────────────────
+  // Admin-only: view all entries, edit/delete any entry
+  app.get("/api/admin/time-clock", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number | undefined = req.tenantId;
+      res.json(await storage.getTimeClockEntries(tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // Staff policy: any authenticated tenant member may clock in/out for themselves
+  app.post("/api/admin/time-clock/clock-in", authMiddleware, async (req: any, res) => {
+    try {
+      const tenantId = resolveWriteTenantId(req, res);
+      if (!tenantId) return;
+      const userId = req.user?.id;
+      const open = await storage.getOpenTimeClockEntry(userId, tenantId);
+      if (open) return res.status(400).json({ message: "Already clocked in", entry: open });
+      res.json(await storage.clockIn(userId, tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.post("/api/admin/time-clock/clock-out", authMiddleware, async (req: any, res) => {
+    try {
+      const tenantId: number | undefined = req.tenantId;
+      res.json(await storage.clockOut(req.user?.id, tenantId));
+    } catch (e: any) { res.status(400).json({ message: e.message }); }
+  });
+
+  // Returns the calling user's own open entry (no admin needed)
+  app.get("/api/admin/time-clock/status", authMiddleware, async (req: any, res) => {
+    try {
+      const tenantId: number | undefined = req.tenantId;
+      const entry = await storage.getOpenTimeClockEntry(req.user?.id, tenantId);
+      res.json({ isClockedIn: !!entry, entry: entry || null });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // Returns the calling user's own time-clock entries (no admin needed)
+  app.get("/api/admin/time-clock/mine", authMiddleware, async (req: any, res) => {
+    try {
+      const tenantId: number | undefined = req.tenantId;
+      res.json(await storage.getTimeClockEntries(tenantId, req.user?.id));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.patch("/api/admin/time-clock/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      const updates: any = { ...req.body };
+      if (updates.clockIn) updates.clockIn = new Date(updates.clockIn);
+      if (updates.clockOut) updates.clockOut = new Date(updates.clockOut);
+      res.json(await storage.updateTimeClockEntry(id, updates, tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.delete("/api/admin/time-clock/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      await storage.deleteTimeClockEntry(id, tenantId);
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // ─── Intake Form Routes ────────────────────────────────────────────────────
+  // Admin-only: manage forms
+  app.get("/api/admin/intake-forms", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number | undefined = req.tenantId;
+      res.json(await storage.getIntakeForms(tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // Public: active forms for this tenant (customers fill these out)
+  app.get("/api/intake-forms/active", async (req: any, res) => {
+    try {
+      const tenantId: number | undefined = req.tenantId;
+      res.json(await storage.getActiveIntakeForms(tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.post("/api/admin/intake-forms", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (!tenantId) return;
+      const { title, fields } = req.body;
+      if (!title) return res.status(400).json({ message: "title is required" });
+      res.json(await storage.createIntakeForm({ tenantId, title, fields: fields || [], isActive: true }));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.patch("/api/admin/intake-forms/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      res.json(await storage.updateIntakeForm(id, req.body, tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.delete("/api/admin/intake-forms/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      await storage.deleteIntakeForm(id, tenantId);
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // Submit a form response — any authenticated user may respond to an active form
+  app.post("/api/intake-forms/:id/respond", authMiddleware, async (req: any, res) => {
+    try {
+      const formId = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      const { responses, appointmentId } = req.body;
+      res.json(await storage.createIntakeFormResponse({ tenantId, formId, userId: req.user?.id, responses: responses || {}, appointmentId: appointmentId || null }));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // Admin: view submissions for a form
+  app.get("/api/admin/intake-forms/:id/responses", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const formId = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      res.json(await storage.getIntakeFormResponses(formId, tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // ─── SMS Blast Routes (admin-only) ─────────────────────────────────────────
+  app.get("/api/admin/sms-blasts", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number | undefined = req.tenantId;
+      res.json(await storage.getSmsBlasts(tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.post("/api/admin/sms-blasts", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (!tenantId) return;
+      const { message, segment } = req.body;
+      if (!message) return res.status(400).json({ message: "message is required" });
+      const seg = segment || "all";
+
+      const allUsers = await storage.getAllUsers(tenantId);
+      const contacts = await storage.getAllContacts(tenantId);
+      let phones: string[] = [];
+      if (seg === "all") {
+        const userPhones = allUsers.filter(u => u.phoneNumber).map(u => u.phoneNumber!);
+        const contactPhones = contacts.filter(c => c.phoneNumber && !c.smsOptOut).map(c => c.phoneNumber!);
+        phones = [...new Set([...userPhones, ...contactPhones])];
+      } else if (seg === "contacts") {
+        phones = contacts.filter(c => c.phoneNumber && !c.smsOptOut).map(c => c.phoneNumber!);
+      } else if (seg === "loyalty") {
+        phones = allUsers.filter(u => u.phoneNumber && (parseFloat(u.totalSpent ?? "0") > 0 || parseFloat(u.loyaltyCredits ?? "0") > 0)).map(u => u.phoneNumber!);
+      }
+
+      let sent = 0;
+      for (const phone of phones) {
+        try {
+          const ok = await notificationService.sendGenericSMS(phone, message, undefined, tenantId);
+          if (ok) sent++;
+        } catch { /* skip failed sends */ }
+      }
+
+      const blast = await storage.createSmsBlast({ tenantId, message, segment: seg, recipientCount: sent, sentBy: req.user?.id, status: sent > 0 ? "sent" : "failed" });
+      res.json({ blast, sent, total: phones.length });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // Preview recipient count (admin-only)
+  app.get("/api/admin/sms-blasts/preview-count", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number | undefined = req.tenantId;
+      const seg = (req.query.segment as string) || "all";
+      const allUsers = await storage.getAllUsers(tenantId);
+      const contacts = await storage.getAllContacts(tenantId);
+      let phones: string[] = [];
+      if (seg === "all") {
+        const up = allUsers.filter(u => u.phoneNumber).map(u => u.phoneNumber!);
+        const cp = contacts.filter(c => c.phoneNumber && !c.smsOptOut).map(c => c.phoneNumber!);
+        phones = [...new Set([...up, ...cp])];
+      } else if (seg === "contacts") {
+        phones = contacts.filter(c => c.phoneNumber && !c.smsOptOut).map(c => c.phoneNumber!);
+      } else if (seg === "loyalty") {
+        phones = allUsers.filter(u => u.phoneNumber && (parseFloat(u.totalSpent ?? "0") > 0 || parseFloat(u.loyaltyCredits ?? "0") > 0)).map(u => u.phoneNumber!);
+      }
+      res.json({ count: phones.length });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // ─── Membership Plan Routes (admin-only) ───────────────────────────────────
+  app.get("/api/admin/membership-plans", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number | undefined = req.tenantId;
+      res.json(await storage.getMembershipPlans(tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.post("/api/admin/membership-plans", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (!tenantId) return;
+      const { name, description, price, billingInterval, visitCredits } = req.body;
+      if (!name || !price) return res.status(400).json({ message: "name and price are required" });
+      res.json(await storage.createMembershipPlan({ tenantId, name, description, price: String(price), billingInterval: billingInterval || "monthly", visitCredits: visitCredits || 0 }));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.patch("/api/admin/membership-plans/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      res.json(await storage.updateMembershipPlan(id, req.body, tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.delete("/api/admin/membership-plans/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      await storage.deleteMembershipPlan(id, tenantId);
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // ─── Member Subscription Routes (admin-only) ───────────────────────────────
+  app.get("/api/admin/member-subscriptions", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number | undefined = req.tenantId;
+      res.json(await storage.getMemberSubscriptions(tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.post("/api/admin/member-subscriptions", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (!tenantId) return;
+      const { userId, planId, endsAt } = req.body;
+      if (!userId || !planId) return res.status(400).json({ message: "userId and planId are required" });
+      res.json(await storage.createMemberSubscription({ tenantId, userId, planId: parseInt(planId), status: "active", endsAt: endsAt ? new Date(endsAt) : undefined }));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.patch("/api/admin/member-subscriptions/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      const updates: any = { ...req.body };
+      if (updates.endsAt) updates.endsAt = new Date(updates.endsAt);
+      res.json(await storage.updateMemberSubscription(id, updates, tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.delete("/api/admin/member-subscriptions/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const id = parseInt(req.params.id);
+      const tenantId: number | undefined = req.tenantId;
+      await storage.deleteMemberSubscription(id, tenantId);
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
   // Server is now created externally in index.ts
 }
