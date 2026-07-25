@@ -68,6 +68,7 @@ export const users = pgTable("users", {
   isGroomer: boolean("is_groomer").default(false),
   isSuperiorManager: boolean("is_superior_manager").default(false),
   isChargeAccount: boolean("is_charge_account").default(false),
+  isEmployee: boolean("is_employee").default(false), // Tenant staff account created by admin
   totalSpent: decimal("total_spent", { precision: 10, scale: 2 }).default("0"),
   loyaltyCredits: decimal("loyalty_credits", { precision: 10, scale: 2 }).default("0"),
   stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
@@ -249,6 +250,7 @@ export const orders = pgTable("orders", {
   nextRecurringDate: timestamp("next_recurring_date"), // When to remind/place next order
   recurringParentId: integer("recurring_parent_id"), // Links to original order if this is a recurring copy
   hiddenFromAdmin: boolean("hidden_from_admin").default(false), // Hidden from admin view but visible in customer history
+  createdByUserId: varchar("created_by_user_id").references(() => users.id), // Employee who created this order
   stripeCheckoutSessionId: varchar("stripe_checkout_session_id", { length: 255 }), // Stripe checkout session for payment
   stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 255 }), // Stripe payment intent ID
   stripePaymentUrl: text("stripe_payment_url"), // Payment link URL sent to customer
@@ -1421,3 +1423,32 @@ export const memberSubscriptions = pgTable("member_subscriptions", {
 });
 export type MemberSubscription = typeof memberSubscriptions.$inferSelect;
 export type InsertMemberSubscription = typeof memberSubscriptions.$inferInsert;
+
+// ── Employee permission flags (one row per employee user per tenant) ─────────
+export const employeePermissions = pgTable("employee_permissions", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  tenantId: integer("tenant_id").notNull().references(() => tenants.id),
+  // POS / sales
+  canManageOrders:       boolean("can_manage_orders").default(false),
+  canApplyDiscounts:     boolean("can_apply_discounts").default(false),
+  canIssueRefunds:       boolean("can_issue_refunds").default(false),
+  // Customers / loyalty
+  canManageCustomers:    boolean("can_manage_customers").default(false),
+  canManageLoyalty:      boolean("can_manage_loyalty").default(false),
+  // Inventory
+  canManageInventory:    boolean("can_manage_inventory").default(false),
+  // Reports
+  canViewReports:        boolean("can_view_reports").default(false),
+  // Appointments / schedule
+  canManageAppointments: boolean("can_manage_appointments").default(false),
+  // Service staff
+  canManageGrooming:     boolean("can_manage_grooming").default(false),
+  canManageBoarding:     boolean("can_manage_boarding").default(false),
+  // Store settings (dangerous — off by default)
+  canAccessSettings:     boolean("can_access_settings").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+export type EmployeePermissions = typeof employeePermissions.$inferSelect;
+export type InsertEmployeePermissions = typeof employeePermissions.$inferInsert;

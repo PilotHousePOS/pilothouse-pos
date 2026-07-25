@@ -117,6 +117,7 @@ import TimeClockTab from "@/components/tabs/TimeClockTab";
 import IntakeFormsTab from "@/components/tabs/IntakeFormsTab";
 import SMSBlastsTab from "@/components/tabs/SMSBlastsTab";
 import MembershipsTab from "@/components/tabs/MembershipsTab";
+import StaffTab from "@/components/tabs/StaffTab";
 import { safeGoBack } from "@/lib/navigation";
 import { capitalizeWords } from "@/lib/stringUtils";
 import { formatCategory } from "@/lib/formatCategory";
@@ -6270,6 +6271,13 @@ export default function Admin() {
   const typedUser = user as User;
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Employee permissions — loaded when the logged-in user is an employee account
+  const { data: employeePerms } = useQuery<Record<string, boolean>>({
+    queryKey: ["/api/employee/my-permissions"],
+    enabled: !!typedUser?.isEmployee,
+    staleTime: 60_000,
+  });
   const [isAddPetOpen, setIsAddPetOpen] = useState(false);
   const [isAddSupplyOpen, setIsAddSupplyOpen] = useState(false);
   const [isInvoiceScanOpen, setIsInvoiceScanOpen] = useState(false);
@@ -6861,7 +6869,7 @@ export default function Admin() {
     'calendar', 'contacts', 'schedule', 'inventory', 'inv-audit',
     'pos-tracker', 'pos-reports', 'grooming', 'groomers', 'users',
     'database', 'astro', 'orders', 'charge-accounts', 'specials',
-    'applications', 'feedback', 'settings',
+    'applications', 'feedback', 'staff', 'settings',
   ];
   const OPTIONAL_TABS: { id: string; label: string }[] = [
     { id: 'appointments',  label: 'Appointments'  },
@@ -7007,6 +7015,7 @@ export default function Admin() {
       case 'intake-forms': return 'Intake Forms';
       case 'sms-blasts': return 'SMS Blasts';
       case 'memberships': return 'Memberships';
+      case 'staff': return 'Staff Accounts';
       default: return value;
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -9130,13 +9139,13 @@ export default function Admin() {
     );
   }
 
-  if (!typedUser?.isAdmin && !typedUser?.isGroomer) {
+  if (!typedUser?.isAdmin && !typedUser?.isGroomer && !typedUser?.isEmployee) {
     return (
       <div className="p-6">
         <div className="text-center">
           <Shield className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h2>
-          <p className="text-gray-600">Administrator or Groomer privileges required</p>
+          <p className="text-gray-600">Administrator, Groomer, or Employee account required</p>
         </div>
       </div>
     );
@@ -9467,38 +9476,42 @@ export default function Admin() {
               .filter(v => {
                 // Optional tabs only show when the admin has enabled them
                 if (OPTIONAL_TAB_IDS.includes(v) && !enabledOptionalTabs.includes(v)) return false;
+                // Employees see only the tabs their permissions allow
+                const isEmp = !!typedUser?.isEmployee && !typedUser?.isAdmin;
+                const ep = employeePerms ?? {};
                 return ({
-                  'appointments':   true,
-                  'non-payment':    true,
-                  'calendar':       true,
-                  'contacts':       true,
-                  'boarding':       !!(typedUser?.isAdmin && featureEnabled('boarding')),
-                  'schedule':       !!typedUser?.isAdmin,
-                  'inventory':      true,
-                  'inv-audit':      !!typedUser?.isAdmin,
-                  'pos-tracker':    !!typedUser?.isAdmin,
-                  'pos-reports':    !!typedUser?.isAdmin,
-                  'grooming':       !!typedUser?.isAdmin,
-                  'groomers':       true,
-                  'users':          !!typedUser?.isAdmin,
-                  'database':       !!typedUser?.isAdmin,
-                  'astro':          !!typedUser?.isAdmin,
-                  'email-center':   !!typedUser?.isAdmin,
-                  'orders':         true,
-                  'charge-accounts':!!typedUser?.isAdmin,
-                  'specials':       !!typedUser?.isAdmin,
-                  'applications':   !!typedUser?.isAdmin,
-                  'feedback':       !!typedUser?.isAdmin,
-                  'settings':       !!typedUser?.isAdmin,
-                  'waitlist':       !!typedUser?.isAdmin,
-                  'tasks':          !!typedUser?.isAdmin,
-                  'announcements':  !!typedUser?.isAdmin,
-                  'estimates':      !!typedUser?.isAdmin,
-                  'invoicing':      !!typedUser?.isAdmin,
-                  'time-clock':     true,
-                  'intake-forms':   !!typedUser?.isAdmin,
-                  'sms-blasts':     !!typedUser?.isAdmin,
-                  'memberships':    !!typedUser?.isAdmin,
+                  'appointments':    isEmp ? !!ep.canManageAppointments : true,
+                  'non-payment':     isEmp ? false : true,
+                  'calendar':        true,
+                  'contacts':        isEmp ? !!ep.canManageCustomers : true,
+                  'boarding':        isEmp ? !!ep.canManageBoarding && featureEnabled('boarding') : !!(typedUser?.isAdmin && featureEnabled('boarding')),
+                  'schedule':        isEmp ? true : !!typedUser?.isAdmin,
+                  'inventory':       isEmp ? !!ep.canManageInventory : true,
+                  'inv-audit':       isEmp ? false : !!typedUser?.isAdmin,
+                  'pos-tracker':     isEmp ? !!ep.canViewReports : !!typedUser?.isAdmin,
+                  'pos-reports':     isEmp ? !!ep.canViewReports : !!typedUser?.isAdmin,
+                  'grooming':        isEmp ? !!ep.canManageGrooming : !!typedUser?.isAdmin,
+                  'groomers':        isEmp ? !!ep.canManageGrooming : true,
+                  'users':           isEmp ? false : !!typedUser?.isAdmin,
+                  'database':        isEmp ? false : !!typedUser?.isAdmin,
+                  'astro':           isEmp ? false : !!typedUser?.isAdmin,
+                  'email-center':    isEmp ? false : !!typedUser?.isAdmin,
+                  'orders':          isEmp ? !!ep.canManageOrders : true,
+                  'charge-accounts': isEmp ? false : !!typedUser?.isAdmin,
+                  'specials':        isEmp ? false : !!typedUser?.isAdmin,
+                  'applications':    isEmp ? false : !!typedUser?.isAdmin,
+                  'feedback':        isEmp ? false : !!typedUser?.isAdmin,
+                  'settings':        isEmp ? !!ep.canAccessSettings : !!typedUser?.isAdmin,
+                  'staff':           isEmp ? false : !!typedUser?.isAdmin,
+                  'waitlist':        isEmp ? false : !!typedUser?.isAdmin,
+                  'tasks':           true,
+                  'announcements':   true,
+                  'estimates':       isEmp ? false : !!typedUser?.isAdmin,
+                  'invoicing':       isEmp ? false : !!typedUser?.isAdmin,
+                  'time-clock':      true,
+                  'intake-forms':    isEmp ? false : !!typedUser?.isAdmin,
+                  'sms-blasts':      isEmp ? false : !!typedUser?.isAdmin,
+                  'memberships':     isEmp ? false : !!typedUser?.isAdmin,
                 } as Record<string, boolean>)[v] ?? false;
               })
               .map(value => (
@@ -14896,6 +14909,10 @@ export default function Admin() {
 
         <TabsContent value="memberships" className="space-y-4">
           <MembershipsTab typedUser={typedUser} />
+        </TabsContent>
+
+        <TabsContent value="staff" className="space-y-4">
+          <StaffTab typedUser={typedUser} />
         </TabsContent>
 
       </Tabs>

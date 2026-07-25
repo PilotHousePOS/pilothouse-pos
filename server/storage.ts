@@ -130,6 +130,9 @@ import {
   smsBlasts,
   membershipPlans,
   memberSubscriptions,
+  employeePermissions,
+  type EmployeePermissions,
+  type InsertEmployeePermissions,
   type WaitlistEntry,
   type InsertWaitlistEntry,
   type InternalTask,
@@ -179,6 +182,14 @@ export interface IStorage {
   createUser(user: { email: string; password: string; firstName: string; lastName: string; tenantId?: number }): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
   updateUserAdmin(id: string, isAdmin: boolean): Promise<User>;
+  // Employee operations
+  createEmployee(data: { tenantId: number; email: string; password: string; firstName: string; lastName: string; phoneNumber?: string }): Promise<User>;
+  getEmployees(tenantId: number): Promise<User[]>;
+  updateEmployee(id: string, data: Partial<{ firstName: string; lastName: string; email: string; password: string; phoneNumber: string }>, tenantId: number): Promise<User>;
+  deleteEmployee(id: string, tenantId: number): Promise<void>;
+  getEmployeePermissions(userId: string, tenantId: number): Promise<EmployeePermissions | undefined>;
+  upsertEmployeePermissions(userId: string, tenantId: number, perms: Partial<Omit<InsertEmployeePermissions, 'userId' | 'tenantId' | 'id' | 'createdAt' | 'updatedAt'>>): Promise<EmployeePermissions>;
+  getEmployeeSalesStats(tenantId: number): Promise<Array<{ userId: string; firstName: string | null; lastName: string | null; orderCount: number; totalSales: string }>>;
   updateUserGroomer(id: string, isGroomer: boolean): Promise<User>;
   updateUserChargeAccount(id: string, isChargeAccount: boolean): Promise<User>;
   updateUserSuperiorManager(id: string, isSuperiorManager: boolean): Promise<User>;
@@ -5667,6 +5678,77 @@ export class DatabaseStorage implements IStorage {
    * Returns row counts for each tenant-scoped table for the given tenant.
    * Used by the super-admin isolation verification route.
    */
+
+  // ── Employee operations ──────────────────────────────────────────────────
+  async createEmployee(data: { tenantId: number; email: string; password: string; firstName: string; lastName: string; phoneNumber?: string }): Promise<User> {
+    const bcrypt = await import("bcryptjs");
+    const hashed = await bcrypt.hash(data.password, 10);
+    const id = `emp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const [user] = await db.insert(users).values({
+      id,
+      email: data.email,
+      password: hashed,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      phoneNumber: data.phoneNumber,
+      tenantId: data.tenantId,
+      isAdmin: false,
+      isEmployee: true,
+      emailVerified: true,
+    }).returning();
+    return user;
+  }
+
+  async getEmployees(tenantId: number): Promise<User[]> {
+    return db.select().from(users).where(and(eq(users.tenantId, tenantId), eq(users.isEmployee, true))).orderBy(asc(users.firstName));
+  }
+
+  async updateEmployee(id: string, data: Partial<{ firstName: string; lastName: string; email: string; password: string; phoneNumber: string }>, tenantId: number): Promise<User> {
+    const update: any = { ...data, updatedAt: new Date() };
+    if (data.password) {
+      const bcrypt = await import("bcryptjs");
+      update.password = await bcrypt.hash(data.password, 10);
+    } else {
+      delete update.password;
+    }
+    const [user] = await db.update(users).set(update).where(and(eq(users.id, id), eq(users.tenantId, tenantId), eq(users.isEmployee, true))).returning();
+    if (!user) throw new Error("Employee not found");
+    return user;
+  }
+
+  async deleteEmployee(id: string, tenantId: number): Promise<void> {
+    await db.delete(users).where(and(eq(users.id, id), eq(users.tenantId, tenantId), eq(users.isEmployee, true)));
+  }
+
+  async getEmployeePermissions(userId: string, tenantId: number): Promise<EmployeePermissions | undefined> {
+    const [row] = await db.select().from(employeePermissions).where(and(eq(employeePermissions.userId, userId), eq(employeePermissions.tenantId, tenantId)));
+    return row;
+  }
+
+  async upsertEmployeePermissions(userId: string, tenantId: number, perms: Partial<Omit<InsertEmployeePermissions, 'userId' | 'tenantId' | 'id' | 'createdAt' | 'updatedAt'>>): Promise<EmployeePermissions> {
+    const [row] = await db.insert(employeePermissions).values({ userId, tenantId, ...perms }).onConflictDoUpdate({
+      target: [employeePermissions.userId, employeePermissions.tenantId],
+      set: { ...perms, updatedAt: new Date() },
+    }).returning();
+    return row;
+  }
+
+  async getEmployeeSalesStats(tenantId: number): Promise<Array<{ userId: string; firstName: string | null; lastName: string | null; orderCount: number; totalSales: string }>> {
+    const rows = await db
+      .select({
+        userId: orders.createdByUserId,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        orderCount: count(orders.id),
+        totalSales: sql<string>`COALESCE(SUM(${orders.totalAmount}), 0)`,
+      })
+      .from(orders)
+      .innerJoin(users, eq(orders.createdByUserId, users.id))
+      .where(and(eq(orders.tenantId, tenantId), isNotNull(orders.createdByUserId)))
+      .groupBy(orders.createdByUserId, users.firstName, users.lastName);
+    return rows.map(r => ({ ...r, userId: r.userId!, orderCount: Number(r.orderCount) }));
+  }
+
   async getTenantRowCounts(tenantId: number): Promise<Record<string, number>> {
     const tables = [
       { name: 'users',                     table: users,                    col: users.tenantId },

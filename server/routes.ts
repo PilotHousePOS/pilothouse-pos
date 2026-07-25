@@ -15645,5 +15645,101 @@ CRITICAL RULES:
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 
+  // ── Employee management routes ───────────────────────────────────────────
+  // GET /api/admin/employees — list employees for tenant (admin only)
+  app.get("/api/admin/employees", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number = req.tenantId;
+      res.json(await storage.getEmployees(tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // GET /api/admin/employees/sales-stats — per-employee sales totals (admin only)
+  app.get("/api/admin/employees/sales-stats", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number = req.tenantId;
+      res.json(await storage.getEmployeeSalesStats(tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // POST /api/admin/employees — create employee account (admin only)
+  app.post("/api/admin/employees", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number = req.tenantId;
+      const { email, password, firstName, lastName, phoneNumber } = req.body;
+      if (!email || !password || !firstName) return res.status(400).json({ message: "email, password, and firstName are required" });
+      const existing = await storage.getUserByEmail(email);
+      if (existing) return res.status(409).json({ message: "An account with that email already exists" });
+      res.status(201).json(await storage.createEmployee({ tenantId, email, password, firstName, lastName, phoneNumber }));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // PATCH /api/admin/employees/:id — update employee info/password (admin only)
+  app.patch("/api/admin/employees/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number = req.tenantId;
+      const { firstName, lastName, email, password, phoneNumber } = req.body;
+      const update: any = {};
+      if (firstName !== undefined) update.firstName = firstName;
+      if (lastName  !== undefined) update.lastName  = lastName;
+      if (email     !== undefined) update.email     = email;
+      if (password)                update.password  = password;
+      if (phoneNumber !== undefined) update.phoneNumber = phoneNumber;
+      res.json(await storage.updateEmployee(req.params.id, update, tenantId));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // DELETE /api/admin/employees/:id — remove employee (admin only)
+  app.delete("/api/admin/employees/:id", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number = req.tenantId;
+      await storage.deleteEmployee(req.params.id, tenantId);
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // GET /api/admin/employees/:id/permissions — get employee permissions (admin only)
+  app.get("/api/admin/employees/:id/permissions", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number = req.tenantId;
+      const perms = await storage.getEmployeePermissions(req.params.id, tenantId);
+      res.json(perms ?? {});
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // PUT /api/admin/employees/:id/permissions — set employee permissions (admin only)
+  app.put("/api/admin/employees/:id/permissions", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number = req.tenantId;
+      const perms = req.body;
+      res.json(await storage.upsertEmployeePermissions(req.params.id, tenantId, perms));
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // GET /api/employee/my-permissions — employee fetches own permissions (any authenticated employee)
+  app.get("/api/employee/my-permissions", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isEmployee) return res.status(403).json({ message: "Employee access only" });
+      const tenantId: number = req.tenantId;
+      const perms = await storage.getEmployeePermissions(user.id, tenantId);
+      res.json(perms ?? {});
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
   // Server is now created externally in index.ts
 }

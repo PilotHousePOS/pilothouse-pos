@@ -871,6 +871,40 @@ async function runAppMigrations() {
       log('[migration] optional_tabs_tables_v1 complete');
     }
 
+    // ── Employee system migration ────────────────────────────────────────────
+    const empKey = 'employee_system_v1';
+    const empExists = await migDb.execute(
+      migSql.raw(`SELECT key FROM data_migrations WHERE key = '${empKey}'`)
+    );
+    if (empExists.rows.length === 0) {
+      log('[migration] Running employee_system_v1...');
+      await migDb.execute(migSql.raw(`
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS is_employee BOOLEAN DEFAULT FALSE;
+        ALTER TABLE orders ADD COLUMN IF NOT EXISTS created_by_user_id VARCHAR REFERENCES users(id);
+        CREATE TABLE IF NOT EXISTS employee_permissions (
+          id SERIAL PRIMARY KEY,
+          user_id VARCHAR NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          tenant_id INTEGER NOT NULL REFERENCES tenants(id),
+          can_manage_orders       BOOLEAN DEFAULT FALSE,
+          can_apply_discounts     BOOLEAN DEFAULT FALSE,
+          can_issue_refunds       BOOLEAN DEFAULT FALSE,
+          can_manage_customers    BOOLEAN DEFAULT FALSE,
+          can_manage_loyalty      BOOLEAN DEFAULT FALSE,
+          can_manage_inventory    BOOLEAN DEFAULT FALSE,
+          can_view_reports        BOOLEAN DEFAULT FALSE,
+          can_manage_appointments BOOLEAN DEFAULT FALSE,
+          can_manage_grooming     BOOLEAN DEFAULT FALSE,
+          can_manage_boarding     BOOLEAN DEFAULT FALSE,
+          can_access_settings     BOOLEAN DEFAULT FALSE,
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW(),
+          UNIQUE(user_id, tenant_id)
+        );
+      `));
+      await migDb.execute(migSql.raw(`INSERT INTO data_migrations (key) VALUES ('${empKey}')`));
+      log('[migration] employee_system_v1 complete');
+    }
+
     // Startup cleanup: remove zero-stock items from pending queue (POS tracker)
     await migDb.execute(migSql.raw(`DELETE FROM pos_pending_new_items WHERE pos_stock <= 0`));
 
