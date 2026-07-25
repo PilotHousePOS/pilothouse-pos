@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { useLocation } from "wouter";
 import { ArrowLeft, Mail, Save, User as UserIcon, Lock, Phone, CreditCard, Trash2, Star, Plus, Loader2, Receipt, ChevronRight, Link as LinkIcon, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
@@ -1144,9 +1145,8 @@ export default function Settings() {
               </div>
               <div>
                 <Label htmlFor="phone-current-password">Current Password</Label>
-                <Input
+                <PasswordInput
                   id="phone-current-password"
-                  type="password"
                   placeholder="Enter your current password to confirm"
                   value={phonePassword}
                   onChange={(e) => setPhonePassword(e.target.value)}
@@ -1230,9 +1230,8 @@ export default function Settings() {
               </div>
               <div>
                 <Label htmlFor="email-current-password">Current Password</Label>
-                <Input
+                <PasswordInput
                   id="email-current-password"
-                  type="password"
                   placeholder="Enter your current password to confirm"
                   value={emailPassword}
                   onChange={(e) => setEmailPassword(e.target.value)}
@@ -1265,9 +1264,8 @@ export default function Settings() {
         <CardContent className="space-y-4">
           <div>
             <Label htmlFor="current-password">Current Password</Label>
-            <Input
+            <PasswordInput
               id="current-password"
-              type="password"
               placeholder="Enter current password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
@@ -1277,9 +1275,8 @@ export default function Settings() {
           </div>
           <div>
             <Label htmlFor="new-password">New Password</Label>
-            <Input
+            <PasswordInput
               id="new-password"
-              type="password"
               placeholder="Enter new password (min 6 characters)"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
@@ -1289,9 +1286,8 @@ export default function Settings() {
           </div>
           <div>
             <Label htmlFor="confirm-password">Confirm New Password</Label>
-            <Input
+            <PasswordInput
               id="confirm-password"
-              type="password"
               placeholder="Confirm new password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}

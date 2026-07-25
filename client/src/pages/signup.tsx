@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, ArrowRight, Sparkles, CheckCircle, AlertTriangle, Loader2, Pencil } from "lucide-react";
 import { useLocation } from "wouter";
@@ -275,9 +276,8 @@ export default function Signup() {
 
               <div className="space-y-1.5">
                 <Label className="text-white font-semibold">Password <span className="text-red-400">*</span></Label>
-                <Input
+                <PasswordInput
                   name="password"
-                  type="password"
                   placeholder="Create a strong password"
                   className="bg-white/10 border-white/30 text-white placeholder:text-gray-500"
                   required

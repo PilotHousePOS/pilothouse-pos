@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Heart, AlertCircle } from "lucide-react";
+import { PasswordInput } from "@/components/ui/password-input";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
@@ -414,9 +415,8 @@ export default function Auth() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="password" className="text-white">Password</Label>
-                    <Input
+                    <PasswordInput
                       name="password"
-                      type="password"
                       placeholder="Enter your password"
                       className="bg-white/10 border-white/30 text-white placeholder:text-gray-400"
                       required
@@ -500,9 +500,8 @@ export default function Auth() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signupPassword" className="text-white">Password</Label>
-                    <Input
+                    <PasswordInput
                       name="password"
-                      type="password"
                       placeholder="Create a password"
                       className="bg-white/10 border-white/30 text-white placeholder:text-gray-400"
                       required
