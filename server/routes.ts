@@ -949,7 +949,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       if (!dbUser.isAdmin) return res.status(403).json({ message: "Admin access required." });
 
       // Whitelist of valid feature keys
-      const VALID_FEATURES = ['appointments', 'loyalty', 'boarding', 'hiring', 'emailMarketing'];
+      const VALID_FEATURES = ['appointments', 'loyalty', 'boarding', 'hiring', 'emailMarketing', 'pets'];
       const incoming = req.body ?? {};
       const features: Record<string, boolean> = {};
       for (const key of VALID_FEATURES) {

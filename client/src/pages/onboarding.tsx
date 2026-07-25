@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   CheckCircle, ArrowRight, Building2, CreditCard, Users, Sparkles, Star,
-  Package, Loader2, Calendar, Gift, Home, Briefcase, Mail,
+  Package, Loader2, Calendar, Gift, Home, Briefcase, Mail, PawPrint,
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
@@ -354,6 +354,14 @@ const ALL_FEATURES: Feature[] = [
     Icon: Mail,
     color: 'text-cyan-400',
     defaultOn: true,
+  },
+  {
+    id: 'pets',
+    name: 'Pet Profiles',
+    description: 'Let customers add their pets to their account. Best for groomers, vet clinics, and pet stores.',
+    Icon: PawPrint,
+    color: 'text-pink-400',
+    defaultOn: false,
   },
 ];
 

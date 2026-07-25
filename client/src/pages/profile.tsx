@@ -70,6 +70,13 @@ export default function Profile() {
     enabled: !!currentUser,
   });
 
+  const { data: tenantInfo } = useQuery<{ enabledFeatures?: Record<string, any> }>({
+    queryKey: ["/api/tenants/current"],
+    enabled: !!currentUser,
+  });
+  // Show pets section unless the store has explicitly disabled it (default: visible for backward compat)
+  const petsEnabled = tenantInfo?.enabledFeatures?.pets !== false;
+
   const feedbackMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", "/api/feedback", {
@@ -558,8 +565,8 @@ export default function Profile() {
         </Card>
       </div>}
 
-      {/* My Pets Section */}
-      <div className="mb-8">
+      {/* My Pets Section — only shown when the store has the pets feature enabled */}
+      {petsEnabled && <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-gray-900">My Pets</h3>
           <Button variant="ghost" size="sm" className="text-brand-blue" onClick={() => setShowAddPet(true)}>
@@ -748,7 +755,7 @@ export default function Profile() {
             )}
           </DialogContent>
         </Dialog>
-      </div>
+      </div>}
 
       {/* Quick Actions */}
       <div className="mb-8">

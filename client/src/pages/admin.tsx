@@ -12482,10 +12482,10 @@ export default function Admin() {
                           </p>
                           <div className="flex gap-2 mt-2 flex-wrap">
                             {userItem.isSuperiorManager && (
-                              <Badge className="text-xs bg-yellow-400 text-black border border-yellow-500">Superior Manager</Badge>
+                              <Badge className="text-xs bg-yellow-400 text-black border border-yellow-500">Owner</Badge>
                             )}
                             {userItem.isAdmin && (
-                              <Badge variant="default" className="text-xs">Owner</Badge>
+                              <Badge variant="default" className="text-xs">Admin</Badge>
                             )}
                             {userItem.isGroomer && (
                               <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700">Groomer</Badge>
@@ -12503,15 +12503,15 @@ export default function Admin() {
                         </div>
                         <div className="flex flex-col gap-2 sm:min-w-[140px]">
                           <div className="flex items-center justify-between gap-3">
-                            <span className="text-sm font-medium">Owner</span>
+                            <span className="text-sm font-medium">Admin</span>
                             <Switch
                               checked={userItem.isAdmin}
                               onCheckedChange={(checked) => {
                                 showDeleteConfirmation(
-                                  checked ? 'Grant Owner Access' : 'Remove Owner Access',
+                                  checked ? 'Grant Admin Access' : 'Remove Admin Access',
                                   checked
-                                    ? `This will give ${userItem.firstName} ${userItem.lastName} full owner privileges.`
-                                    : `This will remove owner privileges from ${userItem.firstName} ${userItem.lastName}.`,
+                                    ? `This will give ${userItem.firstName} ${userItem.lastName} full admin privileges.`
+                                    : `This will remove admin privileges from ${userItem.firstName} ${userItem.lastName}.`,
                                   '',
                                   () => updateAdminMutation.mutate({ userId: userItem.id, isAdmin: checked }),
                                   checked ? 'Yes, Grant Access' : 'Yes, Remove Access',
@@ -12584,19 +12584,19 @@ export default function Admin() {
                           {typedUser?.isSuperiorManager && (
                             <div className={`flex items-center justify-between gap-3 px-2 py-1.5 rounded-md border ${userItem.isSuperiorManager ? 'bg-yellow-400/20 border-yellow-500' : 'bg-yellow-400/5 border-yellow-500/30'}`}>
                               <span className="text-sm font-semibold text-yellow-600 flex items-center gap-1">
-                                ★ Sup. Mgr
+                                ★ Owner
                               </span>
                               <Switch
                                 checked={!!userItem.isSuperiorManager}
                                 onCheckedChange={(checked) => {
                                   showDeleteConfirmation(
-                                    checked ? 'Grant Superior Manager' : 'Remove Superior Manager',
+                                    checked ? 'Grant Owner' : 'Remove Owner',
                                     checked
-                                      ? `This will grant Superior Manager privileges to ${userItem.firstName} ${userItem.lastName}.`
-                                      : `This will remove Superior Manager privileges from ${userItem.firstName} ${userItem.lastName}.`,
+                                      ? `This will grant Owner privileges to ${userItem.firstName} ${userItem.lastName}.`
+                                      : `This will remove Owner privileges from ${userItem.firstName} ${userItem.lastName}.`,
                                     '',
                                     () => updateSuperiorManagerMutation.mutate({ userId: userItem.id, isSuperiorManager: checked }),
-                                    checked ? 'Yes, Grant Superior Manager' : 'Yes, Remove Superior Manager',
+                                    checked ? 'Yes, Grant Owner' : 'Yes, Remove Owner',
                                     'confirm'
                                   );
                                 }}
@@ -14236,7 +14236,7 @@ export default function Admin() {
                     data-testid="button-add-groomer"
                   >
                     <UserPlus className="w-4 h-4 mr-2" />
-                    Add New Groomer
+                    Add New {tl('groomers', 'Staff')}
                   </Button>
                 )}
               </div>
@@ -14245,13 +14245,13 @@ export default function Admin() {
               {groomersQuery.isLoading ? (
                 <div className="text-center py-8">
                   <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
-                  <p className="text-sm text-gray-500 mt-2">Loading groomers...</p>
+                  <p className="text-sm text-gray-500 mt-2">Loading {tl('groomers', 'Staff').toLowerCase()}s...</p>
                 </div>
               ) : groomersQuery.data?.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                  <p>No groomers found</p>
-                  <p className="text-sm mt-1">Click "Add New Groomer" to create one</p>
+                  <p>No {tl('groomers', 'Staff').toLowerCase()}s found</p>
+                  <p className="text-sm mt-1">Click "Add New {tl('groomers', 'Staff')}" to create one</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -14369,14 +14369,14 @@ export default function Admin() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CalendarX2 className="w-5 h-5" />
-                  Blocked Days (Sick/Vacation)
+                  {tl('groomers', 'Staff')} Blocked Days (Sick/Vacation)
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {groomersQuery.data?.filter((g: any) => g.isActive).length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     <CalendarX2 className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                    <p>No active groomers found</p>
+                    <p>No active {tl('groomers', 'Staff').toLowerCase()}s found</p>
                   </div>
                 ) : (
                   <Accordion type="single" collapsible className="space-y-2">
@@ -15384,8 +15384,8 @@ export default function Admin() {
       <Dialog open={isAddGroomerOpen} onOpenChange={setIsAddGroomerOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Add New Groomer</DialogTitle>
-            <DialogDescription>Add a new groomer to your team.</DialogDescription>
+            <DialogTitle>Add New {tl('groomers', 'Staff')}</DialogTitle>
+            <DialogDescription>Add a new {tl('groomers', 'Staff').toLowerCase()} to your team.</DialogDescription>
           </DialogHeader>
           <GroomerForm 
             onSubmit={(data) => createGroomerMutation.mutate(data)}

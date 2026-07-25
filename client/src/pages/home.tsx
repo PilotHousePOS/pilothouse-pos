@@ -498,7 +498,7 @@ export default function Home() {
               {user && (
                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                   Welcome, {typedUser?.firstName || typedUser?.email || "Guest"}
-                  {typedUser?.isAdmin ? " (Owner)" : typedUser?.isEmployee ? " (Staff)" : ""}
+                  {typedUser?.isSuperiorManager ? " (Owner)" : typedUser?.isAdmin ? " (Admin)" : typedUser?.isEmployee ? " (Staff)" : ""}
                 </p>
               )}
             </div>
