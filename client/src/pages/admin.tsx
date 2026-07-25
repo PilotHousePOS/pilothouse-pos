@@ -4452,6 +4452,61 @@ function SettingsPanel() {
   );
 }
 
+// Store Code Card — shows the owner their unique auto-generated store code to share with employees
+function StoreCodeCard() {
+  const { data: tenantInfo } = useQuery<{ slug?: string; name?: string }>({
+    queryKey: ['/api/tenants/current'],
+  });
+  const { toast } = useToast();
+  const [copied, setCopied] = useState(false);
+
+  const slug = tenantInfo?.slug ?? '';
+
+  const copy = () => {
+    if (!slug) return;
+    navigator.clipboard.writeText(slug).then(() => {
+      setCopied(true);
+      toast({ title: 'Store code copied!' });
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  return (
+    <Card className="border-blue-200 bg-blue-50/50">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-blue-800">
+          <Shield className="w-5 h-5" />
+          Your Store Code
+        </CardTitle>
+        <p className="text-sm text-blue-700">
+          This code is unique to your business — generated automatically when your account was created. Share it with employees so they can sign in on a new device. It can never match another store's code.
+        </p>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center gap-3">
+          <div className="flex-1 bg-white border border-blue-200 rounded-lg px-4 py-3">
+            <p className="text-xs text-blue-500 font-medium mb-0.5">Store code</p>
+            <p className="font-mono text-lg font-bold text-blue-900 tracking-wide">{slug || '—'}</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-blue-300 text-blue-700 hover:bg-blue-100 shrink-0"
+            onClick={copy}
+            disabled={!slug}
+          >
+            {copied ? <Check className="w-4 h-4 mr-1.5 text-green-600" /> : <Copy className="w-4 h-4 mr-1.5" />}
+            {copied ? 'Copied' : 'Copy'}
+          </Button>
+        </div>
+        <p className="text-xs text-blue-500 mt-3">
+          Employees enter this once on a fresh device in the <strong>Staff Sign-In</strong> tab. After that, their device remembers it automatically.
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
 // Store Hours Panel Component
 function StoreHoursPanel() {
   const { toast } = useToast();
@@ -14910,6 +14965,7 @@ export default function Admin() {
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-6">
+          <StoreCodeCard />
           <FeaturesPanel />
           <StoreHoursPanel />
           <SettingsPanel />
