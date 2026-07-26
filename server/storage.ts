@@ -186,9 +186,9 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>;
   updateUserAdmin(id: string, isAdmin: boolean): Promise<User>;
   // Employee operations
-  createEmployee(data: { tenantId: number; email: string; password: string; firstName: string; lastName: string; phoneNumber?: string; makeAdmin?: boolean; defaultWorkDays?: string[]; defaultTimeSlot?: string }): Promise<User>;
+  createEmployee(data: { tenantId: number; email: string; password: string; firstName: string; lastName: string; phoneNumber?: string; makeAdmin?: boolean; defaultWorkDays?: string[]; defaultTimeSlot?: string; defaultDaySlots?: Record<string, string> }): Promise<User>;
   getEmployees(tenantId: number): Promise<User[]>;
-  updateEmployee(id: string, data: Partial<{ firstName: string; lastName: string; email: string; password: string; phoneNumber: string; isAdmin: boolean; defaultWorkDays: string[]; defaultTimeSlot: string }>, tenantId: number): Promise<User>;
+  updateEmployee(id: string, data: Partial<{ firstName: string; lastName: string; email: string; password: string; phoneNumber: string; isAdmin: boolean; defaultWorkDays: string[]; defaultTimeSlot: string; defaultDaySlots: Record<string, string> }>, tenantId: number): Promise<User>;
   setEmployeePin(userId: string, tenantId: number, pin: string): Promise<void>;
   authenticateEmployeeByPin(tenantId: number, employeeCode: string, pin: string): Promise<User | null>;
   deleteEmployee(id: string, tenantId: number): Promise<void>;
@@ -5691,7 +5691,7 @@ export class DatabaseStorage implements IStorage {
    */
 
   // ── Employee operations ──────────────────────────────────────────────────
-  async createEmployee(data: { tenantId: number; email: string; password: string; firstName: string; lastName: string; phoneNumber?: string; makeAdmin?: boolean; defaultWorkDays?: string[]; defaultTimeSlot?: string }): Promise<User> {
+  async createEmployee(data: { tenantId: number; email: string; password: string; firstName: string; lastName: string; phoneNumber?: string; makeAdmin?: boolean; defaultWorkDays?: string[]; defaultTimeSlot?: string; defaultDaySlots?: Record<string,string> }): Promise<User> {
     const bcrypt = await import("bcryptjs");
     const hashed = await bcrypt.hash(data.password, 10);
     const id = `emp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -5711,6 +5711,7 @@ export class DatabaseStorage implements IStorage {
       employeeCode: code,
       defaultWorkDays: data.defaultWorkDays ?? null,
       defaultTimeSlot: data.defaultTimeSlot ?? null,
+      defaultDaySlots: data.defaultDaySlots ?? null,
     } as any).returning();
     return user;
   }

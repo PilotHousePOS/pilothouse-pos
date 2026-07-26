@@ -12257,6 +12257,7 @@ West Monroe LA 71291
     try {
       await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS default_work_days JSONB`);
       await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS default_time_slot VARCHAR(50)`);
+      await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS default_day_slots JSONB`);
       await db.execute(sql`ALTER TABLE groomers ADD COLUMN IF NOT EXISTS group_id VARCHAR(100) DEFAULT 'default'`);
       await db.execute(sql`
         CREATE TABLE IF NOT EXISTS schedule_overrides (
@@ -15862,11 +15863,11 @@ CRITICAL RULES:
       const user = await storage.getUser(req.user?.id);
       if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
       const tenantId: number = req.tenantId;
-      const { email, password, firstName, lastName, phoneNumber, defaultWorkDays, defaultTimeSlot } = req.body;
+      const { email, password, firstName, lastName, phoneNumber, defaultWorkDays, defaultTimeSlot, defaultDaySlots } = req.body;
       if (!email || !password || !firstName) return res.status(400).json({ message: "email, password, and firstName are required" });
       const existing = await storage.getUserByEmail(email);
       if (existing) return res.status(409).json({ message: "An account with that email already exists" });
-      res.status(201).json(await storage.createEmployee({ tenantId, email, password, firstName, lastName, phoneNumber, defaultWorkDays, defaultTimeSlot }));
+      res.status(201).json(await storage.createEmployee({ tenantId, email, password, firstName, lastName, phoneNumber, defaultWorkDays, defaultTimeSlot, defaultDaySlots }));
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 
@@ -15876,7 +15877,7 @@ CRITICAL RULES:
       const user = await storage.getUser(req.user?.id);
       if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
       const tenantId: number = req.tenantId;
-      const { firstName, lastName, email, password, phoneNumber, defaultWorkDays, defaultTimeSlot } = req.body;
+      const { firstName, lastName, email, password, phoneNumber, defaultWorkDays, defaultTimeSlot, defaultDaySlots } = req.body;
       const update: any = {};
       if (firstName !== undefined) update.firstName = firstName;
       if (lastName  !== undefined) update.lastName  = lastName;
@@ -15885,6 +15886,7 @@ CRITICAL RULES:
       if (phoneNumber !== undefined) update.phoneNumber = phoneNumber;
       if (defaultWorkDays !== undefined) update.defaultWorkDays = defaultWorkDays;
       if (defaultTimeSlot !== undefined) update.defaultTimeSlot = defaultTimeSlot;
+      if (defaultDaySlots !== undefined) update.defaultDaySlots = defaultDaySlots;
       res.json(await storage.updateEmployee(req.params.id, update, tenantId));
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
@@ -16111,6 +16113,21 @@ CRITICAL RULES:
       const tenant = await storage.getTenant(tenantId);
       const features = { ...(tenant?.enabledFeatures || {}) } as any;
       features.posOverrideRequirements = req.body;
+      await storage.updateTenant(tenantId, { enabledFeatures: features });
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // PUT /api/admin/service-groups — save service group definitions (array of {id, name})
+  app.put("/api/admin/service-groups", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const tenantId: number | undefined = req.tenantId;
+      if (!tenantId) return res.status(400).json({ message: "No tenant context" });
+      const groups = req.body;
+      if (!Array.isArray(groups)) return res.status(400).json({ message: "Body must be an array of groups" });
+      const tenant = await storage.getTenant(tenantId);
+      const features = { ...(tenant?.enabledFeatures || {}) } as any;
+      features.serviceGroups = groups;
       await storage.updateTenant(tenantId, { enabledFeatures: features });
       res.json({ success: true });
     } catch (e: any) { res.status(500).json({ message: e.message }); }

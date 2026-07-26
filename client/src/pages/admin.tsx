@@ -2356,9 +2356,10 @@ function ScheduleManagement() {
 
   const addEmployeeFromPicker = (section: string, emp: any) => {
     const defaultDays: string[] = emp.defaultWorkDays ?? [];
-    const defaultSlot: string = emp.defaultTimeSlot ?? 'OFF';
+    const daySlots: Record<string, string> = emp.defaultDaySlots ?? {};
+    const fallbackSlot: string = emp.defaultTimeSlot ?? '9-5';
     const newEmp: any = { employeeName: `${emp.firstName} ${emp.lastName}`, displayOrder: (scheduleData[section]||[]).length };
-    DAYS.forEach(day => { newEmp[day] = defaultDays.includes(day) ? defaultSlot : 'OFF'; });
+    DAYS.forEach(day => { newEmp[day] = defaultDays.includes(day) ? (daySlots[day] || fallbackSlot) : 'OFF'; });
     setScheduleData(prev => ({ ...prev, [section]: [...(prev[section]||[]), newEmp] }));
     setAddEmpOpen(null);
   };
@@ -2577,7 +2578,7 @@ function ScheduleManagement() {
                       onClick={() => addEmpOpen && addEmployeeFromPicker(addEmpOpen, emp)}>
                       <p className="font-medium text-sm">{emp.firstName} {emp.lastName}</p>
                       <p className="text-xs text-muted-foreground">
-                        {emp.defaultWorkDays?.length ? `${emp.defaultWorkDays.join(', ')} · ${emp.defaultTimeSlot ?? '?'}` : 'No default schedule set'}
+                        {emp.defaultWorkDays?.length ? emp.defaultWorkDays.map((d: string) => `${d.slice(0,3)} ${(emp.defaultDaySlots?.[d] || emp.defaultTimeSlot || '?')}`).join(' · ') : 'No default schedule set'}
                       </p>
                     </button>
                   ))}

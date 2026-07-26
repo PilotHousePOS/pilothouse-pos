@@ -86,7 +86,8 @@ export const users = pgTable("users", {
   emailVerificationExpiry: timestamp("email_verification_expiry"),
   tokenVersion: integer("token_version").default(0),
   defaultWorkDays: jsonb("default_work_days").$type<string[]>(), // e.g. ["Monday","Tuesday","Wednesday","Thursday","Friday"]
-  defaultTimeSlot: varchar("default_time_slot", { length: 50 }), // e.g. "9-5"
+  defaultTimeSlot: varchar("default_time_slot", { length: 50 }), // e.g. "9-5" (legacy fallback)
+  defaultDaySlots: jsonb("default_day_slots").$type<Record<string, string>>(), // e.g. {"Monday":"9-5","Tuesday":"8-4"}
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

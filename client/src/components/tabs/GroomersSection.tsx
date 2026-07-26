@@ -143,8 +143,7 @@ export default function GroomersSection({ typedUser }: Props) {
 
   // ── Helpers ───────────────────────────────────────────────────────────────
   const saveGroups = async (newGroups: ServiceGroup[]) => {
-    const current = (tenantInfo?.enabledFeatures as any) ?? {};
-    await apiRequest("PUT", "/api/admin/settings/features", { ...current, serviceGroups: newGroups });
+    await apiRequest("PUT", "/api/admin/service-groups", newGroups);
     qc.invalidateQueries({ queryKey: ["/api/tenants/current"] });
   };
 

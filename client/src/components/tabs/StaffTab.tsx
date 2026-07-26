@@ -141,11 +141,13 @@ export default function StaffTab({ typedUser }: Props) {
 
   const ALL_WEEK_DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 
+  const DEFAULT_DAY_SLOTS: Record<string, string> = { Monday:"9-5", Tuesday:"9-5", Wednesday:"9-5", Thursday:"9-5", Friday:"9-5" };
+
   // form state
   const [form, setForm] = useState({
     firstName: "", lastName: "", email: "", password: "", phoneNumber: "", makeAdmin: false,
     defaultWorkDays: ["Monday","Tuesday","Wednesday","Thursday","Friday"] as string[],
-    defaultTimeSlot: "9-5",
+    defaultDaySlots: { ...DEFAULT_DAY_SLOTS } as Record<string, string>,
   });
   const [perms, setPerms] = useState<EmployeePermissions>(DEFAULT_PERMS);
   const [isAdminEmployee, setIsAdminEmployee] = useState(false);
@@ -206,7 +208,7 @@ export default function StaffTab({ typedUser }: Props) {
       qc.invalidateQueries({ queryKey: ["/api/admin/groomers"] });
       setCreateOpen(false);
       setServiceGroupId("");
-      setForm({ firstName: "", lastName: "", email: "", password: "", phoneNumber: "", makeAdmin: false, defaultWorkDays: ["Monday","Tuesday","Wednesday","Thursday","Friday"], defaultTimeSlot: "9-5" });
+      setForm({ firstName: "", lastName: "", email: "", password: "", phoneNumber: "", makeAdmin: false, defaultWorkDays: ["Monday","Tuesday","Wednesday","Thursday","Friday"], defaultDaySlots: { ...DEFAULT_DAY_SLOTS } });
       toast({ title: "Employee account created" + (serviceGroupId ? " and added to service roster" : "") });
     },
     onError: (e: any) => toast({ title: "Failed to create employee", description: e.message, variant: "destructive" }),
@@ -327,7 +329,7 @@ export default function StaffTab({ typedUser }: Props) {
       email: emp.email ?? "", password: "", phoneNumber: emp.phoneNumber ?? "",
       makeAdmin: !!emp.isAdmin,
       defaultWorkDays: (emp as any).defaultWorkDays ?? ["Monday","Tuesday","Wednesday","Thursday","Friday"],
-      defaultTimeSlot: (emp as any).defaultTimeSlot ?? "9-5",
+      defaultDaySlots: (emp as any).defaultDaySlots ?? { ...DEFAULT_DAY_SLOTS },
     });
   };
 
@@ -350,7 +352,7 @@ export default function StaffTab({ typedUser }: Props) {
             <TabsTrigger value="sales">Sales by Employee</TabsTrigger>
           </TabsList>
           <Button size="sm" onClick={() => {
-            setForm({ firstName: "", lastName: "", email: "", password: "", phoneNumber: "", makeAdmin: false, defaultWorkDays: ["Monday","Tuesday","Wednesday","Thursday","Friday"], defaultTimeSlot: "9-5" });
+            setForm({ firstName: "", lastName: "", email: "", password: "", phoneNumber: "", makeAdmin: false, defaultWorkDays: ["Monday","Tuesday","Wednesday","Thursday","Friday"], defaultDaySlots: { ...DEFAULT_DAY_SLOTS } });
             setCreateOpen(true);
           }}>
             <UserPlus className="h-4 w-4 mr-2" /> Add Employee
@@ -677,9 +679,9 @@ export default function StaffTab({ typedUser }: Props) {
 
       {/* ── Create Employee Dialog ── */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="max-w-md flex flex-col max-h-[90vh]">
-          <DialogHeader><DialogTitle>Add Employee Account</DialogTitle></DialogHeader>
-          <div className="space-y-4 overflow-y-auto flex-1 pr-1">
+        <DialogContent className="max-w-md flex flex-col max-h-[88vh] overflow-hidden p-0">
+          <DialogHeader className="shrink-0 px-6 pt-6 pb-0"><DialogTitle>Add Employee Account</DialogTitle></DialogHeader>
+          <div className="space-y-4 overflow-y-auto flex-1 px-6 py-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5"><Label>First Name</Label><Input value={form.firstName} onChange={e => setForm(f => ({ ...f, firstName: e.target.value }))} /></div>
               <div className="space-y-1.5"><Label>Last Name</Label><Input value={form.lastName} onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))} /></div>
@@ -702,27 +704,33 @@ export default function StaffTab({ typedUser }: Props) {
             <div className="space-y-2">
               <p className="text-sm font-medium flex items-center gap-1.5"><Clock className="h-4 w-4" /> Default Weekly Schedule</p>
               <p className="text-xs text-muted-foreground">Used to auto-fill the employee schedule tab</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {ALL_WEEK_DAYS.map(day => (
                   <button
                     key={day}
                     type="button"
                     onClick={() => setForm(f => ({ ...f, defaultWorkDays: f.defaultWorkDays.includes(day) ? f.defaultWorkDays.filter(d => d !== day) : [...f.defaultWorkDays, day] }))}
-                    className={`px-2 py-1 text-xs rounded border transition-colors ${form.defaultWorkDays.includes(day) ? 'bg-green-600 text-white border-green-600' : 'bg-background border-input text-muted-foreground'}`}
+                    className={`px-2.5 py-1 text-xs rounded border transition-colors ${form.defaultWorkDays.includes(day) ? 'bg-green-600 text-white border-green-600' : 'bg-background border-input text-muted-foreground'}`}
                   >
                     {day.slice(0,3)}
                   </button>
                 ))}
               </div>
-              <div className="flex items-center gap-2">
-                <Label className="text-xs shrink-0">Hours</Label>
-                <Input
-                  placeholder="e.g. 9-5"
-                  value={form.defaultTimeSlot}
-                  onChange={e => setForm(f => ({ ...f, defaultTimeSlot: e.target.value }))}
-                  className="h-8 text-sm"
-                />
-              </div>
+              {form.defaultWorkDays.length > 0 && (
+                <div className="rounded-md border divide-y text-sm">
+                  {ALL_WEEK_DAYS.filter(d => form.defaultWorkDays.includes(d)).map(day => (
+                    <div key={day} className="flex items-center gap-3 px-3 py-1.5">
+                      <span className="text-xs font-medium w-8 shrink-0 text-muted-foreground">{day.slice(0,3)}</span>
+                      <Input
+                        placeholder="e.g. 9-5"
+                        value={form.defaultDaySlots[day] ?? ""}
+                        onChange={e => setForm(f => ({ ...f, defaultDaySlots: { ...f.defaultDaySlots, [day]: e.target.value } }))}
+                        className="h-7 text-xs border-0 shadow-none focus-visible:ring-0 p-0"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <Separator />
             <div className="space-y-2">
@@ -747,7 +755,7 @@ export default function StaffTab({ typedUser }: Props) {
               An <strong>employee code</strong> (e.g. E01) is auto-generated. Set a 4-digit PIN after creating the account so they can sign in at the POS keypad.
             </p>
           </div>
-          <DialogFooter>
+          <DialogFooter className="shrink-0 border-t px-6 py-4">
             <Button variant="outline" onClick={() => setCreateOpen(false)}>Cancel</Button>
             <Button
               onClick={() => createMutation.mutate(form)}
@@ -761,9 +769,9 @@ export default function StaffTab({ typedUser }: Props) {
 
       {/* ── Edit Employee Dialog ── */}
       <Dialog open={!!editEmployee} onOpenChange={v => !v && setEditEmployee(null)}>
-        <DialogContent className="max-w-md flex flex-col max-h-[90vh]">
-          <DialogHeader><DialogTitle>Edit — {editEmployee?.firstName} {editEmployee?.lastName}</DialogTitle></DialogHeader>
-          <div className="space-y-4 overflow-y-auto flex-1 pr-1">
+        <DialogContent className="max-w-md flex flex-col max-h-[88vh] overflow-hidden p-0">
+          <DialogHeader className="shrink-0 px-6 pt-6 pb-0"><DialogTitle>Edit — {editEmployee?.firstName} {editEmployee?.lastName}</DialogTitle></DialogHeader>
+          <div className="space-y-4 overflow-y-auto flex-1 px-6 py-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5"><Label>First Name</Label><Input value={form.firstName} onChange={e => setForm(f => ({ ...f, firstName: e.target.value }))} /></div>
               <div className="space-y-1.5"><Label>Last Name</Label><Input value={form.lastName} onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))} /></div>
@@ -787,27 +795,33 @@ export default function StaffTab({ typedUser }: Props) {
             <Separator />
             <div className="space-y-2">
               <p className="text-sm font-medium flex items-center gap-1.5"><Clock className="h-4 w-4" /> Default Weekly Schedule</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {ALL_WEEK_DAYS.map(day => (
                   <button
                     key={day}
                     type="button"
                     onClick={() => setForm(f => ({ ...f, defaultWorkDays: f.defaultWorkDays.includes(day) ? f.defaultWorkDays.filter(d => d !== day) : [...f.defaultWorkDays, day] }))}
-                    className={`px-2 py-1 text-xs rounded border transition-colors ${form.defaultWorkDays.includes(day) ? 'bg-green-600 text-white border-green-600' : 'bg-background border-input text-muted-foreground'}`}
+                    className={`px-2.5 py-1 text-xs rounded border transition-colors ${form.defaultWorkDays.includes(day) ? 'bg-green-600 text-white border-green-600' : 'bg-background border-input text-muted-foreground'}`}
                   >
                     {day.slice(0,3)}
                   </button>
                 ))}
               </div>
-              <div className="flex items-center gap-2">
-                <Label className="text-xs shrink-0">Hours</Label>
-                <Input
-                  placeholder="e.g. 9-5"
-                  value={form.defaultTimeSlot}
-                  onChange={e => setForm(f => ({ ...f, defaultTimeSlot: e.target.value }))}
-                  className="h-8 text-sm"
-                />
-              </div>
+              {form.defaultWorkDays.length > 0 && (
+                <div className="rounded-md border divide-y text-sm">
+                  {ALL_WEEK_DAYS.filter(d => form.defaultWorkDays.includes(d)).map(day => (
+                    <div key={day} className="flex items-center gap-3 px-3 py-1.5">
+                      <span className="text-xs font-medium w-8 shrink-0 text-muted-foreground">{day.slice(0,3)}</span>
+                      <Input
+                        placeholder="e.g. 9-5"
+                        value={form.defaultDaySlots[day] ?? ""}
+                        onChange={e => setForm(f => ({ ...f, defaultDaySlots: { ...f.defaultDaySlots, [day]: e.target.value } }))}
+                        className="h-7 text-xs border-0 shadow-none focus-visible:ring-0 p-0"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
           <DialogFooter>
@@ -820,7 +834,7 @@ export default function StaffTab({ typedUser }: Props) {
                   email: form.email, phoneNumber: form.phoneNumber,
                   isAdmin: form.makeAdmin,
                   defaultWorkDays: form.defaultWorkDays,
-                  defaultTimeSlot: form.defaultTimeSlot,
+                  defaultDaySlots: form.defaultDaySlots,
                   ...(form.password ? { password: form.password } : {}),
                 },
               })}
