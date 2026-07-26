@@ -293,11 +293,12 @@ function Router() {
             <Route path="/supplies" component={Supplies} />
             <Route path="/supplies/:id" component={SupplyDetail} />
             
+            {/* /auth is always accessible so employee sign-out always lands on the roster */}
+            <Route path="/auth" component={Auth} />
+            <Route path="/signup" component={Signup} />
             {!isAuthenticated ? (
               <>
                 <Route path="/" component={Landing} />
-                <Route path="/auth" component={Auth} />
-                <Route path="/signup" component={Signup} />
                 <Route component={NotFound} />
               </>
             ) : (

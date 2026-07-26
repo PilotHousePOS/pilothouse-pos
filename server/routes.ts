@@ -1128,7 +1128,9 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
 
   // Logout
   app.post('/api/auth/logout', (req, res) => {
-    res.clearCookie('auth_token');
+    const isProduction = process.env.NODE_ENV === 'production';
+    // Options must match setAuthCookie exactly or browsers won't remove the cookie
+    res.clearCookie('auth_token', { httpOnly: true, secure: isProduction, sameSite: 'lax', path: '/' });
     res.json({ message: "Logged out successfully" });
   });
 
