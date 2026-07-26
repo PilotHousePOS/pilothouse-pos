@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import {
   ChevronLeft, DollarSign, CreditCard, Search, Settings, X,
   ChevronUp, ChevronDown, Pencil, Trash2, Plus, Check, GripVertical,
-  Lock, Unlock, Delete,
+  Lock, Unlock, Delete, LogOut, UserCircle,
 } from "lucide-react";
 
 interface PosOverrideConfig {
@@ -176,6 +176,23 @@ export default function PosPage() {
   const typedUser = user as any;
   const isEmployee = !!typedUser?.isEmployee;
 
+  // ── POS operator lock (shift-based sign-in) ──
+  // posLocked = true when no employee is actively signed in at the register.
+  // posOperatorName tracks who is currently on the register so their sales
+  // stay attributed to them. Starts unlocked because whoever navigated here
+  // is already authenticated.
+  const [posLocked, setPosLocked]               = useState(false);
+  const [posOperatorName, setPosOperatorName]   = useState<string>(() => {
+    const u = typedUser;
+    if (!u) return "";
+    return [u.firstName, u.lastName].filter(Boolean).join(" ") || u.email || "Operator";
+  });
+  const [lockStep, setLockStep]                 = useState<"roster" | "pin">("roster");
+  const [lockSelected, setLockSelected]         = useState<{ id: number; firstName: string; lastName: string; employeeCode: string } | null>(null);
+  const [lockPinEntry, setLockPinEntry]         = useState("");
+  const [lockPinError, setLockPinError]         = useState("");
+  const [lockPinLoading, setLockPinLoading]     = useState(false);
+
   // Per-action override tracking: each key is a PosOverrideConfig flag unlocked for this session slot
   const [unlockedActions, setUnlockedActions] = useState<Set<keyof PosOverrideConfig>>(new Set());
 
@@ -278,6 +295,80 @@ export default function PosPage() {
     const t = setInterval(() => setClock(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
+
+  // Block back-navigation while the POS is locked — the terminal must not be
+  // abandoned mid-shift without a signed-in operator.
+  useEffect(() => {
+    if (!posLocked) return;
+    window.history.pushState(null, "", window.location.pathname);
+    const handlePop = () => window.history.pushState(null, "", window.location.pathname);
+    window.addEventListener("popstate", handlePop);
+    return () => window.removeEventListener("popstate", handlePop);
+  }, [posLocked]);
+
+  // ── Roster (for POS lock screen sign-in) ──
+  const { data: empRoster = [] } = useQuery<{ id: number; firstName: string; lastName: string; employeeCode: string }[]>({
+    queryKey: ["/api/employee/roster"],
+    queryFn: async () => {
+      const res = await fetch("/api/employee/roster", { headers: slug ? { "X-Tenant-Slug": slug } : {} });
+      if (!res.ok) return [];
+      return res.json();
+    },
+    staleTime: 5 * 60_000,
+  });
+
+  // Sign the current operator out and lock the terminal
+  const handlePosSignOut = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+    } catch {}
+    queryClient.clear();
+    setPosLocked(true);
+    setPosOperatorName("");
+    setLockStep("roster");
+    setLockSelected(null);
+    setLockPinEntry("");
+    setLockPinError("");
+  };
+
+  // Handle a digit press on the lock-screen PIN pad
+  const handleLockPinDigit = async (d: string) => {
+    if (lockPinEntry.length >= 4 || lockPinLoading) return;
+    const next = lockPinEntry + d;
+    setLockPinEntry(next);
+    setLockPinError("");
+    if (next.length === 4 && lockSelected) {
+      setLockPinLoading(true);
+      try {
+        const res = await fetch("/api/auth/employee-pin-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...(slug ? { "X-Tenant-Slug": slug } : {}) },
+          body: JSON.stringify({ employeeCode: lockSelected.employeeCode, pin: next }),
+          credentials: "include",
+        });
+        const data = await res.json();
+        if (res.ok) {
+          queryClient.invalidateQueries();
+          const name = [lockSelected.firstName, lockSelected.lastName].filter(Boolean).join(" ") || lockSelected.employeeCode;
+          setPosOperatorName(name);
+          setPosLocked(false);
+          setLockStep("roster");
+          setLockSelected(null);
+          setLockPinEntry("");
+        } else {
+          setLockPinError(data.message || "Incorrect PIN");
+          setLockPinEntry("");
+        }
+      } catch {
+        setLockPinError("Sign-in failed. Try again.");
+        setLockPinEntry("");
+      } finally {
+        setLockPinLoading(false);
+      }
+    }
+  };
+  const handleLockPinBack = () => { setLockPinEntry(p => p.slice(0, -1)); setLockPinError(""); };
+  const lockPadDigits = ["1","2","3","4","5","6","7","8","9","","0","⌫"];
 
   // ── Data queries ──
   const { data: layoutData } = useQuery<PosConfig | null>({
@@ -511,23 +602,43 @@ export default function PosPage() {
       {/* ── Top bar ── */}
       <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-3">
-          <button onClick={() => setLocation("/admin")} className="flex items-center gap-1 text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-gray-300">
-            <ChevronLeft className="h-3 w-3" /> Admin
-          </button>
+          {!posLocked && (
+            <button onClick={() => setLocation("/admin")} className="flex items-center gap-1 text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-gray-300">
+              <ChevronLeft className="h-3 w-3" /> Admin
+            </button>
+          )}
           <span className="text-sm font-bold">PilotHouse</span>
           <span className="text-xs bg-blue-700 px-2 py-0.5 rounded font-semibold">IN STORE</span>
         </div>
         <div className="flex items-center gap-3">
+          {/* Current operator chip + sign-out */}
+          {!posLocked && posOperatorName && (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 text-xs bg-gray-700 px-2.5 py-1.5 rounded border border-gray-600">
+                <UserCircle className="h-3.5 w-3.5 text-green-400" />
+                <span className="text-gray-200 font-medium">{posOperatorName}</span>
+              </div>
+              <button
+                onClick={handlePosSignOut}
+                className="flex items-center gap-1.5 text-xs bg-red-900/70 hover:bg-red-700 px-2.5 py-1.5 rounded text-red-300 hover:text-white border border-red-800 hover:border-red-600 transition-colors"
+                title="Sign out of this register session"
+              >
+                <LogOut className="h-3.5 w-3.5" /> Sign Out
+              </button>
+            </div>
+          )}
           <div className="text-right">
             <div className="text-sm font-mono font-bold">{timeStr}</div>
             <div className="text-xs text-gray-400">{dateStr}</div>
           </div>
-          <button
-            onClick={() => isEmployee ? openOverride('settings') : setShowSettings(true)}
-            className="flex items-center gap-1.5 text-xs bg-gray-700 hover:bg-gray-600 px-2.5 py-1.5 rounded text-gray-300 border border-gray-600"
-          >
-            {isEmployee ? <Lock className="h-3.5 w-3.5" /> : <Settings className="h-3.5 w-3.5" />} Settings
-          </button>
+          {!posLocked && (
+            <button
+              onClick={() => isEmployee ? openOverride('settings') : setShowSettings(true)}
+              className="flex items-center gap-1.5 text-xs bg-gray-700 hover:bg-gray-600 px-2.5 py-1.5 rounded text-gray-300 border border-gray-600"
+            >
+              {isEmployee ? <Lock className="h-3.5 w-3.5" /> : <Settings className="h-3.5 w-3.5" />} Settings
+            </button>
+          )}
         </div>
       </div>
 
@@ -772,6 +883,122 @@ export default function PosPage() {
           <Search className="h-4 w-4" /> Scan / Search
         </button>
       </div>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          POS LOCK SCREEN — shown when no operator is signed in
+          The POS UI underneath remains visible but is non-interactive.
+      ═══════════════════════════════════════════════════════════════════════ */}
+      {posLocked && (
+        <div className="fixed inset-0 z-[55] flex flex-col" style={{ background: "rgba(5, 8, 18, 0.93)" }}>
+
+          {/* ── Locked top bar ── */}
+          <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 flex items-center justify-between flex-shrink-0">
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-bold text-white">PilotHouse</span>
+              <span className="text-xs bg-blue-700 px-2 py-0.5 rounded font-semibold">IN STORE</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <div className="text-sm font-mono font-bold text-white">{timeStr}</div>
+                <div className="text-xs text-gray-400">{dateStr}</div>
+              </div>
+              {/* Highlighted sign-in prompt */}
+              <div className="flex items-center gap-1.5 text-xs bg-green-600 px-3 py-1.5 rounded text-white font-bold ring-2 ring-green-400 ring-offset-1 ring-offset-gray-800 animate-pulse">
+                <Lock className="h-3.5 w-3.5" /> Sign In to Continue
+              </div>
+            </div>
+          </div>
+
+          {/* ── Sign-in card ── */}
+          <div className="flex-1 flex items-center justify-center p-4">
+            <div className="bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-sm">
+
+              {/* Card header */}
+              <div className="px-6 pt-6 pb-4 border-b border-gray-800 text-center">
+                <div className="w-12 h-12 rounded-full bg-green-700 flex items-center justify-center mx-auto mb-3">
+                  <UserCircle className="h-7 w-7 text-white" />
+                </div>
+                <h2 className="text-lg font-bold text-white">
+                  {lockStep === "roster" ? "Who's at the register?" : `Welcome, ${lockSelected?.firstName}`}
+                </h2>
+                <p className="text-xs text-gray-400 mt-1">
+                  {lockStep === "roster"
+                    ? "Select your name to sign in"
+                    : "Enter your PIN to continue"}
+                </p>
+              </div>
+
+              {/* ── STEP 1: Employee roster ── */}
+              {lockStep === "roster" && (
+                <div className="p-4">
+                  {empRoster.length === 0 ? (
+                    <p className="text-center text-gray-500 text-sm py-6">No employees found for this store.</p>
+                  ) : (
+                    <div className="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto">
+                      {empRoster.map(emp => {
+                        const initials = [emp.firstName?.[0], emp.lastName?.[0]].filter(Boolean).join("").toUpperCase() || "?";
+                        return (
+                          <button
+                            key={emp.id}
+                            onClick={() => { setLockSelected(emp); setLockStep("pin"); setLockPinEntry(""); setLockPinError(""); }}
+                            className="flex flex-col items-center gap-2 p-3 bg-gray-800 hover:bg-gray-700 rounded-xl border border-gray-700 hover:border-green-500 transition-all active:scale-95"
+                          >
+                            <div className="w-10 h-10 rounded-full bg-blue-700 flex items-center justify-center text-white font-bold text-sm">
+                              {initials}
+                            </div>
+                            <span className="text-xs text-gray-300 text-center leading-tight">
+                              {emp.firstName} {emp.lastName}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ── STEP 2: PIN entry ── */}
+              {lockStep === "pin" && lockSelected && (
+                <div className="p-5 space-y-4">
+                  {/* PIN dots */}
+                  <div className="flex justify-center gap-4">
+                    {[0, 1, 2, 3].map(i => (
+                      <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all ${i < lockPinEntry.length ? "bg-green-400 border-green-400 scale-110" : "bg-transparent border-gray-500"}`} />
+                    ))}
+                  </div>
+                  {lockPinError && <p className="text-center text-red-400 text-xs animate-pulse">{lockPinError}</p>}
+
+                  {/* Keypad */}
+                  <div className="grid grid-cols-3 gap-2">
+                    {lockPadDigits.map((d, i) => {
+                      if (d === "") return <div key={i} />;
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => d === "⌫" ? handleLockPinBack() : handleLockPinDigit(d)}
+                          disabled={lockPinLoading}
+                          className={`h-12 rounded-xl text-base font-semibold transition-all active:scale-95 disabled:opacity-50 border border-white/10 ${d === "⌫" ? "bg-white/5 hover:bg-white/10 text-gray-400" : "bg-white/10 hover:bg-white/20 text-white"}`}
+                        >
+                          {d === "⌫" ? <Delete className="h-4 w-4 mx-auto" /> : d}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {lockPinLoading && <p className="text-center text-gray-400 text-xs animate-pulse">Signing in…</p>}
+
+                  {/* Back to roster */}
+                  <button
+                    onClick={() => { setLockStep("roster"); setLockSelected(null); setLockPinEntry(""); setLockPinError(""); }}
+                    className="w-full text-xs text-gray-500 hover:text-gray-300 transition-colors py-1"
+                  >
+                    ← Different person?
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ═══════════════════════════════════════════════════════════════════════
           ADMIN OVERRIDE PIN MODAL
