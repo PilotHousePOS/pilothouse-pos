@@ -9451,7 +9451,7 @@ export default function Admin() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={safeGoBack}
+          onClick={() => typedUser?.isEmployee ? window.location.href = '/' : safeGoBack()}
           className="bg-white shadow-lg hover:bg-gray-100 rounded-full"
           data-testid="button-back"
         >
@@ -9462,7 +9462,7 @@ export default function Admin() {
       {/* Header */}
       <div className="px-6 pt-16 pb-4">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{typedUser?.isEmployee ? "Dashboard" : "Admin Dashboard"}</h1>
           <div className="flex items-center space-x-3">
             <Button
               variant="outline"
