@@ -15850,6 +15850,33 @@ CRITICAL RULES:
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 
+  // POST /api/auth/pos-admin-pin-login — PIN-only login for admins/owners at the POS
+  // Searches all admin-flagged users in the tenant for a matching employee_pin
+  // and returns a full JWT session for the first match.
+  app.post("/api/auth/pos-admin-pin-login", async (req: any, res) => {
+    try {
+      const tenantId: number | undefined = req.tenantId;
+      if (!tenantId) return res.status(400).json({ message: "Tenant required" });
+      const { pin } = req.body;
+      if (!pin) return res.status(400).json({ message: "PIN required" });
+      // Find all admins/owners for this tenant who have an employee_pin set
+      const rows = await db.execute(
+        sql`SELECT * FROM users WHERE tenant_id = ${tenantId} AND (is_admin = true OR is_superior_manager = true) AND employee_pin IS NOT NULL`
+      );
+      for (const row of rows.rows as any[]) {
+        if (row.employee_pin && await verifyPassword(String(pin), row.employee_pin)) {
+          // Reuse the same user shape that generateToken/sanitizeUser expect
+          const user = await storage.getUser(row.id);
+          if (!user) continue;
+          const token = generateToken(user);
+          setAuthCookie(res, token);
+          return res.json({ ...sanitizeUser(user), token });
+        }
+      }
+      return res.status(401).json({ message: "Incorrect PIN" });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
   // POST /api/auth/admin-override — verify override PIN, log the action
   app.post("/api/auth/admin-override", authMiddleware, async (req: any, res) => {
     try {

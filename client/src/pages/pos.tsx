@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient, getActiveTenantSlug } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import {
   ChevronLeft, DollarSign, CreditCard, Search, Settings, X,
   ChevronUp, ChevronDown, Pencil, Trash2, Plus, Check, GripVertical,
-  Lock, Unlock, Delete, LogOut, UserCircle,
+  Lock, Unlock, Delete, LogOut, UserCircle, Eye, EyeOff,
 } from "lucide-react";
 
 interface PosOverrideConfig {
@@ -158,6 +158,7 @@ function TypeBadge({ cat }: { cat: PosCategory }) {
 export default function PosPage() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const slug = getActiveTenantSlug();
 
   // ── Order state ──
   const [orderItems, setOrderItems]           = useState<OrderItem[]>([]);
@@ -192,6 +193,9 @@ export default function PosPage() {
   const [lockPinEntry, setLockPinEntry]         = useState("");
   const [lockPinError, setLockPinError]         = useState("");
   const [lockPinLoading, setLockPinLoading]     = useState(false);
+  const [lockAdminSubTab, setLockAdminSubTab]   = useState<"pin" | "password">("pin");
+  const [lockAdminPinEntry, setLockAdminPinEntry] = useState("");
+  const [lockAdminShowPassword, setLockAdminShowPassword] = useState(false);
   const [lockAdminEmail, setLockAdminEmail]     = useState("");
   const [lockAdminPassword, setLockAdminPassword] = useState("");
   const [lockAdminError, setLockAdminError]     = useState("");
@@ -373,6 +377,43 @@ export default function PosPage() {
   };
   const handleLockPinBack = () => { setLockPinEntry(p => p.slice(0, -1)); setLockPinError(""); };
   const lockPadDigits = ["1","2","3","4","5","6","7","8","9","","0","⌫"];
+
+  // Admin PIN sign-in on the lock screen (no employee code needed)
+  const handleLockAdminPinDigit = async (d: string) => {
+    if (lockAdminPinEntry.length >= 4 || lockAdminLoading) return;
+    const next = lockAdminPinEntry + d;
+    setLockAdminPinEntry(next);
+    setLockAdminError("");
+    if (next.length === 4) {
+      setLockAdminLoading(true);
+      try {
+        const res = await fetch("/api/auth/pos-admin-pin-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...(slug ? { "X-Tenant-Slug": slug } : {}) },
+          body: JSON.stringify({ pin: next }),
+          credentials: "include",
+        });
+        const data = await res.json();
+        if (res.ok) {
+          queryClient.invalidateQueries();
+          const name = [data.firstName, data.lastName].filter(Boolean).join(" ") || data.email || "Admin";
+          setPosOperatorName(name);
+          setPosLocked(false);
+          setLockStep("roster");
+          setLockAdminPinEntry("");
+        } else {
+          setLockAdminError(data.message || "Incorrect PIN");
+          setLockAdminPinEntry("");
+        }
+      } catch {
+        setLockAdminError("Sign-in failed. Try again.");
+        setLockAdminPinEntry("");
+      } finally {
+        setLockAdminLoading(false);
+      }
+    }
+  };
+  const handleLockAdminPinBack = () => { setLockAdminPinEntry(p => p.slice(0, -1)); setLockAdminError(""); };
 
   // Full email + password sign-in for admins / owners on the lock screen
   const handleLockAdminLogin = async () => {
@@ -954,12 +995,14 @@ export default function PosPage() {
                   <UserCircle className="h-7 w-7 text-white" />
                 </div>
                 <h2 className="text-lg font-bold text-white">
-                  {lockStep === "roster" ? "Who's at the register?" : `Welcome, ${lockSelected?.firstName}`}
+                  {lockStep === "roster" ? "Who's at the register?"
+                    : lockStep === "pin" ? `Welcome, ${lockSelected?.firstName}`
+                    : "Admin Sign In"}
                 </h2>
                 <p className="text-xs text-gray-400 mt-1">
-                  {lockStep === "roster"
-                    ? "Select your name to sign in"
-                    : "Enter your PIN to continue"}
+                  {lockStep === "roster" ? "Select your name to sign in"
+                    : lockStep === "pin" ? "Enter your PIN to continue"
+                    : "Use your PIN or email & password"}
                 </p>
               </div>
 
@@ -1031,46 +1074,99 @@ export default function PosPage() {
                 </div>
               )}
 
-              {/* ── STEP 3: Admin / owner email+password login ── */}
+              {/* ── STEP 3: Admin / owner login — PIN or password ── */}
               {lockStep === "adminLogin" && (
-                <div className="p-5 space-y-3">
-                  <div>
-                    <label className="text-xs text-gray-400 block mb-1">Email</label>
-                    <input
-                      type="email"
-                      value={lockAdminEmail}
-                      onChange={e => { setLockAdminEmail(e.target.value); setLockAdminError(""); }}
-                      onKeyDown={e => e.key === "Enter" && handleLockAdminLogin()}
-                      placeholder="admin@example.com"
-                      className="w-full bg-gray-800 border border-gray-600 focus:border-green-500 rounded-lg px-3 py-2 text-sm text-white outline-none"
-                      autoFocus
-                    />
+                <div>
+                  {/* Sub-tabs */}
+                  <div className="flex border-b border-gray-800">
+                    {(["pin", "password"] as const).map(tab => (
+                      <button
+                        key={tab}
+                        onClick={() => { setLockAdminSubTab(tab); setLockAdminError(""); setLockAdminPinEntry(""); }}
+                        className={`flex-1 py-2.5 text-xs font-semibold capitalize transition-colors border-b-2 ${lockAdminSubTab === tab ? "border-green-500 text-green-400" : "border-transparent text-gray-500 hover:text-gray-300"}`}
+                      >
+                        {tab === "pin" ? "PIN" : "Email & Password"}
+                      </button>
+                    ))}
                   </div>
-                  <div>
-                    <label className="text-xs text-gray-400 block mb-1">Password</label>
-                    <input
-                      type="password"
-                      value={lockAdminPassword}
-                      onChange={e => { setLockAdminPassword(e.target.value); setLockAdminError(""); }}
-                      onKeyDown={e => e.key === "Enter" && handleLockAdminLogin()}
-                      placeholder="••••••••"
-                      className="w-full bg-gray-800 border border-gray-600 focus:border-green-500 rounded-lg px-3 py-2 text-sm text-white outline-none"
-                    />
+
+                  {/* PIN tab */}
+                  {lockAdminSubTab === "pin" && (
+                    <div className="p-5 space-y-4">
+                      <p className="text-xs text-gray-500 text-center">Enter your admin or owner PIN</p>
+                      <div className="flex justify-center gap-4">
+                        {[0,1,2,3].map(i => (
+                          <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all ${i < lockAdminPinEntry.length ? "bg-green-400 border-green-400 scale-110" : "bg-transparent border-gray-500"}`} />
+                        ))}
+                      </div>
+                      {lockAdminError && <p className="text-center text-red-400 text-xs animate-pulse">{lockAdminError}</p>}
+                      <div className="grid grid-cols-3 gap-2">
+                        {lockPadDigits.map((d, i) => {
+                          if (d === "") return <div key={i} />;
+                          return (
+                            <button key={i}
+                              onClick={() => d === "⌫" ? handleLockAdminPinBack() : handleLockAdminPinDigit(d)}
+                              disabled={lockAdminLoading}
+                              className={`h-12 rounded-xl text-base font-semibold transition-all active:scale-95 disabled:opacity-50 border border-white/10 ${d === "⌫" ? "bg-white/5 hover:bg-white/10 text-gray-400" : "bg-white/10 hover:bg-white/20 text-white"}`}
+                            >
+                              {d === "⌫" ? <Delete className="h-4 w-4 mx-auto" /> : d}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {lockAdminLoading && <p className="text-center text-gray-400 text-xs animate-pulse">Signing in…</p>}
+                    </div>
+                  )}
+
+                  {/* Password tab */}
+                  {lockAdminSubTab === "password" && (
+                    <div className="p-5 space-y-3">
+                      <div>
+                        <label className="text-xs text-gray-400 block mb-1">Email</label>
+                        <input type="email" value={lockAdminEmail}
+                          onChange={e => { setLockAdminEmail(e.target.value); setLockAdminError(""); }}
+                          onKeyDown={e => e.key === "Enter" && handleLockAdminLogin()}
+                          placeholder="admin@example.com"
+                          className="w-full bg-gray-800 border border-gray-600 focus:border-green-500 rounded-lg px-3 py-2 text-sm text-white outline-none"
+                          autoFocus />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-400 block mb-1">Password</label>
+                        <div className="relative">
+                          <input
+                            type={lockAdminShowPassword ? "text" : "password"}
+                            value={lockAdminPassword}
+                            onChange={e => { setLockAdminPassword(e.target.value); setLockAdminError(""); }}
+                            onKeyDown={e => e.key === "Enter" && handleLockAdminLogin()}
+                            placeholder="••••••••"
+                            className="w-full bg-gray-800 border border-gray-600 focus:border-green-500 rounded-lg px-3 py-2 pr-10 text-sm text-white outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setLockAdminShowPassword(v => !v)}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors"
+                            tabIndex={-1}
+                          >
+                            {lockAdminShowPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </button>
+                        </div>
+                      </div>
+                      {lockAdminError && <p className="text-red-400 text-xs text-center animate-pulse">{lockAdminError}</p>}
+                      <button onClick={handleLockAdminLogin} disabled={lockAdminLoading}
+                        className="w-full bg-green-700 hover:bg-green-600 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded-lg py-2.5 text-sm font-bold transition-colors">
+                        {lockAdminLoading ? "Signing in…" : "Sign In"}
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="px-5 pb-4">
+                    <button
+                      onClick={() => { setLockStep("roster"); setLockAdminEmail(""); setLockAdminPassword(""); setLockAdminPinEntry(""); setLockAdminError(""); }}
+                      className="w-full text-xs text-gray-500 hover:text-gray-300 transition-colors py-1"
+                    >
+                      ← Back to employee list
+                    </button>
                   </div>
-                  {lockAdminError && <p className="text-red-400 text-xs text-center animate-pulse">{lockAdminError}</p>}
-                  <button
-                    onClick={handleLockAdminLogin}
-                    disabled={lockAdminLoading}
-                    className="w-full bg-green-700 hover:bg-green-600 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded-lg py-2.5 text-sm font-bold transition-colors"
-                  >
-                    {lockAdminLoading ? "Signing in…" : "Sign In"}
-                  </button>
-                  <button
-                    onClick={() => { setLockStep("roster"); setLockAdminEmail(""); setLockAdminPassword(""); setLockAdminError(""); }}
-                    className="w-full text-xs text-gray-500 hover:text-gray-300 transition-colors py-1"
-                  >
-                    ← Back to employee list
-                  </button>
                 </div>
               )}
 
