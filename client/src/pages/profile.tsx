@@ -33,7 +33,10 @@ import {
   ChevronDown,
   ChevronUp,
   MessageSquare,
-  CheckCircle2
+  CheckCircle2,
+  ArrowLeft,
+  Clock,
+  LogOut,
 } from "lucide-react";
 import type { User, CustomerPet, Order, Appointment } from "@shared/schema";
 
@@ -355,6 +358,84 @@ export default function Profile() {
   const userName = currentUser?.firstName && currentUser?.lastName
     ? `${currentUser.firstName} ${currentUser.lastName}`
     : currentUser?.email || 'User';
+
+  // ── Employee-only view ────────────────────────────────────────────────────
+  // Employees see only their schedule; all customer-facing sections are hidden.
+  if ((currentUser as any)?.isEmployee && !(currentUser as any)?.isAdmin) {
+    const emp = currentUser as any;
+    const days: string[] = emp.defaultWorkDays ?? [];
+    const daySlots: Record<string, string> = emp.defaultDaySlots ?? {};
+    const fallbackSlot: string = emp.defaultTimeSlot ?? "";
+    const DAY_ORDER = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+    const sortedDays = [...days].sort((a, b) => DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b));
+
+    const handleEmpSignOut = async () => {
+      const savedSlug = localStorage.getItem('active_tenant_slug');
+      try { await fetch("/api/auth/logout", { method: "POST", credentials: "include" }); } catch {}
+      if (savedSlug) localStorage.setItem('active_tenant_slug', savedSlug);
+      window.location.href = "/auth?tab=employee";
+    };
+
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white border-b px-4 py-3 flex items-center gap-3">
+          <button onClick={() => setLocation("/admin")} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+            <ArrowLeft className="h-5 w-5 text-gray-600" />
+          </button>
+          <h1 className="text-lg font-semibold text-gray-900">My Profile</h1>
+        </div>
+
+        <div className="px-4 py-6 space-y-5 max-w-lg mx-auto">
+          {/* Avatar + Name */}
+          <div className="bg-white rounded-2xl p-6 text-center shadow-sm border">
+            <div className="w-16 h-16 bg-brand-red rounded-full mx-auto mb-3 flex items-center justify-center">
+              <span className="text-2xl text-white font-bold">{userInitials}</span>
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">{userName}</h2>
+            {emp.employeeCode && (
+              <span className="inline-block mt-1 text-xs font-mono bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                {emp.employeeCode}
+              </span>
+            )}
+          </div>
+
+          {/* Work Schedule */}
+          <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
+            <div className="flex items-center gap-2 px-5 py-4 border-b">
+              <Clock className="h-4 w-4 text-brand-red" />
+              <h3 className="font-semibold text-gray-900">My Schedule</h3>
+            </div>
+            {sortedDays.length === 0 ? (
+              <p className="text-sm text-gray-500 px-5 py-4">No schedule set — ask your manager.</p>
+            ) : (
+              <div className="divide-y">
+                {sortedDays.map(day => {
+                  const slot = daySlots[day] || fallbackSlot || "—";
+                  return (
+                    <div key={day} className="flex items-center justify-between px-5 py-3">
+                      <span className="text-sm font-medium text-gray-700">{day}</span>
+                      <span className="text-sm text-gray-500">{slot}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Sign out */}
+          <button
+            onClick={handleEmpSignOut}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-red-500 hover:bg-red-600 text-white font-semibold transition-colors"
+          >
+            <LogOut className="h-4 w-4" />
+            Sign Out
+          </button>
+        </div>
+      </div>
+    );
+  }
+  // ── End employee view ─────────────────────────────────────────────────────
 
   return (
     <div className="px-6 py-4 pb-20">
