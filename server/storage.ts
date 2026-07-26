@@ -5734,7 +5734,11 @@ export class DatabaseStorage implements IStorage {
     const update: any = { ...data, updatedAt: new Date() };
     if (data.password) {
       const bcrypt = await import("bcryptjs");
-      update.password = await bcrypt.hash(data.password, 10);
+      const hashed = await bcrypt.hash(data.password, 10);
+      update.password = hashed;
+      // Employees use a single PIN for everything — keep employee_pin and pos_pin_plain in sync
+      update.employeePin = hashed;
+      update.posPinPlain = data.password;
     } else {
       delete update.password;
     }
