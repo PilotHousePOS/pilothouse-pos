@@ -187,11 +187,15 @@ export default function PosPage() {
     if (!u) return "";
     return [u.firstName, u.lastName].filter(Boolean).join(" ") || u.email || "Operator";
   });
-  const [lockStep, setLockStep]                 = useState<"roster" | "pin">("roster");
+  const [lockStep, setLockStep]                 = useState<"roster" | "pin" | "adminLogin">("roster");
   const [lockSelected, setLockSelected]         = useState<{ id: number; firstName: string; lastName: string; employeeCode: string } | null>(null);
   const [lockPinEntry, setLockPinEntry]         = useState("");
   const [lockPinError, setLockPinError]         = useState("");
   const [lockPinLoading, setLockPinLoading]     = useState(false);
+  const [lockAdminEmail, setLockAdminEmail]     = useState("");
+  const [lockAdminPassword, setLockAdminPassword] = useState("");
+  const [lockAdminError, setLockAdminError]     = useState("");
+  const [lockAdminLoading, setLockAdminLoading] = useState(false);
 
   // Per-action override tracking: each key is a PosOverrideConfig flag unlocked for this session slot
   const [unlockedActions, setUnlockedActions] = useState<Set<keyof PosOverrideConfig>>(new Set());
@@ -369,6 +373,37 @@ export default function PosPage() {
   };
   const handleLockPinBack = () => { setLockPinEntry(p => p.slice(0, -1)); setLockPinError(""); };
   const lockPadDigits = ["1","2","3","4","5","6","7","8","9","","0","⌫"];
+
+  // Full email + password sign-in for admins / owners on the lock screen
+  const handleLockAdminLogin = async () => {
+    if (!lockAdminEmail || !lockAdminPassword) { setLockAdminError("Email and password are required."); return; }
+    setLockAdminLoading(true);
+    setLockAdminError("");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(slug ? { "X-Tenant-Slug": slug } : {}) },
+        body: JSON.stringify({ email: lockAdminEmail, password: lockAdminPassword }),
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        queryClient.invalidateQueries();
+        const name = [data.firstName, data.lastName].filter(Boolean).join(" ") || data.email || "Admin";
+        setPosOperatorName(name);
+        setPosLocked(false);
+        setLockStep("roster");
+        setLockAdminEmail("");
+        setLockAdminPassword("");
+      } else {
+        setLockAdminError(data.message || "Invalid credentials.");
+      }
+    } catch {
+      setLockAdminError("Login failed. Check your connection.");
+    } finally {
+      setLockAdminLoading(false);
+    }
+  };
 
   // ── Data queries ──
   const { data: layoutData } = useQuery<PosConfig | null>({
@@ -992,6 +1027,61 @@ export default function PosPage() {
                     className="w-full text-xs text-gray-500 hover:text-gray-300 transition-colors py-1"
                   >
                     ← Different person?
+                  </button>
+                </div>
+              )}
+
+              {/* ── STEP 3: Admin / owner email+password login ── */}
+              {lockStep === "adminLogin" && (
+                <div className="p-5 space-y-3">
+                  <div>
+                    <label className="text-xs text-gray-400 block mb-1">Email</label>
+                    <input
+                      type="email"
+                      value={lockAdminEmail}
+                      onChange={e => { setLockAdminEmail(e.target.value); setLockAdminError(""); }}
+                      onKeyDown={e => e.key === "Enter" && handleLockAdminLogin()}
+                      placeholder="admin@example.com"
+                      className="w-full bg-gray-800 border border-gray-600 focus:border-green-500 rounded-lg px-3 py-2 text-sm text-white outline-none"
+                      autoFocus
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-400 block mb-1">Password</label>
+                    <input
+                      type="password"
+                      value={lockAdminPassword}
+                      onChange={e => { setLockAdminPassword(e.target.value); setLockAdminError(""); }}
+                      onKeyDown={e => e.key === "Enter" && handleLockAdminLogin()}
+                      placeholder="••••••••"
+                      className="w-full bg-gray-800 border border-gray-600 focus:border-green-500 rounded-lg px-3 py-2 text-sm text-white outline-none"
+                    />
+                  </div>
+                  {lockAdminError && <p className="text-red-400 text-xs text-center animate-pulse">{lockAdminError}</p>}
+                  <button
+                    onClick={handleLockAdminLogin}
+                    disabled={lockAdminLoading}
+                    className="w-full bg-green-700 hover:bg-green-600 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded-lg py-2.5 text-sm font-bold transition-colors"
+                  >
+                    {lockAdminLoading ? "Signing in…" : "Sign In"}
+                  </button>
+                  <button
+                    onClick={() => { setLockStep("roster"); setLockAdminEmail(""); setLockAdminPassword(""); setLockAdminError(""); }}
+                    className="w-full text-xs text-gray-500 hover:text-gray-300 transition-colors py-1"
+                  >
+                    ← Back to employee list
+                  </button>
+                </div>
+              )}
+
+              {/* Admin login escape hatch — always visible on roster + pin steps */}
+              {lockStep !== "adminLogin" && (
+                <div className="border-t border-gray-800 px-5 py-3">
+                  <button
+                    onClick={() => { setLockStep("adminLogin"); setLockAdminEmail(""); setLockAdminPassword(""); setLockAdminError(""); }}
+                    className="w-full text-xs text-gray-500 hover:text-gray-300 transition-colors flex items-center justify-center gap-1.5"
+                  >
+                    <Lock className="h-3 w-3" /> Admin / owner login
                   </button>
                 </div>
               )}
