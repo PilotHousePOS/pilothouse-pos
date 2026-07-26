@@ -8046,6 +8046,109 @@ West Monroe LA 71291
     }
   });
 
+  // ── Schedule overrides routes ─────────────────────────────────────────────
+  app.get("/api/admin/schedule-overrides", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number = req.tenantId;
+      const overrides = await storage.getScheduleOverrides(tenantId);
+      res.json(overrides);
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.post("/api/admin/schedule-overrides", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      const { employeeName, specificDate, timeSlot, note } = req.body;
+      if (!employeeName || !specificDate || !timeSlot) return res.status(400).json({ message: "employeeName, specificDate, and timeSlot are required" });
+      const override = await storage.upsertScheduleOverride({ tenantId, employeeName, specificDate, timeSlot, note });
+      res.json(override);
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  app.delete("/api/admin/schedule-overrides/:id", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      await storage.deleteScheduleOverride(parseInt(req.params.id), tenantId);
+      res.status(204).send();
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // ── Payroll report — weekly summary (schedule template + overrides) ────────
+  app.get("/api/admin/payroll/report", authMiddleware, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number = req.tenantId;
+      const { startDate } = req.query as { startDate?: string };
+      if (!startDate) return res.status(400).json({ message: "startDate (YYYY-MM-DD) is required" });
+
+      // Build 7 dates for the week starting at startDate
+      const start = new Date(startDate + "T00:00:00Z");
+      const DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+      const weekDates: { date: Date; iso: string; dayName: string }[] = [];
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(start);
+        d.setUTCDate(start.getUTCDate() + i);
+        weekDates.push({ date: d, iso: d.toISOString().slice(0, 10), dayName: DAY_NAMES[d.getUTCDay()] });
+      }
+
+      // Fetch template entries and overrides
+      const [templateEntries, overrides] = await Promise.all([
+        storage.getAllScheduleEntries(tenantId),
+        storage.getScheduleOverrides(tenantId),
+      ]);
+
+      // Helper: parse hours from time slot string
+      function parseHours(slot: string): number | null {
+        if (!slot || slot.toUpperCase() === "OFF" || slot === "-") return 0;
+        // Normalize: remove am/pm, collapse to "HH:MM-HH:MM"
+        const norm = slot.toLowerCase().replace(/am|pm/g, "").trim();
+        const m = norm.match(/^(\d{1,2})(?::(\d{2}))?[-–](\d{1,2})(?::(\d{2}))?$/);
+        if (!m) return null;
+        const startH = parseInt(m[1]), startM = parseInt(m[2] ?? "0");
+        let endH = parseInt(m[3]), endM = parseInt(m[4] ?? "0");
+        // If end < start, assume PM (e.g. 9-5 means 9am-5pm)
+        if (endH < startH) endH += 12;
+        return (endH * 60 + endM - startH * 60 - startM) / 60;
+      }
+
+      // Get all unique employee names appearing in template
+      const employeeNames = [...new Set(templateEntries.map((e: any) => e.employeeName))];
+
+      // Build per-employee report rows
+      const rows = employeeNames.map(empName => {
+        const days: Record<string, { timeSlot: string; hours: number | null; isOverride: boolean }> = {};
+        let totalHours = 0;
+        let hasUnknown = false;
+
+        weekDates.forEach(({ iso, dayName }) => {
+          // Check for override first
+          const override = overrides.find((o: any) => o.employeeName === empName && o.specificDate === iso);
+          if (override) {
+            const h = parseHours(override.timeSlot);
+            days[iso] = { timeSlot: override.timeSlot, hours: h, isOverride: true };
+            if (h === null) hasUnknown = true; else totalHours += h;
+          } else {
+            // Use template (match by dayOfWeek name)
+            const tmpl = templateEntries.find((e: any) => e.employeeName === empName && e.dayOfWeek === dayName);
+            const slot = tmpl?.timeSlot ?? "OFF";
+            const h = parseHours(slot);
+            days[iso] = { timeSlot: slot, hours: h, isOverride: false };
+            if (h === null) hasUnknown = true; else totalHours += h;
+          }
+        });
+
+        return { employeeName: empName, days, totalHours, hasUnknown };
+      });
+
+      res.json({ startDate, weekDates: weekDates.map(d => ({ iso: d.iso, dayName: d.dayName })), rows });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
   // Grooming schedule routes
   app.get("/api/admin/grooming-schedule", authMiddleware, async (req: any, res) => {
     try {
@@ -12149,6 +12252,28 @@ West Monroe LA 71291
     }
   });
 
+  // ── Employee default schedule + schedule overrides migration ─────────────
+  (async () => {
+    try {
+      await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS default_work_days JSONB`);
+      await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS default_time_slot VARCHAR(50)`);
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS schedule_overrides (
+          id SERIAL PRIMARY KEY,
+          tenant_id INTEGER REFERENCES tenants(id),
+          employee_name VARCHAR(255) NOT NULL,
+          specific_date DATE NOT NULL,
+          time_slot VARCHAR(100) NOT NULL,
+          note TEXT,
+          created_at TIMESTAMP DEFAULT NOW(),
+          UNIQUE (tenant_id, employee_name, specific_date)
+        )
+      `);
+    } catch (e) {
+      console.error("Failed to run schedule overrides migration:", e);
+    }
+  })();
+
   // Ensure supply_categories table exists (tenant_id column added via migration)
   (async () => {
     try {
@@ -15736,11 +15861,11 @@ CRITICAL RULES:
       const user = await storage.getUser(req.user?.id);
       if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
       const tenantId: number = req.tenantId;
-      const { email, password, firstName, lastName, phoneNumber } = req.body;
+      const { email, password, firstName, lastName, phoneNumber, defaultWorkDays, defaultTimeSlot } = req.body;
       if (!email || !password || !firstName) return res.status(400).json({ message: "email, password, and firstName are required" });
       const existing = await storage.getUserByEmail(email);
       if (existing) return res.status(409).json({ message: "An account with that email already exists" });
-      res.status(201).json(await storage.createEmployee({ tenantId, email, password, firstName, lastName, phoneNumber }));
+      res.status(201).json(await storage.createEmployee({ tenantId, email, password, firstName, lastName, phoneNumber, defaultWorkDays, defaultTimeSlot }));
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 
@@ -15750,13 +15875,15 @@ CRITICAL RULES:
       const user = await storage.getUser(req.user?.id);
       if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
       const tenantId: number = req.tenantId;
-      const { firstName, lastName, email, password, phoneNumber } = req.body;
+      const { firstName, lastName, email, password, phoneNumber, defaultWorkDays, defaultTimeSlot } = req.body;
       const update: any = {};
       if (firstName !== undefined) update.firstName = firstName;
       if (lastName  !== undefined) update.lastName  = lastName;
       if (email     !== undefined) update.email     = email;
       if (password)                update.password  = password;
       if (phoneNumber !== undefined) update.phoneNumber = phoneNumber;
+      if (defaultWorkDays !== undefined) update.defaultWorkDays = defaultWorkDays;
+      if (defaultTimeSlot !== undefined) update.defaultTimeSlot = defaultTimeSlot;
       res.json(await storage.updateEmployee(req.params.id, update, tenantId));
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });

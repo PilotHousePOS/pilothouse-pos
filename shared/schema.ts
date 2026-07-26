@@ -85,6 +85,8 @@ export const users = pgTable("users", {
   emailVerificationToken: varchar("email_verification_token", { length: 255 }),
   emailVerificationExpiry: timestamp("email_verification_expiry"),
   tokenVersion: integer("token_version").default(0),
+  defaultWorkDays: jsonb("default_work_days").$type<string[]>(), // e.g. ["Monday","Tuesday","Wednesday","Thursday","Friday"]
+  defaultTimeSlot: varchar("default_time_slot", { length: 50 }), // e.g. "9-5"
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -907,6 +909,21 @@ export const scheduleEntries = pgTable("schedule_entries", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+// Date-specific schedule overrides (override the weekly template for a specific date)
+export const scheduleOverrides = pgTable("schedule_overrides", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => tenants.id),
+  employeeName: varchar("employee_name", { length: 255 }).notNull(),
+  specificDate: date("specific_date").notNull(), // ISO date string "YYYY-MM-DD"
+  timeSlot: varchar("time_slot", { length: 100 }).notNull(), // "9-5", "OFF", etc.
+  note: text("note"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertScheduleOverrideSchema = createInsertSchema(scheduleOverrides).omit({ id: true, createdAt: true });
+export type ScheduleOverride = typeof scheduleOverrides.$inferSelect;
+export type InsertScheduleOverride = z.infer<typeof insertScheduleOverrideSchema>;
 
 // Grooming Schedule
 export const groomingScheduleEntries = pgTable("grooming_schedule_entries", {

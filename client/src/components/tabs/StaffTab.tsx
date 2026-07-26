@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Clock } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ import {
   KeyRound, Shield, Copy, Check, Lock, Settings2,
 } from "lucide-react";
 import type { User } from "@shared/schema";
+import GroomersSection from "@/components/tabs/GroomersSection";
 
 // ── Permission definitions ───────────────────────────────────────────────────
 
@@ -135,9 +136,13 @@ export default function StaffTab({ typedUser }: Props) {
   const [pinEmployee, setPinEmployee] = useState<User | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<User | null>(null);
 
+  const ALL_WEEK_DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+
   // form state
   const [form, setForm] = useState({
     firstName: "", lastName: "", email: "", password: "", phoneNumber: "", makeAdmin: false,
+    defaultWorkDays: ["Monday","Tuesday","Wednesday","Thursday","Friday"] as string[],
+    defaultTimeSlot: "9-5",
   });
   const [perms, setPerms] = useState<EmployeePermissions>(DEFAULT_PERMS);
   const [isAdminEmployee, setIsAdminEmployee] = useState(false);
@@ -174,7 +179,7 @@ export default function StaffTab({ typedUser }: Props) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/admin/employees"] });
       setCreateOpen(false);
-      setForm({ firstName: "", lastName: "", email: "", password: "", phoneNumber: "", makeAdmin: false });
+      setForm({ firstName: "", lastName: "", email: "", password: "", phoneNumber: "", makeAdmin: false, defaultWorkDays: ["Monday","Tuesday","Wednesday","Thursday","Friday"], defaultTimeSlot: "9-5" });
       toast({ title: "Employee account created" });
     },
     onError: (e: any) => toast({ title: "Failed to create employee", description: e.message, variant: "destructive" }),
@@ -294,6 +299,8 @@ export default function StaffTab({ typedUser }: Props) {
       firstName: emp.firstName ?? "", lastName: emp.lastName ?? "",
       email: emp.email ?? "", password: "", phoneNumber: emp.phoneNumber ?? "",
       makeAdmin: !!emp.isAdmin,
+      defaultWorkDays: (emp as any).defaultWorkDays ?? ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+      defaultTimeSlot: (emp as any).defaultTimeSlot ?? "9-5",
     });
   };
 
@@ -316,7 +323,7 @@ export default function StaffTab({ typedUser }: Props) {
             <TabsTrigger value="sales">Sales by Employee</TabsTrigger>
           </TabsList>
           <Button size="sm" onClick={() => {
-            setForm({ firstName: "", lastName: "", email: "", password: "", phoneNumber: "", makeAdmin: false });
+            setForm({ firstName: "", lastName: "", email: "", password: "", phoneNumber: "", makeAdmin: false, defaultWorkDays: ["Monday","Tuesday","Wednesday","Thursday","Friday"], defaultTimeSlot: "9-5" });
             setCreateOpen(true);
           }}>
             <UserPlus className="h-4 w-4 mr-2" /> Add Employee
@@ -553,9 +560,8 @@ export default function StaffTab({ typedUser }: Props) {
                   /* Read-only preview */
                   <div className="space-y-1.5 text-sm">
                     {[
-                      { key: 'groomers',       def: 'Staff',          hint: '"Staff" tab label' },
                       { key: 'staff',          def: 'Staff Accounts', hint: '"Staff Accounts" tab label' },
-                      { key: 'groomersHeading', def: 'Staff',         hint: 'Section heading inside the Staff tab' },
+                      { key: 'groomers',       def: 'Staff',          hint: 'Service staff section heading' },
                     ].map(({ key, def, hint }) => (
                       <div key={key} className="flex items-center justify-between gap-2">
                         <span className="text-muted-foreground text-xs">{hint}</span>
@@ -567,9 +573,8 @@ export default function StaffTab({ typedUser }: Props) {
                   /* Edit mode */
                   <div className="space-y-3">
                     {[
-                      { key: 'groomers',        def: 'Staff',          label: '"Staff" tab' },
-                      { key: 'staff',           def: 'Staff Accounts', label: '"Staff Accounts" tab' },
-                      { key: 'groomersHeading', def: 'Staff',          label: 'Section heading (inside tab)' },
+                      { key: 'staff',    def: 'Staff Accounts', label: '"Staff Accounts" tab' },
+                      { key: 'groomers', def: 'Staff',          label: 'Service staff section heading' },
                     ].map(({ key, def, label }) => (
                       <div key={key}>
                         <Label className="text-xs text-muted-foreground">{label}</Label>
@@ -640,6 +645,9 @@ export default function StaffTab({ typedUser }: Props) {
         </TabsContent>
       </Tabs>
 
+      {/* ── Service Staff (Groomers) ── */}
+      <GroomersSection typedUser={typedUser} staffLabel={savedTabLabels['groomers'] || 'Staff'} />
+
       {/* ── Create Employee Dialog ── */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent className="max-w-md">
@@ -662,6 +670,32 @@ export default function StaffTab({ typedUser }: Props) {
                 <p className="text-xs text-muted-foreground">Unlocks a wider set of permissions you can assign</p>
               </div>
               <Switch checked={form.makeAdmin} onCheckedChange={v => setForm(f => ({ ...f, makeAdmin: v }))} />
+            </div>
+            <Separator />
+            <div className="space-y-2">
+              <p className="text-sm font-medium flex items-center gap-1.5"><Clock className="h-4 w-4" /> Default Weekly Schedule</p>
+              <p className="text-xs text-muted-foreground">Used to auto-fill the employee schedule tab</p>
+              <div className="flex flex-wrap gap-2">
+                {ALL_WEEK_DAYS.map(day => (
+                  <button
+                    key={day}
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, defaultWorkDays: f.defaultWorkDays.includes(day) ? f.defaultWorkDays.filter(d => d !== day) : [...f.defaultWorkDays, day] }))}
+                    className={`px-2 py-1 text-xs rounded border transition-colors ${form.defaultWorkDays.includes(day) ? 'bg-green-600 text-white border-green-600' : 'bg-background border-input text-muted-foreground'}`}
+                  >
+                    {day.slice(0,3)}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-2">
+                <Label className="text-xs shrink-0">Hours</Label>
+                <Input
+                  placeholder="e.g. 9-5"
+                  value={form.defaultTimeSlot}
+                  onChange={e => setForm(f => ({ ...f, defaultTimeSlot: e.target.value }))}
+                  className="h-8 text-sm"
+                />
+              </div>
             </div>
             <p className="text-xs text-muted-foreground bg-muted rounded p-2">
               An <strong>employee code</strong> (e.g. E01) is auto-generated. Set a 4-digit PIN after creating the account so they can sign in at the POS keypad.
@@ -704,6 +738,31 @@ export default function StaffTab({ typedUser }: Props) {
               </div>
               <Switch checked={form.makeAdmin} onCheckedChange={v => setForm(f => ({ ...f, makeAdmin: v }))} />
             </div>
+            <Separator />
+            <div className="space-y-2">
+              <p className="text-sm font-medium flex items-center gap-1.5"><Clock className="h-4 w-4" /> Default Weekly Schedule</p>
+              <div className="flex flex-wrap gap-2">
+                {ALL_WEEK_DAYS.map(day => (
+                  <button
+                    key={day}
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, defaultWorkDays: f.defaultWorkDays.includes(day) ? f.defaultWorkDays.filter(d => d !== day) : [...f.defaultWorkDays, day] }))}
+                    className={`px-2 py-1 text-xs rounded border transition-colors ${form.defaultWorkDays.includes(day) ? 'bg-green-600 text-white border-green-600' : 'bg-background border-input text-muted-foreground'}`}
+                  >
+                    {day.slice(0,3)}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-2">
+                <Label className="text-xs shrink-0">Hours</Label>
+                <Input
+                  placeholder="e.g. 9-5"
+                  value={form.defaultTimeSlot}
+                  onChange={e => setForm(f => ({ ...f, defaultTimeSlot: e.target.value }))}
+                  className="h-8 text-sm"
+                />
+              </div>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditEmployee(null)}>Cancel</Button>
@@ -714,6 +773,8 @@ export default function StaffTab({ typedUser }: Props) {
                   firstName: form.firstName, lastName: form.lastName,
                   email: form.email, phoneNumber: form.phoneNumber,
                   isAdmin: form.makeAdmin,
+                  defaultWorkDays: form.defaultWorkDays,
+                  defaultTimeSlot: form.defaultTimeSlot,
                   ...(form.password ? { password: form.password } : {}),
                 },
               })}

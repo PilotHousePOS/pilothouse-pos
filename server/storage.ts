@@ -26,6 +26,9 @@ import {
   supplyImportStaging,
   boardingRecords,
   scheduleEntries,
+  scheduleOverrides,
+  type ScheduleOverride,
+  type InsertScheduleOverride,
   groomingScheduleEntries,
   orderPhotos,
   extractedOrderItems,
@@ -183,9 +186,9 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>;
   updateUserAdmin(id: string, isAdmin: boolean): Promise<User>;
   // Employee operations
-  createEmployee(data: { tenantId: number; email: string; password: string; firstName: string; lastName: string; phoneNumber?: string; makeAdmin?: boolean }): Promise<User>;
+  createEmployee(data: { tenantId: number; email: string; password: string; firstName: string; lastName: string; phoneNumber?: string; makeAdmin?: boolean; defaultWorkDays?: string[]; defaultTimeSlot?: string }): Promise<User>;
   getEmployees(tenantId: number): Promise<User[]>;
-  updateEmployee(id: string, data: Partial<{ firstName: string; lastName: string; email: string; password: string; phoneNumber: string; isAdmin: boolean }>, tenantId: number): Promise<User>;
+  updateEmployee(id: string, data: Partial<{ firstName: string; lastName: string; email: string; password: string; phoneNumber: string; isAdmin: boolean; defaultWorkDays: string[]; defaultTimeSlot: string }>, tenantId: number): Promise<User>;
   setEmployeePin(userId: string, tenantId: number, pin: string): Promise<void>;
   authenticateEmployeeByPin(tenantId: number, employeeCode: string, pin: string): Promise<User | null>;
   deleteEmployee(id: string, tenantId: number): Promise<void>;
@@ -505,6 +508,12 @@ export interface IStorage {
   checkOutBoardingRecord(id: number, tenantId?: number): Promise<BoardingRecord>;
   deleteBoardingRecord(id: number, tenantId?: number): Promise<void>;
   
+  // Schedule override operations
+  getScheduleOverrides(tenantId: number): Promise<ScheduleOverride[]>;
+  upsertScheduleOverride(data: { tenantId: number; employeeName: string; specificDate: string; timeSlot: string; note?: string }): Promise<ScheduleOverride>;
+  deleteScheduleOverride(id: number, tenantId: number): Promise<void>;
+  deleteScheduleOverridesForEmployee(tenantId: number, employeeName: string): Promise<void>;
+
   // Schedule operations
   getAllScheduleEntries(tenantId?: number): Promise<ScheduleEntry[]>;
   batchUpdateScheduleEntries(entries: InsertScheduleEntry[], tenantId?: number): Promise<ScheduleEntry[]>;
@@ -5682,7 +5691,7 @@ export class DatabaseStorage implements IStorage {
    */
 
   // ── Employee operations ──────────────────────────────────────────────────
-  async createEmployee(data: { tenantId: number; email: string; password: string; firstName: string; lastName: string; phoneNumber?: string; makeAdmin?: boolean }): Promise<User> {
+  async createEmployee(data: { tenantId: number; email: string; password: string; firstName: string; lastName: string; phoneNumber?: string; makeAdmin?: boolean; defaultWorkDays?: string[]; defaultTimeSlot?: string }): Promise<User> {
     const bcrypt = await import("bcryptjs");
     const hashed = await bcrypt.hash(data.password, 10);
     const id = `emp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -5700,7 +5709,9 @@ export class DatabaseStorage implements IStorage {
       isEmployee: true,
       emailVerified: true,
       employeeCode: code,
-    }).returning();
+      defaultWorkDays: data.defaultWorkDays ?? null,
+      defaultTimeSlot: data.defaultTimeSlot ?? null,
+    } as any).returning();
     return user;
   }
 
@@ -5718,7 +5729,7 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(users).where(and(eq(users.tenantId, tenantId), eq(users.isEmployee, true))).orderBy(asc(users.firstName));
   }
 
-  async updateEmployee(id: string, data: Partial<{ firstName: string; lastName: string; email: string; password: string; phoneNumber: string; isAdmin: boolean }>, tenantId: number): Promise<User> {
+  async updateEmployee(id: string, data: Partial<{ firstName: string; lastName: string; email: string; password: string; phoneNumber: string; isAdmin: boolean; defaultWorkDays: string[]; defaultTimeSlot: string }>, tenantId: number): Promise<User> {
     const update: any = { ...data, updatedAt: new Date() };
     if (data.password) {
       const bcrypt = await import("bcryptjs");
@@ -5729,6 +5740,34 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db.update(users).set(update).where(and(eq(users.id, id), eq(users.tenantId, tenantId), eq(users.isEmployee, true))).returning();
     if (!user) throw new Error("Employee not found");
     return user;
+  }
+
+  // ── Schedule overrides ────────────────────────────────────────────────────
+  async getScheduleOverrides(tenantId: number): Promise<ScheduleOverride[]> {
+    return db.select().from(scheduleOverrides).where(eq(scheduleOverrides.tenantId, tenantId)).orderBy(asc(scheduleOverrides.specificDate));
+  }
+
+  async upsertScheduleOverride(data: { tenantId: number; employeeName: string; specificDate: string; timeSlot: string; note?: string }): Promise<ScheduleOverride> {
+    // Use raw SQL upsert on (tenantId, employeeName, specificDate)
+    const existing = await db.select().from(scheduleOverrides)
+      .where(and(eq(scheduleOverrides.tenantId, data.tenantId), eq(scheduleOverrides.employeeName, data.employeeName), eq(scheduleOverrides.specificDate, data.specificDate)));
+    if (existing.length > 0) {
+      const [updated] = await db.update(scheduleOverrides)
+        .set({ timeSlot: data.timeSlot, note: data.note ?? null })
+        .where(eq(scheduleOverrides.id, existing[0].id))
+        .returning();
+      return updated;
+    }
+    const [created] = await db.insert(scheduleOverrides).values({ tenantId: data.tenantId, employeeName: data.employeeName, specificDate: data.specificDate, timeSlot: data.timeSlot, note: data.note ?? null } as any).returning();
+    return created;
+  }
+
+  async deleteScheduleOverride(id: number, tenantId: number): Promise<void> {
+    await db.delete(scheduleOverrides).where(and(eq(scheduleOverrides.id, id), eq(scheduleOverrides.tenantId, tenantId)));
+  }
+
+  async deleteScheduleOverridesForEmployee(tenantId: number, employeeName: string): Promise<void> {
+    await db.delete(scheduleOverrides).where(and(eq(scheduleOverrides.tenantId, tenantId), eq(scheduleOverrides.employeeName, employeeName)));
   }
 
   async setEmployeePin(userId: string, tenantId: number, pin: string): Promise<void> {

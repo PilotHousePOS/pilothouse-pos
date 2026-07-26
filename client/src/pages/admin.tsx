@@ -2267,323 +2267,384 @@ function ScheduleManagement() {
   const [sections, setSections] = useState<string[]>(['A', 'B']);
   const [scheduleData, setScheduleData] = useState<Record<string, any[]>>({ A: [], B: [] });
   const [isSaving, setIsSaving] = useState(false);
-  
-  // Pay period: Wednesday through Tuesday
-  const DAYS = ['Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Monday', 'Tuesday'];
-  
-  // Calculate dates for each section (week starts on Wednesday)
+  const [addEmpOpen, setAddEmpOpen] = useState<string | null>(null);
+  const [payrollOpen, setPayrollOpen] = useState(false);
+  const [payrollData, setPayrollData] = useState<any>(null);
+  const [payrollLoading, setPayrollLoading] = useState(false);
+  const [pendingOverrides, setPendingOverrides] = useState<Record<string, string>>({});
+  // sectionNames maps section key → display label (editable, persisted in enabledFeatures)
+  const [sectionNames, setSectionNames] = useState<Record<string, string>>({ A: 'Group A', B: 'Group B' });
+  const [editingSectionKey, setEditingSectionKey] = useState<string | null>(null);
+
+  const { data: tenantInfo } = useQuery<{ enabledFeatures?: any }>({ queryKey: ['/api/tenants/current'] });
+  const { data: employeeList = [] } = useQuery<any[]>({ queryKey: ['/api/admin/employees'] });
+  const { data: existingOverrides = [] } = useQuery<any[]>({ queryKey: ['/api/admin/schedule-overrides'] });
+
+  // Sync section names from saved tenant settings when they load
+  useEffect(() => {
+    const saved = (tenantInfo?.enabledFeatures as any)?.scheduleGroupNames;
+    if (saved && typeof saved === 'object') setSectionNames(prev => ({ ...prev, ...saved }));
+  }, [tenantInfo]);
+
+  const payPeriodStartDay: number = (tenantInfo?.enabledFeatures as any)?.payPeriodStartDay ?? 3;
+  const ALL_DAYS_ORDER = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const DAYS = Array.from({ length: 7 }, (_, i) => ALL_DAYS_ORDER[(payPeriodStartDay + i) % 7]);
+
   const getDatesForSection = (section: string) => {
     const now = new Date();
-    const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, ... 3 = Wednesday
-    
-    // Calculate days to subtract to get to Wednesday of current week
-    // Wednesday = 3, so we need: (currentDay - 3 + 7) % 7 days ago was Wednesday
-    const daysToWednesday = (currentDay - 3 + 7) % 7;
-    const currentWeekWednesday = new Date(now);
-    currentWeekWednesday.setDate(now.getDate() - daysToWednesday);
-    currentWeekWednesday.setHours(0, 0, 0, 0);
-    
-    // Section index determines week offset (A = current week, B = next week, etc.)
+    const currentDay = now.getDay();
+    const daysToStart = (currentDay - payPeriodStartDay + 7) % 7;
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - daysToStart);
+    weekStart.setHours(0, 0, 0, 0);
     const sectionIndex = sections.indexOf(section);
-    const weekOffset = sectionIndex * 7;
-    const sectionWednesday = new Date(currentWeekWednesday);
-    sectionWednesday.setDate(currentWeekWednesday.getDate() + weekOffset);
-    
-    // Generate dates for all days of the week (Wed-Tue)
-    return DAYS.map((_, index) => {
-      const date = new Date(sectionWednesday);
-      date.setDate(sectionWednesday.getDate() + index);
-      return date;
+    const sectionStart = new Date(weekStart);
+    sectionStart.setDate(weekStart.getDate() + sectionIndex * 7);
+    return DAYS.map((_, i) => {
+      const d = new Date(sectionStart);
+      d.setDate(sectionStart.getDate() + i);
+      return d;
     });
   };
-  
-  // Fetch schedule entries
-  const scheduleQuery = useQuery({
-    queryKey: ['/api/admin/schedule'],
-  });
-  
-  // Organize schedule data by section and employee
+
+  const toIso = (d: Date) => {
+    const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), dd = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${dd}`;
+  };
+
+  const scheduleQuery = useQuery({ queryKey: ['/api/admin/schedule'] });
+
   useEffect(() => {
-    if (scheduleQuery.data) {
-      const entries = scheduleQuery.data as any[];
-      
-      // Find all unique sections from data
-      const existingSections = [...new Set(entries.map((e: any) => e.section))].filter(Boolean).sort();
-      if (existingSections.length > 0) {
-        setSections(existingSections);
-      }
-      
-      const organized: Record<string, any[]> = {};
-      
-      // Initialize all sections
-      (existingSections.length > 0 ? existingSections : sections).forEach(section => {
-        organized[section] = [];
-      });
-      
-      // Group by section and employee
-      (existingSections.length > 0 ? existingSections : sections).forEach(section => {
-        const sectionEntries = entries.filter((e: any) => e.section === section);
-        const employees = [...new Set(sectionEntries.map((e: any) => e.employeeName))];
-        
-        organized[section] = employees.map((empName, idx) => {
-          const empEntries = sectionEntries.filter((e: any) => e.employeeName === empName);
-          const schedule: Record<string, string> = {};
-          
-          DAYS.forEach(day => {
-            const dayEntry = empEntries.find((e: any) => e.dayOfWeek === day);
-            schedule[day] = dayEntry?.timeSlot || 'OFF';
-          });
-          
-          return {
-            employeeName: empName,
-            displayOrder: idx,
-            ...schedule
-          };
+    if (!scheduleQuery.data) return;
+    const entries = scheduleQuery.data as any[];
+    const existingSections = Array.from(new Set(entries.map((e: any) => e.section))).filter(Boolean).sort() as string[];
+    if (existingSections.length > 0) setSections(existingSections);
+    const usedSections = existingSections.length > 0 ? existingSections : sections;
+    const organized: Record<string, any[]> = {};
+    usedSections.forEach(s => { organized[s] = []; });
+    usedSections.forEach(section => {
+      const sectionEntries = entries.filter((e: any) => e.section === section);
+      const empNames = Array.from(new Set(sectionEntries.map((e: any) => e.employeeName))) as string[];
+      organized[section] = empNames.map((empName, idx) => {
+        const empEntries = sectionEntries.filter((e: any) => e.employeeName === empName);
+        const schedule: Record<string, string> = {};
+        DAYS.forEach(day => {
+          const entry = empEntries.find((e: any) => e.dayOfWeek === day);
+          schedule[day] = entry?.timeSlot || 'OFF';
         });
+        return { employeeName: empName, displayOrder: idx, ...schedule };
       });
-      
-      setScheduleData(organized);
-    }
+    });
+    setScheduleData(organized);
   }, [scheduleQuery.data]);
-  
-  const handleCellChange = (section: string, employeeIndex: number, day: string, value: string) => {
-    setScheduleData(prev => ({
-      ...prev,
-      [section]: prev[section].map((emp, idx) => 
-        idx === employeeIndex ? { ...emp, [day]: value } : emp
-      )
-    }));
+
+  const getEffectiveSlot = (empName: string, day: string, dateIso: string, templateValue: string) => {
+    const pKey = `${empName}:${dateIso}`;
+    if (pendingOverrides[pKey] !== undefined) return { value: pendingOverrides[pKey], isOverride: true };
+    const saved = (existingOverrides as any[]).find(o => o.employeeName === empName && o.specificDate === dateIso);
+    if (saved) return { value: saved.timeSlot, isOverride: true };
+    return { value: templateValue, isOverride: false };
   };
-  
-  const handleEmployeeNameChange = (section: string, employeeIndex: number, newName: string) => {
-    setScheduleData(prev => ({
-      ...prev,
-      [section]: prev[section].map((emp, idx) => 
-        idx === employeeIndex ? { ...emp, employeeName: newName } : emp
-      )
-    }));
+
+  const handleCellChange = (empName: string, dateIso: string, value: string) => {
+    setPendingOverrides(prev => ({ ...prev, [`${empName}:${dateIso}`]: value }));
   };
-  
-  const addEmployee = (section: string) => {
-    const currentSectionData = scheduleData[section] || [];
-    const newEmployee: any = {
-      employeeName: 'New Employee',
-      displayOrder: currentSectionData.length,
-    };
-    
-    DAYS.forEach(day => {
-      newEmployee[day] = 'OFF';
-    });
-    
-    setScheduleData(prev => ({
-      ...prev,
-      [section]: [...(prev[section] || []), newEmployee]
-    }));
+
+  const handleEmployeeNameChange = (section: string, idx: number, newName: string) => {
+    setScheduleData(prev => ({ ...prev, [section]: prev[section].map((e, i) => i === idx ? { ...e, employeeName: newName } : e) }));
   };
-  
-  const removeEmployee = (section: string, employeeIndex: number) => {
-    setScheduleData(prev => ({
-      ...prev,
-      [section]: (prev[section] || []).filter((_, idx) => idx !== employeeIndex)
-    }));
+
+  const addEmployeeFromPicker = (section: string, emp: any) => {
+    const defaultDays: string[] = emp.defaultWorkDays ?? [];
+    const defaultSlot: string = emp.defaultTimeSlot ?? 'OFF';
+    const newEmp: any = { employeeName: `${emp.firstName} ${emp.lastName}`, displayOrder: (scheduleData[section]||[]).length };
+    DAYS.forEach(day => { newEmp[day] = defaultDays.includes(day) ? defaultSlot : 'OFF'; });
+    setScheduleData(prev => ({ ...prev, [section]: [...(prev[section]||[]), newEmp] }));
+    setAddEmpOpen(null);
   };
-  
+
+  const addEmployeeManual = (section: string) => {
+    const newEmp: any = { employeeName: 'New Employee', displayOrder: (scheduleData[section]||[]).length };
+    DAYS.forEach(day => { newEmp[day] = 'OFF'; });
+    setScheduleData(prev => ({ ...prev, [section]: [...(prev[section]||[]), newEmp] }));
+    setAddEmpOpen(null);
+  };
+
+  const removeEmployee = (section: string, idx: number) => {
+    setScheduleData(prev => ({ ...prev, [section]: prev[section].filter((_, i) => i !== idx) }));
+  };
+
   const addSection = () => {
-    // Get next section letter (A, B, C, D, ...)
-    const nextLetter = String.fromCharCode(65 + sections.length); // 65 = 'A'
-    setSections(prev => [...prev, nextLetter]);
-    setScheduleData(prev => ({ ...prev, [nextLetter]: [] }));
+    const letter = String.fromCharCode(65 + sections.length);
+    setSections(prev => [...prev, letter]);
+    setScheduleData(prev => ({ ...prev, [letter]: [] }));
+    setSectionNames(prev => ({ ...prev, [letter]: `Group ${letter}` }));
   };
-  
-  const removeSection = (sectionToRemove: string) => {
-    if (sections.length <= 1) {
-      toast({ title: 'Cannot remove last section', variant: 'destructive' });
-      return;
-    }
-    setSections(prev => prev.filter(s => s !== sectionToRemove));
-    setScheduleData(prev => {
-      const newData = { ...prev };
-      delete newData[sectionToRemove];
-      return newData;
-    });
+
+  const removeSection = (s: string) => {
+    if (sections.length <= 1) { toast({ title: 'Cannot remove last section', variant: 'destructive' }); return; }
+    setSections(prev => prev.filter(x => x !== s));
+    setScheduleData(prev => { const nd = { ...prev }; delete nd[s]; return nd; });
+    setSectionNames(prev => { const nd = { ...prev }; delete nd[s]; return nd; });
   };
-  
+
+  const renameSectionKey = (key: string, newName: string) => {
+    const trimmed = newName.trim() || `Group ${key}`;
+    setSectionNames(prev => ({ ...prev, [key]: trimmed }));
+    setEditingSectionKey(null);
+  };
+
   const saveSchedule = async () => {
     setIsSaving(true);
     try {
       const entries: any[] = [];
-      
       sections.forEach(section => {
-        (scheduleData[section] || []).forEach((employee, idx) => {
-          DAYS.forEach(day => {
-            entries.push({
-              section,
-              employeeName: employee.employeeName,
-              dayOfWeek: day,
-              timeSlot: employee[day] || 'OFF',
-              displayOrder: idx
-            });
-          });
+        (scheduleData[section]||[]).forEach((emp, idx) => {
+          DAYS.forEach(day => { entries.push({ section, employeeName: emp.employeeName, dayOfWeek: day, timeSlot: emp[day]||'OFF', displayOrder: idx }); });
         });
       });
-      
       await apiRequest('POST', '/api/admin/schedule/batch', { entries });
+      await Promise.all(Object.entries(pendingOverrides).map(([key, timeSlot]) => {
+        const [empName, dateIso] = key.split(':');
+        return apiRequest('POST', '/api/admin/schedule-overrides', { employeeName: empName, specificDate: dateIso, timeSlot });
+      }));
+      // Persist section display names alongside schedule
+      const currentFeatures = (tenantInfo?.enabledFeatures as any) ?? {};
+      await apiRequest('PUT', '/api/admin/settings/features', { ...currentFeatures, scheduleGroupNames: sectionNames });
       await queryClient.invalidateQueries({ queryKey: ['/api/admin/schedule'] });
-      toast({ title: 'Schedule saved successfully' });
-    } catch (error) {
-      console.error('Failed to save schedule:', error);
-      toast({ title: 'Failed to save schedule', variant: 'destructive' });
-    } finally {
-      setIsSaving(false);
-    }
+      await queryClient.invalidateQueries({ queryKey: ['/api/admin/schedule-overrides'] });
+      await queryClient.invalidateQueries({ queryKey: ['/api/tenants/current'] });
+      setPendingOverrides({});
+      toast({ title: 'Schedule saved' });
+    } catch { toast({ title: 'Failed to save schedule', variant: 'destructive' }); }
+    finally { setIsSaving(false); }
   };
-  
-  if (scheduleQuery.isLoading) {
-    return <div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin" /></div>;
-  }
-  
+
+  const loadPayroll = async () => {
+    setPayrollOpen(true);
+    setPayrollLoading(true);
+    try {
+      const now = new Date();
+      const daysToStart = (now.getDay() - payPeriodStartDay + 7) % 7;
+      const weekStart = new Date(now); weekStart.setDate(now.getDate() - daysToStart);
+      const startIso = toIso(weekStart);
+      const data = await (await apiRequest('GET', `/api/admin/payroll/report?startDate=${startIso}`)).json();
+      setPayrollData(data);
+    } catch { toast({ title: 'Failed to load payroll report', variant: 'destructive' }); }
+    finally { setPayrollLoading(false); }
+  };
+
+  const exportCsv = () => {
+    if (!payrollData) return;
+    const { weekDates, rows } = payrollData;
+    const hdrs = ['Employee', ...weekDates.map((d: any) => `${d.dayName} ${d.iso}`), 'Total Hours'];
+    const csvRows = rows.map((r: any) => [r.employeeName, ...weekDates.map((d: any) => r.days[d.iso]?.timeSlot ?? ''), `${r.totalHours.toFixed(1)}${r.hasUnknown?'+':''}`]);
+    const csv = [hdrs, ...csvRows].map(r => r.map((v: any) => `"${v}"`).join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    a.download = `payroll-${payrollData.startDate}.csv`; a.click();
+  };
+
+  const payPeriodLabel = `${DAYS[0].slice(0,3)} – ${DAYS[6].slice(0,3)}`;
+  const hasOverrides = (existingOverrides as any[]).length > 0 || Object.keys(pendingOverrides).length > 0;
+
+  if (scheduleQuery.isLoading) return <div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <CardTitle className="flex items-center gap-2">
-            <CalendarIcon className="w-5 h-5" />
-            Employee Schedule
-          </CardTitle>
-          <Button 
-            onClick={saveSchedule}
-            disabled={isSaving}
-            className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
-            data-testid="button-save-schedule"
-          >
-            {isSaving ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                Save Schedule
-              </>
-            )}
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-8">
-        <div className="flex items-center gap-2 pb-2 border-b">
-          <span className="text-sm text-gray-600">Manage Sections:</span>
-          <Button 
-            size="sm"
-            variant="outline"
-            onClick={addSection}
-            data-testid="button-add-section"
-          >
-            <Plus className="w-3 h-3 mr-1" />
-            Add Section
-          </Button>
-          <span className="text-xs text-gray-500 ml-2">(Pay period: Wed - Tue)</span>
-        </div>
-        
-        {sections.map(section => (
-          <div key={section} className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold text-gray-900 bg-green-200 px-3 py-1 rounded">
-                  Section {section}
-                </h3>
-                {sections.length > 1 && (
-                  <Button 
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => removeSection(section)}
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    data-testid={`button-remove-section-${section}`}
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </Button>
-                )}
-              </div>
-              <Button 
-                size="sm"
-                variant="outline"
-                onClick={() => addEmployee(section)}
-                data-testid={`button-add-employee-${section}`}
-              >
-                <Plus className="w-3 h-3 mr-1" />
-                Add Employee
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <CardTitle className="flex items-center gap-2"><CalendarIcon className="w-5 h-5" />Employee Schedule</CardTitle>
+            <div className="flex gap-2 flex-wrap">
+              <Button variant="outline" size="sm" onClick={loadPayroll} data-testid="button-payroll-report">
+                <FileText className="w-4 h-4 mr-2" />Payroll Report
+              </Button>
+              <Button onClick={saveSchedule} disabled={isSaving} className="bg-green-600 hover:bg-green-700" data-testid="button-save-schedule">
+                {isSaving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving...</> : <><Save className="w-4 h-4 mr-2" />Save Schedule</>}
               </Button>
             </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-gray-300">
-                <thead>
-                  <tr className="bg-green-100">
-                    <th className="border border-gray-300 px-2 py-2 text-left text-sm font-semibold min-w-[120px]">Employee</th>
-                    {DAYS.map((day, index) => {
-                      const dates = getDatesForSection(section);
-                      const date = dates[index];
-                      const month = date.getMonth() + 1;
-                      const dayNum = date.getDate();
-                      return (
-                        <th key={day} className="border border-gray-300 px-2 py-2 text-center text-sm font-semibold min-w-[100px]">
-                          {day.substring(0, 3)} {month}/{dayNum}
-                        </th>
-                      );
-                    })}
-                    <th className="border border-gray-300 px-2 py-2 text-center text-sm font-semibold w-[80px]">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(scheduleData[section] || []).map((employee, empIdx) => (
-                    <tr key={empIdx} className="hover:bg-gray-50">
-                      <td className="border border-gray-300 px-2 py-1">
-                        <input
-                          type="text"
-                          value={employee.employeeName}
-                          onChange={(e) => handleEmployeeNameChange(section, empIdx, e.target.value)}
-                          className="w-full px-2 py-1 text-sm border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                          data-testid={`input-employee-name-${section}-${empIdx}`}
-                        />
-                      </td>
-                      {DAYS.map(day => (
-                        <td key={day} className="border border-gray-300 px-1 py-1">
-                          <input
-                            type="text"
-                            value={employee[day] || 'OFF'}
-                            onChange={(e) => handleCellChange(section, empIdx, day, e.target.value)}
-                            className="w-full px-2 py-1 text-sm text-center border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="OFF"
-                            data-testid={`input-schedule-${section}-${empIdx}-${day}`}
-                          />
-                        </td>
-                      ))}
-                      <td className="border border-gray-300 px-2 py-1 text-center">
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => removeEmployee(section, empIdx)}
-                          data-testid={`button-remove-employee-${section}-${empIdx}`}
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                  {(scheduleData[section] || []).length === 0 && (
-                    <tr>
-                      <td colSpan={DAYS.length + 2} className="border border-gray-300 px-4 py-8 text-center text-gray-500">
-                        No employees in this section. Click "Add Employee" to get started.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
           </div>
-        ))}
-      </CardContent>
-    </Card>
+        </CardHeader>
+        <CardContent className="space-y-8">
+          <div className="flex items-center gap-2 pb-2 border-b flex-wrap">
+            <span className="text-sm text-gray-600">Manage Sections:</span>
+            <Button size="sm" variant="outline" onClick={addSection} data-testid="button-add-section"><Plus className="w-3 h-3 mr-1" />Add Section</Button>
+            <span className="text-xs text-gray-500">(Pay period: {payPeriodLabel})</span>
+            {hasOverrides && <span className="text-xs text-amber-600 ml-auto">⚠ Amber cells = date-specific overrides (revert to weekly template after their date)</span>}
+          </div>
+
+          {sections.map(section => {
+            const dates = getDatesForSection(section);
+            return (
+              <div key={section} className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {editingSectionKey === section ? (
+                      <input
+                        autoFocus
+                        defaultValue={sectionNames[section] ?? `Group ${section}`}
+                        onBlur={e => renameSectionKey(section, e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); if (e.key === 'Escape') setEditingSectionKey(null); }}
+                        className="text-lg font-bold bg-green-50 border border-green-400 px-3 py-1 rounded focus:outline-none focus:ring-2 focus:ring-green-500 min-w-[120px]"
+                      />
+                    ) : (
+                      <button
+                        onClick={() => setEditingSectionKey(section)}
+                        title="Click to rename"
+                        className="text-lg font-bold text-gray-900 bg-green-200 hover:bg-green-300 px-3 py-1 rounded flex items-center gap-1.5 transition-colors"
+                      >
+                        {sectionNames[section] ?? `Group ${section}`}
+                        <Pencil className="w-3 h-3 opacity-50" />
+                      </button>
+                    )}
+                    {sections.length > 1 && (
+                      <Button size="sm" variant="ghost" onClick={() => removeSection(section)} className="text-red-500 hover:text-red-700 hover:bg-red-50" data-testid={`button-remove-section-${section}`}>
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    )}
+                  </div>
+                  <Button size="sm" variant="outline" onClick={() => setAddEmpOpen(section)} data-testid={`button-add-employee-${section}`}>
+                    <Plus className="w-3 h-3 mr-1" />Add Employee
+                  </Button>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse border border-gray-300">
+                    <thead>
+                      <tr className="bg-green-100">
+                        <th className="border border-gray-300 px-2 py-2 text-left text-sm font-semibold min-w-[120px]">Employee</th>
+                        {DAYS.map((day, i) => (
+                          <th key={day} className="border border-gray-300 px-2 py-2 text-center text-sm font-semibold min-w-[100px]">
+                            {day.slice(0,3)} {dates[i].getMonth()+1}/{dates[i].getDate()}
+                          </th>
+                        ))}
+                        <th className="border border-gray-300 px-2 py-2 text-center text-sm font-semibold w-[80px]">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(scheduleData[section]||[]).map((emp, empIdx) => (
+                        <tr key={empIdx} className="hover:bg-gray-50">
+                          <td className="border border-gray-300 px-2 py-1">
+                            <input type="text" value={emp.employeeName} onChange={e => handleEmployeeNameChange(section, empIdx, e.target.value)}
+                              className="w-full px-2 py-1 text-sm border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                              data-testid={`input-employee-name-${section}-${empIdx}`} />
+                          </td>
+                          {DAYS.map((day, dayIdx) => {
+                            const dateIso = toIso(dates[dayIdx]);
+                            const { value, isOverride } = getEffectiveSlot(emp.employeeName, day, dateIso, emp[day]||'OFF');
+                            return (
+                              <td key={day} className="border border-gray-300 px-1 py-1">
+                                <input type="text" value={value}
+                                  onChange={e => handleCellChange(emp.employeeName, dateIso, e.target.value)}
+                                  title={isOverride ? 'Date-specific override — reverts to weekly template after this date' : 'Weekly template'}
+                                  className={`w-full px-2 py-1 text-sm text-center border rounded focus:outline-none focus:ring-2 focus:ring-green-500 ${isOverride ? 'border-amber-400 bg-amber-50' : 'border-gray-200'}`}
+                                  placeholder="OFF" data-testid={`input-schedule-${section}-${empIdx}-${day}`} />
+                              </td>
+                            );
+                          })}
+                          <td className="border border-gray-300 px-2 py-1 text-center">
+                            <Button size="sm" variant="destructive" onClick={() => removeEmployee(section, empIdx)} data-testid={`button-remove-employee-${section}-${empIdx}`}>
+                              <Trash2 className="w-3 h-3" />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                      {(scheduleData[section]||[]).length === 0 && (
+                        <tr><td colSpan={DAYS.length+2} className="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                          No employees in this section. Click "Add Employee" to get started.
+                        </td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
+
+      {/* Add Employee Dialog */}
+      <Dialog open={!!addEmpOpen} onOpenChange={v => !v && setAddEmpOpen(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>Add Employee to Schedule</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            {(employeeList as any[]).length > 0 && (
+              <>
+                <p className="text-sm text-muted-foreground">Pick a staff account to auto-fill their default schedule:</p>
+                <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
+                  {(employeeList as any[]).map((emp: any) => (
+                    <button key={emp.id} className="w-full text-left px-3 py-2 rounded border hover:bg-muted transition-colors"
+                      onClick={() => addEmpOpen && addEmployeeFromPicker(addEmpOpen, emp)}>
+                      <p className="font-medium text-sm">{emp.firstName} {emp.lastName}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {emp.defaultWorkDays?.length ? `${emp.defaultWorkDays.join(', ')} · ${emp.defaultTimeSlot ?? '?'}` : 'No default schedule set'}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+                <div className="relative"><div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div><div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">or</span></div></div>
+              </>
+            )}
+            <Button variant="secondary" className="w-full" onClick={() => addEmpOpen && addEmployeeManual(addEmpOpen)}>
+              Enter name manually
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Payroll Report Dialog */}
+      <Dialog open={payrollOpen} onOpenChange={setPayrollOpen}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><FileText className="w-5 h-5" />Payroll Report — Current Pay Period ({payPeriodLabel})</DialogTitle>
+            <DialogDescription>Hours per employee for this pay period. Amber = date-specific override.</DialogDescription>
+          </DialogHeader>
+          {payrollLoading ? (
+            <div className="flex justify-center py-8"><Loader2 className="w-8 h-8 animate-spin" /></div>
+          ) : payrollData ? (
+            <div className="space-y-4">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse border border-gray-300 text-sm">
+                  <thead>
+                    <tr className="bg-green-100">
+                      <th className="border border-gray-300 px-2 py-2 text-left">Employee</th>
+                      {payrollData.weekDates.map((d: any) => (
+                        <th key={d.iso} className="border border-gray-300 px-2 py-2 text-center min-w-[80px]">
+                          {d.dayName.slice(0,3)}<br/><span className="font-normal text-xs">{d.iso.slice(5)}</span>
+                        </th>
+                      ))}
+                      <th className="border border-gray-300 px-2 py-2 text-center font-bold bg-green-50">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {payrollData.rows.map((row: any) => (
+                      <tr key={row.employeeName} className="hover:bg-gray-50">
+                        <td className="border border-gray-300 px-2 py-1 font-medium">{row.employeeName}</td>
+                        {payrollData.weekDates.map((d: any) => {
+                          const cell = row.days[d.iso];
+                          return (
+                            <td key={d.iso} className={`border border-gray-300 px-2 py-1 text-center ${cell?.isOverride ? 'bg-amber-50' : ''}`}>
+                              <div className="text-xs font-medium">{cell?.timeSlot || 'OFF'}</div>
+                              {cell?.hours != null && cell.hours > 0 && <div className="text-xs text-muted-foreground">{cell.hours}h</div>}
+                            </td>
+                          );
+                        })}
+                        <td className="border border-gray-300 px-2 py-1 text-center font-bold bg-green-50">
+                          {row.totalHours.toFixed(1)}{row.hasUnknown?'+':''}h
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="flex justify-end">
+                <Button onClick={exportCsv} variant="outline" size="sm"><Download className="w-4 h-4 mr-2" />Export CSV</Button>
+              </div>
+            </div>
+          ) : <p className="text-center py-8 text-muted-foreground">No schedule data for this period.</p>}
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
 
@@ -2625,7 +2686,7 @@ function GroomingSchedule() {
   useEffect(() => {
     if (scheduleQuery.data) {
       const entries = scheduleQuery.data as any[];
-      const groomers = [...new Set(entries.map((e: any) => e.groomerName))];
+      const groomers = Array.from(new Set(entries.map((e: any) => e.groomerName)));
       
       const organized = groomers.map((groomerName, idx) => {
         const groomerEntries = entries.filter((e: any) => e.groomerName === groomerName);
@@ -4889,6 +4950,60 @@ function FeaturesPanel() {
   );
 }
 
+function PayPeriodCard() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { data: tenantInfo } = useQuery<{ enabledFeatures?: any }>({ queryKey: ['/api/tenants/current'] });
+  const payPeriodStartDay: number = (tenantInfo?.enabledFeatures as any)?.payPeriodStartDay ?? 3;
+  const DAY_OPTIONS = [
+    { value: 0, label: 'Sunday' }, { value: 1, label: 'Monday' }, { value: 2, label: 'Tuesday' },
+    { value: 3, label: 'Wednesday' }, { value: 4, label: 'Thursday' }, { value: 5, label: 'Friday' }, { value: 6, label: 'Saturday' },
+  ];
+
+  const mutation = useMutation({
+    mutationFn: async (startDay: number) => {
+      const current = (tenantInfo?.enabledFeatures as any) ?? {};
+      return apiRequest('PUT', '/api/admin/settings/features', { ...current, payPeriodStartDay: startDay });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/tenants/current'] });
+      toast({ title: 'Pay period start day updated' });
+    },
+    onError: (e: any) => toast({ title: 'Failed to save', description: e.message, variant: 'destructive' }),
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <CalendarIcon className="w-5 h-5" />
+          Pay Period Settings
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex-1">
+            <p className="text-sm font-medium">Pay period starts on</p>
+            <p className="text-xs text-muted-foreground">The employee schedule week begins on this day (e.g. Wednesday–Tuesday)</p>
+          </div>
+          <div className="flex gap-1 flex-wrap">
+            {DAY_OPTIONS.map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => mutation.mutate(opt.value)}
+                disabled={mutation.isPending}
+                className={`px-3 py-1.5 text-sm rounded border transition-colors ${payPeriodStartDay === opt.value ? 'bg-green-600 text-white border-green-600' : 'bg-background border-input hover:bg-muted'}`}
+              >
+                {opt.label.slice(0,3)}
+              </button>
+            ))}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function LoyaltySettingsPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -6465,17 +6580,6 @@ export default function Admin() {
   const [apptItemSearching, setApptItemSearching] = useState(false);
   const [showApptItemScanner, setShowApptItemScanner] = useState(false);
   const [apptItemQty, setApptItemQty] = useState<{[supplyId: number]: number}>({});
-  const [isAddGroomerOpen, setIsAddGroomerOpen] = useState(false);
-  const [editingGroomer, setEditingGroomer] = useState<any>(null);
-  const [groomerToDelete, setGroomerToDelete] = useState<any>(null);
-  const [isAddBlockedDayOpen, setIsAddBlockedDayOpen] = useState(false);
-  const [blockedDayFormData, setBlockedDayFormData] = useState({
-    groomerId: '',
-    dates: [] as Date[],
-    reason: 'sick',
-    notes: ''
-  });
-  const [blockedDaysGroomerFilter, setBlockedDaysGroomerFilter] = useState<string>('all');
   const [isAddBoardingOpen, setIsAddBoardingOpen] = useState(false);
   const [showApprovedAppointments, setShowApprovedAppointments] = useState(false);
   const [showDeniedAppointments, setShowDeniedAppointments] = useState(false);
@@ -7014,11 +7118,6 @@ export default function Admin() {
   });
 
 
-  const groomersQuery = useQuery<any[]>({
-    queryKey: ["/api/admin/groomers"],
-    enabled: Boolean(isAuthenticated && (typedUser?.isAdmin || typedUser?.isGroomer)),
-  });
-
   // Tenant feature flags — controls which tabs/sections are visible
   const { data: tenantInfo } = useQuery<{ enabledFeatures?: Record<string, boolean> }>({
     queryKey: ["/api/tenants/current"],
@@ -7035,7 +7134,7 @@ export default function Admin() {
   // Base tabs always visible; optional tabs must be explicitly added by the admin
   const BASE_TAB_ORDER = [
     'calendar', 'contacts', 'schedule', 'inventory', 'inv-audit',
-    'pos-tracker', 'pos-reports', 'grooming', 'groomers', 'users',
+    'pos-tracker', 'pos-reports', 'grooming', 'users',
     'database', 'astro', 'orders', 'charge-accounts', 'specials',
     'applications', 'feedback', 'staff', 'settings',
   ];
@@ -7045,7 +7144,7 @@ export default function Admin() {
     { id: 'operations', label: 'Operations',          tabs: ['calendar', 'contacts', 'schedule', 'appointments', 'waitlist', 'boarding', 'time-clock'] },
     { id: 'sales',      label: 'Sales',               tabs: ['pos-tracker', 'pos-reports', 'orders', 'charge-accounts', 'non-payment', 'estimates', 'invoicing'] },
     { id: 'inventory',  label: 'Inventory & Services', tabs: ['inventory', 'inv-audit', 'grooming', 'specials', 'memberships'] },
-    { id: 'staff',      label: 'Staff',               tabs: ['groomers', 'staff', 'tasks', 'intake-forms'] },
+    { id: 'staff',      label: 'Staff',               tabs: ['staff', 'tasks', 'intake-forms'] },
     { id: 'outreach',   label: 'Outreach',            tabs: ['email-center', 'sms-blasts', 'announcements', 'feedback'] },
     { id: 'admin',      label: 'Admin',               tabs: ['users', 'database', 'astro', 'applications', 'settings'] },
   ];
@@ -7151,7 +7250,6 @@ export default function Admin() {
       'pos-tracker':     isEmp ? !!ep.canViewReports : !!typedUser?.isAdmin,
       'pos-reports':     isEmp ? !!ep.canViewReports : !!typedUser?.isAdmin,
       'grooming':        isEmp ? !!ep.canManageGrooming : !!typedUser?.isAdmin,
-      'groomers':        isEmp ? !!ep.canManageGrooming : true,
       'users':           isEmp ? false : !!typedUser?.isAdmin,
       'database':        isEmp ? false : !!typedUser?.isAdmin,
       'astro':           isEmp ? false : !!typedUser?.isAdmin,
@@ -7271,12 +7369,6 @@ export default function Admin() {
       return response.json();
     },
     enabled: !!bookingSelectedDateStr,
-  });
-
-  // Fetch groomer blocked days (sick days, vacation, etc.)
-  const { data: groomerBlockedDays = [] } = useQuery<any[]>({
-    queryKey: ["/api/admin/groomer-blocked-days"],
-    enabled: Boolean(isAuthenticated && typedUser?.isAdmin),
   });
 
   // Fetch contacts for booking search
@@ -9080,172 +9172,6 @@ export default function Admin() {
       toast({
         title: "Error",
         description: error.message || "Failed to delete special date",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Groomer Mutations
-  const createGroomerMutation = useMutation({
-    mutationFn: async (groomerData: any) => {
-      await apiRequest("POST", "/api/admin/groomers", groomerData);
-    },
-    onSuccess: () => {
-      toast({
-        title: "Groomer Added",
-        description: "Groomer has been added successfully.",
-      });
-      setIsAddGroomerOpen(false);
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/groomers"] });
-    },
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
-      }
-      toast({
-        title: "Error",
-        description: "Failed to add groomer.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const updateGroomerMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: any }) => {
-      await apiRequest("PUT", `/api/admin/groomers/${id}`, data);
-    },
-    onSuccess: () => {
-      toast({
-        title: "Groomer Updated",
-        description: "Groomer has been updated successfully.",
-      });
-      setEditingGroomer(null);
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/groomers"] });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to update groomer.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const deleteGroomerMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await apiRequest("DELETE", `/api/admin/groomers/${id}`);
-    },
-    onSuccess: async () => {
-      toast({
-        title: "Groomer Deleted",
-        description: "Groomer has been deleted successfully.",
-      });
-      setGroomerToDelete(null);
-      await queryClient.refetchQueries({ queryKey: ["/api/admin/groomers"] });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to delete groomer.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const toggleGroomerActiveMutation = useMutation({
-    mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
-      await apiRequest("PUT", `/api/admin/groomers/${id}`, { isActive });
-    },
-    onSuccess: () => {
-      toast({
-        title: "Status Updated",
-        description: "Groomer status has been updated successfully.",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/groomers"] });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to update groomer status.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Update groomer weekly off-days mutation
-  const updateGroomerOffDaysMutation = useMutation({
-    mutationFn: async ({ id, offDays }: { id: number; offDays: number[] }) => {
-      await apiRequest("PUT", `/api/admin/groomers/${id}`, { offDays });
-    },
-    onSuccess: () => {
-      toast({
-        title: "Off Days Updated",
-        description: "Groomer's weekly off-days have been updated.",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/groomers"] });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to update off-days.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Groomer blocked days mutations
-  const createBlockedDayMutation = useMutation({
-    mutationFn: async (blockedDayData: { groomerId: number; dates: string[]; reason: string; notes?: string }) => {
-      for (const date of blockedDayData.dates) {
-        await apiRequest("POST", "/api/admin/groomer-blocked-days", {
-          groomerId: blockedDayData.groomerId,
-          date,
-          reason: blockedDayData.reason,
-          notes: blockedDayData.notes
-        });
-      }
-    },
-    onSuccess: () => {
-      toast({
-        title: "Blocked Days Added",
-        description: `${blockedDayFormData.dates.length} blocked day(s) added successfully.`,
-      });
-      setIsAddBlockedDayOpen(false);
-      setBlockedDayFormData({ groomerId: '', dates: [], reason: 'sick', notes: '' });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/groomer-blocked-days"] });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to add blocked days.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const deleteBlockedDayMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await apiRequest("DELETE", `/api/admin/groomer-blocked-days/${id}`);
-    },
-    onSuccess: () => {
-      toast({
-        title: "Blocked Day Removed",
-        description: "Groomer blocked day has been removed successfully.",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/groomer-blocked-days"] });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to remove blocked day.",
         variant: "destructive",
       });
     },
@@ -14386,252 +14312,6 @@ export default function Admin() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="groomers">
-          <Card>
-            <CardHeader>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="w-5 h-5" />
-                  {tl('groomersHeading', tl('groomers', 'Staff'))} ({groomersQuery.data?.length || 0})
-                </CardTitle>
-                {typedUser?.isAdmin && (
-                  <Button 
-                    onClick={() => setIsAddGroomerOpen(true)}
-                    className="w-full sm:w-auto bg-brand-blue hover:bg-blue-600"
-                    data-testid="button-add-groomer"
-                  >
-                    <UserPlus className="w-4 h-4 mr-2" />
-                    Add New {tl('groomers', 'Staff')}
-                  </Button>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent>
-              {groomersQuery.isLoading ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
-                  <p className="text-sm text-gray-500 mt-2">Loading {tl('groomers', 'Staff').toLowerCase()}s...</p>
-                </div>
-              ) : groomersQuery.data?.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                  <p>No {tl('groomers', 'Staff').toLowerCase()}s found</p>
-                  <p className="text-sm mt-1">Click "Add New {tl('groomers', 'Staff')}" to create one</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {groomersQuery.data?.map((groomer: any) => (
-                    <Card key={groomer.id} className="border shadow-sm">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <CardTitle className="text-lg flex items-center gap-2">
-                              {groomer.name}
-                              <Badge variant={groomer.isActive ? "default" : "secondary"}>
-                                {groomer.isActive ? "Active" : "Inactive"}
-                              </Badge>
-                            </CardTitle>
-                            {groomer.specialties && (
-                              <p className="text-sm text-gray-600 mt-1">{groomer.specialties}</p>
-                            )}
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <div className="space-y-2 text-sm">
-                          {groomer.email && (
-                            <div className="flex items-center gap-2 text-gray-600">
-                              <Mail className="w-4 h-4" />
-                              <span>{groomer.email}</span>
-                            </div>
-                          )}
-                          {groomer.phone && (
-                            <div className="flex items-center gap-2 text-gray-600">
-                              <Phone className="w-4 h-4" />
-                              <span>{groomer.phone}</span>
-                            </div>
-                          )}
-                        </div>
-                        
-                        {/* Weekly Off-Days - Admin only */}
-                        {typedUser?.isAdmin && (
-                          <div className="mt-3 pt-3 border-t">
-                            <p className="text-xs text-gray-500 mb-2">Weekly Off-Days (click to toggle)</p>
-                            <div className="flex flex-wrap gap-1">
-                              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => {
-                                const isOffDay = groomer.offDays?.includes(idx) || false;
-                                return (
-                                  <Button
-                                    key={day}
-                                    variant={isOffDay ? "destructive" : "outline"}
-                                    size="sm"
-                                    className="text-xs px-2 py-1 h-7"
-                                    onClick={() => {
-                                      const currentOffDays = groomer.offDays || [];
-                                      const newOffDays = isOffDay
-                                        ? currentOffDays.filter((d: number) => d !== idx)
-                                        : [...currentOffDays, idx];
-                                      updateGroomerOffDaysMutation.mutate({ id: groomer.id, offDays: newOffDays });
-                                    }}
-                                    disabled={updateGroomerOffDaysMutation.isPending}
-                                  >
-                                    {day}
-                                  </Button>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        )}
-
-                        {typedUser?.isAdmin && (
-                          <div className="flex flex-wrap gap-2 mt-4">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="flex-1 min-w-[80px]"
-                              onClick={() => setEditingGroomer(groomer)}
-                              data-testid={`button-edit-groomer-${groomer.id}`}
-                            >
-                              <Pencil className="w-3 h-3 mr-1" />
-                              Edit
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="flex-1 min-w-[100px]"
-                              onClick={() => toggleGroomerActiveMutation.mutate({ 
-                                id: groomer.id, 
-                                isActive: !groomer.isActive 
-                              })}
-                              disabled={toggleGroomerActiveMutation.isPending}
-                              data-testid={`button-toggle-groomer-${groomer.id}`}
-                            >
-                              {groomer.isActive ? <EyeOff className="w-3 h-3 mr-1" /> : <Eye className="w-3 h-3 mr-1" />}
-                              {groomer.isActive ? "Deactivate" : "Activate"}
-                            </Button>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              className="min-w-[40px]"
-                              onClick={() => setGroomerToDelete(groomer)}
-                              data-testid={`button-delete-groomer-${groomer.id}`}
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </Button>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Groomer Blocked Days Management */}
-          {typedUser?.isAdmin && (
-            <Card className="mt-6">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CalendarX2 className="w-5 h-5" />
-                  {tl('groomers', 'Staff')} Blocked Days (Sick/Vacation)
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {groomersQuery.data?.filter((g: any) => g.isActive).length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <CalendarX2 className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                    <p>No active {tl('groomers', 'Staff').toLowerCase()}s found</p>
-                  </div>
-                ) : (
-                  <Accordion type="single" collapsible className="space-y-2">
-                    {groomersQuery.data?.filter((g: any) => g.isActive).map((groomer: any) => {
-                      const groomerBlockedList = groomerBlockedDays.filter((bd: any) => bd.groomerId === groomer.id);
-                      const blockedDates = groomerBlockedList.map((bd: any) => new Date(bd.date + 'T00:00:00'));
-                      
-                      return (
-                        <AccordionItem key={groomer.id} value={`groomer-${groomer.id}`} className="border rounded-lg px-4">
-                          <AccordionTrigger className="hover:no-underline">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
-                                <UserIcon className="w-5 h-5 text-orange-600" />
-                              </div>
-                              <div className="text-left">
-                                <p className="font-medium">{groomer.name}</p>
-                                <p className="text-sm text-muted-foreground">
-                                  {groomerBlockedList.length} blocked day{groomerBlockedList.length !== 1 ? 's' : ''}
-                                </p>
-                              </div>
-                            </div>
-                          </AccordionTrigger>
-                          <AccordionContent>
-                            <div className="pt-4 pb-2">
-                              <div className="flex justify-center mb-4">
-                                <Calendar
-                                  mode="multiple"
-                                  selected={blockedDates}
-                                  className="rounded-md border"
-                                  modifiers={{
-                                    blocked: blockedDates
-                                  }}
-                                  modifiersStyles={{
-                                    blocked: { backgroundColor: '#ef4444', color: 'white', borderRadius: '50%' }
-                                  }}
-                                  disabled
-                                />
-                              </div>
-                              {groomerBlockedList.length > 0 && (
-                                <div className="space-y-2 max-h-48 overflow-y-auto">
-                                  {groomerBlockedList.sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime()).map((bd: any) => (
-                                    <div key={bd.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-sm">
-                                          {new Date(bd.date + 'T00:00:00').toLocaleDateString('en-US', { 
-                                            weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
-                                          })}
-                                        </span>
-                                        <Badge variant={bd.reason === 'sick' ? 'destructive' : bd.reason === 'vacation' ? 'default' : 'secondary'} className="text-xs">
-                                          {bd.reason}
-                                        </Badge>
-                                        {bd.notes && <span className="text-xs text-muted-foreground">({bd.notes})</span>}
-                                      </div>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => deleteBlockedDayMutation.mutate(bd.id)}
-                                        disabled={deleteBlockedDayMutation.isPending}
-                                      >
-                                        <Trash2 className="w-3 h-3 text-red-500" />
-                                      </Button>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                              <div className="mt-4 text-center">
-                                <Button 
-                                  onClick={() => {
-                                    setBlockedDayFormData({ ...blockedDayFormData, groomerId: groomer.id.toString() });
-                                    setIsAddBlockedDayOpen(true);
-                                  }}
-                                  className="bg-orange-600 hover:bg-orange-700"
-                                  size="sm"
-                                >
-                                  <Plus className="w-4 h-4 mr-2" />
-                                  Add Blocked Days
-                                </Button>
-                              </div>
-                            </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      );
-                    })}
-                  </Accordion>
-                )}
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-
         <TabsContent value="boarding">
           <Card>
             <CardHeader>
@@ -14660,7 +14340,6 @@ export default function Admin() {
 
         <TabsContent value="schedule">
           <ScheduleManagement />
-          <GroomingSchedule />
         </TabsContent>
 
         <TabsContent value="astro" className="space-y-6">
@@ -14994,6 +14673,7 @@ export default function Admin() {
         <TabsContent value="settings" className="space-y-6">
           <StoreCodeCard />
           <FeaturesPanel />
+          <PayPeriodCard />
           <StoreHoursPanel />
           <SettingsPanel />
           <TrackedItemsSettingsPanel />
@@ -15546,202 +15226,6 @@ export default function Admin() {
           </DialogContent>
         </Dialog>
       )}
-
-      {/* Add Groomer Dialog */}
-      <Dialog open={isAddGroomerOpen} onOpenChange={setIsAddGroomerOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Add New {tl('groomers', 'Staff')}</DialogTitle>
-            <DialogDescription>Add a new {tl('groomers', 'Staff').toLowerCase()} to your team.</DialogDescription>
-          </DialogHeader>
-          <GroomerForm 
-            onSubmit={(data) => createGroomerMutation.mutate(data)}
-            isPending={createGroomerMutation.isPending}
-          />
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Groomer Dialog */}
-      {editingGroomer && (
-        <Dialog open={!!editingGroomer} onOpenChange={() => setEditingGroomer(null)}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Edit Groomer</DialogTitle>
-              <DialogDescription>Update groomer information.</DialogDescription>
-            </DialogHeader>
-            <GroomerForm 
-              groomer={editingGroomer}
-              onSubmit={(data) => updateGroomerMutation.mutate({ id: editingGroomer.id, data })}
-              isPending={updateGroomerMutation.isPending}
-            />
-          </DialogContent>
-        </Dialog>
-      )}
-
-      {groomerToDelete && (
-        <Dialog open={!!groomerToDelete} onOpenChange={() => setGroomerToDelete(null)}>
-          <DialogContent className="max-w-sm">
-            <DialogHeader>
-              <DialogTitle>Delete Groomer</DialogTitle>
-              <DialogDescription>Confirm deletion of groomer from your team.</DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <p className="text-sm text-gray-600">
-                Are you sure you want to delete <strong>{groomerToDelete.name}</strong>? This action cannot be undone.
-              </p>
-              <div className="flex gap-2 justify-end">
-                <Button
-                  variant="outline"
-                  onClick={() => setGroomerToDelete(null)}
-                  data-testid="button-cancel-delete-groomer"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={() => deleteGroomerMutation.mutate(groomerToDelete.id)}
-                  disabled={deleteGroomerMutation.isPending}
-                  data-testid="button-confirm-delete-groomer"
-                >
-                  {deleteGroomerMutation.isPending ? "Deleting..." : "Delete"}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
-
-      {/* Add Blocked Day Dialog */}
-      <Dialog open={isAddBlockedDayOpen} onOpenChange={setIsAddBlockedDayOpen}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <CalendarX2 className="w-5 h-5" />
-              Add Blocked Days
-            </DialogTitle>
-            <DialogDescription>Block a groomer from being assigned on specific dates (sick days, vacation, etc.). Click multiple dates to select them.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="blocked-groomer">Groomer *</Label>
-              <Select
-                value={blockedDayFormData.groomerId}
-                onValueChange={(value) => setBlockedDayFormData({ ...blockedDayFormData, groomerId: value })}
-              >
-                <SelectTrigger data-testid="select-blocked-groomer">
-                  <SelectValue placeholder="Select a groomer" />
-                </SelectTrigger>
-                <SelectContent>
-                  {groomersQuery.data?.filter((g: any) => g.isActive).map((groomer: any) => (
-                    <SelectItem key={groomer.id} value={groomer.id.toString()}>
-                      {groomer.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Dates * <span className="text-sm text-gray-500">({blockedDayFormData.dates.length} selected)</span></Label>
-              <div className="border rounded-md p-2 bg-white dark:bg-gray-950">
-                <Calendar
-                  mode="multiple"
-                  selected={blockedDayFormData.dates}
-                  onSelect={(dates) => setBlockedDayFormData({ ...blockedDayFormData, dates: dates || [] })}
-                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                  className="rounded-md"
-                  data-testid="calendar-blocked-dates"
-                />
-              </div>
-              {blockedDayFormData.dates.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {blockedDayFormData.dates.sort((a, b) => a.getTime() - b.getTime()).map((date, idx) => (
-                    <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded">
-                      {date.toLocaleDateString()}
-                      <button
-                        type="button"
-                        onClick={() => setBlockedDayFormData({
-                          ...blockedDayFormData,
-                          dates: blockedDayFormData.dates.filter((d) => d.getTime() !== date.getTime())
-                        })}
-                        className="hover:text-orange-600"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="blocked-reason">Reason *</Label>
-              <Select
-                value={blockedDayFormData.reason}
-                onValueChange={(value) => setBlockedDayFormData({ ...blockedDayFormData, reason: value })}
-              >
-                <SelectTrigger data-testid="select-blocked-reason">
-                  <SelectValue placeholder="Select a reason" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="sick">Sick</SelectItem>
-                  <SelectItem value="vacation">Vacation</SelectItem>
-                  <SelectItem value="personal">Personal</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="blocked-notes">Notes (Optional)</Label>
-              <Textarea
-                id="blocked-notes"
-                placeholder="Additional notes about why they are blocked..."
-                value={blockedDayFormData.notes}
-                onChange={(e) => setBlockedDayFormData({ ...blockedDayFormData, notes: e.target.value })}
-                data-testid="textarea-blocked-notes"
-              />
-            </div>
-            <div className="flex gap-2 justify-end pt-2">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsAddBlockedDayOpen(false);
-                  setBlockedDayFormData({ groomerId: '', dates: [], reason: 'sick', notes: '' });
-                }}
-                data-testid="button-cancel-blocked-day"
-              >
-                Cancel
-              </Button>
-              <Button
-                className="bg-orange-600 hover:bg-orange-700"
-                onClick={() => {
-                  if (!blockedDayFormData.groomerId || blockedDayFormData.dates.length === 0) {
-                    toast({
-                      title: "Missing Information",
-                      description: "Please select a groomer and at least one date.",
-                      variant: "destructive",
-                    });
-                    return;
-                  }
-                  createBlockedDayMutation.mutate({
-                    groomerId: parseInt(blockedDayFormData.groomerId),
-                    dates: blockedDayFormData.dates.map(d => {
-                      const year = d.getFullYear();
-                      const month = String(d.getMonth() + 1).padStart(2, '0');
-                      const day = String(d.getDate()).padStart(2, '0');
-                      return `${year}-${month}-${day}`;
-                    }),
-                    reason: blockedDayFormData.reason,
-                    notes: blockedDayFormData.notes || undefined
-                  });
-                }}
-                disabled={createBlockedDayMutation.isPending}
-                data-testid="button-save-blocked-day"
-              >
-                {createBlockedDayMutation.isPending ? "Adding..." : `Add ${blockedDayFormData.dates.length || ''} Blocked Day${blockedDayFormData.dates.length !== 1 ? 's' : ''}`}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Book Appointment Modal */}
       <Dialog open={isBookAppointmentOpen} onOpenChange={setIsBookAppointmentOpen}>
@@ -18187,84 +17671,7 @@ function AddSupplyForm({ onSubmit, initialUpc }: { onSubmit: (data: any) => void
   );
 }
 
-function GroomerForm({ groomer, onSubmit, isPending }: { groomer?: any; onSubmit: (data: any) => void; isPending: boolean }) {
-  const [formData, setFormData] = useState({
-    name: groomer?.name || "",
-    email: groomer?.email || "",
-    phone: groomer?.phone || "",
-    specialties: groomer?.specialties || "",
-    isActive: groomer?.isActive !== undefined ? groomer.isActive : true,
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <Label htmlFor="name">Name *</Label>
-        <Input
-          id="name"
-          type="text"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          required
-          data-testid="input-groomer-name"
-        />
-      </div>
-      <div>
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          data-testid="input-groomer-email"
-        />
-      </div>
-      <div>
-        <Label htmlFor="phone">Phone</Label>
-        <Input
-          id="phone"
-          type="tel"
-          value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-          placeholder="(555) 123-4567"
-          data-testid="input-groomer-phone"
-        />
-      </div>
-      <div>
-        <Label htmlFor="specialties">Specialties</Label>
-        <Textarea
-          id="specialties"
-          value={formData.specialties}
-          onChange={(e) => setFormData({ ...formData, specialties: e.target.value })}
-          placeholder="e.g., Full Grooming, Bath Only, Large Breeds"
-          rows={3}
-          data-testid="input-groomer-specialties"
-        />
-      </div>
-      <div className="flex items-center space-x-2">
-        <Switch
-          checked={formData.isActive}
-          onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
-          data-testid="switch-groomer-active"
-        />
-        <Label>Active</Label>
-      </div>
-      <Button 
-        type="submit" 
-        className="w-full bg-brand-blue hover:bg-blue-600"
-        disabled={isPending}
-        data-testid="button-submit-groomer"
-      >
-        {isPending ? "Saving..." : (groomer ? "Update Groomer" : "Add Groomer")}
-      </Button>
-    </form>
-  );
-}
+// GroomerForm moved to GroomersSection.tsx
 
 // Close the wrapper div at the end of the main return
 // Adding this closing tag before the component ends
