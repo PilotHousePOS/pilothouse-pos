@@ -30,10 +30,13 @@ export default function StaffDashboard() {
   const features = tenantInfo?.enabledFeatures ?? {};
   const isOn = (key: string) => features[key] !== false;
 
-  const handleLogout = () => {
-    // On a shared POS device we don't destroy the session or clear storage —
-    // we just return to the employee roster so the next person can pick their name.
-    // The store slug stays in localStorage so no re-entry of the store code is needed.
+  const handleLogout = async () => {
+    // Preserve the store slug BEFORE touching anything else so the auth page
+    // can skip the "enter store code" step and go straight to the roster.
+    const savedSlug = localStorage.getItem('active_tenant_slug');
+    try { await fetch("/api/auth/logout", { method: "POST", credentials: "include" }); } catch {}
+    // Restore slug without wiping the rest of localStorage
+    if (savedSlug) localStorage.setItem('active_tenant_slug', savedSlug);
     globalQueryClient.clear();
     window.location.href = "/auth?tab=employee";
   };
