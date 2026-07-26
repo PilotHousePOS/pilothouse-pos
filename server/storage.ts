@@ -5732,13 +5732,15 @@ export class DatabaseStorage implements IStorage {
 
   async updateEmployee(id: string, data: Partial<{ firstName: string; lastName: string; email: string; password: string; phoneNumber: string; isAdmin: boolean; defaultWorkDays: string[]; defaultTimeSlot: string }>, tenantId: number): Promise<User> {
     const update: any = { ...data, updatedAt: new Date() };
+    let plainPin: string | undefined;
     if (data.password) {
       const bcrypt = await import("bcryptjs");
       const hashed = await bcrypt.hash(data.password, 10);
       update.password = hashed;
-      // Employees use a single PIN for everything — keep employee_pin and pos_pin_plain in sync
-      update.employeePin = hashed;
-      update.posPinPlain = data.password;
+      plainPin = data.password;
+      // Employees use a single PIN — keep employee_pin + pos_pin_plain in sync via raw SQL
+      // (Drizzle ignores extra camelCase keys in a plain object, so use sql`` directly)
+      await db.execute(sql`UPDATE users SET employee_pin = ${hashed}, pos_pin_plain = ${plainPin} WHERE id = ${id} AND tenant_id = ${tenantId} AND is_employee = true`);
     } else {
       delete update.password;
     }
