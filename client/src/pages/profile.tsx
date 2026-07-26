@@ -359,6 +359,64 @@ export default function Profile() {
     ? `${currentUser.firstName} ${currentUser.lastName}`
     : currentUser?.email || 'User';
 
+  // ── Owner / Admin view ───────────────────────────────────────────────────
+  // Owners and admins are not customers — hide all customer-facing sections.
+  if ((currentUser as any)?.isAdmin) {
+    const handleOwnerSignOut = async () => {
+      try { await fetch("/api/auth/logout", { method: "POST", credentials: "include" }); } catch {}
+      queryClient.clear();
+      window.location.href = "/auth";
+    };
+
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white border-b px-4 py-3 flex items-center gap-3">
+          <button onClick={() => setLocation("/admin")} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+            <ArrowLeft className="h-5 w-5 text-gray-600" />
+          </button>
+          <h1 className="text-lg font-semibold text-gray-900">My Account</h1>
+        </div>
+
+        <div className="px-4 py-6 space-y-4 max-w-lg mx-auto">
+          {/* Avatar + Name */}
+          <div className="bg-white rounded-2xl p-6 text-center shadow-sm border">
+            <div className="w-16 h-16 bg-brand-red rounded-full mx-auto mb-3 flex items-center justify-center">
+              <span className="text-2xl text-white font-bold">{userInitials}</span>
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">{userName}</h2>
+            <p className="text-sm text-gray-500 mt-0.5">{currentUser?.email}</p>
+            <span className="inline-block mt-2 text-xs bg-blue-100 text-blue-700 font-medium px-2.5 py-0.5 rounded-full">
+              {(currentUser as any)?.isSuperAdmin ? "Super Admin" : "Store Owner"}
+            </span>
+          </div>
+
+          {/* Go to Admin Dashboard */}
+          <button
+            onClick={() => setLocation("/admin")}
+            className="w-full flex items-center justify-between px-5 py-4 bg-white rounded-2xl shadow-sm border hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Settings className="h-5 w-5 text-gray-500" />
+              <span className="font-medium text-gray-900">Admin Dashboard</span>
+            </div>
+            <span className="text-gray-400 text-lg">›</span>
+          </button>
+
+          {/* Sign out */}
+          <button
+            onClick={handleOwnerSignOut}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-red-500 hover:bg-red-600 text-white font-semibold transition-colors"
+          >
+            <LogOut className="h-4 w-4" />
+            Sign Out
+          </button>
+        </div>
+      </div>
+    );
+  }
+  // ── End owner view ────────────────────────────────────────────────────────
+
   // ── Employee-only view ────────────────────────────────────────────────────
   // Employees see only their schedule; all customer-facing sections are hidden.
   if ((currentUser as any)?.isEmployee && !(currentUser as any)?.isAdmin) {
