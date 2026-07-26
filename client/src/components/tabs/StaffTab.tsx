@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -148,6 +149,7 @@ export default function StaffTab({ typedUser }: Props) {
   const [overrideSuccess, setOverrideSuccess]   = useState(false);
   const [overridePinSet, setOverridePinSet]     = useState("");
   const [overridePinSaving, setOverridePinSaving] = useState(false);
+  const [overridePinVisible, setOverridePinVisible] = useState(false);
 
   // Tab label editor state
   const [labelDraft, setLabelDraft] = useState<Record<string, string> | null>(null);
@@ -462,16 +464,26 @@ export default function StaffTab({ typedUser }: Props) {
                 <p className="text-xs text-muted-foreground mb-3">
                   Set a 4-digit Owner PIN for POS overrides. Both this PIN and any admin account's personal PIN are always accepted — the Owner PIN gives you a private code that's separate from your managers'.
                 </p>
-                <div className="flex gap-2">
-                  <Input
-                    type="password"
-                    inputMode="numeric"
-                    maxLength={4}
-                    value={overridePinSet}
-                    onChange={e => setOverridePinSet(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                    placeholder="New 4-digit PIN"
-                    className="text-center text-xl tracking-widest font-mono max-w-[140px]"
-                  />
+                <div className="flex gap-2 items-center">
+                  <div className="relative">
+                    <Input
+                      type={overridePinVisible ? "text" : "password"}
+                      inputMode="numeric"
+                      maxLength={4}
+                      value={overridePinSet}
+                      onChange={e => setOverridePinSet(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                      placeholder="New 4-digit PIN"
+                      className="text-center text-xl tracking-widest font-mono max-w-[140px] pr-9"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setOverridePinVisible(v => !v)}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      tabIndex={-1}
+                    >
+                      {overridePinVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                   <Button
                     onClick={saveOverridePin}
                     disabled={overridePinSet.length !== 4 || overridePinSaving}

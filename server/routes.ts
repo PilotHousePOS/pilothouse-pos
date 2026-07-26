@@ -15859,13 +15859,31 @@ CRITICAL RULES:
       if (!tenantId) return res.status(400).json({ message: "Tenant required" });
       const { pin } = req.body;
       if (!pin) return res.status(400).json({ message: "PIN required" });
-      // Find all admins/owners for this tenant who have an employee_pin set
+
+      // 1. Check the store-wide Owner / Override PIN first (stored on the tenant row)
+      const tenant = await storage.getTenant(tenantId);
+      if (tenant?.adminOverridePin && await verifyPassword(String(pin), tenant.adminOverridePin)) {
+        // Log in as the tenant's super-manager / owner
+        const ownerRows = await db.execute(
+          sql`SELECT id FROM users WHERE tenant_id = ${tenantId} AND is_superior_manager = true ORDER BY id ASC LIMIT 1`
+        );
+        const ownerId = (ownerRows.rows[0] as any)?.id;
+        if (ownerId) {
+          const owner = await storage.getUser(ownerId);
+          if (owner) {
+            const token = generateToken(owner);
+            setAuthCookie(res, token);
+            return res.json({ ...sanitizeUser(owner), token });
+          }
+        }
+      }
+
+      // 2. Check personal employee_pin on any admin or owner account
       const rows = await db.execute(
         sql`SELECT * FROM users WHERE tenant_id = ${tenantId} AND (is_admin = true OR is_superior_manager = true) AND employee_pin IS NOT NULL`
       );
       for (const row of rows.rows as any[]) {
         if (row.employee_pin && await verifyPassword(String(pin), row.employee_pin)) {
-          // Reuse the same user shape that generateToken/sanitizeUser expect
           const user = await storage.getUser(row.id);
           if (!user) continue;
           const token = generateToken(user);
@@ -15873,6 +15891,7 @@ CRITICAL RULES:
           return res.json({ ...sanitizeUser(user), token });
         }
       }
+
       return res.status(401).json({ message: "Incorrect PIN" });
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });

@@ -195,6 +195,7 @@ export default function PosPage() {
   const [lockPinLoading, setLockPinLoading]     = useState(false);
   const [lockAdminSubTab, setLockAdminSubTab]   = useState<"pin" | "password">("pin");
   const [lockAdminPinEntry, setLockAdminPinEntry] = useState("");
+  const [lockAdminPinVisible, setLockAdminPinVisible] = useState(false);
   const [lockAdminShowPassword, setLockAdminShowPassword] = useState(false);
   const [lockAdminEmail, setLockAdminEmail]     = useState("");
   const [lockAdminPassword, setLockAdminPassword] = useState("");
@@ -1094,11 +1095,24 @@ export default function PosPage() {
                   {lockAdminSubTab === "pin" && (
                     <div className="p-5 space-y-4">
                       <p className="text-xs text-gray-500 text-center">Enter your admin or owner PIN</p>
-                      <div className="flex justify-center gap-4">
-                        {[0,1,2,3].map(i => (
-                          <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all ${i < lockAdminPinEntry.length ? "bg-green-400 border-green-400 scale-110" : "bg-transparent border-gray-500"}`} />
-                        ))}
+
+                      {/* Digit display with eye toggle */}
+                      <div className="flex items-center justify-center gap-3">
+                        <div className="flex gap-4">
+                          {[0,1,2,3].map(i => {
+                            const filled = i < lockAdminPinEntry.length;
+                            return (
+                              <div key={i} className={`w-8 h-10 rounded-lg border-2 flex items-center justify-center text-lg font-bold transition-all ${filled ? "border-green-500 bg-green-500/10 text-green-300" : "border-gray-600 bg-transparent text-transparent"}`}>
+                                {filled ? (lockAdminPinVisible ? lockAdminPinEntry[i] : "●") : ""}
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <button type="button" onClick={() => setLockAdminPinVisible(v => !v)} className="text-gray-500 hover:text-gray-300 transition-colors ml-1" tabIndex={-1}>
+                          {lockAdminPinVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
                       </div>
+
                       {lockAdminError && <p className="text-center text-red-400 text-xs animate-pulse">{lockAdminError}</p>}
                       <div className="grid grid-cols-3 gap-2">
                         {lockPadDigits.map((d, i) => {
