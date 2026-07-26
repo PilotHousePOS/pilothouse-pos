@@ -5779,10 +5779,20 @@ export class DatabaseStorage implements IStorage {
 
   async authenticateEmployeeByPin(tenantId: number, employeeCode: string, pin: string): Promise<User | null> {
     const [emp] = await db.select().from(users).where(and(eq(users.tenantId, tenantId), eq(users.employeeCode, employeeCode.toUpperCase()), eq(users.isEmployee, true)));
-    if (!emp || !emp.employeePin) return null;
+    if (!emp) return null;
     const bcrypt = await import("bcryptjs");
-    const valid = await bcrypt.compare(pin, emp.employeePin);
-    return valid ? emp : null;
+    // Primary: check the dedicated employee PIN
+    if (emp.employeePin) {
+      const valid = await bcrypt.compare(pin, emp.employeePin);
+      return valid ? emp : null;
+    }
+    // Fallback: if no PIN has been set yet, accept their account password so the account
+    // still works right after creation (owner can set a dedicated PIN later via the key icon)
+    if (emp.password) {
+      const valid = await bcrypt.compare(pin, emp.password);
+      return valid ? emp : null;
+    }
+    return null;
   }
 
   async deleteEmployee(id: string, tenantId: number): Promise<void> {

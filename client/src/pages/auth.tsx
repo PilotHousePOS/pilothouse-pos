@@ -37,6 +37,7 @@ export default function Auth() {
   const [empPin, setEmpPin] = useState("");
   const [empError, setEmpError] = useState("");
   const [empLoading, setEmpLoading] = useState(false);
+  const [empSearch, setEmpSearch] = useState("");
 
   // Store code — needed on a fresh device where no slug is saved in localStorage yet.
   // Once entered it's persisted so subsequent visits don't need it again.
@@ -593,21 +594,42 @@ export default function Auth() {
                         <p className="text-xs text-gray-500">Ask your manager to create your account, or make sure you're using the store's sign-in link.</p>
                       </div>
                     ) : (
-                      empRoster.map(emp => (
-                        <button
-                          key={emp.id}
-                          onClick={() => { setEmpSelected(emp); setEmpPin(""); setEmpError(""); }}
-                          className="w-full flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl px-4 py-3 text-left transition-all"
-                        >
-                          <div className="w-9 h-9 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center shrink-0">
-                            <span className="text-blue-300 font-semibold text-sm">{(emp.firstName?.[0] ?? "?").toUpperCase()}</span>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-white font-medium truncate">{emp.firstName} {emp.lastName}</p>
-                            <p className="text-gray-400 text-xs">{emp.employeeCode}</p>
-                          </div>
-                        </button>
-                      ))
+                      <>
+                        {empRoster.length > 5 && (
+                          <Input
+                            value={empSearch}
+                            onChange={e => setEmpSearch(e.target.value)}
+                            placeholder="Search your name…"
+                            className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 mb-2"
+                            autoComplete="off"
+                          />
+                        )}
+                        {empRoster
+                          .filter(emp => {
+                            if (!empSearch.trim()) return true;
+                            const q = empSearch.toLowerCase();
+                            return (
+                              emp.firstName?.toLowerCase().includes(q) ||
+                              emp.lastName?.toLowerCase().includes(q) ||
+                              emp.employeeCode?.toLowerCase().includes(q)
+                            );
+                          })
+                          .map(emp => (
+                            <button
+                              key={emp.id}
+                              onClick={() => { setEmpSelected(emp); setEmpPin(""); setEmpError(""); setEmpSearch(""); }}
+                              className="w-full flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl px-4 py-3 text-left transition-all"
+                            >
+                              <div className="w-9 h-9 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center shrink-0">
+                                <span className="text-blue-300 font-semibold text-sm">{(emp.firstName?.[0] ?? "?").toUpperCase()}</span>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-white font-medium truncate">{emp.firstName} {emp.lastName}</p>
+                                <p className="text-gray-400 text-xs">{emp.employeeCode}</p>
+                              </div>
+                            </button>
+                          ))}
+                      </>
                     )}
                   </div>
                 ) : (
