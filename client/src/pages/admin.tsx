@@ -7235,15 +7235,29 @@ export default function Admin() {
   }, []);
 
   // Employees must never land on a tab they can't see (e.g. sessionStorage from an admin session).
-  // Run after employeePerms is loaded so isTabVisible has accurate permission data.
+  // Intentionally does NOT reference isTabVisible (which is declared later) to avoid TDZ crashes;
+  // instead mirrors the same permission map inline using raw employeePerms.
   useEffect(() => {
     if (!typedUser?.isEmployee || typedUser?.isAdmin) return;
-    if (employeePerms === undefined) return; // wait until permissions have loaded
-    if (!isTabVisible(activeTab)) {
+    if (employeePerms === undefined) return; // wait until permissions are loaded
+    const ep = employeePerms as Record<string, boolean>;
+    const empTabAllowed: Record<string, boolean> = {
+      schedule: true,  grooming: !!ep.canManageGrooming, appointments: !!ep.canManageAppointments,
+      contacts: !!ep.canManageCustomers, orders: !!ep.canManageOrders, inventory: !!ep.canManageInventory,
+      'pos-tracker': !!ep.canViewReports, 'pos-reports': !!ep.canViewReports,
+      specials: !!ep.canManageSpecials, 'email-center': !!ep.canManageEmail,
+      boarding: !!ep.canManageBoarding, 'charge-accounts': !!ep.canManageChargeAccounts,
+      staff: !!ep.canManageStaff, settings: !!ep.canAccessSettings,
+      tasks: true, announcements: true, 'time-clock': true,
+      waitlist: !!ep.canManageWaitlist, estimates: !!ep.canManageEstimates,
+      invoicing: !!ep.canManageInvoicing, 'sms-blasts': !!ep.canManageSmsBlasts,
+      memberships: !!ep.canManageMemberships, homepage: !!ep.canEditHomepage,
+    };
+    if (!empTabAllowed[activeTab]) {
       setActiveTab('schedule');
       try { sessionStorage.setItem('admin-active-tab', 'schedule'); } catch {}
     }
-  }, [typedUser?.isEmployee, typedUser?.isAdmin, activeTab, employeePerms, isTabVisible]);
+  }, [typedUser?.isEmployee, typedUser?.isAdmin, activeTab, employeePerms]);
 
   // Derived: which group contains the active tab
   const activeGroupId = useMemo(

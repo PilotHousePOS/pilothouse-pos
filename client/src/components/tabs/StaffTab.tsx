@@ -805,7 +805,7 @@ export default function StaffTab({ typedUser }: Props) {
             <div className="space-y-1.5"><Label>Phone</Label><Input value={form.phoneNumber} onChange={e => setForm(f => ({ ...f, phoneNumber: e.target.value }))} /></div>
             <div className="space-y-1.5">
               <Label>New PIN <span className="text-muted-foreground text-xs">(leave blank to keep current — used to sign in at the keypad)</span></Label>
-              <Input type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} inputMode="numeric" pattern="\d*" maxLength={4} />
+              <Input type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} inputMode="numeric" pattern="\d*" maxLength={6} />
             </div>
             <Separator />
             <div className="flex items-center justify-between">

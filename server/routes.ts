@@ -15950,7 +15950,7 @@ CRITICAL RULES:
       if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
       const tenantId: number = req.tenantId;
       const { pin } = req.body;
-      if (!pin || !/^\d{4}$/.test(String(pin))) return res.status(400).json({ message: "PIN must be exactly 4 digits" });
+      if (!pin || !/^\d{4,6}$/.test(String(pin))) return res.status(400).json({ message: "PIN must be 4–6 digits" });
       await storage.setEmployeePin(req.params.id, tenantId, String(pin));
       res.json({ success: true });
     } catch (e: any) { res.status(500).json({ message: e.message }); }
@@ -16093,7 +16093,7 @@ CRITICAL RULES:
   app.put("/api/admin/override-pin", requireAdminMiddleware, async (req: any, res) => {
     try {
       const { pin } = req.body;
-      if (!pin || !/^\d{4}$/.test(String(pin))) return res.status(400).json({ message: "PIN must be exactly 4 digits" });
+      if (!pin || !/^\d{4,6}$/.test(String(pin))) return res.status(400).json({ message: "PIN must be 4–6 digits" });
       const tenantId: number | undefined = req.tenantId;
       if (!tenantId) return res.status(400).json({ message: "No tenant context" });
       const hashed = await hashPassword(String(pin));

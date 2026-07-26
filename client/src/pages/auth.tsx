@@ -75,39 +75,44 @@ export default function Auth() {
     staleTime: 30_000,
   });
 
+  const submitEmpPin = async (pin: string) => {
+    if (!empSelected?.employeeCode || pin.length < 4 || empLoading) return;
+    setEmpLoading(true);
+    setEmpError("");
+    try {
+      const slug = getActiveTenantSlug();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (slug) headers['X-Tenant-Slug'] = slug;
+      const res = await fetch('/api/auth/employee-pin-login', {
+        method: 'POST',
+        credentials: 'include',
+        headers,
+        body: JSON.stringify({ employeeCode: empSelected.employeeCode, pin }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.token) localStorage.setItem('token', data.token);
+        queryClient.setQueryData(["/api/auth/user"], data);
+        window.location.replace('/admin');
+      } else {
+        setEmpError("Incorrect PIN. Try again.");
+        setEmpPin("");
+      }
+    } catch {
+      setEmpError("Sign-in failed. Please try again.");
+      setEmpPin("");
+    } finally {
+      setEmpLoading(false);
+    }
+  };
+
   const handleEmpDigit = async (d: string) => {
-    if (empPin.length >= 4 || empLoading) return;
+    if (empPin.length >= 6 || empLoading) return;
     const next = empPin + d;
     setEmpPin(next);
     setEmpError("");
-    if (next.length === 4 && empSelected?.employeeCode) {
-      setEmpLoading(true);
-      try {
-        const slug = getActiveTenantSlug();
-        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-        if (slug) headers['X-Tenant-Slug'] = slug;
-        const res = await fetch('/api/auth/employee-pin-login', {
-          method: 'POST',
-          credentials: 'include',
-          headers,
-          body: JSON.stringify({ employeeCode: empSelected.employeeCode, pin: next }),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.token) localStorage.setItem('token', data.token);
-          queryClient.setQueryData(["/api/auth/user"], data);
-          window.location.replace('/admin');
-        } else {
-          setEmpError("Incorrect PIN. Try again.");
-          setEmpPin("");
-        }
-      } catch {
-        setEmpError("Sign-in failed. Please try again.");
-        setEmpPin("");
-      } finally {
-        setEmpLoading(false);
-      }
-    }
+    // Auto-submit only at max length (6); shorter PINs use the ✓ button
+    if (next.length === 6) await submitEmpPin(next);
   };
 
   const handleEmpBack = () => { setEmpPin(prev => prev.slice(0, -1)); setEmpError(""); };
@@ -647,12 +652,19 @@ export default function Auth() {
                         <Badge variant="outline" className="text-gray-400 border-gray-600 text-xs">{empSelected.employeeCode}</Badge>
                       </div>
                     </div>
-                    {/* PIN dots */}
-                    <div className="flex justify-center gap-4 mb-5">
-                      {[0,1,2,3].map(i => (
-                        <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all ${i < empPin.length ? "bg-blue-400 border-blue-400 scale-110" : "bg-transparent border-gray-500"}`} />
+                    {/* PIN dots — 4 required, up to 6 */}
+                    <div className="flex justify-center gap-3 mb-1">
+                      {[0,1,2,3,4,5].map(i => (
+                        <div key={i} className={`rounded-full border-2 transition-all ${
+                          i < empPin.length
+                            ? "w-4 h-4 bg-blue-400 border-blue-400 scale-110"
+                            : i < 4
+                              ? "w-4 h-4 bg-transparent border-gray-500"
+                              : "w-3 h-3 bg-transparent border-gray-700 opacity-50"
+                        }`} />
                       ))}
                     </div>
+                    <p className="text-center text-gray-600 text-xs mb-4">4–6 digits</p>
                     {empError && <p className="text-center text-red-400 text-sm mb-3 animate-pulse">{empError}</p>}
                     {/* Keypad */}
                     <div className="grid grid-cols-3 gap-3">
@@ -667,6 +679,15 @@ export default function Auth() {
                         );
                       })}
                     </div>
+                    {/* Confirm button — shown once ≥4 digits entered (required for 5-6 digit PINs) */}
+                    {empPin.length >= 4 && !empLoading && (
+                      <button
+                        onClick={() => submitEmpPin(empPin)}
+                        className="mt-3 w-full h-12 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-base transition-all active:scale-95 border border-blue-500"
+                      >
+                        Sign In →
+                      </button>
+                    )}
                     {empLoading && <p className="text-center text-gray-400 text-sm mt-3 animate-pulse">Verifying…</p>}
                   </div>
                 )}
