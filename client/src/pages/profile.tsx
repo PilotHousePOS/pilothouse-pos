@@ -373,6 +373,8 @@ export default function Profile() {
       const savedSlug = localStorage.getItem('active_tenant_slug');
       try { await fetch("/api/auth/logout", { method: "POST", credentials: "include" }); } catch {}
       if (savedSlug) localStorage.setItem('active_tenant_slug', savedSlug);
+      // Clear cached auth state so the router sees the user as logged out immediately
+      queryClient.clear();
       window.location.href = "/auth?tab=employee";
     };
 
@@ -393,11 +395,6 @@ export default function Profile() {
               <span className="text-2xl text-white font-bold">{userInitials}</span>
             </div>
             <h2 className="text-xl font-bold text-gray-900">{userName}</h2>
-            {emp.employeeCode && (
-              <span className="inline-block mt-1 text-xs font-mono bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
-                {emp.employeeCode}
-              </span>
-            )}
           </div>
 
           {/* Work Schedule */}
