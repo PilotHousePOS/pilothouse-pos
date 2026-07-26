@@ -400,6 +400,29 @@ export default function Home() {
   const [showEditor, setShowEditor] = useState(false);
   const slug = getActiveTenantSlug();
 
+  // ── Tenant feature flags ── resolved FIRST so we can gate all other queries
+  // and avoid firing 30+ requests on a frame that's about to redirect anyway.
+  // staleTime keeps the cached value for 30 s so re-navigation uses it instantly.
+  const { data: tenantInfo } = useQuery<{ enabledFeatures?: Record<string, any> }>({
+    queryKey: ["/api/tenants/current"],
+    staleTime: 30_000,
+  });
+  const enabledFeatures = (tenantInfo as any)?.enabledFeatures ?? {};
+  const featureOn = (k: string) => enabledFeatures[k] !== false;
+
+  // ── Role helpers ──
+  const typedUser = user as any;
+  const isStaff = !!user && (typedUser?.isEmployee || typedUser?.isAdmin) && !typedUser?.isSuperiorManager;
+
+  // Owners redirect to /admin only when the online store is OFF.
+  // When it's ON they stay on the homepage so they can see and edit their storefront.
+  const storeOff = tenantInfo !== undefined && !featureOn('onlineStore');
+  const ownerRedirect = !!typedUser?.isSuperiorManager && storeOff;
+
+  // Content queries are only enabled when we know we're actually rendering the
+  // homepage. This prevents a flood of requests on frames that will redirect.
+  const showingHomepage = !isStaff && !ownerRedirect;
+
   // ── Homepage config ──
   const { data: rawConfig = {} } = useQuery<HomepageConfig>({
     queryKey: ["/api/homepage-config"],
@@ -408,11 +431,11 @@ export default function Home() {
       if (!res.ok) return {};
       return res.json();
     },
+    enabled: showingHomepage,
   });
   const hc = mergeConfig(rawConfig as HomepageConfig);
 
   // ── Employee permissions (needed to check canEditHomepage for non-admins) ──
-  const typedUser = user as any;
   const canEdit = typedUser?.isAdmin || typedUser?.isEmployee;
 
   // For employees we also need to verify canEditHomepage; fetch their perms
@@ -474,9 +497,9 @@ export default function Home() {
     .map(id => ((recentlyViewedData as any)?.items || []).find((s: any) => s.id === id))
     .filter(Boolean);
 
-  const { data: suppliesData } = useQuery({ queryKey: ["/api/supplies", { limit: 3 }], retry: false });
-  const { data: cartItems = [] } = useQuery({ queryKey: ["/api/cart"], retry: false });
-  const { data: hiringData } = useQuery<{ open: boolean }>({ queryKey: ["/api/settings/hiring-open"] });
+  const { data: suppliesData } = useQuery({ queryKey: ["/api/supplies", { limit: 3 }], retry: false, enabled: showingHomepage && featureOn('onlineStore') });
+  const { data: cartItems = [] } = useQuery({ queryKey: ["/api/cart"], retry: false, enabled: showingHomepage && featureOn('onlineStore') });
+  const { data: hiringData } = useQuery<{ open: boolean }>({ queryKey: ["/api/settings/hiring-open"], enabled: showingHomepage });
 
   const hiringOpen = hiringData?.open ?? false;
   const supplies = (suppliesData as any)?.items || [];
@@ -494,22 +517,20 @@ export default function Home() {
   const enabledFeatures = (tenantInfo as any)?.enabledFeatures ?? {};
   const featureOn = (k: string) => enabledFeatures[k] !== false;
 
-  // ── Staff branch ── employees and admins (but not the owner) get a dedicated
-  // streamlined dashboard instead of the customer-facing homepage.
-  const isStaff = !!user && (typedUser?.isEmployee || typedUser?.isAdmin) && !typedUser?.isSuperiorManager;
+  // ── Routing ──────────────────────────────────────────────────────────────────
+
+  // Staff (employees / admins who aren't the owner) → dedicated dashboard.
   if (isStaff) return <StaffDashboard />;
 
-  // ── Owner branch ── the owner's home is always /admin. Redirect immediately
-  // without waiting for tenant data — avoids firing 30+ admin queries on a page
-  // that will only be visible for one frame anyway.
-  if (typedUser?.isSuperiorManager) {
+  // Owner + online store OFF → admin panel (their real home).
+  // Owner + online store ON  → falls through to homepage so they can see/edit it.
+  if (ownerRedirect) {
     setLocation('/admin');
     return null;
   }
 
-  // ── Online store off ── physical-only store with no public storefront.
-  // Show a minimal landing card for unauthenticated visitors / customers.
-  const storeOff = tenantInfo !== undefined && !featureOn('onlineStore');
+  // Physical-only store (online store off): show a minimal landing card for
+  // unauthenticated visitors and customers.
   if (storeOff && !typedUser?.isSuperiorManager) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-gray-50 text-center gap-4">
