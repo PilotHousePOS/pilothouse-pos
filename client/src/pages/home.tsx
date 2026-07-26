@@ -510,13 +510,6 @@ export default function Home() {
   // Card destinations
   const CARD_ROUTES = ["/supplies", "/booking", "/profile", "/orders"];
 
-  // Tenant feature flags (for gating sections on owner/customer view)
-  const { data: tenantInfo } = useQuery<{ enabledFeatures?: Record<string, any> }>({
-    queryKey: ["/api/tenants/current"],
-  });
-  const enabledFeatures = (tenantInfo as any)?.enabledFeatures ?? {};
-  const featureOn = (k: string) => enabledFeatures[k] !== false;
-
   // ── Routing ──────────────────────────────────────────────────────────────────
 
   // Staff (employees / admins who aren't the owner) → dedicated dashboard.
