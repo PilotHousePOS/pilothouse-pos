@@ -556,8 +556,9 @@ export default function Auth() {
                       <Input
                         value={storeCodeInput}
                         onChange={e => { setStoreCodeInput(e.target.value); setStoreCodeError(""); }}
-                        placeholder="store name, not your E01 code"
-                        className="bg-white/10 border-white/30 text-white placeholder:text-gray-400 text-center tracking-widest"
+                        placeholder="e.g. test-business-1"
+                        className="bg-white/10 border-white/30 text-white placeholder:text-gray-400"
+                        dir="ltr"
                         autoCapitalize="none"
                         autoCorrect="off"
                         spellCheck={false}
