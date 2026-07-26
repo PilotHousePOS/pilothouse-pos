@@ -15869,7 +15869,10 @@ CRITICAL RULES:
       if (!email || !password || !firstName) return res.status(400).json({ message: "email, password, and firstName are required" });
       const existing = await storage.getUserByEmail(email);
       if (existing) return res.status(409).json({ message: "An account with that email already exists" });
-      res.status(201).json(await storage.createEmployee({ tenantId, email, password, firstName, lastName, phoneNumber, defaultWorkDays, defaultTimeSlot, defaultDaySlots }));
+      const newEmp = await storage.createEmployee({ tenantId, email, password, firstName, lastName, phoneNumber, defaultWorkDays, defaultTimeSlot, defaultDaySlots });
+      // PIN and password are unified for employees — store the PIN immediately so the keypad works right away
+      await storage.setEmployeePin(newEmp.id, tenantId, String(password));
+      res.status(201).json(newEmp);
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 
@@ -15889,7 +15892,10 @@ CRITICAL RULES:
       if (defaultWorkDays !== undefined) update.defaultWorkDays = defaultWorkDays;
       if (defaultTimeSlot !== undefined) update.defaultTimeSlot = defaultTimeSlot;
       if (defaultDaySlots !== undefined) update.defaultDaySlots = defaultDaySlots;
-      res.json(await storage.updateEmployee(req.params.id, update, tenantId));
+      const updated = await storage.updateEmployee(req.params.id, update, tenantId);
+      // Keep employee_pin in sync whenever the PIN is changed via the edit dialog
+      if (password) await storage.setEmployeePin(req.params.id, tenantId, String(password));
+      res.json(updated);
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 
