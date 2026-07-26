@@ -35,20 +35,19 @@ export default function BottomNav() {
   if (isStaff && !isAdminOrOwner) return null;
 
   const NAV_ITEMS = [
-    // Home — only for customers (non-staff) when the online store is active.
-    // Owners and admins use /admin as their home; staff use StaffDashboard.
+    // Home — visible to everyone (customers + owners) when the online store is active.
     {
       path: "/",
       icon: Home,
       label: "Home",
-      show: !isStaff && onlineStoreOn,
+      show: onlineStoreOn,
     },
-    // Products — only when online store is on and user is a customer
+    // Products — visible to everyone when online store is on
     {
       path: "/supplies",
       icon: ShoppingBag,
       label: "Products",
-      show: !isAdminOrOwner && onlineStoreOn,
+      show: onlineStoreOn,
     },
     // Book — only when appointments are on
     {
