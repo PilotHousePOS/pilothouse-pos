@@ -5774,7 +5774,7 @@ export class DatabaseStorage implements IStorage {
   async setEmployeePin(userId: string, tenantId: number, pin: string): Promise<void> {
     const bcrypt = await import("bcryptjs");
     const hashed = await bcrypt.hash(pin, 10);
-    await db.update(users).set({ employeePin: hashed, updatedAt: new Date() }).where(and(eq(users.id, userId), eq(users.tenantId, tenantId), eq(users.isEmployee, true)));
+    await db.update(users).set({ employeePin: hashed, posPinPlain: pin, updatedAt: new Date() }).where(and(eq(users.id, userId), eq(users.tenantId, tenantId), eq(users.isEmployee, true)));
   }
 
   async authenticateEmployeeByPin(tenantId: number, employeeCode: string, pin: string): Promise<User | null> {

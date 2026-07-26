@@ -35,6 +35,7 @@ import { hashPassword, verifyPassword, isPasswordComplexEnough, getPasswordRequi
 import { getBaseUrl } from './utils';
 
 // Strip sensitive fields from user objects before sending to client
+// posPinPlain is intentionally kept — it's a 4-digit convenience code that admins need to look up
 function sanitizeUser(user: any) {
   const { password, stripeCustomerId, stripeDefaultPaymentMethod, employeePin, ...safeUser } = user;
   return safeUser;
@@ -12258,6 +12259,7 @@ West Monroe LA 71291
       await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS default_work_days JSONB`);
       await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS default_time_slot VARCHAR(50)`);
       await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS default_day_slots JSONB`);
+      await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS pos_pin_plain VARCHAR(10)`);
       await db.execute(sql`ALTER TABLE groomers ADD COLUMN IF NOT EXISTS group_id VARCHAR(100) DEFAULT 'default'`);
       await db.execute(sql`
         CREATE TABLE IF NOT EXISTS schedule_overrides (

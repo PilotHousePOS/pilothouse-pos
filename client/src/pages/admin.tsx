@@ -118,6 +118,7 @@ import IntakeFormsTab from "@/components/tabs/IntakeFormsTab";
 import SMSBlastsTab from "@/components/tabs/SMSBlastsTab";
 import MembershipsTab from "@/components/tabs/MembershipsTab";
 import StaffTab from "@/components/tabs/StaffTab";
+import HomepageTab from "@/components/tabs/HomepageTab";
 import { safeGoBack } from "@/lib/navigation";
 import { capitalizeWords } from "@/lib/stringUtils";
 import { formatCategory } from "@/lib/formatCategory";
@@ -3441,6 +3442,11 @@ function EditAppointmentDialog({
   const { data: editServicePrices } = useQuery<{ fullGrooming: string; bathOnly: string }>({
     queryKey: ["/api/service-prices"],
   });
+
+  const { data: editGroomingSettings = [] } = useQuery({ queryKey: ["/api/admin/grooming-settings"] });
+  const _egs = (editGroomingSettings as any[]);
+  const editTrackedLabel = _egs.find((s: any) => s.setting === 'tracked_items_label')?.value || 'Pets';
+  const editTrackedSingular = editTrackedLabel.replace(/s$/i, '');
   
   // Fetch appointment and appointment_pets data
   const { data: appointmentData, isLoading: isLoadingAppointment } = useQuery({
@@ -3765,7 +3771,7 @@ function EditAppointmentDialog({
           {/* Pets Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-sm">Pets ({pets.length})</h3>
+              <h3 className="font-semibold text-sm">{editTrackedLabel} ({pets.length})</h3>
               <Button
                 type="button"
                 variant="outline"
@@ -3785,7 +3791,7 @@ function EditAppointmentDialog({
                 data-testid="button-add-pet"
               >
                 <Plus className="w-3.5 h-3.5 mr-1" />
-                Add Pet
+                Add {editTrackedSingular}
               </Button>
             </div>
             
@@ -3793,7 +3799,7 @@ function EditAppointmentDialog({
             {pets.map((pet, index) => (
               <div key={index} className="p-4 border rounded-lg space-y-3 bg-gray-50">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold text-sm">Pet {index + 1}</span>
+                  <span className="font-semibold text-sm">{editTrackedSingular} {index + 1}</span>
                   {pets.length > 1 && (
                     <Button
                       type="button"
@@ -4541,7 +4547,7 @@ function StoreCodeCard() {
           Your Store Code
         </CardTitle>
         <p className="text-sm text-blue-700">
-          This code is unique to your business — generated automatically when your account was created. Share it with employees so they can sign in on a new device. It can never match another store's code.
+          Share this with employees so they can set up the <strong>Staff Sign-In</strong> tab on a new device. This is <em>different</em> from an employee's personal E01/E02 code — employees need <strong>both</strong>: this store code once (to find the store), then their own E-code + PIN each time they sign in.
         </p>
       </CardHeader>
       <CardContent>
@@ -4562,7 +4568,7 @@ function StoreCodeCard() {
           </Button>
         </div>
         <p className="text-xs text-blue-500 mt-3">
-          Employees enter this once on a fresh device in the <strong>Staff Sign-In</strong> tab. After that, their device remembers it automatically.
+          Employees enter this <strong>once</strong> on a fresh device. After that the device remembers it — they only need their personal E-code + PIN to sign in each time.
         </p>
       </CardContent>
     </Card>
@@ -6990,7 +6996,8 @@ export default function Admin() {
 
   // Tracked items feature flags (derived from grooming settings)
   const trackedItemsEnabled = (groomingSettings as any[]).find((s: any) => s.setting === "tracked_items_enabled")?.value === "true";
-  const trackedItemsLabel   = (groomingSettings as any[]).find((s: any) => s.setting === "tracked_items_label")?.value || "Pets";
+  const trackedItemsLabel    = (groomingSettings as any[]).find((s: any) => s.setting === "tracked_items_label")?.value || "Pets";
+  const trackedItemsSingular = trackedItemsLabel.replace(/s$/i, "");
 
   // Fetch available slots for calendar display (next 60 days)
   const { data: availableSlots = {} } = useQuery({
@@ -7137,7 +7144,7 @@ export default function Admin() {
     'calendar', 'contacts', 'schedule', 'inventory', 'inv-audit',
     'pos-tracker', 'pos-reports', 'grooming', 'users',
     'database', 'astro', 'orders', 'charge-accounts', 'specials',
-    'applications', 'feedback', 'staff', 'settings',
+    'applications', 'feedback', 'staff', 'settings', 'homepage',
   ];
 
   // Two-level navigation: group definitions (order matters for display)
@@ -7147,7 +7154,7 @@ export default function Admin() {
     { id: 'inventory',  label: 'Inventory & Services', tabs: ['inventory', 'inv-audit', 'grooming', 'specials', 'memberships'] },
     { id: 'staff',      label: 'Staff',               tabs: ['staff', 'tasks', 'intake-forms'] },
     { id: 'outreach',   label: 'Outreach',            tabs: ['email-center', 'sms-blasts', 'announcements', 'feedback'] },
-    { id: 'admin',      label: 'Admin',               tabs: ['users', 'database', 'astro', 'applications', 'settings'] },
+    { id: 'admin',      label: 'Admin',               tabs: ['users', 'database', 'astro', 'applications', 'settings', 'homepage'] },
   ];
 
   const OPTIONAL_TABS: { id: string; label: string }[] = [
@@ -7271,6 +7278,7 @@ export default function Admin() {
       'intake-forms':    isEmp ? false : !!typedUser?.isAdmin,
       'sms-blasts':      isEmp ? !!ep.canManageSmsBlasts : !!typedUser?.isAdmin,
       'memberships':     isEmp ? !!ep.canManageMemberships : !!typedUser?.isAdmin,
+      'homepage':        isEmp ? !!ep.canEditHomepage && featureEnabled('onlineStore') : !!(typedUser?.isAdmin && featureEnabled('onlineStore')),
     } as Record<string, boolean>)[v] ?? false;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typedUser, employeePerms, enabledOptionalTabs, featureEnabled]);
@@ -7343,6 +7351,7 @@ export default function Admin() {
       case 'applications': return 'Applications';
       case 'feedback': return 'Feedback';
       case 'settings': return 'Settings';
+      case 'homepage': return 'Homepage';
       case 'waitlist': return 'Waitlist';
       case 'tasks': return 'Tasks';
       case 'announcements': return 'Announcements';
@@ -14836,6 +14845,10 @@ export default function Admin() {
           <StaffTab typedUser={typedUser} />
         </TabsContent>
 
+        <TabsContent value="homepage" className="space-y-4">
+          <HomepageTab />
+        </TabsContent>
+
       </Tabs>
 
       {/* SMS Confirmation Dialog for Grooming Completed */}
@@ -14939,12 +14952,12 @@ export default function Admin() {
                   </div>
                 </div>
                 <div className="border-t pt-3">
-                  <h4 className="font-semibold text-gray-900 mb-2">Pet Information</h4>
+                  <h4 className="font-semibold text-gray-900 mb-2">{trackedItemsSingular} Information</h4>
                   {selectedAppointment.pets && selectedAppointment.pets.length > 0 ? (
                     <div className="space-y-3">
                       {selectedAppointment.pets.map((pet: any, index: number) => (
                         <div key={index} className="bg-gray-50 p-3 rounded-lg">
-                          <div className="font-medium text-sm text-gray-600 mb-2">Pet {index + 1}</div>
+                          <div className="font-medium text-sm text-gray-600 mb-2">{trackedItemsSingular} {index + 1}</div>
                           <div className="grid grid-cols-2 gap-3">
                             <div>
                               <Label className="text-xs font-semibold text-gray-600">Name</Label>
@@ -15357,10 +15370,10 @@ export default function Admin() {
                     </Button>
                   )}
 
-                  <div className="font-medium text-sm text-gray-700">Pet {index + 1}</div>
+                  <div className="font-medium text-sm text-gray-700">{trackedItemsSingular} {index + 1}</div>
 
                   <div>
-                    <Label>Pet Name *</Label>
+                    <Label>{trackedItemsSingular} Name *</Label>
                     <Input
                       type="text"
                       value={pet.name}

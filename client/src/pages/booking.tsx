@@ -94,6 +94,8 @@ export default function Booking() {
 
   // Build services list using admin-configurable names + dynamic prices (must be after groomingSettings)
   const gs = (groomingSettings as any[]);
+  const trackedItemsLabelPlural = gs.find((s: any) => s.setting === 'tracked_items_label')?.value || 'Pets';
+  const trackedItemsSingular = trackedItemsLabelPlural.replace(/s$/i, '');
   const service1Name = gs.find((s: any) => s.setting === 'service1_name')?.value || 'Full Service';
   const service2Name = gs.find((s: any) => s.setting === 'service2_name')?.value || 'Basic Service';
   const SERVICES = [
@@ -1038,7 +1040,7 @@ export default function Booking() {
         {/* Pet Information - Multiple Pets */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <Label className="text-sm font-semibold text-gray-900">Service Details</Label>
+            <Label className="text-sm font-semibold text-gray-900">{trackedItemsSingular} Details</Label>
             <Button
               type="button"
               onClick={addPet}
@@ -1055,7 +1057,7 @@ export default function Booking() {
             <Card key={index} className="mb-4">
               <CardContent className="p-4 space-y-3">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-semibold text-gray-900">Pet {index + 1}</h4>
+                  <h4 className="font-semibold text-gray-900">{trackedItemsSingular} {index + 1}</h4>
                   {pets.length > 1 && (
                     <Button
                       type="button"

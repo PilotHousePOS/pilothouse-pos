@@ -548,14 +548,14 @@ export default function Auth() {
                       <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-2">
                         <LogIn className="h-6 w-6 text-white" />
                       </div>
-                      <p className="text-white font-medium">Enter your store code</p>
-                      <p className="text-gray-400 text-xs mt-1">Your manager can give you this. You only need to do this once on a new device.</p>
+                      <p className="text-white font-medium">Enter your store's sign-in code</p>
+                      <p className="text-gray-400 text-xs mt-1">Ask your manager — it looks like a short name (e.g. <span className="font-mono text-gray-300">paw-palace</span>), <em>not</em> your personal employee code like E01.</p>
                     </div>
                     <form onSubmit={handleStoreCodeSubmit} className="space-y-3">
                       <Input
                         value={storeCodeInput}
                         onChange={e => { setStoreCodeInput(e.target.value); setStoreCodeError(""); }}
-                        placeholder="e.g. paw-palace"
+                        placeholder="store name, not your E01 code"
                         className="bg-white/10 border-white/30 text-white placeholder:text-gray-400 text-center tracking-widest"
                         autoCapitalize="none"
                         autoCorrect="off"

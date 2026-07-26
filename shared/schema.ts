@@ -72,6 +72,7 @@ export const users = pgTable("users", {
   isEmployee: boolean("is_employee").default(false), // Tenant staff account created by admin
   employeeCode: varchar("employee_code", { length: 20 }), // Short unique code per tenant e.g. "E01"
   employeePin: varchar("employee_pin", { length: 255 }), // bcrypt-hashed 4-digit PIN
+  posPinPlain: varchar("pos_pin_plain", { length: 10 }), // plain-text copy so admins can look it up
   totalSpent: decimal("total_spent", { precision: 10, scale: 2 }).default("0"),
   loyaltyCredits: decimal("loyalty_credits", { precision: 10, scale: 2 }).default("0"),
   stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),

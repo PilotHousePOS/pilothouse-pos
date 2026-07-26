@@ -63,19 +63,21 @@ interface EmployeePermissions {
   canTogglePets: boolean;
 }
 
-const BASIC_PERMS: { key: keyof EmployeePermissions; label: string; description: string }[] = [
-  { key: "canManageOrders",       label: "Manage Orders",       description: "Create, edit, and process orders at POS" },
-  { key: "canApplyDiscounts",     label: "Apply Discounts",     description: "Apply discount codes or manual price reductions" },
-  { key: "canIssueRefunds",       label: "Issue Refunds",       description: "Process refunds on existing orders" },
-  { key: "canManageCustomers",    label: "Manage Customers",    description: "View and edit customer profiles" },
-  { key: "canManageLoyalty",      label: "Manage Loyalty",      description: "Add or adjust customer loyalty credits" },
-  { key: "canManageInventory",    label: "Manage Inventory",    description: "Edit products, stock levels, and categories" },
-  { key: "canViewReports",        label: "View Reports",        description: "Access POS sales reports and analytics" },
-  { key: "canManageAppointments", label: "Manage Appointments", description: "Create, reschedule, and cancel appointments" },
-  { key: "canManageGrooming",     label: "Grooming",            description: "Access the grooming and groomers tabs" },
-  { key: "canManageBoarding",     label: "Boarding",            description: "Access boarding records" },
-  { key: "canAccessSettings",     label: "Store Settings",      description: "View and edit store configuration (use with care)" },
-];
+function buildBasicPerms(groomingLabel: string): { key: keyof EmployeePermissions; label: string; description: string }[] {
+  return [
+    { key: "canManageOrders",       label: "Manage Orders",       description: "Create, edit, and process orders at POS" },
+    { key: "canApplyDiscounts",     label: "Apply Discounts",     description: "Apply discount codes or manual price reductions" },
+    { key: "canIssueRefunds",       label: "Issue Refunds",       description: "Process refunds on existing orders" },
+    { key: "canManageCustomers",    label: "Manage Customers",    description: "View and edit customer profiles" },
+    { key: "canManageLoyalty",      label: "Manage Loyalty",      description: "Add or adjust customer loyalty credits" },
+    { key: "canManageInventory",    label: "Manage Inventory",    description: "Edit products, stock levels, and categories" },
+    { key: "canViewReports",        label: "View Reports",        description: "Access POS sales reports and analytics" },
+    { key: "canManageAppointments", label: "Manage Appointments", description: "Create, reschedule, and cancel appointments" },
+    { key: "canManageGrooming",     label: groomingLabel,         description: `Access the ${groomingLabel.toLowerCase()} and staff tabs` },
+    { key: "canManageBoarding",     label: "Boarding",            description: "Access boarding records" },
+    { key: "canAccessSettings",     label: "Store Settings",      description: "View and edit store configuration (use with care)" },
+  ];
+}
 
 const ADMIN_PERMS: { key: keyof EmployeePermissions; label: string; description: string }[] = [
   { key: "canManageStaff",          label: "Manage Staff Accounts",  description: "Create, edit, and remove other employee accounts" },
@@ -153,6 +155,7 @@ export default function StaffTab({ typedUser }: Props) {
   const [isAdminEmployee, setIsAdminEmployee] = useState(false);
   const [newPin, setNewPin] = useState("");
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [copiedPin, setCopiedPin]   = useState<string | null>(null);
 
   // Override PIN panel state
   const [overridePin, setOverridePin]           = useState("");
@@ -176,6 +179,7 @@ export default function StaffTab({ typedUser }: Props) {
     enabled: !typedUser?.isEmployee,
   });
   const savedTabLabels: Record<string, string> = tenantInfo?.enabledFeatures?.tabLabels ?? {};
+  const basicPerms = buildBasicPerms(savedTabLabels.groomers || "Grooming");
 
   // Derive service groups from tenant settings
   const rawServiceGroups: { id: string; name: string }[] = (tenantInfo?.enabledFeatures as any)?.serviceGroups ?? [];
@@ -339,6 +343,12 @@ export default function StaffTab({ typedUser }: Props) {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
+  const copyPin = (pin: string) => {
+    navigator.clipboard.writeText(pin).catch(() => {});
+    setCopiedPin(pin);
+    setTimeout(() => setCopiedPin(null), 2000);
+  };
+
   const activeCount = (emp: User) => salesStats.find(s => s.userId === emp.id)?.orderCount ?? 0;
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -377,6 +387,7 @@ export default function StaffTab({ typedUser }: Props) {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Code</TableHead>
+                  <TableHead>PIN</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Sales</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -406,6 +417,20 @@ export default function StaffTab({ typedUser }: Props) {
                               : <Copy className="h-3 w-3 text-muted-foreground" />}
                           </button>
                         ) : <span className="text-muted-foreground text-xs">—</span>}
+                      </TableCell>
+                      <TableCell>
+                        {(emp as any).posPinPlain ? (
+                          <button
+                            onClick={() => copyPin((emp as any).posPinPlain)}
+                            className="flex items-center gap-1 font-mono text-sm bg-muted px-2 py-0.5 rounded hover:bg-muted/80 transition-colors"
+                            title="Click to copy PIN"
+                          >
+                            ••••
+                            {copiedPin === (emp as any).posPinPlain
+                              ? <Check className="h-3 w-3 text-green-500" />
+                              : <Copy className="h-3 w-3 text-muted-foreground" />}
+                          </button>
+                        ) : <span className="text-muted-foreground text-xs">not set</span>}
                       </TableCell>
                       <TableCell>
                         {emp.isAdmin
@@ -901,7 +926,7 @@ export default function StaffTab({ typedUser }: Props) {
           <div className="max-h-[60vh] overflow-y-auto space-y-1 pr-1">
             {/* Basic permissions */}
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide pt-1 pb-1">Staff Capabilities</p>
-            {BASIC_PERMS.map(({ key, label, description }) => (
+            {basicPerms.map(({ key, label, description }) => (
               <PermToggle
                 key={key} pkey={key} label={label} description={description}
                 value={!!perms[key]}
