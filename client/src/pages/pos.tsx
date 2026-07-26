@@ -681,7 +681,7 @@ export default function PosPage() {
         <div className="flex items-center gap-3">
           {!posLocked && (
             <button onClick={() => setLocation("/admin")} className="flex items-center gap-1 text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-gray-300">
-              <ChevronLeft className="h-3 w-3" /> Admin
+              <ChevronLeft className="h-3 w-3" /> Back
             </button>
           )}
           <span className="text-sm font-bold">PilotHouse</span>

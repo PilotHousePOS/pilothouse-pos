@@ -7234,6 +7234,19 @@ export default function Admin() {
     try { sessionStorage.setItem('admin-active-tab', value); } catch {}
   }, []);
 
+  // Employees must never land on an admin-only tab (e.g. sessionStorage left over from an admin session).
+  // Once their identity is known, snap them to 'schedule' if their current tab is off-limits.
+  useEffect(() => {
+    if (!typedUser?.isEmployee || typedUser?.isAdmin) return;
+    const EMPLOYEE_ALLOWED = ['schedule', 'grooming', 'appointments', 'contacts', 'orders',
+      'inventory', 'pos-tracker', 'pos-reports', 'specials', 'email-center', 'boarding',
+      'charge-accounts', 'staff', 'settings'];
+    if (!EMPLOYEE_ALLOWED.includes(activeTab)) {
+      setActiveTab('schedule');
+      try { sessionStorage.setItem('admin-active-tab', 'schedule'); } catch {}
+    }
+  }, [typedUser?.isEmployee, typedUser?.isAdmin, activeTab]);
+
   // Derived: which group contains the active tab
   const activeGroupId = useMemo(
     () => TAB_GROUPS.find(g => g.tabs.includes(activeTab))?.id ?? 'operations',
@@ -9499,6 +9512,15 @@ export default function Admin() {
             >
               <RefreshCw className="w-4 h-4 mr-2" />
               Refresh
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open('/', '_blank')}
+              title="Preview your store's public homepage"
+            >
+              <Home className="w-4 h-4 mr-2" />
+              View Site
             </Button>
             <AdminNotifications />
             {typedUser?.isAdmin ? (
@@ -14681,9 +14703,9 @@ export default function Admin() {
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-6">
-          <StoreCodeCard />
+          {!typedUser?.isEmployee && <StoreCodeCard />}
           <FeaturesPanel />
-          <PayPeriodCard />
+          {!typedUser?.isEmployee && <PayPeriodCard />}
           <StoreHoursPanel />
           <SettingsPanel />
           <TrackedItemsSettingsPanel />
