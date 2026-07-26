@@ -12257,6 +12257,7 @@ West Monroe LA 71291
     try {
       await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS default_work_days JSONB`);
       await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS default_time_slot VARCHAR(50)`);
+      await db.execute(sql`ALTER TABLE groomers ADD COLUMN IF NOT EXISTS group_id VARCHAR(100) DEFAULT 'default'`);
       await db.execute(sql`
         CREATE TABLE IF NOT EXISTS schedule_overrides (
           id SERIAL PRIMARY KEY,

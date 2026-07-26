@@ -468,6 +468,7 @@ export const groomers = pgTable("groomers", {
   specialties: text("specialties"), // e.g., "full grooming, bath only"
   isActive: boolean("is_active").default(true),
   offDays: integer("off_days").array(), // Array of day numbers: 0=Sunday, 1=Monday, etc.
+  groupId: varchar("group_id", { length: 100 }).default("default"), // service group key
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

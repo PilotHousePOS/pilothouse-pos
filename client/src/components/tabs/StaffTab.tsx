@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff, Clock } from "lucide-react";
+import { Eye, EyeOff, Clock, Users } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,9 @@ import { Separator } from "@/components/ui/separator";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -159,6 +162,9 @@ export default function StaffTab({ typedUser }: Props) {
   // Tab label editor state
   const [labelDraft, setLabelDraft] = useState<Record<string, string> | null>(null);
 
+  // Service group assignment (when creating/editing employees)
+  const [serviceGroupId, setServiceGroupId] = useState<string>("");
+
   // queries
   const { data: employees = [], isLoading } = useQuery<User[]>({
     queryKey: ["/api/admin/employees"],
@@ -168,6 +174,10 @@ export default function StaffTab({ typedUser }: Props) {
     enabled: !typedUser?.isEmployee,
   });
   const savedTabLabels: Record<string, string> = tenantInfo?.enabledFeatures?.tabLabels ?? {};
+
+  // Derive service groups from tenant settings
+  const rawServiceGroups: { id: string; name: string }[] = (tenantInfo?.enabledFeatures as any)?.serviceGroups ?? [];
+  const serviceGroups = rawServiceGroups.length > 0 ? rawServiceGroups : [{ id: "default", name: "Service Members" }];
   const { data: salesStats = [] } = useQuery<Array<{
     userId: string; firstName: string | null; lastName: string | null;
     orderCount: number; totalSales: string;
@@ -175,12 +185,29 @@ export default function StaffTab({ typedUser }: Props) {
 
   // mutations
   const createMutation = useMutation({
-    mutationFn: (data: typeof form) => apiRequest("POST", "/api/admin/employees", data),
+    mutationFn: async (data: typeof form) => {
+      const emp = await apiRequest("POST", "/api/admin/employees", data);
+      // Optionally also add them to a service group
+      if (serviceGroupId) {
+        const empJson = await emp.json();
+        await apiRequest("POST", "/api/admin/groomers", {
+          name: `${data.firstName}${data.lastName ? " " + data.lastName : ""}`,
+          email: data.email || undefined,
+          phone: data.phoneNumber || undefined,
+          groupId: serviceGroupId,
+          isActive: true,
+        });
+        return empJson;
+      }
+      return emp.json();
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/admin/employees"] });
+      qc.invalidateQueries({ queryKey: ["/api/admin/groomers"] });
       setCreateOpen(false);
+      setServiceGroupId("");
       setForm({ firstName: "", lastName: "", email: "", password: "", phoneNumber: "", makeAdmin: false, defaultWorkDays: ["Monday","Tuesday","Wednesday","Thursday","Friday"], defaultTimeSlot: "9-5" });
-      toast({ title: "Employee account created" });
+      toast({ title: "Employee account created" + (serviceGroupId ? " and added to service roster" : "") });
     },
     onError: (e: any) => toast({ title: "Failed to create employee", description: e.message, variant: "destructive" }),
   });
@@ -646,7 +673,7 @@ export default function StaffTab({ typedUser }: Props) {
       </Tabs>
 
       {/* ── Service Staff (Groomers) ── */}
-      <GroomersSection typedUser={typedUser} staffLabel={savedTabLabels['groomers'] || 'Staff'} />
+      <GroomersSection typedUser={typedUser} />
 
       {/* ── Create Employee Dialog ── */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
@@ -696,6 +723,22 @@ export default function StaffTab({ typedUser }: Props) {
                   className="h-8 text-sm"
                 />
               </div>
+            </div>
+            <Separator />
+            <div className="space-y-2">
+              <p className="text-sm font-medium flex items-center gap-1.5"><Users className="h-4 w-4" /> Add to Service Roster</p>
+              <p className="text-xs text-muted-foreground">Optionally add this employee to a service group so they appear as an assignable provider in bookings.</p>
+              <Select value={serviceGroupId} onValueChange={setServiceGroupId}>
+                <SelectTrigger className="h-8 text-sm">
+                  <SelectValue placeholder="— Not in service roster —" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">— Not in service roster —</SelectItem>
+                  {serviceGroups.map(g => (
+                    <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <p className="text-xs text-muted-foreground bg-muted rounded p-2">
               An <strong>employee code</strong> (e.g. E01) is auto-generated. Set a 4-digit PIN after creating the account so they can sign in at the POS keypad.
