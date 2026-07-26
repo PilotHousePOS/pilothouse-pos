@@ -422,9 +422,9 @@ export default function GroomersSection({ typedUser, staffLabel = "Staff" }: Pro
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Groomer *</Label>
+              <Label>{staffLabel} *</Label>
               <Select value={blockedForm.groomerId} onValueChange={v => setBlockedForm({ ...blockedForm, groomerId: v })}>
-                <SelectTrigger data-testid="select-blocked-groomer"><SelectValue placeholder="Select a groomer" /></SelectTrigger>
+                <SelectTrigger data-testid="select-blocked-groomer"><SelectValue placeholder={`Select a ${staffLabel.toLowerCase()}`} /></SelectTrigger>
                 <SelectContent>
                   {groomersQ.data?.filter((g: any) => g.isActive).map((g: any) => (
                     <SelectItem key={g.id} value={g.id.toString()}>{g.name}</SelectItem>
