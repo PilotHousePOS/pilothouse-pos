@@ -670,6 +670,23 @@ export default function Auth() {
                     {empLoading && <p className="text-center text-gray-400 text-sm mt-3 animate-pulse">Verifying…</p>}
                   </div>
                 )}
+                {/* Owner escape hatch — rare on a shared POS device */}
+                <div className="mt-6 pt-4 border-t border-white/10 text-center">
+                  <button
+                    className="text-xs text-gray-600 hover:text-gray-400 transition-colors"
+                    onClick={() => {
+                      setActiveTenantSlug(null);
+                      setKnownSlug(null);
+                      setStoreCodeInput("");
+                      setEmpSelected(null);
+                      setEmpPin("");
+                      setEmpError("");
+                      setActiveTab("signin");
+                    }}
+                  >
+                    Sign in as owner / switch account
+                  </button>
+                </div>
               </TabsContent>
 
               <TabsContent value="signup" className="space-y-4 mt-6">

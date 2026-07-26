@@ -32,9 +32,12 @@ export default function StaffDashboard() {
 
   const handleLogout = async () => {
     try { await fetch("/api/auth/logout", { method: "POST", credentials: "include" }); } catch {}
+    // Keep the tenant slug so the staff sign-in screen skips the store-code step
+    const savedSlug = localStorage.getItem('active_tenant_slug');
     localStorage.clear();
+    if (savedSlug) localStorage.setItem('active_tenant_slug', savedSlug);
     globalQueryClient.clear();
-    window.location.href = "/";
+    window.location.href = "/auth?tab=employee";
   };
 
   // Feature cards shown to staff when the store has that feature enabled
