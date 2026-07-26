@@ -7234,18 +7234,16 @@ export default function Admin() {
     try { sessionStorage.setItem('admin-active-tab', value); } catch {}
   }, []);
 
-  // Employees must never land on an admin-only tab (e.g. sessionStorage left over from an admin session).
-  // Once their identity is known, snap them to 'schedule' if their current tab is off-limits.
+  // Employees must never land on a tab they can't see (e.g. sessionStorage from an admin session).
+  // Run after employeePerms is loaded so isTabVisible has accurate permission data.
   useEffect(() => {
     if (!typedUser?.isEmployee || typedUser?.isAdmin) return;
-    const EMPLOYEE_ALLOWED = ['schedule', 'grooming', 'appointments', 'contacts', 'orders',
-      'inventory', 'pos-tracker', 'pos-reports', 'specials', 'email-center', 'boarding',
-      'charge-accounts', 'staff', 'settings'];
-    if (!EMPLOYEE_ALLOWED.includes(activeTab)) {
+    if (employeePerms === undefined) return; // wait until permissions have loaded
+    if (!isTabVisible(activeTab)) {
       setActiveTab('schedule');
       try { sessionStorage.setItem('admin-active-tab', 'schedule'); } catch {}
     }
-  }, [typedUser?.isEmployee, typedUser?.isAdmin, activeTab]);
+  }, [typedUser?.isEmployee, typedUser?.isAdmin, activeTab, employeePerms, isTabVisible]);
 
   // Derived: which group contains the active tab
   const activeGroupId = useMemo(

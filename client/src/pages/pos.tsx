@@ -680,7 +680,7 @@ export default function PosPage() {
       <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-3">
           {!posLocked && (
-            <button onClick={() => setLocation("/admin")} className="flex items-center gap-1 text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-gray-300">
+            <button onClick={() => setLocation(isEmployee ? "/" : "/admin")} className="flex items-center gap-1 text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-gray-300">
               <ChevronLeft className="h-3 w-3" /> Back
             </button>
           )}
