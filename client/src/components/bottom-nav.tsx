@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Home, ShoppingBag, Calendar, User, Settings } from "lucide-react";
+import { Home, ShoppingBag, Calendar, User, Settings, Monitor } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 
@@ -63,6 +63,13 @@ export default function BottomNav() {
       icon: User,
       label: "Profile",
       show: true,
+    },
+    // POS — all admin/owner accounts get a direct shortcut
+    {
+      path: "/pos",
+      icon: Monitor,
+      label: "POS",
+      show: isAdminOrOwner,
     },
     // Admin — admins and groomers
     {
