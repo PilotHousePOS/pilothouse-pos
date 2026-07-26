@@ -728,12 +728,15 @@ export default function StaffTab({ typedUser }: Props) {
             <div className="space-y-2">
               <p className="text-sm font-medium flex items-center gap-1.5"><Users className="h-4 w-4" /> Add to Service Roster</p>
               <p className="text-xs text-muted-foreground">Optionally add this employee to a service group so they appear as an assignable provider in bookings.</p>
-              <Select value={serviceGroupId} onValueChange={setServiceGroupId}>
+              <Select
+                value={serviceGroupId || "none"}
+                onValueChange={v => setServiceGroupId(v === "none" ? "" : v)}
+              >
                 <SelectTrigger className="h-8 text-sm">
                   <SelectValue placeholder="— Not in service roster —" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">— Not in service roster —</SelectItem>
+                  <SelectItem value="none">— Not in service roster —</SelectItem>
                   {serviceGroups.map(g => (
                     <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>
                   ))}
