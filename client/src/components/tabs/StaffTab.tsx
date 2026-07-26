@@ -467,10 +467,12 @@ export default function StaffTab({ typedUser }: Props) {
 
           {/* How sign-in works — updated info box */}
           <div className="mt-4 rounded-lg bg-blue-50 border border-blue-100 p-3 text-sm text-blue-800">
-            <p className="font-medium mb-1">How employee sign-in works</p>
+            <p className="font-medium mb-1">Off-site &amp; first-time employee sign-in</p>
             <p className="text-blue-700 text-xs leading-relaxed">
-              Employees sign in on the store's <strong>Sign In page</strong> — tap the <strong>Staff Sign-In</strong> tab,
-              select their name, and enter their 4-digit PIN. All sales and changes are tracked to their account.
+              On a new or personal device, employees visit the store's <strong>Sign In page</strong>, tap <strong>Staff Sign-In</strong>,
+              enter the store code once, then select their name and PIN. After that first setup the device stays linked —
+              signing out just returns to the name picker, no store code needed again.
+              All sales and changes are tracked to their account.
             </p>
           </div>
 
@@ -533,7 +535,7 @@ export default function StaffTab({ typedUser }: Props) {
                       maxLength={4}
                       value={overridePinSet}
                       onChange={e => setOverridePinSet(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                      placeholder="New 4-digit PIN"
+                      placeholder="New 4–6 digit PIN"
                       className="text-center text-xl tracking-widest font-mono max-w-[140px] pr-9"
                     />
                     <button
@@ -777,7 +779,7 @@ export default function StaffTab({ typedUser }: Props) {
               </Select>
             </div>
             <p className="text-xs text-muted-foreground bg-muted rounded p-2">
-              An <strong>employee code</strong> (e.g. E01) is auto-generated. Set a 4-digit PIN after creating the account so they can sign in at the POS keypad.
+              An <strong>employee code</strong> (e.g. E01) is auto-generated. Set a 4–6 digit PIN after creating the account so they can sign in at the POS keypad.
             </p>
           </div>
           <DialogFooter className="shrink-0 border-t px-6 py-4">
@@ -880,7 +882,7 @@ export default function StaffTab({ typedUser }: Props) {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">Enter a new 4-digit PIN the employee will use at the sign-in keypad.</p>
+            <p className="text-sm text-muted-foreground">Enter a new 4–6 digit PIN the employee will use at the sign-in keypad.</p>
             <div className="space-y-1.5">
               <Label>New PIN (4 digits)</Label>
               <Input
