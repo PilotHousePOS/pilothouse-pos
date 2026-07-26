@@ -214,8 +214,8 @@ export const queryClient = new QueryClient({
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),
       refetchInterval: false,
-      refetchOnWindowFocus: true,
-      staleTime: 30000,
+      refetchOnWindowFocus: import.meta.env.PROD,   // off in dev — saves dozens of requests on every tab switch
+      staleTime: import.meta.env.DEV ? 5 * 60_000 : 30_000,  // 5 min in dev, 30 s in prod
       retry: 1,
     },
     mutations: {
