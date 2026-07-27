@@ -23,7 +23,7 @@ import {
 } from "@shared/schema";
 import { z } from "zod/v4";
 import { notificationService } from './notifications';
-import { sendPasswordResetEmail, sendVerificationEmail, sendContactChangeOtpEmail, sendNoTenantAlertToSuperAdmins } from './sendgrid';
+import { sendPasswordResetEmail, sendVerificationEmail, sendContactChangeOtpEmail, sendNoTenantAlertToSuperAdmins, send2faCodeEmail } from './sendgrid';
 import { normalizePhoneNumber } from './phoneUtils';
 import { db, resetPool } from './db';
 import { eq, inArray, or, and, ilike, sql } from 'drizzle-orm';
@@ -69,7 +69,7 @@ import { categorizeProduct, detectLiveAnimal } from './productCategorization';
 import { registerBillingRoutes } from './billingRoutes';
 // Shared-pool limiters MUST be imported from sharedLimiters.ts — never
 // re-created inline.  See server/sharedLimiters.ts for the full explanation.
-import { getRealIp, authLimiter, searchLimiter, checkoutLimiter, uploadLimiter, overridePinLimiter, overridePinSlugLimiter } from './sharedLimiters';
+import { getRealIp, authLimiter, searchLimiter, checkoutLimiter, uploadLimiter, overridePinLimiter, overridePinSlugLimiter, rosterLimiter } from './sharedLimiters';
 
 // Helper: clean a name string — collapse extra spaces, trim
 function cleanName(name: string | undefined | null): string {
@@ -1115,15 +1115,53 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         }
       }
 
-      // Generate JWT token
+      // Owner / admin 2FA — send a 6-digit code and hold the session
+      if (user.isAdmin || user.isSuperiorManager) {
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        const bcrypt = await import("bcryptjs");
+        const codeHash = await bcrypt.hash(code, 10);
+        const expires = new Date(Date.now() + 10 * 60 * 1000);
+        await db.execute(sql`UPDATE users SET two_fa_code = ${codeHash}, two_fa_code_expires = ${expires} WHERE id = ${user.id}`);
+        try { await send2faCodeEmail(user.email!, user.firstName ?? 'Owner', code); } catch (e) { console.error('[2FA] email send failed:', e); }
+        const ip = getRealIp(req as any);
+        await db.execute(sql`INSERT INTO pin_attempt_log (tenant_id, event_type, ip_address, success) VALUES (${user.tenantId}, 'owner_login_2fa_sent', ${ip}, true)`).catch(() => {});
+        return res.json({ requires2fa: true, userId: user.id });
+      }
+
+      // Regular user — generate JWT token immediately
       const token = generateToken(user);
       setAuthCookie(res, token);
-      
       res.json({ ...sanitizeUser(user), token });
     } catch (error) {
       console.error("Login error:", error);
       res.status(500).json({ message: "Login failed" });
     }
+  });
+
+  // POST /api/auth/verify-2fa — exchange a 2FA code for a full JWT session
+  app.post('/api/auth/verify-2fa', authLimiter, async (req: any, res) => {
+    try {
+      const { userId, code } = req.body;
+      if (!userId || !code) return res.status(400).json({ message: "User ID and code are required" });
+      const user = await storage.getUser(String(userId));
+      if (!user) return res.status(401).json({ message: "Invalid session. Please sign in again." });
+      const dbCode: string | null = (user as any).twoFaCode ?? null;
+      const expires: Date | null = (user as any).twoFaCodeExpires ? new Date((user as any).twoFaCodeExpires) : null;
+      if (!dbCode || !expires || new Date() > expires) {
+        return res.status(401).json({ message: "Code has expired. Please sign in again." });
+      }
+      const bcrypt = await import("bcryptjs");
+      const valid = await bcrypt.compare(String(code), dbCode);
+      if (!valid) {
+        const ip = getRealIp(req as any);
+        await db.execute(sql`INSERT INTO pin_attempt_log (tenant_id, event_type, ip_address, success) VALUES (${user.tenantId}, 'owner_2fa_failed', ${ip}, false)`).catch(() => {});
+        return res.status(401).json({ message: "Incorrect code." });
+      }
+      await db.execute(sql`UPDATE users SET two_fa_code = NULL, two_fa_code_expires = NULL WHERE id = ${userId}`);
+      const token = generateToken(user);
+      setAuthCookie(res, token);
+      res.json({ ...sanitizeUser(user), token });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 
   // Logout
@@ -12264,6 +12302,12 @@ West Monroe LA 71291
       await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS pos_pin_plain VARCHAR(10)`);
       await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS pin_failed_attempts INTEGER NOT NULL DEFAULT 0`);
       await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS pin_locked_until TIMESTAMPTZ`);
+      await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS two_fa_code VARCHAR(10)`);
+      await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS two_fa_code_expires TIMESTAMPTZ`);
+      await db.execute(sql`ALTER TABLE tenants ADD COLUMN IF NOT EXISTS pos_pin_failed_attempts INTEGER NOT NULL DEFAULT 0`);
+      await db.execute(sql`ALTER TABLE tenants ADD COLUMN IF NOT EXISTS pos_pin_locked_until TIMESTAMPTZ`);
+      await db.execute(sql`CREATE TABLE IF NOT EXISTS pin_attempt_log (id SERIAL PRIMARY KEY, tenant_id INTEGER, event_type VARCHAR(50) NOT NULL, employee_code VARCHAR(20), ip_address VARCHAR(45), success BOOLEAN NOT NULL DEFAULT false, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`);
+      await db.execute(sql`CREATE INDEX IF NOT EXISTS idx_pin_attempt_log_tenant_created ON pin_attempt_log (tenant_id, created_at DESC)`);
       await db.execute(sql`ALTER TABLE groomers ADD COLUMN IF NOT EXISTS group_id VARCHAR(100) DEFAULT 'default'`);
       await db.execute(sql`
         CREATE TABLE IF NOT EXISTS schedule_overrides (
@@ -15958,6 +16002,17 @@ CRITICAL RULES:
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 
+  // POST /api/admin/employees/:id/force-signout — bump token_version, invalidating all active sessions
+  app.post("/api/admin/employees/:id/force-signout", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number = req.tenantId;
+      await db.execute(sql`UPDATE users SET token_version = COALESCE(token_version, 0) + 1 WHERE id = ${req.params.id} AND tenant_id = ${tenantId}`);
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
   // POST /api/admin/employees/:id/set-pin — owner sets/resets employee PIN (admin only)
   app.post("/api/admin/employees/:id/set-pin", authMiddleware, async (req: any, res) => {
     try {
@@ -15971,9 +16026,19 @@ CRITICAL RULES:
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 
-  // GET /api/employee/roster — public-ish: list employees for PIN sign-in (by tenant slug, no auth needed)
-  // Returns only id, firstName, lastName, employeeCode — no sensitive fields
-  app.get("/api/employee/roster", async (req: any, res) => {
+  // GET /api/admin/security-log — recent PIN attempt log for this tenant (admin only)
+  app.get("/api/admin/security-log", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number = req.tenantId;
+      const rows = await db.execute(sql`SELECT id, event_type, employee_code, ip_address, success, created_at FROM pin_attempt_log WHERE tenant_id = ${tenantId} ORDER BY created_at DESC LIMIT 100`);
+      res.json(rows.rows);
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
+  // GET /api/employee/roster — rate-limited; returns only safe fields for PIN sign-in UI
+  app.get("/api/employee/roster", rosterLimiter, async (req: any, res) => {
     try {
       const tenantId: number | undefined = req.tenantId;
       if (!tenantId) return res.status(400).json({ message: "Tenant required" });
@@ -15994,12 +16059,18 @@ CRITICAL RULES:
       if (!tenantId) return res.status(400).json({ message: "Tenant required" });
       const { employeeCode, pin } = req.body;
       if (!employeeCode || !pin) return res.status(400).json({ message: "Employee code and PIN are required" });
+      const ip = getRealIp(req as any);
       const result = await storage.authenticateEmployeeByPin(tenantId, String(employeeCode), String(pin));
-      if (!result) return res.status(401).json({ message: "Incorrect PIN. Too many wrong attempts will lock this account for 24 hours." });
+      if (!result) {
+        await db.execute(sql`INSERT INTO pin_attempt_log (tenant_id, event_type, employee_code, ip_address, success) VALUES (${tenantId}, 'employee_pin', ${String(employeeCode)}, ${ip}, false)`).catch(() => {});
+        return res.status(401).json({ message: "Incorrect PIN. Too many wrong attempts will lock this account for 24 hours." });
+      }
       if ('locked' in result) {
+        await db.execute(sql`INSERT INTO pin_attempt_log (tenant_id, event_type, employee_code, ip_address, success) VALUES (${tenantId}, 'employee_pin_locked', ${String(employeeCode)}, ${ip}, false)`).catch(() => {});
         const until = result.lockedUntil.toLocaleString('en-US', { timeZone: 'America/Chicago', hour: 'numeric', minute: '2-digit', hour12: true, month: 'short', day: 'numeric' });
         return res.status(423).json({ message: `This account is locked due to too many failed PIN attempts. Try again after ${until} or ask your manager to unlock it.`, locked: true });
       }
+      await db.execute(sql`INSERT INTO pin_attempt_log (tenant_id, event_type, employee_code, ip_address, success) VALUES (${tenantId}, 'employee_pin', ${String(employeeCode)}, ${ip}, true)`).catch(() => {});
       const token = generateToken(result);
       setAuthCookie(res, token);
       res.json({ ...sanitizeUser(result), token });
@@ -16007,48 +16078,82 @@ CRITICAL RULES:
   });
 
   // POST /api/auth/pos-admin-pin-login — PIN-only login for admins/owners at the POS
-  // Searches all admin-flagged users in the tenant for a matching employee_pin
-  // and returns a full JWT session for the first match.
   app.post("/api/auth/pos-admin-pin-login", async (req: any, res) => {
     try {
       const tenantId: number | undefined = req.tenantId;
       if (!tenantId) return res.status(400).json({ message: "Tenant required" });
       const { pin } = req.body;
       if (!pin) return res.status(400).json({ message: "PIN required" });
+      const ip = getRealIp(req as any);
 
-      // 1. Check the store-wide Owner / Override PIN first (stored on the tenant row)
       const tenant = await storage.getTenant(tenantId);
-      if (tenant?.adminOverridePin && await verifyPassword(String(pin), tenant.adminOverridePin)) {
-        // Log in as the tenant's super-manager / owner
-        const ownerRows = await db.execute(
-          sql`SELECT id FROM users WHERE tenant_id = ${tenantId} AND is_superior_manager = true ORDER BY id ASC LIMIT 1`
-        );
-        const ownerId = (ownerRows.rows[0] as any)?.id;
-        if (ownerId) {
-          const owner = await storage.getUser(ownerId);
-          if (owner) {
-            const token = generateToken(owner);
-            setAuthCookie(res, token);
-            return res.json({ ...sanitizeUser(owner), token });
+
+      // ── Check tenant-level lockout (override PIN brute-force) ──────────────
+      const posLockedUntil: Date | null = (tenant as any)?.posPinLockedUntil
+        ? new Date((tenant as any).posPinLockedUntil) : null;
+      if (posLockedUntil && posLockedUntil > new Date()) {
+        const until = posLockedUntil.toLocaleString('en-US', { timeZone: 'America/Chicago', hour: 'numeric', minute: '2-digit', hour12: true, month: 'short', day: 'numeric' });
+        return res.status(423).json({ message: `POS sign-in is locked until ${until}. Contact the store owner.`, locked: true });
+      }
+
+      // 1. Check the store-wide override PIN
+      if (tenant?.adminOverridePin) {
+        const overrideMatch = await verifyPassword(String(pin), tenant.adminOverridePin);
+        if (overrideMatch) {
+          // Reset lockout counter on success
+          await db.execute(sql`UPDATE tenants SET pos_pin_failed_attempts = 0, pos_pin_locked_until = NULL WHERE id = ${tenantId}`);
+          await db.execute(sql`INSERT INTO pin_attempt_log (tenant_id, event_type, ip_address, success) VALUES (${tenantId}, 'pos_override_pin', ${ip}, true)`).catch(() => {});
+          const ownerRows = await db.execute(sql`SELECT id FROM users WHERE tenant_id = ${tenantId} AND is_superior_manager = true ORDER BY id ASC LIMIT 1`);
+          const ownerId = (ownerRows.rows[0] as any)?.id;
+          if (ownerId) {
+            const owner = await storage.getUser(ownerId);
+            if (owner) { const token = generateToken(owner); setAuthCookie(res, token); return res.json({ ...sanitizeUser(owner), token }); }
           }
+        } else {
+          // Wrong override PIN — increment lockout counter
+          const cur = ((tenant as any).posPinFailedAttempts ?? 0) + 1;
+          await db.execute(sql`INSERT INTO pin_attempt_log (tenant_id, event_type, ip_address, success) VALUES (${tenantId}, 'pos_override_pin', ${ip}, false)`).catch(() => {});
+          if (cur >= 5) {
+            const lockUntil = new Date(Date.now() + 24 * 60 * 60 * 1000);
+            await db.execute(sql`UPDATE tenants SET pos_pin_failed_attempts = ${cur}, pos_pin_locked_until = ${lockUntil} WHERE id = ${tenantId}`);
+            const until = lockUntil.toLocaleString('en-US', { timeZone: 'America/Chicago', hour: 'numeric', minute: '2-digit', hour12: true, month: 'short', day: 'numeric' });
+            return res.status(423).json({ message: `Too many wrong PINs. POS access is locked until ${until}.`, locked: true });
+          }
+          await db.execute(sql`UPDATE tenants SET pos_pin_failed_attempts = ${cur} WHERE id = ${tenantId}`);
         }
       }
 
-      // 2. Check personal employee_pin on any admin or owner account
+      // 2. Check personal employee_pin on admin / owner accounts (uses per-user lockout)
       const rows = await db.execute(
         sql`SELECT * FROM users WHERE tenant_id = ${tenantId} AND (is_admin = true OR is_superior_manager = true) AND employee_pin IS NOT NULL`
       );
       for (const row of rows.rows as any[]) {
-        if (row.employee_pin && await verifyPassword(String(pin), row.employee_pin)) {
+        if (!row.employee_pin) continue;
+        // Check per-user PIN lockout
+        const userLockedUntil: Date | null = row.pin_locked_until ? new Date(row.pin_locked_until) : null;
+        if (userLockedUntil && userLockedUntil > new Date()) continue; // skip locked accounts
+        const match = await verifyPassword(String(pin), row.employee_pin);
+        if (match) {
+          await db.execute(sql`UPDATE users SET pin_failed_attempts = 0, pin_locked_until = NULL WHERE id = ${row.id}`);
+          await db.execute(sql`INSERT INTO pin_attempt_log (tenant_id, event_type, employee_code, ip_address, success) VALUES (${tenantId}, 'pos_admin_pin', ${row.employee_code ?? null}, ${ip}, true)`).catch(() => {});
           const user = await storage.getUser(row.id);
           if (!user) continue;
           const token = generateToken(user);
           setAuthCookie(res, token);
           return res.json({ ...sanitizeUser(user), token });
+        } else {
+          const newAttempts = ((row.pin_failed_attempts) ?? 0) + 1;
+          await db.execute(sql`INSERT INTO pin_attempt_log (tenant_id, event_type, employee_code, ip_address, success) VALUES (${tenantId}, 'pos_admin_pin', ${row.employee_code ?? null}, ${ip}, false)`).catch(() => {});
+          if (newAttempts >= 5) {
+            const lockUntil = new Date(Date.now() + 24 * 60 * 60 * 1000);
+            await db.execute(sql`UPDATE users SET pin_failed_attempts = ${newAttempts}, pin_locked_until = ${lockUntil} WHERE id = ${row.id}`);
+          } else {
+            await db.execute(sql`UPDATE users SET pin_failed_attempts = ${newAttempts} WHERE id = ${row.id}`);
+          }
         }
       }
 
-      return res.status(401).json({ message: "Incorrect PIN" });
+      return res.status(401).json({ message: "Incorrect PIN. Too many wrong attempts will lock POS access for 24 hours." });
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 

@@ -257,3 +257,19 @@ export const overridePinSlugLimiter = rateLimit({
   },
   message: { message: "Too many override PIN attempts for this store, please try again in 15 minutes." },
 });
+
+// ─── rosterLimiter — throttle the public employee roster endpoint ─────────────
+//
+// /api/employee/roster is intentionally unauthenticated (employees use it
+// before signing in), but that makes it a scraping target.  This limiter caps
+// requests at 20 per 5 minutes per real IP, which is generous for legitimate
+// use (a device refreshes maybe once per session) but makes automated
+// enumeration slow and noisy.
+export const rosterLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: getRealIp,
+  message: { message: "Too many requests. Please wait a few minutes." },
+});

@@ -46,6 +46,11 @@ export default function Auth() {
   const [storeCodeError, setStoreCodeError] = useState("");
   const [storeCodeLoading, setStoreCodeLoading] = useState(false);
 
+  // Owner / admin two-factor auth state
+  const [pending2fa, setPending2fa] = useState<{ userId: string } | null>(null);
+  const [twoFaCode, setTwoFaCode] = useState("");
+  const [twoFaLoading, setTwoFaLoading] = useState(false);
+
   const handleStoreCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const code = storeCodeInput.trim().toLowerCase();
@@ -220,37 +225,23 @@ export default function Auth() {
       
       if (response.ok) {
         const userData = await response.json();
-        
+
+        // Owner/admin 2FA — server returns requires2fa:true instead of a JWT
+        if (userData.requires2fa) {
+          setPending2fa({ userId: userData.userId });
+          return;
+        }
+
         // Store token in localStorage as backup to cookies
         if (userData.token) {
           localStorage.setItem('token', userData.token);
         }
 
-        // Seed the React Query auth cache with the login response so that
-        // App.tsx's Router can evaluate the tenantId guard in the same
-        // navigation without waiting for a separate /api/auth/user round-trip.
-        // This is especially important for stranded users (tenantId=null): the
-        // NoTenantScreen guard in Router fires immediately, so there is no
-        // blank/broken intermediate state and no full page reload is needed.
         queryClient.setQueryData(["/api/auth/user"], userData);
 
         if (!userData.tenantId && !userData.isSuperAdmin) {
-          // Stranded user — navigate in-app so NoTenantScreen appears instantly
-          // without a hard page reload.  The Router guard detects tenantId=null
-          // and renders NoTenantScreen before any tenant-scoped route is shown.
           setLocation('/');
         } else {
-          // Normal user — force a complete page reload so the tenant slug, session
-          // cookie, and any per-tenant config are all picked up cleanly.
-          //
-          // Safety: `window.location.replace` is called synchronously in the same
-          // call stack as `setQueryData` above — there is no `await` between them.
-          // React batches state updates and only flushes renders after the current
-          // synchronous execution completes, but `window.location.replace` initiates
-          // page unload *before* that render opportunity arrives.  The browser never
-          // gives React a chance to paint the seeded cache, so NoTenantScreen cannot
-          // flash for a normal user (whose tenantId is truthy and therefore bypasses
-          // the `!userData.tenantId` guard in the first place).
           window.location.replace('/');
         }
       } else {
@@ -279,6 +270,33 @@ export default function Auth() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleVerify2fa = async () => {
+    if (!pending2fa || twoFaCode.length !== 6 || twoFaLoading) return;
+    setTwoFaLoading(true);
+    try {
+      const res = await fetch('/api/auth/verify-2fa', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: pending2fa.userId, code: twoFaCode }),
+      });
+      if (res.ok) {
+        const userData = await res.json();
+        if (userData.token) localStorage.setItem('token', userData.token);
+        queryClient.setQueryData(["/api/auth/user"], userData);
+        window.location.replace('/');
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast({ title: "Incorrect code", description: err.message ?? "The code was wrong or expired. Try again.", variant: "destructive" });
+        setTwoFaCode("");
+      }
+    } catch {
+      toast({ title: "Error", description: "Could not verify. Please try again.", variant: "destructive" });
+    } finally {
+      setTwoFaLoading(false);
     }
   };
 
@@ -412,6 +430,49 @@ export default function Auth() {
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Home
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Owner / admin 2FA screen ──────────────────────────────────────────────
+  if (pending2fa) {
+    return (
+      <div className="w-full min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          <Card className="bg-white/10 backdrop-blur-md border border-white/20 text-center">
+            <CardContent className="pt-8 pb-8 space-y-4">
+              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto text-3xl">🔐</div>
+              <h2 className="text-2xl font-bold text-white">Two-Factor Verification</h2>
+              <p className="text-gray-300 text-sm">
+                A 6-digit code was sent to your email. Enter it below to complete sign-in.
+              </p>
+              <Input
+                value={twoFaCode}
+                onChange={e => setTwoFaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="000000"
+                className="bg-white/10 border-white/30 text-white placeholder:text-gray-400 text-center text-2xl tracking-[0.5em]"
+                maxLength={6}
+                inputMode="numeric"
+                autoFocus
+                onKeyDown={e => { if (e.key === 'Enter') handleVerify2fa(); }}
+              />
+              <Button
+                className="w-full bg-blue-600 hover:bg-blue-700"
+                onClick={handleVerify2fa}
+                disabled={twoFaCode.length !== 6 || twoFaLoading}
+              >
+                {twoFaLoading ? "Verifying…" : "Verify & Sign In"}
+              </Button>
+              <Button
+                variant="ghost"
+                className="text-gray-400 hover:text-white text-sm w-full"
+                onClick={() => { setPending2fa(null); setTwoFaCode(""); }}
+              >
+                ← Back to Sign In
               </Button>
             </CardContent>
           </Card>

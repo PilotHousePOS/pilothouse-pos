@@ -598,3 +598,46 @@ export async function sendNoTenantAlertToSuperAdmins(strandedUser: {
     // Non-fatal — never block the user response for an alert failure
   }
 }
+
+export async function send2faCodeEmail(
+  toEmail: string,
+  firstName: string,
+  code: string,
+): Promise<void> {
+  try {
+    const { client, fromEmail, replyTo } = await getUncachableSendGridClient();
+    await client.send({
+      to: toEmail,
+      from: { email: fromEmail, name: 'PilotHouse' },
+      replyTo,
+      subject: 'PilotHouse – Your Sign-In Verification Code',
+      text: `Hi ${firstName},\n\nYour sign-in verification code is: ${code}\n\nThis code expires in 10 minutes. If you did not attempt to sign in, please change your password immediately.\n\nPilotHouse\n(318) 322-3023`,
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+          <div style="background-color:#dc2626;color:white;padding:20px;text-align:center;">
+            <h1 style="margin:0;">PilotHouse</h1>
+          </div>
+          <div style="padding:30px;background-color:#f9f9f9;">
+            <h2 style="color:#333;">Sign-In Verification</h2>
+            <p style="font-size:16px;color:#444;">Hi ${firstName},</p>
+            <p style="font-size:16px;color:#444;">Enter this code to complete your sign-in:</p>
+            <div style="text-align:center;margin:30px 0;">
+              <span style="font-size:40px;font-weight:bold;letter-spacing:10px;color:#dc2626;background:#fff;border:2px solid #dc2626;padding:14px 28px;border-radius:8px;">${code}</span>
+            </div>
+            <div style="background:#fef3c7;border:1px solid #f59e0b;padding:15px;border-radius:5px;margin:20px 0;">
+              <p style="margin:0;color:#92400e;font-size:14px;"><strong>Expires in 10 minutes.</strong> If you did not try to sign in, change your password immediately.</p>
+            </div>
+          </div>
+          <div style="background-color:#1f2937;color:#d1d5db;padding:15px;text-align:center;font-size:12px;">
+            <p style="margin:0 0 5px 0;"><strong>PilotHouse</strong></p>
+            <p style="margin:0 0 5px 0;">2934 Cypress St, West Monroe, LA 71291</p>
+            <p style="margin:0;">Phone: (318) 322-3023</p>
+          </div>
+        </div>
+      `,
+    });
+  } catch (error: any) {
+    console.error('Error sending 2FA code email:', error);
+    throw new Error('Failed to send verification code');
+  }
+}

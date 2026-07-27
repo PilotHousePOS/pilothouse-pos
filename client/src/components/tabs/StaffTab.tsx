@@ -24,7 +24,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import {
   UserPlus, Pencil, Trash2, ShieldCheck, TrendingUp,
-  KeyRound, Shield, Copy, Check, Lock, Settings2,
+  KeyRound, Shield, Copy, Check, Lock, Settings2, LogOut as ForceSignOutIcon, ShieldAlert,
 } from "lucide-react";
 import type { User } from "@shared/schema";
 import GroomersSection from "@/components/tabs/GroomersSection";
@@ -254,6 +254,16 @@ export default function StaffTab({ typedUser }: Props) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["/api/admin/employees"] }),
   });
 
+  const forceSignOutMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("POST", `/api/admin/employees/${id}/force-signout`, {}),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["/api/admin/employees"] }),
+  });
+
+  const { data: securityLog = [] } = useQuery<any[]>({
+    queryKey: ["/api/admin/security-log"],
+    refetchInterval: 30_000,
+  });
+
   const pinMutation = useMutation({
     mutationFn: ({ id, pin }: { id: string; pin: string }) =>
       apiRequest("POST", `/api/admin/employees/${id}/set-pin`, { pin }),
@@ -467,6 +477,17 @@ export default function StaffTab({ typedUser }: Props) {
                               </Button>
                             );
                           })()}
+                          {/* Orange force-sign-out icon — invalidates all active sessions instantly */}
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            title="Force sign out — ends all active sessions for this employee"
+                            className="text-orange-400 hover:text-orange-600"
+                            disabled={forceSignOutMutation.isPending}
+                            onClick={() => forceSignOutMutation.mutate(emp.id)}
+                          >
+                            <ForceSignOutIcon className="h-4 w-4" />
+                          </Button>
                           <Button size="icon" variant="ghost" title="Set PIN" onClick={() => { setPinEmployee(emp); setNewPin(""); }}>
                             <KeyRound className="h-4 w-4" />
                           </Button>
@@ -989,6 +1010,45 @@ export default function StaffTab({ typedUser }: Props) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* ── Security Log ── */}
+      {!typedUser?.isEmployee && securityLog.length > 0 && (
+        <div className="mt-6">
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-1.5">
+            <ShieldAlert className="h-4 w-4 text-orange-500" /> Recent Sign-In Activity
+          </h3>
+          <div className="rounded-lg border overflow-hidden text-xs">
+            <table className="w-full">
+              <thead className="bg-muted/50">
+                <tr>
+                  <th className="text-left px-3 py-2 font-medium text-muted-foreground">Event</th>
+                  <th className="text-left px-3 py-2 font-medium text-muted-foreground">Code</th>
+                  <th className="text-left px-3 py-2 font-medium text-muted-foreground">IP</th>
+                  <th className="text-left px-3 py-2 font-medium text-muted-foreground">Result</th>
+                  <th className="text-left px-3 py-2 font-medium text-muted-foreground">Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {securityLog.slice(0, 15).map((row: any) => (
+                  <tr key={row.id} className={`border-t ${!row.success ? 'bg-red-50' : ''}`}>
+                    <td className="px-3 py-1.5 text-muted-foreground">{row.event_type?.replace(/_/g, ' ')}</td>
+                    <td className="px-3 py-1.5 font-mono">{row.employee_code ?? '—'}</td>
+                    <td className="px-3 py-1.5 font-mono text-muted-foreground">{row.ip_address ?? '—'}</td>
+                    <td className="px-3 py-1.5">
+                      {row.success
+                        ? <span className="text-green-600 font-medium">✓ OK</span>
+                        : <span className="text-red-600 font-medium">✗ Failed</span>}
+                    </td>
+                    <td className="px-3 py-1.5 text-muted-foreground whitespace-nowrap">
+                      {new Date(row.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* ── Delete Confirm ── */}
       <Dialog open={!!deleteConfirm} onOpenChange={v => !v && setDeleteConfirm(null)}>
