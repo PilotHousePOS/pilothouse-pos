@@ -178,6 +178,62 @@ export function registerTerminalRoutes(app: Express): void {
     }
   });
 
+  // ── POST /api/terminal/ping ───────────────────────────────────────────────
+  /**
+   * Test whether the server can open a TCP connection to the given IP/port.
+   * Used by the Hardware Settings UI "Test Connection" button.
+   *
+   * Body: { terminalIp, terminalPort? }
+   */
+  app.post("/api/terminal/ping", authMiddleware, async (req: any, res) => {
+    try {
+      const tenantId: number | undefined = req.tenantId;
+      if (!tenantId) return res.status(400).json({ message: "No tenant context" });
+
+      // Admin only — same guard as PUT /api/terminal/config
+      const user = req.user as any;
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+
+      const ip   = req.body.terminalIp   as string | undefined;
+      const rawPort = req.body.terminalPort;
+      const port = rawPort !== undefined ? Number(rawPort) : 9100;
+
+      if (!ip) return res.status(400).json({ message: "terminalIp is required" });
+      if (!isPrivateOrLoopback(ip)) {
+        return res.status(400).json({ message: `${ip} is not a private/LAN address` });
+      }
+
+      // Validate port range
+      if (!Number.isInteger(port) || port < 1 || port > 65535) {
+        return res.status(400).json({ message: "terminalPort must be an integer between 1 and 65535" });
+      }
+
+      // Attempt a TCP connection with a 3-second timeout
+      const net = await import("net");
+      await new Promise<void>((resolve, reject) => {
+        const sock = new net.Socket();
+        const timer = setTimeout(() => {
+          sock.destroy();
+          reject(new Error(`Timed out connecting to ${ip}:${port}`));
+        }, 3000);
+        sock.connect(port, ip, () => {
+          clearTimeout(timer);
+          sock.destroy();
+          resolve();
+        });
+        sock.on("error", (err) => {
+          clearTimeout(timer);
+          sock.destroy();
+          reject(err);
+        });
+      });
+
+      res.json({ success: true, message: `Connected to ${ip}:${port}` });
+    } catch (e: any) {
+      res.status(502).json({ message: e.message ?? "Connection failed" });
+    }
+  });
+
   // ── GET /api/terminal/config ──────────────────────────────────────────────
   /**
    * Returns the tenant's terminal configuration (no secrets).

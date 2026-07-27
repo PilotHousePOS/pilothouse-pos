@@ -10,7 +10,7 @@ import {
   ChevronLeft, DollarSign, CreditCard, Search, Settings, X,
   ChevronUp, ChevronDown, Pencil, Trash2, Plus, Check, GripVertical,
   Lock, Unlock, Delete, LogOut, UserCircle, Eye, EyeOff, WifiOff,
-  Printer, Tag, AlertCircle, Loader2, Zap,
+  Printer, Tag, AlertCircle, Loader2, Zap, Save, Wifi,
 } from "lucide-react";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { OfflineBanner } from "@/components/offline-banner";
@@ -618,6 +618,12 @@ export default function PosPage() {
   const [showHardwareWizard, setShowHardwareWizard] = useState(false);
   // Terminal is processing a card charge right now
   const [terminalProcessing, setTerminalProcessing] = useState(false);
+
+  // ── Card Terminal LAN config ──
+  const [terminalIpDraft, setTerminalIpDraft]     = useState("");
+  const [terminalPortDraft, setTerminalPortDraft] = useState("9100");
+  const [terminalSaving, setTerminalSaving]       = useState(false);
+  const [terminalTesting, setTerminalTesting]     = useState(false);
   // Stores the last completed sale for the "Print Sale" reprint button
   const lastCompletedSaleRef = useRef<{
     orderNumber: string; items: OrderItem[]; subtotal: number;
@@ -771,6 +777,66 @@ export default function PosPage() {
     },
     onError: () => toast({ title: "Error", description: "Failed to save footer", variant: "destructive" }),
   });
+
+  // ── Card Terminal LAN config (load on mount) ──
+  const { data: terminalConfig } = useQuery<{
+    terminalIp: string | null; terminalPort: number; transport: string;
+  }>({
+    queryKey: ["/api/terminal/config"],
+    staleTime: 60_000,
+  });
+
+  // Sync fetched values into draft fields (once loaded)
+  useEffect(() => {
+    if (terminalConfig) {
+      setTerminalIpDraft(terminalConfig.terminalIp ?? "");
+      setTerminalPortDraft(String(terminalConfig.terminalPort ?? 9100));
+    }
+  }, [terminalConfig]);
+
+  const saveTerminalConfig = async () => {
+    setTerminalSaving(true);
+    try {
+      const res = await apiRequest("PUT", "/api/terminal/config", {
+        terminalIp:   terminalIpDraft.trim() || null,
+        terminalPort: Number(terminalPortDraft) || 9100,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/terminal/config"] });
+      toast({ title: "Terminal saved", description: "Card terminal configuration updated." });
+    } catch (err: any) {
+      toast({ title: "Save failed", description: err?.message ?? "Could not save terminal config.", variant: "destructive" });
+    } finally {
+      setTerminalSaving(false);
+    }
+  };
+
+  const testTerminalConnection = async () => {
+    const ip   = terminalIpDraft.trim();
+    const port = Number(terminalPortDraft) || 9100;
+    if (!ip) {
+      toast({ title: "No IP entered", description: "Enter an IP address before testing.", variant: "destructive" });
+      return;
+    }
+    setTerminalTesting(true);
+    try {
+      const res = await fetch("/api/terminal/ping", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ terminalIp: ip, terminalPort: port }),
+      });
+      if (res.ok) {
+        toast({ title: "Connection successful", description: `Reached ${ip}:${port}` });
+      } else {
+        const body = await res.json().catch(() => ({}));
+        toast({ title: "Connection failed", description: body?.message ?? `Could not reach ${ip}:${port}`, variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Connection failed", description: `Could not reach ${ip}:${port}`, variant: "destructive" });
+    } finally {
+      setTerminalTesting(false);
+    }
+  };
 
   // ── Tenant supply categories (for the "Inventory Category" picker in settings) ──
   const { data: tenantCategories = [] } = useQuery<{ key: string; label: string }[]>({
@@ -2282,6 +2348,77 @@ export default function PosPage() {
                   hw={hw}
                   onSuccess={(_, name) => toast({ title: `${name} connected`, duration: 2000 })}
                 />
+
+                {/* ── Card Terminal LAN config ─────────────────────────── */}
+                <div className="border-t border-gray-700 pt-5 space-y-3">
+                  <div>
+                    <h2 className="text-base font-bold text-white mb-1">Card Terminal</h2>
+                    <p className="text-xs text-gray-400 leading-relaxed">
+                      Enter the terminal's local network address so the POS can reach it over TCP.
+                      Leave blank to use Web Serial instead.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-xs text-gray-400">IP Address</label>
+                      <Input
+                        value={terminalIpDraft}
+                        onChange={e => setTerminalIpDraft(e.target.value)}
+                        placeholder="e.g. 192.168.1.50"
+                        className="bg-gray-800 border-gray-600 text-white text-sm font-mono placeholder:text-gray-600"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs text-gray-400">Port</label>
+                      <Input
+                        value={terminalPortDraft}
+                        onChange={e => setTerminalPortDraft(e.target.value)}
+                        placeholder="9100"
+                        type="number"
+                        min={1}
+                        max={65535}
+                        className="bg-gray-800 border-gray-600 text-white text-sm font-mono placeholder:text-gray-600"
+                      />
+                    </div>
+                  </div>
+
+                  {terminalConfig?.transport && (
+                    <p className="text-xs text-gray-500">
+                      Active transport:{' '}
+                      <span className={
+                        terminalConfig.transport === 'tcp'
+                          ? 'text-green-400 font-semibold'
+                          : 'text-gray-400'
+                      }>
+                        {terminalConfig.transport}
+                      </span>
+                    </p>
+                  )}
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={saveTerminalConfig}
+                      disabled={terminalSaving}
+                      className="flex items-center gap-2 text-sm bg-blue-700 hover:bg-blue-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                    >
+                      {terminalSaving
+                        ? <Loader2 className="h-4 w-4 animate-spin" />
+                        : <Save className="h-4 w-4" />}
+                      Save
+                    </button>
+                    <button
+                      onClick={testTerminalConnection}
+                      disabled={terminalTesting || !terminalIpDraft.trim()}
+                      className="flex items-center gap-2 text-sm bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                    >
+                      {terminalTesting
+                        ? <Loader2 className="h-4 w-4 animate-spin" />
+                        : <Wifi className="h-4 w-4" />}
+                      Test Connection
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
 
