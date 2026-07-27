@@ -30,7 +30,7 @@ const ENCRYPTION_KEY = crypto
   .update(process.env.SESSION_SECRET || 'pilotHouse-placeholder-key')
   .digest(); // always 32 bytes
 
-function encryptToken(text: string): string {
+export function encryptToken(text: string): string {
   const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv('aes-256-cbc', ENCRYPTION_KEY, iv);
   let enc = cipher.update(text, 'utf8', 'hex');

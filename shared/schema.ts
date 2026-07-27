@@ -53,6 +53,21 @@ export const insertTenantSchema = createInsertSchema(tenants).omit({ id: true, c
 export type Tenant = typeof tenants.$inferSelect;
 export type InsertTenant = z.infer<typeof insertTenantSchema>;
 
+// ─── Per-tenant payment processors ───────────────────────────────────────────
+// Stores OAuth credentials for each connected payment processor.
+// Tokens are AES-256-CBC encrypted (see tenantPaymentRoutes.ts).
+export const tenantPaymentProcessors = pgTable("tenant_payment_processors", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").notNull().references(() => tenants.id, { onDelete: "cascade" }),
+  processorType: varchar("processor_type", { length: 50 }).notNull(), // 'stripe' | 'square' | 'paypal'
+  encryptedAccessToken: text("encrypted_access_token").notNull(),
+  encryptedRefreshToken: text("encrypted_refresh_token"),
+  accountDisplayName: varchar("account_display_name", { length: 255 }), // merchant name shown in UI
+  accountId: varchar("account_id", { length: 255 }), // Stripe acct_xxx / Square location_id / PayPal payer_id
+  isActive: boolean("is_active").notNull().default(false),
+  connectedAt: timestamp("connected_at").defaultNow(),
+});
+
 // Session storage table for Replit Auth
 export const sessions = pgTable(
   "sessions",

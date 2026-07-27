@@ -34,6 +34,35 @@ export default function OrderHistory() {
   const [reorderQuantities, setReorderQuantities] = useState<Record<number, number>>({});
   const { toast } = useToast();
 
+  // Handle redirect back from Stripe / Square / PayPal after the customer pays
+  const { data: _orders, refetch: refetchOrders } = useQuery<Order[]>({ queryKey: ["/api/orders"] });
+  useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const orderPaid = params.get("orderPaid");
+    const sessionId = params.get("session_id"); // present for Stripe, absent for Square/PayPal
+    if (!orderPaid) return;
+    const orderId = parseInt(orderPaid);
+    if (isNaN(orderId)) return;
+    // Strip params immediately so a page refresh doesn't re-confirm
+    const clean = window.location.pathname;
+    window.history.replaceState({}, "", clean);
+    apiRequest("POST", `/api/orders/${orderId}/confirm-payment`, { sessionId: sessionId || undefined })
+      .then(r => r.json())
+      .then((result: any) => {
+        if (result?.pending) {
+          toast({ title: "Order submitted", description: "We received your order — payment will be confirmed once the processor notifies us.", variant: "default" });
+        } else if (result?.success || result?.alreadyPaid) {
+          toast({ title: "Payment confirmed!", description: "Your order has been submitted and is being prepared." });
+        } else {
+          toast({ title: "Order submitted", description: "We received your order — payment will be confirmed shortly.", variant: "default" });
+        }
+        refetchOrders();
+      })
+      .catch(() => {
+        toast({ title: "Order submitted", description: "We received your order — payment will be confirmed shortly.", variant: "default" });
+      });
+  });
+
   const getReorderQuantity = (itemId: number, originalQuantity: number) => {
     return reorderQuantities[itemId] ?? originalQuantity;
   };

@@ -68,7 +68,8 @@ async function withRetry<T>(operation: () => Promise<T>, maxRetries = 3, delayMs
 import { extractOrderFromPhoto, apply99Pricing } from './orderPhotoProcessor';
 import { categorizeProduct, detectLiveAnimal } from './productCategorization';
 import { registerBillingRoutes } from './billingRoutes';
-import { registerStripeConnectRoutes, getTenantConnectAccountId } from './stripeConnectRoutes';
+import { registerStripeConnectRoutes } from './stripeConnectRoutes';
+import { registerTenantPaymentRoutes } from './tenantPaymentRoutes';
 // Shared-pool limiters MUST be imported from sharedLimiters.ts — never
 // re-created inline.  See server/sharedLimiters.ts for the full explanation.
 import { getRealIp, authLimiter, searchLimiter, checkoutLimiter, uploadLimiter, overridePinLimiter, overridePinSlugLimiter, rosterLimiter } from './sharedLimiters';
@@ -458,6 +459,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   // available in every handler. billingRoutes is exempt because it resolves
   // tenantId via user record lookup rather than req.tenantId.
   registerStripeConnectRoutes(app);
+  registerTenantPaymentRoutes(app);
 
   // Stripe API routes
   app.get("/api/stripe/config", async (req, res) => {
@@ -4541,61 +4543,54 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         });
         await storage.updateOrderApprovalStatus(orderId, 'approved', tenantId);
         console.log(`Order #${orderId} approved - fully discounted ($0.00), no payment needed`);
-      } else if (orderOwner?.stripeCustomerId && orderOwner?.stripeDefaultPaymentMethod) {
-        // Try to charge the customer's saved payment method
-        try {
-          const { getUncachableStripeClient } = await import('./stripeClient');
-          const stripe = await getUncachableStripeClient();
-          
-          const amountCents = Math.round(orderTotalAmount * 100);
-
-          // Route through the tenant's connected Stripe account when configured,
-          // so the merchant receives the funds directly (destination charge).
-          const _connectAcctApprove = await getTenantConnectAccountId((req as any).tenantId);
-
-          // Create and confirm a PaymentIntent with the saved payment method
-          const paymentIntent = await stripe.paymentIntents.create({
-            amount: amountCents,
-            currency: 'usd',
-            customer: orderOwner.stripeCustomerId,
-            payment_method: orderOwner.stripeDefaultPaymentMethod,
-            off_session: true, // Charging without customer present
-            confirm: true, // Charge immediately
-            description: `Order #${orderId} - PilotHouse`,
-            metadata: {
-              orderId: orderId.toString(),
-              customerId: order.userId,
-            },
-            ...(_connectAcctApprove ? { transfer_data: { destination: _connectAcctApprove } } : {}),
-          }, {
-            idempotencyKey: `order-approve-${orderId}`,
-          });
-          
-          if (paymentIntent.status === 'succeeded') {
-            paymentSuccessful = true;
-            paymentIntentId = paymentIntent.id;
-            
-            // Update order with payment info
-            await storage.updateOrderStripePayment(orderId, {
-              stripePaymentIntentId: paymentIntentId,
-              paymentStatus: 'paid',
-              paidAt: new Date(),
-            });
-            
-            // Keep order in "approved" status - admin needs to manually gather items
-            // and move to "ready_for_pickup" when the order is actually ready
-            await storage.updateOrderApprovalStatus(orderId, 'approved', tenantId);
-            
-            console.log(`Order #${orderId} approved and payment charged successfully: ${paymentIntentId}`);
-          } else {
-            paymentError = `Payment status: ${paymentIntent.status}`;
-          }
-        } catch (stripeError: any) {
-          console.error("Failed to charge saved payment method:", stripeError);
-          paymentError = stripeError.message;
-        }
       } else {
-        paymentError = "No saved payment method";
+        // Route payment through the tenant's own connected processor.
+        // Platform Stripe is not involved in tenant transactions.
+        try {
+          const { getActiveTenantProcessor, createTenantStripeClient, createSquarePaymentLink, createPayPalCheckout } = await import('./tenantPaymentHelper');
+          const processor = await getActiveTenantProcessor(tenantId);
+
+          if (!processor) {
+            return res.status(402).json({
+              message: 'No payment processor configured. Connect a payment processor in Payment Settings to accept online payments.',
+              code: 'NO_PAYMENT_PROCESSOR',
+            });
+          }
+
+          const origin = req.headers.origin || `https://${req.headers.host}`;
+          const amountCents = Math.round(orderTotalAmount * 100);
+          let checkoutUrl: string | null | undefined;
+
+          if (processor.processorType === 'stripe') {
+            const tenantStripe = createTenantStripeClient(processor);
+            const session = await tenantStripe.checkout.sessions.create({
+              payment_method_types: ['card'],
+              line_items: [{ price_data: { currency: 'usd', product_data: { name: `Order #${orderId}` }, unit_amount: amountCents }, quantity: 1 }],
+              mode: 'payment',
+              success_url: `${origin}/order-history?orderPaid=${orderId}&session_id={CHECKOUT_SESSION_ID}`,
+              cancel_url: `${origin}/order-history`,
+              customer_email: customerEmail || undefined,
+              metadata: { orderId: orderId.toString(), type: 'order' },
+            }, { idempotencyKey: `order-approve-${orderId}` });
+            checkoutUrl = session.url;
+            await storage.updateOrderStripePayment(orderId, { stripeCheckoutSessionId: session.id, stripePaymentUrl: session.url!, paymentStatus: 'pending' });
+          } else if (processor.processorType === 'square') {
+            checkoutUrl = await createSquarePaymentLink(processor, amountCents, `Order #${orderId}`, `${origin}/order-history?orderPaid=${orderId}`);
+            if (checkoutUrl) await storage.updateOrderStripePayment(orderId, { stripePaymentUrl: checkoutUrl, paymentStatus: 'pending' });
+          } else if (processor.processorType === 'paypal') {
+            checkoutUrl = await createPayPalCheckout(processor, amountCents, `Order #${orderId}`, `${origin}/order-history?orderPaid=${orderId}`, `${origin}/order-history`);
+            if (checkoutUrl) await storage.updateOrderStripePayment(orderId, { stripePaymentUrl: checkoutUrl, paymentStatus: 'pending' });
+          }
+
+          if (checkoutUrl) {
+            await storage.updateOrderApprovalStatus(orderId, 'approved', tenantId);
+            return res.json({ success: true, paymentSuccessful: false, requiresCustomerPayment: true, checkoutUrl, message: 'Order approved. Share the payment link with the customer to collect payment.' });
+          }
+          paymentError = 'Failed to create payment link via processor';
+        } catch (procError: any) {
+          console.error('Failed to create payment via processor:', procError);
+          paymentError = procError.message;
+        }
       }
       
       // If automatic charge failed, just approve and notify admin
@@ -4724,59 +4719,109 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         return res.status(400).json({ message: "Order is already paid" });
       }
       
-      const orderOwner = await storage.getUser(order.userId);
-      
-      if (!orderOwner?.stripeCustomerId || !orderOwner?.stripeDefaultPaymentMethod) {
-        return res.status(400).json({ message: "Customer has no saved payment method on file" });
-      }
-      
-      const { getUncachableStripeClient } = await import('./stripeClient');
-      const stripe = await getUncachableStripeClient();
-      
       const amountCents = Math.round(parseFloat(order.totalAmount) * 100);
-      
-      const retryKey = req.body?.idempotencyKey || `order-retry-${orderId}-${Date.now()}`;
-      const _connectAcctRetry = await getTenantConnectAccountId((req as any).tenantId);
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: amountCents,
-        currency: 'usd',
-        customer: orderOwner.stripeCustomerId,
-        payment_method: orderOwner.stripeDefaultPaymentMethod,
-        off_session: true,
-        confirm: true,
-        description: `Order #${orderId} - PilotHouse (Retry)`,
-        metadata: {
-          orderId: orderId.toString(),
-          customerId: order.userId,
-        },
-        ...(_connectAcctRetry ? { transfer_data: { destination: _connectAcctRetry } } : {}),
-      }, {
-        idempotencyKey: retryKey,
-      });
-      
-      if (paymentIntent.status === 'succeeded') {
-        await storage.updateOrderStripePayment(orderId, {
-          stripePaymentIntentId: paymentIntent.id,
-          paymentStatus: 'paid',
-          paidAt: new Date(),
-        });
-        
-        console.log(`Order #${orderId} payment retry succeeded: ${paymentIntent.id}`);
-        
-        res.json({ 
-          success: true, 
-          message: "Payment charged successfully",
-          paymentIntentId: paymentIntent.id,
-        });
-      } else {
-        res.status(400).json({ 
-          success: false, 
-          message: `Payment status: ${paymentIntent.status}` 
+
+      // Route through the tenant's own connected processor
+      const { getActiveTenantProcessor, createTenantStripeClient, createSquarePaymentLink, createPayPalCheckout } = await import('./tenantPaymentHelper');
+      const processor = await getActiveTenantProcessor((req as any).tenantId);
+
+      if (!processor) {
+        return res.status(402).json({
+          message: 'No payment processor configured. Connect a payment processor in Payment Settings.',
+          code: 'NO_PAYMENT_PROCESSOR',
         });
       }
+
+      const origin = req.headers.origin || `https://${req.headers.host}`;
+      let checkoutUrl: string | null | undefined;
+
+      if (processor.processorType === 'stripe') {
+        const tenantStripe = createTenantStripeClient(processor);
+        const session = await tenantStripe.checkout.sessions.create({
+          payment_method_types: ['card'],
+          line_items: [{ price_data: { currency: 'usd', product_data: { name: `Order #${orderId} (retry)` }, unit_amount: amountCents }, quantity: 1 }],
+          mode: 'payment',
+          success_url: `${origin}/order-history?orderPaid=${orderId}&session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${origin}/order-history`,
+          customer_email: order.customerEmail || undefined,
+          metadata: { orderId: orderId.toString(), type: 'order' },
+        }, { idempotencyKey: `order-retry-${orderId}` });
+        checkoutUrl = session.url;
+        await storage.updateOrderStripePayment(orderId, { stripeCheckoutSessionId: session.id, stripePaymentUrl: session.url!, paymentStatus: 'pending' });
+      } else if (processor.processorType === 'square') {
+        checkoutUrl = await createSquarePaymentLink(processor, amountCents, `Order #${orderId}`, `${origin}/order-history?orderPaid=${orderId}`);
+        if (checkoutUrl) await storage.updateOrderStripePayment(orderId, { stripePaymentUrl: checkoutUrl, paymentStatus: 'pending' });
+      } else if (processor.processorType === 'paypal') {
+        checkoutUrl = await createPayPalCheckout(processor, amountCents, `Order #${orderId}`, `${origin}/order-history?orderPaid=${orderId}`, `${origin}/order-history`);
+        if (checkoutUrl) await storage.updateOrderStripePayment(orderId, { stripePaymentUrl: checkoutUrl, paymentStatus: 'pending' });
+      }
+
+      if (checkoutUrl) {
+        return res.json({ success: true, requiresCustomerPayment: true, checkoutUrl, message: 'Payment link generated — share with the customer.' });
+      }
+      return res.status(500).json({ success: false, message: 'Failed to create payment link via processor' });
     } catch (error: any) {
       console.error("Error retrying payment:", error);
       res.status(500).json({ message: `Payment retry failed: ${error.message}` });
+    }
+  });
+
+  // Confirm an order payment after a Stripe/Square/PayPal redirect
+  // Called by the customer after returning from a hosted checkout page
+  app.post("/api/orders/:id/confirm-payment", authMiddleware, async (req: any, res) => {
+    try {
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      const orderId = parseInt(req.params.id);
+      const { sessionId } = req.body; // may be undefined for Square/PayPal (no session)
+
+      const orderResult = await storage.getOrderWithItems(orderId, tenantId);
+      if (!orderResult) return res.status(404).json({ message: "Order not found" });
+      const orderRecord = orderResult.order ?? (orderResult as any);
+
+      // Only the order owner (or admin) can confirm payment
+      const confirmUser = await storage.getUser(req.user?.id);
+      if (!confirmUser?.isAdmin && orderRecord.userId !== req.user?.id) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+
+      // Already paid — idempotent success
+      if (orderRecord.paymentStatus === 'paid') {
+        return res.json({ success: true, alreadyPaid: true });
+      }
+
+      // Only Stripe sessions can be verified synchronously.
+      // Square/PayPal orders remain pending until a server-to-server webhook confirms payment.
+      if (!sessionId || !sessionId.startsWith('cs_')) {
+        // No verifiable session — return pending status without mutating payment state
+        return res.status(202).json({
+          success: false,
+          pending: true,
+          message: 'Payment is being processed. Your order will be confirmed once the payment clears.',
+        });
+      }
+
+      const { getActiveTenantProcessor, createTenantStripeClient } = await import('./tenantPaymentHelper');
+      const orderProcessor = await getActiveTenantProcessor(tenantId);
+      if (!orderProcessor || orderProcessor.processorType !== 'stripe') {
+        return res.status(400).json({ message: 'Cannot verify Stripe session — no Stripe processor configured for this store.' });
+      }
+
+      const tenantStripe = createTenantStripeClient(orderProcessor);
+      const session = await tenantStripe.checkout.sessions.retrieve(sessionId);
+      if (session.payment_status !== 'paid') {
+        return res.status(400).json({ message: 'Payment not completed yet.' });
+      }
+      if (String(session.metadata?.orderId) !== String(orderId)) {
+        return res.status(400).json({ message: 'Session does not match this order.' });
+      }
+
+      await storage.updateOrderStripePayment(orderId, { stripeCheckoutSessionId: sessionId, paymentStatus: 'paid', paidAt: new Date() });
+      await storage.updateOrderApprovalStatus(orderId, 'approved', tenantId);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error confirming order payment:", error);
+      res.status(500).json({ message: "Failed to confirm order payment" });
     }
   });
 
@@ -7066,37 +7111,36 @@ West Monroe LA 71291
       const tipNum = parseFloat(req.body?.tipAmount || "0") || 0;
       const totalAmount = serviceAmount + tipNum;
 
-      const { getUncachableStripeClient } = await import('./stripeClient');
-      const stripe = await getUncachableStripeClient();
+      // Route through the tenant's own connected processor — no platform Stripe involvement
+      const { getActiveTenantProcessor, createTenantStripeClient, createSquarePaymentLink, createPayPalCheckout } = await import('./tenantPaymentHelper');
+      const processor = await getActiveTenantProcessor(tenantId);
 
-      // Prefer charging the saved card directly (same as order payments — no redirect needed)
-      const customer = await storage.getUser(req.user.id);
-      if (customer?.stripeCustomerId && customer?.stripeDefaultPaymentMethod) {
-        const _connectAcctGroom = await getTenantConnectAccountId((req as any).tenantId);
-        const paymentIntent = await stripe.paymentIntents.create({
-          amount: Math.round(totalAmount * 100),
-          currency: 'usd',
-          customer: customer.stripeCustomerId,
-          payment_method: customer.stripeDefaultPaymentMethod,
-          off_session: true,
-          confirm: true,
-          description: `Grooming appointment #${id} — ${appointment.petName}${tipNum > 0 ? ` (incl. $${tipNum.toFixed(2)} tip)` : ''}`,
-          metadata: { appointmentId: String(id), type: 'grooming', tipAmount: String(tipNum) },
-          ...(_connectAcctGroom ? { transfer_data: { destination: _connectAcctGroom } } : {}),
+      if (!processor) {
+        return res.status(402).json({
+          message: 'No payment processor configured. The store must connect a payment processor in Payment Settings.',
+          code: 'NO_PAYMENT_PROCESSOR',
         });
-
-        if (paymentIntent.status === 'succeeded') {
-          await storage.updateAppointmentPaidOnline(id, paymentIntent.id, tenantId);
-          if (tipNum > 0) {
-            await storage.updateAppointmentTip(id, tipNum.toFixed(2), paymentIntent.id);
-          }
-          return res.json({ success: true, charged: true });
-        }
-        // If PaymentIntent didn't immediately succeed, fall through to Checkout redirect
       }
 
-      // Fallback: no saved card — redirect to Stripe Checkout so customer can enter one
+      // For Square/PayPal: go directly to payment link (no off-session support)
+      // For Stripe (tenant own): go to Checkout Session on their account
       const origin = req.headers.origin || `https://${req.headers.host}`;
+      const amountCents = Math.round(totalAmount * 100);
+
+      if (processor.processorType === 'square' || processor.processorType === 'paypal') {
+        let paymentUrl: string | null | undefined;
+        if (processor.processorType === 'square') {
+          paymentUrl = await createSquarePaymentLink(processor, amountCents, `Grooming appointment #${id} — ${appointment.petName}`, `${origin}/my-appointments?groomingPaid=${id}`);
+        } else {
+          paymentUrl = await createPayPalCheckout(processor, amountCents, `Grooming appointment #${id}`, `${origin}/my-appointments?groomingPaid=${id}`, `${origin}/my-appointments`);
+        }
+        if (!paymentUrl) return res.status(500).json({ message: 'Failed to create payment link' });
+        return res.json({ checkoutUrl: paymentUrl, sessionId: null });
+      }
+
+      // Stripe (tenant own): use their Stripe key for Checkout Session (below)
+
+      // Create Checkout Session using the tenant's own Stripe key (no platform involvement)
       const lineItems: any[] = [{
         price_data: {
           currency: 'usd',
@@ -7118,19 +7162,14 @@ West Monroe LA 71291
           quantity: 1,
         });
       }
-      const _connectAcctGroomSession = await getTenantConnectAccountId((req as any).tenantId);
-      const session = await stripe.checkout.sessions.create({
+      const tenantStripe = createTenantStripeClient(processor);
+      const session = await tenantStripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: lineItems,
         mode: 'payment',
         success_url: `${origin}/my-appointments?groomingPaid=${id}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/my-appointments`,
         metadata: { appointmentId: String(id), type: 'grooming', tipAmount: String(tipNum) },
-        // For mode:'payment' sessions, connected-account routing goes inside
-        // payment_intent_data — NOT at the session top level (Stripe rejects that).
-        ...(_connectAcctGroomSession
-          ? { payment_intent_data: { transfer_data: { destination: _connectAcctGroomSession } } }
-          : {}),
       });
 
       res.json({ checkoutUrl: session.url, sessionId: session.id });
@@ -7147,7 +7186,7 @@ West Monroe LA 71291
       if (tenantId === undefined) return;
       const id = parseInt(req.params.id);
       const { sessionId } = req.body;
-      if (!sessionId) return res.status(400).json({ message: "sessionId is required" });
+      // sessionId is optional — absence means Square/PayPal (no hosted session ID)
 
       const appointment = await storage.getAppointment(id, tenantId);
       if (!appointment) return res.status(404).json({ message: "Appointment not found" });
@@ -7168,10 +7207,23 @@ West Monroe LA 71291
       }
       if (appointment.isPaid) return res.json({ success: true, alreadyPaid: true });
 
-      const { getUncachableStripeClient } = await import('./stripeClient');
-      const stripe = await getUncachableStripeClient();
+      // Only Stripe sessions can be verified synchronously.
+      // Square/PayPal appointments stay pending until a webhook confirms payment (see task #444).
+      if (!sessionId || !sessionId.startsWith('cs_')) {
+        return res.status(202).json({
+          success: false,
+          pending: true,
+          message: 'Payment is being processed. Your appointment will be confirmed once the payment clears.',
+        });
+      }
 
-      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      const { getActiveTenantProcessor, createTenantStripeClient } = await import('./tenantPaymentHelper');
+      const apptProcessor = await getActiveTenantProcessor(tenantId);
+      if (!apptProcessor || apptProcessor.processorType !== 'stripe') {
+        return res.status(400).json({ message: 'Cannot verify Stripe session — no Stripe processor configured for this store.' });
+      }
+      const tenantStripe = createTenantStripeClient(apptProcessor);
+      const session = await tenantStripe.checkout.sessions.retrieve(sessionId);
       if (session.payment_status !== 'paid') {
         return res.status(400).json({ message: "Payment not completed" });
       }
@@ -10836,31 +10888,47 @@ West Monroe LA 71291
       const appointment = await storage.getAppointment(id, (req as any).tenantId);
       if (!appointment) return res.status(404).json({ message: "Appointment not found" });
 
-      const customer = await storage.getUser(appointment.userId);
-      if (!customer?.stripeCustomerId || !customer?.stripeDefaultPaymentMethod) {
-        return res.status(400).json({ message: "No saved payment method on file for this customer" });
+      const customer = appointment.userId ? await storage.getUser(appointment.userId) : null;
+
+      const { getActiveTenantProcessor, createTenantStripeClient: createStripeForTip, createPayPalCheckout: createPayPalForTip, createSquarePaymentLink: createSquareForTip } = await import('./tenantPaymentHelper');
+      const tipProcessor = await getActiveTenantProcessor((req as any).tenantId);
+      if (!tipProcessor) {
+        return res.status(402).json({ message: 'No payment processor configured.', code: 'NO_PAYMENT_PROCESSOR' });
       }
 
-      const { getUncachableStripeClient } = await import('./stripeClient');
-      const stripeClient = await getUncachableStripeClient();
-      const _connectAcctTip = await getTenantConnectAccountId((req as any).tenantId);
-
       const amountCents = Math.round(tipNum * 100);
-      const paymentIntent = await stripeClient.paymentIntents.create({
-        amount: amountCents,
-        currency: 'usd',
-        customer: customer.stripeCustomerId,
-        payment_method: customer.stripeDefaultPaymentMethod,
-        confirm: true,
-        off_session: true,
-        description: `Grooming tip — ${appointment.ownerFirstName} ${appointment.ownerLastName} (appt #${appointment.id})`,
-        ...(_connectAcctTip ? { transfer_data: { destination: _connectAcctTip } } : {}),
+
+      // Square / PayPal: generate a payment link for the tip
+      if (tipProcessor.processorType === 'square' || tipProcessor.processorType === 'paypal') {
+        const origin = req.headers.origin || `https://${req.headers.host}`;
+        let tipUrl: string | null | undefined;
+        if (tipProcessor.processorType === 'square') {
+          tipUrl = await createSquareForTip(tipProcessor, amountCents, `Grooming tip — appt #${appointment.id}`, `${origin}/my-appointments`);
+        } else {
+          tipUrl = await createPayPalForTip(tipProcessor, amountCents, `Grooming tip — appt #${appointment.id}`, `${origin}/my-appointments`, `${origin}/my-appointments`);
+        }
+        if (!tipUrl) return res.status(500).json({ message: 'Failed to create tip payment link' });
+        await storage.updateAppointmentTip(id, tipAmount.toString(), 'link-pending');
+        return res.json({ success: true, paymentLinkUrl: tipUrl, amount: tipNum });
+      }
+
+      // Stripe (tenant own): always use a hosted Checkout Session.
+      // Off-session charges cannot be used here because customer/payment-method IDs are scoped
+      // to the platform Stripe account and are not valid on the tenant's own Stripe account.
+      const tipStripe = createStripeForTip(tipProcessor);
+      const tipOrigin = req.headers.origin || `https://${req.headers.host}`;
+      const tipSession = await tipStripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [{ price_data: { currency: 'usd', product_data: { name: `Grooming tip — appt #${appointment.id}` }, unit_amount: amountCents }, quantity: 1 }],
+        mode: 'payment',
+        success_url: `${tipOrigin}/my-appointments?groomingPaid=${appointment.id}&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${tipOrigin}/my-appointments`,
+        customer_email: customer?.email || undefined,
+        metadata: { appointmentId: String(appointment.id), type: 'tip', tipAmount: String(tipNum) },
       });
-
-      await storage.updateAppointmentTip(id, tipAmount.toString(), paymentIntent.id);
-      console.log(`Tip of $${tipNum.toFixed(2)} charged for appointment ${id} (${appointment.ownerLastName}), PI: ${paymentIntent.id}`);
-
-      res.json({ success: true, paymentIntentId: paymentIntent.id, amount: tipNum });
+      if (!tipSession.url) return res.status(500).json({ message: 'Failed to create tip checkout session' });
+      await storage.updateAppointmentTip(id, tipAmount.toString(), 'link-pending');
+      res.json({ success: true, paymentLinkUrl: tipSession.url, amount: tipNum });
     } catch (error: any) {
       console.error('Error charging tip:', error);
       const msg = error?.raw?.message || error?.message || "Failed to charge tip";
@@ -12384,6 +12452,20 @@ West Monroe LA 71291
       await db.execute(sql`CREATE TABLE IF NOT EXISTS pin_attempt_log (id SERIAL PRIMARY KEY, tenant_id INTEGER, event_type VARCHAR(50) NOT NULL, employee_code VARCHAR(20), ip_address VARCHAR(45), success BOOLEAN NOT NULL DEFAULT false, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`);
       await db.execute(sql`CREATE INDEX IF NOT EXISTS idx_pin_attempt_log_tenant_created ON pin_attempt_log (tenant_id, created_at DESC)`);
       await db.execute(sql`ALTER TABLE groomers ADD COLUMN IF NOT EXISTS group_id VARCHAR(100) DEFAULT 'default'`);
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS tenant_payment_processors (
+          id SERIAL PRIMARY KEY,
+          tenant_id INTEGER NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+          processor_type VARCHAR(50) NOT NULL,
+          encrypted_access_token TEXT NOT NULL,
+          encrypted_refresh_token TEXT,
+          account_display_name VARCHAR(255),
+          account_id VARCHAR(255),
+          is_active BOOLEAN NOT NULL DEFAULT FALSE,
+          connected_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `);
+      await db.execute(sql`CREATE INDEX IF NOT EXISTS idx_tenant_payment_processors_tenant ON tenant_payment_processors (tenant_id, is_active)`);
       await db.execute(sql`
         CREATE TABLE IF NOT EXISTS schedule_overrides (
           id SERIAL PRIMARY KEY,

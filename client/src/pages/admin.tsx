@@ -5138,8 +5138,8 @@ function LoyaltySettingsPanel() {
 }
 
 // ─── Payment Processors Panel ─────────────────────────────────────────────────
-// Lets each tenant connect their own Stripe account (online payments) and
-// configure their physical card terminal processor (for the hardware layer).
+// Tenants connect their own Square, PayPal, or Stripe account via OAuth.
+// Customer payments flow directly to the tenant — no platform Stripe involvement.
 function PaymentProcessorsPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -5151,29 +5151,29 @@ function PaymentProcessorsPanel() {
   const [showToken, setShowToken]             = useState(false);
   const [savingTerminal, setSavingTerminal]   = useState(false);
 
-  // ── Stripe Connect status ────────────────────────────────────────────────────
-  const { data: connectStatus, isLoading: statusLoading, refetch: refetchStatus } = useQuery<any>({
-    queryKey: ['/api/billing/stripe-connect/status'],
+  // ── Processor status ─────────────────────────────────────────────────────────
+  const { data: status, isLoading: statusLoading, refetch: refetchStatus } = useQuery<any>({
+    queryKey: ['/api/payment/processor/status'],
     refetchOnWindowFocus: false,
   });
 
   // Populate terminal form from existing config
   useEffect(() => {
-    if (connectStatus?.processor) {
-      setProcessorName(connectStatus.processor.name || '');
-      setTerminalAddress(connectStatus.processor.terminalAddress || '');
+    if (status?.terminal) {
+      setProcessorName(status.terminal.name || '');
+      setTerminalAddress(status.terminal.terminalAddress || '');
     }
-  }, [connectStatus]);
+  }, [status]);
 
-  // Handle OAuth redirect params
+  // Handle OAuth redirect params (success/error toasts after redirect back)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const success = params.get('connectSuccess');
-    const error   = params.get('connectError');
+    const success = params.get('paymentSuccess');
+    const error   = params.get('paymentError');
     if (success) {
-      toast({ title: 'Stripe account connected!', description: 'Online payments will now route to your Stripe account.' });
+      const names: Record<string, string> = { stripe: 'Stripe', square: 'Square', paypal: 'PayPal' };
+      toast({ title: `${names[success] || 'Payment processor'} connected!`, description: 'Customer payments will now route directly to your account.' });
       refetchStatus();
-      // Strip params from URL
       const clean = window.location.pathname + (params.get('tab') ? `?tab=${params.get('tab')}` : '');
       window.history.replaceState({}, '', clean);
     } else if (error) {
@@ -5185,15 +5185,30 @@ function PaymentProcessorsPanel() {
 
   // ── Disconnect mutation ──────────────────────────────────────────────────────
   const disconnectMutation = useMutation({
-    mutationFn: async () => {
-      const res = await apiRequest('DELETE', '/api/billing/stripe-connect/disconnect');
+    mutationFn: async (processorType: string) => {
+      const res = await apiRequest('DELETE', `/api/payment/${processorType}/disconnect`);
       if (!res.ok) throw new Error('Failed to disconnect');
     },
-    onSuccess: () => {
-      toast({ title: 'Stripe account disconnected', description: 'Online payments will fall back to the platform account.' });
-      queryClient.invalidateQueries({ queryKey: ['/api/billing/stripe-connect/status'] });
+    onSuccess: (_data, processorType) => {
+      const names: Record<string, string> = { stripe: 'Stripe', square: 'Square', paypal: 'PayPal' };
+      toast({ title: `${names[processorType] || processorType} disconnected` });
+      queryClient.invalidateQueries({ queryKey: ['/api/payment/processor/status'] });
     },
-    onError: () => toast({ title: 'Error', description: 'Failed to disconnect Stripe account.', variant: 'destructive' }),
+    onError: (_err, processorType) =>
+      toast({ title: 'Error', description: `Failed to disconnect ${processorType}.`, variant: 'destructive' }),
+  });
+
+  // ── Set active processor mutation ────────────────────────────────────────────
+  const setActiveMutation = useMutation({
+    mutationFn: async (processorType: string) => {
+      const res = await apiRequest('POST', '/api/payment/processor/set-active', { processorType });
+      if (!res.ok) throw new Error('Failed to set active');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/payment/processor/status'] });
+      toast({ title: 'Active processor updated' });
+    },
+    onError: () => toast({ title: 'Error', description: 'Failed to update active processor.', variant: 'destructive' }),
   });
 
   // ── Save terminal config ─────────────────────────────────────────────────────
@@ -5214,7 +5229,6 @@ function PaymentProcessorsPanel() {
     }
   };
 
-  // ── Clear terminal config ────────────────────────────────────────────────────
   const clearTerminal = async () => {
     try {
       const res = await apiRequest('DELETE', '/api/admin/settings/processor-config');
@@ -5227,6 +5241,66 @@ function PaymentProcessorsPanel() {
     }
   };
 
+  const processors: any[] = status?.processors ?? [];
+  const getConnected = (type: string) => processors.find((p: any) => p.processorType === type);
+
+  // ── Individual processor card ────────────────────────────────────────────────
+  function ProcessorCard({ type, label, color, connectHref, description }: {
+    type: string; label: string; color: string; connectHref: string; description: string;
+  }) {
+    const connected = getConnected(type);
+    const isActive  = connected?.isActive;
+    return (
+      <div className={`rounded-lg border p-4 space-y-3 transition-colors ${isActive ? 'border-green-300 bg-green-50/50 dark:bg-green-950/20 dark:border-green-700' : 'border-border'}`}>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className={`inline-block w-2 h-2 rounded-full ${color}`} />
+              <span className="font-semibold text-sm">{label}</span>
+              {isActive && (
+                <Badge className="text-xs bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400">Active</Badge>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">{description}</p>
+          </div>
+          {!connected && (
+            <Button size="sm" variant="outline" className="flex-shrink-0 text-xs"
+              onClick={() => { window.location.href = connectHref; }}>
+              Connect
+            </Button>
+          )}
+        </div>
+        {connected && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <CheckCircle2 className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
+              <span>
+                {connected.accountDisplayName || connected.accountId || 'Account connected'}
+                {connected.connectedAt && ` · Connected ${new Date(connected.connectedAt).toLocaleDateString()}`}
+              </span>
+            </div>
+            <div className="flex gap-2">
+              {!isActive && (
+                <Button size="sm" variant="outline" className="text-xs h-7 px-2"
+                  onClick={() => setActiveMutation.mutate(type)}
+                  disabled={setActiveMutation.isPending}>
+                  Set Active
+                </Button>
+              )}
+              <Button size="sm" variant="outline"
+                className="text-xs h-7 px-2 text-red-600 border-red-200 hover:bg-red-50"
+                onClick={() => disconnectMutation.mutate(type)}
+                disabled={disconnectMutation.isPending && disconnectMutation.variables === type}>
+                {disconnectMutation.isPending && disconnectMutation.variables === type
+                  ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Disconnect'}
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -5235,75 +5309,63 @@ function PaymentProcessorsPanel() {
           Payment Processors
         </CardTitle>
         <CardDescription>
-          Connect your own Stripe account so online sales deposit directly to your bank.
-          Configure your physical card terminal for in-store payments.
+          Connect your own payment processor. Customer payments go directly to your account —
+          no platform involvement in the money flow. Physical terminal payments are already
+          fully independent (configure the hardware address below).
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
 
-        {/* ── Online Payments — Stripe Connect ───────────────────────────────── */}
+        {/* ── Online Payments ─────────────────────────────────────────────────── */}
         <div className="space-y-3">
           <h3 className="font-semibold text-sm flex items-center gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-blue-500" />
-            Online Payments (Stripe Connect)
+            Online Payments
           </h3>
+          <p className="text-xs text-muted-foreground">
+            Connect one or more processors. The <strong>Active</strong> one is used for all online
+            orders and appointments. Credentials are stored encrypted and never logged.
+          </p>
 
           {statusLoading ? (
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
-              <Loader2 className="h-4 w-4 animate-spin" /> Checking connection…
-            </div>
-          ) : connectStatus?.connected ? (
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
-                <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-green-800 dark:text-green-300">
-                    Connected — {connectStatus.businessName || connectStatus.accountId}
-                  </p>
-                  <p className="text-xs text-green-600 dark:text-green-400">
-                    Online card sales route to your Stripe account
-                    {connectStatus.onboardedAt && ` · Connected ${new Date(connectStatus.onboardedAt).toLocaleDateString()}`}
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-red-600 border-red-200 hover:bg-red-50"
-                onClick={() => disconnectMutation.mutate()}
-                disabled={disconnectMutation.isPending}
-              >
-                {disconnectMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                Disconnect Stripe Account
-              </Button>
+              <Loader2 className="h-4 w-4 animate-spin" /> Loading…
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
-                <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-amber-800 dark:text-amber-300">No Stripe account connected</p>
-                  <p className="text-xs text-amber-600 dark:text-amber-400">
-                    Online card payments are currently routed through the platform account.
-                    Connect your own Stripe account so payouts go directly to your bank.
-                  </p>
+              {processors.length === 0 && (
+                <div className="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
+                  <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-amber-800 dark:text-amber-300">No payment processor connected</p>
+                    <p className="text-xs text-amber-600 dark:text-amber-400">
+                      Online order and appointment payments will be declined until you connect a processor below.
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <Button
-                size="sm"
-                onClick={() => { window.location.href = '/api/billing/stripe-connect/authorize'; }}
-                className="bg-[#635BFF] hover:bg-[#5148d4] text-white"
-              >
-                <CreditCard className="h-4 w-4 mr-2" />
-                Connect your Stripe account
-              </Button>
+              )}
+              <ProcessorCard
+                type="stripe" label="Stripe" color="bg-[#635BFF]"
+                connectHref="/api/payment/stripe-own/connect"
+                description="Your own Stripe account. Customers pay on your Stripe — funds go directly to your bank."
+              />
+              <ProcessorCard
+                type="square" label="Square" color="bg-neutral-800 dark:bg-white"
+                connectHref="/api/payment/square/connect"
+                description="Your Square seller account. Payments create hosted Square Checkout links."
+              />
+              <ProcessorCard
+                type="paypal" label="PayPal" color="bg-[#003087]"
+                connectHref="/api/payment/paypal/connect"
+                description="Your PayPal business account. Payments create PayPal Checkout links."
+              />
             </div>
           )}
         </div>
 
         <div className="border-t" />
 
-        {/* ── Physical Terminal Config ────────────────────────────────────────── */}
+        {/* ── Physical Card Terminal ──────────────────────────────────────────── */}
         <div className="space-y-3">
           <h3 className="font-semibold text-sm flex items-center gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-purple-500" />
@@ -5315,12 +5377,12 @@ function PaymentProcessorsPanel() {
             The API token (if required by your processor) is stored encrypted.
           </p>
 
-          {connectStatus?.processor?.name && !processorName && (
+          {status?.terminal?.name && !processorName && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
-              Currently configured: <strong>{connectStatus.processor.name}</strong>
-              {connectStatus.processor.terminalAddress && ` · ${connectStatus.processor.terminalAddress}`}
-              {connectStatus.processor.hasToken && ' · API token stored'}
+              Currently configured: <strong>{status.terminal.name}</strong>
+              {status.terminal.terminalAddress && ` · ${status.terminal.terminalAddress}`}
+              {status.terminal.hasToken && ' · API token stored'}
             </div>
           )}
 
@@ -5347,12 +5409,12 @@ function PaymentProcessorsPanel() {
             </div>
             <div className="space-y-1">
               <Label className="text-xs">
-                API Token / Key {connectStatus?.processor?.hasToken && <span className="text-green-600">(stored — leave blank to keep current)</span>}
+                API Token / Key {status?.terminal?.hasToken && <span className="text-green-600">(stored — leave blank to keep current)</span>}
               </Label>
               <div className="relative">
                 <Input
                   type={showToken ? 'text' : 'password'}
-                  placeholder={connectStatus?.processor?.hasToken ? '••••••••' : 'Paste token here (optional)'}
+                  placeholder={status?.terminal?.hasToken ? '••••••••' : 'Paste token here (optional)'}
                   value={apiToken}
                   onChange={e => setApiToken(e.target.value)}
                   className="text-sm pr-9"
@@ -5373,7 +5435,7 @@ function PaymentProcessorsPanel() {
               {savingTerminal ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
               Save Terminal Config
             </Button>
-            {(connectStatus?.processor?.name || connectStatus?.processor?.terminalAddress) && (
+            {(status?.terminal?.name || status?.terminal?.terminalAddress) && (
               <Button size="sm" variant="outline" className="text-red-600 border-red-200 hover:bg-red-50" onClick={clearTerminal}>
                 Clear
               </Button>
@@ -8861,13 +8923,23 @@ export default function Admin() {
 
   const chargeTipMutation = useMutation({
     mutationFn: async ({ id, tipAmount }: { id: number; tipAmount: string }) => {
-      return await apiRequest("POST", `/api/appointments/${id}/tip`, { tipAmount });
+      const resp = await apiRequest("POST", `/api/appointments/${id}/tip`, { tipAmount });
+      return resp.json();
     },
     onSuccess: async (data: any, variables) => {
-      toast({
-        title: "Tip Charged",
-        description: `$${parseFloat(variables.tipAmount).toFixed(2)} tip charged to saved card.`,
-      });
+      if (data?.paymentLinkUrl) {
+        // Processor requires a redirect — open the payment link in a new tab for the customer
+        window.open(data.paymentLinkUrl, '_blank', 'noopener,noreferrer');
+        toast({
+          title: "Tip Payment Link Generated",
+          description: `A $${parseFloat(variables.tipAmount).toFixed(2)} tip payment page has been opened. Share it with the customer to complete the tip.`,
+        });
+      } else {
+        toast({
+          title: "Tip Charged",
+          description: `$${parseFloat(variables.tipAmount).toFixed(2)} tip charged successfully.`,
+        });
+      }
       setTipAmounts(prev => { const n = { ...prev }; delete n[variables.id]; return n; });
       setTipOpen(prev => { const n = { ...prev }; delete n[variables.id]; return n; });
       await queryClient.refetchQueries({ queryKey: ["/api/appointments"] });
@@ -8875,7 +8947,7 @@ export default function Admin() {
     onError: (error: any) => {
       toast({
         title: "Tip Failed",
-        description: error?.message || "Could not charge tip. Customer may not have a saved card.",
+        description: error?.message || "Could not process tip.",
         variant: "destructive",
       });
     },
