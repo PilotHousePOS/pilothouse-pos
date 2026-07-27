@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/select';
 import {
   Printer, Tag, CreditCard, CheckCircle2, AlertCircle,
-  Loader2, Search, ChevronDown,
+  Loader2, Search, ChevronDown, AlertTriangle,
 } from 'lucide-react';
 import {
   lookupDevice, probeDevice,
@@ -38,6 +38,7 @@ type WizardStep =
   | { step: 'probing' }
   | { step: 'recognized'; port: any; device: KnownDevice; suggestedType: DeviceType }
   | { step: 'fallback';   port: any; suggestedType: DeviceType | null; suggestedName: string }
+  | { step: 'replace-confirm'; deviceType: DeviceType; doConnect: () => Promise<void> }
   | { step: 'connecting' }
   | { step: 'error'; message: string };
 
@@ -136,6 +137,25 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
     device: KnownDevice,
     type: DeviceType,
   ) => {
+    // If this slot already has a connected device, require explicit confirmation first
+    if (hw[type].status === 'connected') {
+      setState({
+        step: 'replace-confirm',
+        deviceType: type,
+        doConnect: async () => {
+          setState({ step: 'connecting' });
+          try {
+            await hw.connectWithPort(type, port, device.defaultBaudRate, device.name);
+            onSuccess?.(type, device.name);
+            handleOpenChange(false);
+          } catch (err: any) {
+            setState({ step: 'error', message: err?.message ?? 'Failed to connect device.' });
+          }
+        },
+      });
+      return;
+    }
+
     setState({ step: 'connecting' });
     try {
       await hw.connectWithPort(type, port, device.defaultBaudRate, device.name);
@@ -153,10 +173,31 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
     name: string,
     baudRate: number,
   ) => {
+    const resolvedName = name || deviceTypeLabel(type);
+
+    // If this slot already has a connected device, require explicit confirmation first
+    if (hw[type].status === 'connected') {
+      setState({
+        step: 'replace-confirm',
+        deviceType: type,
+        doConnect: async () => {
+          setState({ step: 'connecting' });
+          try {
+            await hw.connectWithPort(type, port, baudRate, resolvedName);
+            onSuccess?.(type, resolvedName);
+            handleOpenChange(false);
+          } catch (err: any) {
+            setState({ step: 'error', message: err?.message ?? 'Failed to connect device.' });
+          }
+        },
+      });
+      return;
+    }
+
     setState({ step: 'connecting' });
     try {
-      await hw.connectWithPort(type, port, baudRate, name || deviceTypeLabel(type));
-      onSuccess?.(type, name || deviceTypeLabel(type));
+      await hw.connectWithPort(type, port, baudRate, resolvedName);
+      onSuccess?.(type, resolvedName);
       handleOpenChange(false);
     } catch (err: any) {
       setState({ step: 'error', message: err?.message ?? 'Failed to connect device.' });
@@ -192,6 +233,13 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
               initialName={state.suggestedName}
               onConfirm={handleConfirmFallback}
               onBack={() => setState(INITIAL)}
+            />
+          )}
+          {state.step === 'replace-confirm' && (
+            <StepReplaceConfirm
+              deviceType={state.deviceType}
+              onConfirm={state.doConnect}
+              onCancel={() => setState(INITIAL)}
             />
           )}
           {state.step === 'connecting' && <StepConnecting />}
@@ -415,6 +463,49 @@ function StepFallback({
           onClick={() => onConfirm(port, type, name.trim(), defaultBaudRate[type])}
         >
           Connect Device
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function StepReplaceConfirm({
+  deviceType, onConfirm, onCancel,
+}: {
+  deviceType: DeviceType;
+  onConfirm: () => Promise<void>;
+  onCancel: () => void;
+}) {
+  const label = deviceTypeLabel(deviceType);
+  return (
+    <div className="flex flex-col gap-4 py-2">
+      <div className="bg-amber-900/30 border border-amber-700/60 rounded-lg p-4 flex items-start gap-3">
+        <AlertTriangle className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
+        <div>
+          <p className="text-sm font-semibold text-amber-300">
+            {label} already connected
+          </p>
+          <p className="text-xs text-amber-500 mt-1 leading-relaxed">
+            A {label} is already connected. Connecting this device will replace it.
+            The existing connection will be closed immediately.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex gap-2 pt-1">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-gray-400 hover:text-white hover:bg-gray-800"
+          onClick={onCancel}
+        >
+          Cancel
+        </Button>
+        <Button
+          className="flex-1 bg-amber-600 hover:bg-amber-500 text-white h-9"
+          onClick={onConfirm}
+        >
+          Replace {label}
         </Button>
       </div>
     </div>
