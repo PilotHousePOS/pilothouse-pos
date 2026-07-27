@@ -20,6 +20,9 @@ import { useToast } from '@/hooks/use-toast';
 import { TERMINAL_BAUD_RATE } from '@/lib/hardware/terminal';
 import { LABEL_PRINTER_BAUD_RATE } from '@/lib/hardware/zpl';
 
+const AUTO_RECONNECT_DELAY_MS = 2_000; // wait 2 s before first reopen attempt
+const AUTO_RECONNECT_MAX_RETRIES = 3;  // give up after 3 consecutive failures
+
 export type DeviceType = 'terminal' | 'printer' | 'labelPrinter';
 export type DeviceStatus = 'disconnected' | 'connecting' | 'connected' | 'error';
 
@@ -117,6 +120,19 @@ export function useHardwareDevices(): HardwareDevices {
     labelPrinter: setLabelPrinter,
   };
 
+  // Track per-device retry timers so we can cancel them on unmount / manual disconnect
+  const reconnectTimerRef = useRef<Record<DeviceType, ReturnType<typeof setTimeout> | null>>({
+    terminal:     null,
+    printer:      null,
+    labelPrinter: null,
+  });
+  // Track consecutive reopen failures per device
+  const reconnectAttemptsRef = useRef<Record<DeviceType, number>>({
+    terminal:     0,
+    printer:      0,
+    labelPrinter: 0,
+  });
+
   // ── Auto-reconnect on mount ──────────────────────────────────────────────────
   useEffect(() => {
     if (!hardwareSupported) return;
@@ -179,6 +195,93 @@ export function useHardwareDevices(): HardwareDevices {
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ── Auto-reopen on USB disconnect ────────────────────────────────────────────
+  // The Web Serial API fires a 'disconnect' event on navigator.serial when a
+  // USB cable is unplugged.  We listen for it and retry opening the port so
+  // cashiers don't have to manually reconnect from the hardware panel.
+  useEffect(() => {
+    if (!hardwareSupported) return;
+
+    const serial = (navigator as any).serial;
+
+    const handleDisconnect = (event: any) => {
+      const disconnectedPort = event.port;
+      if (!disconnectedPort) return;
+
+      // Find which device type lost this port
+      const types: DeviceType[] = ['terminal', 'printer', 'labelPrinter'];
+      const type = types.find(t => refs[t].current === disconnectedPort);
+      if (!type) return;
+
+      // Null out the ref — the port handle is no longer usable
+      refs[type].current = null;
+      reconnectAttemptsRef.current[type] = 0;
+
+      setters[type](s => ({ ...s, status: 'connecting', port: null }));
+      toast({
+        title: 'Hardware disconnected',
+        description: `Reconnecting ${type === 'labelPrinter' ? 'label printer' : type}…`,
+        duration: 3000,
+      });
+
+      const hints = loadStoredHints();
+      const hint = hints[type];
+
+      const attempt = () => {
+        const attemptNumber = reconnectAttemptsRef.current[type] + 1;
+        reconnectAttemptsRef.current[type] = attemptNumber;
+
+        reconnectTimerRef.current[type] = setTimeout(async () => {
+          // The browser keeps the SerialPort object even after disconnect;
+          // try to reopen it directly.
+          try {
+            const baud = hint?.baudRate ?? DEFAULT_BAUD_RATES[type];
+            await disconnectedPort.open({ baudRate: baud, dataBits: 8, stopBits: 1, parity: 'none' });
+            refs[type].current = disconnectedPort;
+            const name = hint?.friendlyName ?? rawDeviceLabel(disconnectedPort);
+            setters[type]({ status: 'connected', deviceName: name, port: disconnectedPort, baudRate: baud });
+            reconnectAttemptsRef.current[type] = 0;
+            toast({
+              title: 'Hardware reconnected',
+              description: name,
+              duration: 2500,
+            });
+          } catch {
+            if (attemptNumber < AUTO_RECONNECT_MAX_RETRIES) {
+              // Schedule another attempt
+              attempt();
+            } else {
+              // Give up — let the cashier reconnect manually
+              setters[type](EMPTY_DEVICE);
+              toast({
+                title: 'Hardware unavailable',
+                description: `Could not reconnect ${type === 'labelPrinter' ? 'label printer' : type} after ${AUTO_RECONNECT_MAX_RETRIES} attempts. Please reconnect the cable.`,
+                duration: 6000,
+              });
+            }
+          }
+        }, AUTO_RECONNECT_DELAY_MS);
+      };
+
+      attempt();
+    };
+
+    serial.addEventListener('disconnect', handleDisconnect);
+
+    return () => {
+      serial.removeEventListener('disconnect', handleDisconnect);
+      // Cancel any pending retry timers
+      for (const type of (['terminal', 'printer', 'labelPrinter'] as DeviceType[])) {
+        const timer = reconnectTimerRef.current[type];
+        if (timer !== null) {
+          clearTimeout(timer);
+          reconnectTimerRef.current[type] = null;
+        }
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hardwareSupported, toast]);
 
   // ── Connect a port that was already identified by the wizard ─────────────────
   const connectWithPort = useCallback(async (
@@ -254,6 +357,14 @@ export function useHardwareDevices(): HardwareDevices {
 
   // ── Disconnect helper ─────────────────────────────────────────────────────────
   const disconnectDevice = useCallback(async (type: DeviceType): Promise<void> => {
+    // Cancel any pending auto-reconnect timer so a manual disconnect stays disconnected
+    const timer = reconnectTimerRef.current[type];
+    if (timer !== null) {
+      clearTimeout(timer);
+      reconnectTimerRef.current[type] = null;
+    }
+    reconnectAttemptsRef.current[type] = 0;
+
     const port = refs[type].current;
     if (port) {
       try { await port.close(); } catch {}
