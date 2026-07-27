@@ -35,12 +35,8 @@ import {
  * track `openCount` to return the right response per probe cycle.
  */
 function makeZplMockPort() {
-  let openCount = 0;
-
-  // Each call to open() increments the counter so getReader() knows which
-  // probe cycle we are in.
-  const open = vi.fn(async (_options: unknown) => { openCount++; });
-  const close = vi.fn(async () => {});
+  let openCount   = 0;
+  let readableObj: any = null; // null = port closed, matches Web Serial API
 
   // Writers are stateless (we only verify that write() doesn't throw).
   function makeWriter() {
@@ -52,7 +48,7 @@ function makeZplMockPort() {
 
   // Readers are per-cycle: cycle 1 → empty (ESC/POS fails), cycle 2 → 'Y' (ZPL passes).
   function makeReader(cycle: number) {
-    const zplResponse = new TextEncoder().encode('Y,ZPL,1.0\r\n');
+    const zplResponse   = new TextEncoder().encode('Y,ZPL,1.0\r\n');
     const emptyResponse = new Uint8Array(0);
 
     return {
@@ -65,18 +61,22 @@ function makeZplMockPort() {
     };
   }
 
+  // Each call to open() increments the counter so getReader() knows which
+  // probe cycle we are in, and sets readable (port open → non-null).
+  const open  = vi.fn(async (_options: unknown) => {
+    openCount++;
+    readableObj = { getReader: () => makeReader(openCount) };
+  });
+  const close = vi.fn(async () => { readableObj = null; });
+
   return {
     open,
     close,
     writable: {
       getWriter: vi.fn(() => makeWriter()),
     },
-    // getReader is called AFTER open, so openCount reflects the current cycle.
-    readable: {
-      get getReader() {
-        return vi.fn(() => makeReader(openCount));
-      },
-    },
+    // probeDevice guard checks port.readable; probe fns call port.readable.getReader()
+    get readable() { return readableObj; },
   };
 }
 
@@ -154,7 +154,110 @@ describe('probeResultToDeviceType — zpl result', () => {
   });
 });
 
-// ── Suite 3: synthetic KnownDevice uses deviceCategory 'label-printer' ────────
+// ── Suite 3: binary STX+'Y' Zebra firmware response ──────────────────────────
+//
+// Real Zebra firmware responds to ~HI with STX (0x02) followed by 'Y' (0x59)
+// rather than the plain-text 'Y' variant.  The probeZpl() function handles both
+// paths; this suite is the regression guard for the binary path only.
+
+/**
+ * Mock port for the binary STX+'Y' path.
+ *
+ * Mirrors the real Web Serial API lifecycle:
+ *   - port.readable is null  when the port is CLOSED  (probeDevice guard passes)
+ *   - port.readable is set   when the port is OPEN    (probe functions can call getReader())
+ *   - port.readable is null  again after close()
+ *
+ * Cycle 1 (ESC/POS probe) → empty payload → probeEscPos returns false.
+ * Cycle 2 (ZPL probe)     → STX (0x02) + 'Y' (0x59) binary payload → probeZpl returns true.
+ */
+function makeZplBinaryMockPort() {
+  let openCount   = 0;
+  let readableObj: any = null; // null = port closed, matches Web Serial API
+
+  function makeWriter() {
+    return {
+      write:       vi.fn(async (_data: Uint8Array) => {}),
+      releaseLock: vi.fn(),
+    };
+  }
+
+  function makeReader(cycle: number) {
+    // Real Zebra firmware response: STX (0x02) + 'Y' (0x59) + ',ZPL\r\n'
+    const binaryZplResponse = new Uint8Array([0x02, 0x59, 0x2c, 0x5a, 0x50, 0x4c, 0x0d, 0x0a]);
+    const emptyResponse     = new Uint8Array(0);
+
+    return {
+      read: vi.fn(async () => ({
+        value: cycle >= 2 ? binaryZplResponse : emptyResponse,
+        done: false,
+      })),
+      releaseLock: vi.fn(),
+      cancel: vi.fn(async () => {}),
+    };
+  }
+
+  const open  = vi.fn(async (_options: unknown) => {
+    openCount++;
+    // Simulate Web Serial: readable becomes non-null when port opens.
+    readableObj = { getReader: () => makeReader(openCount) };
+  });
+  const close = vi.fn(async () => {
+    readableObj = null; // port closed → readable goes back to null
+  });
+
+  return {
+    open,
+    close,
+    writable: { getWriter: vi.fn(() => makeWriter()) },
+    // probeDevice guard checks port.readable; probe functions call port.readable.getReader()
+    get readable() { return readableObj; },
+  };
+}
+
+describe('probeDevice — binary STX+\'Y\' Zebra firmware response', () => {
+
+  it('returns "zpl" when port responds with STX (0x02) + "Y" (0x59)', async () => {
+    const port   = makeZplBinaryMockPort();
+    const result = await probeDevice(port);
+    expect(result).toBe('zpl');
+  });
+
+  it('does NOT return "unknown" for a binary STX+\'Y\' response — fallback form must not appear', async () => {
+    // Regression guard: if the STX branch is dropped from probeZpl(), every
+    // physical Zebra printer returns 'unknown' and lands on the manual form
+    // with 'printer' as the default — silently misregistering as receipt printer.
+    const port   = makeZplBinaryMockPort();
+    const result = await probeDevice(port);
+    expect(result).not.toBe('unknown');
+  });
+
+  it('does NOT return "escpos" for a binary STX+\'Y\' response', async () => {
+    const port   = makeZplBinaryMockPort();
+    const result = await probeDevice(port);
+    expect(result).not.toBe('escpos');
+  });
+
+  it('probeResultToDeviceType("zpl") returns "labelPrinter" after binary probe', () => {
+    // End-to-end: STX+Y response → probeDevice returns 'zpl' → maps to 'labelPrinter'
+    const type = probeResultToDeviceType('zpl');
+    expect(type).toBe('labelPrinter');
+  });
+
+  it('port.open() is called twice — once per probe (ESC/POS then ZPL)', async () => {
+    const port = makeZplBinaryMockPort();
+    await probeDevice(port);
+    expect(port.open).toHaveBeenCalledTimes(2);
+  });
+
+  it('port.close() is called after each probe attempt', async () => {
+    const port = makeZplBinaryMockPort();
+    await probeDevice(port);
+    expect(port.close).toHaveBeenCalledTimes(2);
+  });
+});
+
+// ── Suite 4: synthetic KnownDevice uses deviceCategory 'label-printer' ────────
 //
 // The wizard builds this object when probeResult !== 'unknown':
 //   const synthetic: KnownDevice = {
