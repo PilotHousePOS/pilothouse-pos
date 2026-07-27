@@ -6,9 +6,10 @@
 // Adjust LABEL_WIDTH_DOTS and LABEL_HEIGHT_DOTS to match your media.
 
 export interface LabelData {
-  name:     string;         // Product name (≤ 30 chars per line, wraps)
-  price:    number;         // e.g. 12.99
-  barcode?: string;         // UPC / SKU for Code128 barcode (optional)
+  name:       string;         // Product name (≤ 30 chars per line, wraps)
+  price:      number;         // e.g. 12.99
+  barcode?:   string;         // UPC / SKU for Code128 barcode (optional)
+  storeName?: string;         // Store name printed at the bottom of the label
 }
 
 // ── Label dimensions (dots at 203 dpi) ────────────────────────────────────────
@@ -18,12 +19,13 @@ const LABEL_HEIGHT_DOTS = 203;  // 1"   at 203 dpi
 // ── ZPL builder ──────────────────────────────────────────────────────────────
 
 function buildZpl(data: LabelData): string {
-  const { name, price, barcode } = data;
+  const { name, price, barcode, storeName } = data;
 
   // Sanitise: remove ZPL control characters (^ ~)
-  const safeName    = name.replace(/[\^~]/g, '').trim().slice(0, 30);
-  const priceStr    = `$${price.toFixed(2)}`;
-  const safeBarcode = barcode ? barcode.replace(/[^A-Za-z0-9\-\.\ \$\/\+\%]/g, '').slice(0, 20) : '';
+  const safeName      = name.replace(/[\^~]/g, '').trim().slice(0, 30);
+  const priceStr      = `$${price.toFixed(2)}`;
+  const safeBarcode   = barcode    ? barcode.replace(/[^A-Za-z0-9\-\.\ \$\/\+\%]/g, '').slice(0, 20) : '';
+  const safeStoreName = storeName  ? storeName.replace(/[\^~]/g, '').trim().slice(0, 30) : '';
 
   const lines: string[] = [];
   lines.push('^XA');
@@ -43,6 +45,12 @@ function buildZpl(data: LabelData): string {
   if (safeBarcode) {
     lines.push('^FO10,82^BCN,50,Y,N,N');
     lines.push(`^FD${safeBarcode}^FS`);
+  }
+
+  // Store name — small text at the bottom of the label
+  if (safeStoreName) {
+    lines.push('^FO10,178^A0N,16,14');
+    lines.push(`^FD${safeStoreName}^FS`);
   }
 
   lines.push('^XZ');

@@ -613,6 +613,12 @@ export default function PosPage() {
   };
 
   // ── Data queries ──
+  const { data: currentTenant } = useQuery<{ id: number; name: string; slug: string }>({
+    queryKey: ["/api/tenants/current"],
+    staleTime: 5 * 60_000,
+  });
+  const storeName = currentTenant?.name || 'PilotHouse POS';
+
   const { data: layoutData } = useQuery<PosConfig | null>({
     queryKey: ["/api/pos/layout"],
     staleTime: Infinity,
@@ -804,7 +810,7 @@ export default function PosPage() {
     if (hw.printer.status !== 'connected' || !hw.printer.port) return;
     try {
       await sendPrintJob(hw.printer.port, async (writer) => {
-        await printReceipt(writer, { storeName: 'PilotHouse POS', ...saleData });
+        await printReceipt(writer, { storeName, ...saleData });
         // Only open drawer on cash sales
         if (saleData.paymentMethod === 'cash') {
           await openDrawer(writer);
@@ -1161,9 +1167,10 @@ export default function PosPage() {
                           (async () => {
                             try {
                               await printLabel(hw.labelPrinter.port, {
-                                name:    item.name,
-                                price:   Number(item.price),
-                                barcode: item.sku || undefined,
+                                name:      item.name,
+                                price:     Number(item.price),
+                                barcode:   item.sku || undefined,
+                                storeName,
                               });
                               toast({ title: 'Label sent', description: item.name });
                             } catch {
@@ -1242,7 +1249,7 @@ export default function PosPage() {
               (async () => {
                 try {
                   await sendPrintJob(hw.printer.port, async (w) => {
-                    await printReceipt(w, { storeName: 'PilotHouse POS', orderNumber, items: orderItems, subtotal, tax, total, paymentMethod: 'pending' });
+                    await printReceipt(w, { storeName, orderNumber, items: orderItems, subtotal, tax, total, paymentMethod: 'pending' });
                   });
                 } catch { toast({ title: 'Print error', description: 'Check printer.', variant: 'destructive' }); }
               })();
@@ -1258,7 +1265,7 @@ export default function PosPage() {
               (async () => {
                 try {
                   await sendPrintJob(hw.printer.port, async (w) => {
-                    await printReceipt(w, { storeName: 'PilotHouse POS', ...sale });
+                    await printReceipt(w, { storeName, ...sale });
                   });
                 } catch { toast({ title: 'Print error', description: 'Check printer.', variant: 'destructive' }); }
               })();
