@@ -3706,6 +3706,36 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // Receipt footer message — store-owner customisation for the bottom of every receipt.
+  // Stored as a plain string under the "pos_receipt_footer" key in grooming_settings.
+  app.get("/api/admin/pos/receipt-footer", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const tenantId: number | undefined = (req as any).tenantId;
+      if (!tenantId) return res.status(400).json({ message: "Tenant context required" });
+      const row = await storage.getGroomingSetting("pos_receipt_footer", tenantId);
+      res.json({ footerMessage: row ? row.value : "" });
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
+  app.put("/api/admin/pos/receipt-footer", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin only" });
+      const { footerMessage } = req.body;
+      if (typeof footerMessage !== "string") {
+        return res.status(400).json({ message: "footerMessage must be a string" });
+      }
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      await storage.upsertGroomingSetting({ setting: "pos_receipt_footer", value: footerMessage.trim(), tenantId });
+      res.json({ ok: true });
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
+    }
+  });
+
   // ────────────────────────────────────────────────────────────────────────────
 
   app.get("/api/admin/pos-scan/pending-new", requireAdminMiddleware, async (req: any, res) => {

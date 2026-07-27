@@ -27,16 +27,18 @@
 //   writer.releaseLock();
 
 export interface ReceiptSaleData {
-  storeName:     string;
-  orderNumber:   string;
-  items:         Array<{ name: string; price: number; quantity: number }>;
-  subtotal:      number;
-  tax:           number;
-  total:         number;
-  paymentMethod: string;
+  storeName:      string;
+  orderNumber:    string;
+  items:          Array<{ name: string; price: number; quantity: number }>;
+  subtotal:       number;
+  tax:            number;
+  total:          number;
+  paymentMethod:  string;
   amountTendered?: number;
-  changeDue?:    number;
-  operatorName?: string;
+  changeDue?:     number;
+  operatorName?:  string;
+  /** Custom footer message set by the store owner. Falls back to the default sign-off when absent. */
+  footerMessage?: string;
 }
 
 // ── ESC/POS byte constants ────────────────────────────────────────────────────
@@ -266,10 +268,11 @@ export async function printReceipt(
     ...(changeDue !== undefined && changeDue > 0 ? [twoColumns('Change', fmt(changeDue)), nl()] : []),
     nl(),
 
-    // Footer
+    // Footer — use store's custom message if set, otherwise fall back to default
     ALIGN_CENTER,
-    encode('Thank you for your business!'), nl(),
-    encode('We appreciate your visit.'), nl(),
+    ...((data.footerMessage ?? '').trim()
+      ? wrapText((data.footerMessage ?? '').trim()).flatMap(line => [encode(line), nl()])
+      : [encode('Thank you for your business!'), nl(), encode('We appreciate your visit.'), nl()]),
     nl(), nl(), nl(),
 
     // Cut

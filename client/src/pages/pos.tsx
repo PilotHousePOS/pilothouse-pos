@@ -495,7 +495,8 @@ export default function PosPage() {
 
   // ── Settings state ──
   const [showSettings, setShowSettings]         = useState(false);
-  const [settingsTab, setSettingsTab]           = useState<"categories" | "amounts" | "hardware">("categories");
+  const [settingsTab, setSettingsTab]           = useState<"categories" | "amounts" | "receipt" | "hardware">("categories");
+  const [receiptFooterDraft, setReceiptFooterDraft] = useState("");
   const [editingCatId, setEditingCatId]         = useState<string | null>(null); // cat id being edited, or "new"
   const [editDraft, setEditDraft]               = useState<PosCategory | null>(null);
   const [editSvcIdx, setEditSvcIdx]             = useState<number | null>(null); // sub-button being edited
@@ -510,6 +511,11 @@ export default function PosPage() {
     const t = setInterval(() => setClock(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
+
+  // Sync receipt footer draft whenever the settings panel opens or the saved value loads
+  useEffect(() => {
+    if (showSettings) setReceiptFooterDraft(receiptFooter);
+  }, [showSettings, receiptFooter]);
 
   // Block back-navigation while the POS is locked — the terminal must not be
   // abandoned mid-shift without a signed-in operator.
@@ -731,6 +737,23 @@ export default function PosPage() {
     onError: () => toast({ title: "Error", description: "Failed to save layout", variant: "destructive" }),
   });
 
+  // ── Receipt footer ──
+  const { data: receiptFooterData } = useQuery<{ footerMessage: string }>({
+    queryKey: ["/api/admin/pos/receipt-footer"],
+    staleTime: 5 * 60_000,
+  });
+  const receiptFooter = receiptFooterData?.footerMessage ?? "";
+
+  const saveFooterMutation = useMutation({
+    mutationFn: (footerMessage: string) =>
+      apiRequest("PUT", "/api/admin/pos/receipt-footer", { footerMessage }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/pos/receipt-footer"] });
+      toast({ title: "Footer saved", description: "Receipt footer message updated" });
+    },
+    onError: () => toast({ title: "Error", description: "Failed to save footer", variant: "destructive" }),
+  });
+
   // ── Tenant supply categories (for the "Inventory Category" picker in settings) ──
   const { data: tenantCategories = [] } = useQuery<{ key: string; label: string }[]>({
     queryKey: ["/api/admin/categories"],
@@ -894,7 +917,7 @@ export default function PosPage() {
     }
     try {
       await sendPrintJob(hw.printer.port, async (writer) => {
-        await printReceipt(writer, { storeName, ...saleData });
+        await printReceipt(writer, { storeName, footerMessage: receiptFooter || undefined, ...saleData });
         // Only open drawer on cash sales
         if (saleData.paymentMethod === 'cash') {
           await openDrawer(writer);
@@ -1337,7 +1360,7 @@ export default function PosPage() {
                     toast({ title: 'Store name may be incorrect', description: `${reason} — receipt will show "PilotHouse POS".`, variant: 'destructive' });
                   }
                   await sendPrintJob(hw.printer.port, async (w) => {
-                    await printReceipt(w, { storeName, orderNumber, items: orderItems, subtotal, tax, total, paymentMethod: 'pending' });
+                    await printReceipt(w, { storeName, orderNumber, items: orderItems, subtotal, tax, total, paymentMethod: 'pending', footerMessage: receiptFooter || undefined });
                   });
                 } catch { toast({ title: 'Print error', description: 'Check printer.', variant: 'destructive' }); }
               })();
@@ -1357,7 +1380,7 @@ export default function PosPage() {
                     toast({ title: 'Store name may be incorrect', description: `${reason} — receipt will show "PilotHouse POS".`, variant: 'destructive' });
                   }
                   await sendPrintJob(hw.printer.port, async (w) => {
-                    await printReceipt(w, { storeName, ...sale });
+                    await printReceipt(w, { storeName, footerMessage: receiptFooter || undefined, ...sale });
                   });
                 } catch { toast({ title: 'Print error', description: 'Check printer.', variant: 'destructive' }); }
               })();
@@ -1793,6 +1816,7 @@ export default function PosPage() {
             {([
               { key: "categories", label: "Category Buttons" },
               { key: "amounts",    label: "Quick Amounts" },
+              { key: "receipt",    label: "Receipt" },
               { key: "hardware",   label: "Hardware" },
             ] as const).map(({ key, label }) => (
               <button key={key} onClick={() => { setSettingsTab(key); cancelEdit(); }}
@@ -2062,6 +2086,55 @@ export default function PosPage() {
 
                 <div className="text-xs text-gray-600 pt-2 border-t border-gray-800">
                   Changes save automatically. Removing a preset doesn't affect completed orders.
+                </div>
+              </div>
+            )}
+
+            {/* ── RECEIPT TAB ── */}
+            {settingsTab === "receipt" && (
+              <div className="flex-1 overflow-y-auto p-6 space-y-5 max-w-xl">
+                <div>
+                  <h2 className="text-base font-bold text-white mb-1">Receipt Footer Message</h2>
+                  <p className="text-xs text-gray-400 leading-relaxed">
+                    This message is printed at the bottom of every receipt.
+                    Leave blank to use the default <em>"Thank you for your business!"</em> sign-off.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-gray-300 uppercase tracking-wide">
+                    Footer text
+                  </label>
+                  <textarea
+                    value={receiptFooterDraft}
+                    onChange={e => setReceiptFooterDraft(e.target.value)}
+                    onFocus={() => setReceiptFooterDraft(prev => prev !== "" ? prev : receiptFooter)}
+                    placeholder="e.g. Visit us at mystore.com · @mystore on Instagram"
+                    rows={3}
+                    maxLength={200}
+                    className="w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg px-3 py-2 resize-none placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500">{receiptFooterDraft.length} / 200 characters</span>
+                    <button
+                      onClick={() => saveFooterMutation.mutate(receiptFooterDraft)}
+                      disabled={saveFooterMutation.isPending}
+                      className="text-sm bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white px-4 py-1.5 rounded-lg font-semibold transition-colors"
+                    >
+                      {saveFooterMutation.isPending ? "Saving…" : "Save"}
+                    </button>
+                  </div>
+                </div>
+
+                {receiptFooter && (
+                  <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 space-y-1">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Current saved message</p>
+                    <p className="text-sm text-gray-200 italic">"{receiptFooter}"</p>
+                  </div>
+                )}
+
+                <div className="text-xs text-gray-600 pt-2 border-t border-gray-800">
+                  The message is word-wrapped to fit the receipt paper width automatically.
                 </div>
               </div>
             )}
