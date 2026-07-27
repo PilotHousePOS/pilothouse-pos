@@ -19,7 +19,7 @@ import {
 } from "@/lib/offline-db";
 import { useHardwareDevices, type DeviceState, type DeviceType } from "@/hooks/useHardwareDevices";
 import { HardwareWizard } from "@/components/pos/HardwareWizard";
-import { printReceipt, openDrawer, printTestPage, sendPrintJob } from "@/lib/hardware/escpos";
+import { printReceipt, openDrawer, printTestPage, sendPrintJob, wrapText, PAPER_WIDTH } from "@/lib/hardware/escpos";
 import { sendTerminalCharge, sendTerminalChargeTcp } from "@/lib/hardware/terminal";
 import { printLabel } from "@/lib/hardware/zpl";
 
@@ -2288,15 +2288,46 @@ export default function PosPage() {
                   </div>
                 </div>
 
-                {receiptFooter && (
-                  <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 space-y-1">
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Current saved message</p>
-                    <p className="text-sm text-gray-200 italic">"{receiptFooter}"</p>
+                {/* ── Live receipt footer preview ── */}
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-gray-300 uppercase tracking-wide">
+                    Receipt preview
+                  </label>
+                  <div
+                    className="rounded-lg p-4 overflow-x-auto"
+                    style={{ background: "#f5f0e8", fontFamily: "monospace" }}
+                  >
+                    <div className="text-center text-gray-400 text-[10px] mb-2 select-none" style={{ fontFamily: "sans-serif", letterSpacing: "0.05em" }}>
+                      ── footer ──
+                    </div>
+                    {receiptFooterDraft.trim() ? (
+                      wrapText(receiptFooterDraft.trim(), PAPER_WIDTH).map((line, i) => {
+                        const pad = Math.floor((PAPER_WIDTH - line.length) / 2);
+                        return (
+                          <div key={i} className="text-gray-900 text-xs leading-snug" style={{ whiteSpace: "pre" }}>
+                            {" ".repeat(pad)}{line}
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <>
+                        {[
+                          "Thank you for your business!",
+                          "We appreciate your visit.",
+                        ].map((line, i) => {
+                          const pad = Math.floor((PAPER_WIDTH - line.length) / 2);
+                          return (
+                            <div key={i} className="text-gray-400 text-xs leading-snug italic" style={{ whiteSpace: "pre" }}>
+                              {" ".repeat(pad)}{line}
+                            </div>
+                          );
+                        })}
+                      </>
+                    )}
                   </div>
-                )}
-
-                <div className="text-xs text-gray-600 pt-2 border-t border-gray-800">
-                  The message is word-wrapped to fit the receipt paper width automatically.
+                  <p className="text-xs text-gray-500">
+                    Paper is {PAPER_WIDTH} chars wide · updates as you type · centred on the receipt
+                  </p>
                 </div>
               </div>
             )}

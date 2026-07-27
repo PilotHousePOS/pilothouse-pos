@@ -116,7 +116,7 @@ function twoColumns(left: string, right: string, width = COL_WIDTH): number[] {
 }
 
 /** Wrap text to COL_WIDTH lines. */
-function wrapText(text: string, width = COL_WIDTH): string[] {
+export function wrapText(text: string, width = COL_WIDTH): string[] {
   const lines: string[] = [];
   let current = '';
   for (const word of text.split(' ')) {
