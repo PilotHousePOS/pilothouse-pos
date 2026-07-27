@@ -120,18 +120,24 @@ export function useHardwareDevices(): HardwareDevices {
     labelPrinter: setLabelPrinter,
   };
 
-  // Track per-device retry timers so we can cancel them on unmount / manual disconnect
-  const reconnectTimerRef = useRef<Record<DeviceType, ReturnType<typeof setTimeout> | null>>({
-    terminal:     null,
-    printer:      null,
-    labelPrinter: null,
-  });
-  // Track consecutive reopen failures per device
-  const reconnectAttemptsRef = useRef<Record<DeviceType, number>>({
-    terminal:     0,
-    printer:      0,
-    labelPrinter: 0,
-  });
+  // Track per-device retry timers so we can cancel them on unmount / manual disconnect.
+  // Using a Map keyed by DeviceType so each device has its own isolated slot and no
+  // sibling key can be accidentally overwritten (e.g. simultaneous disconnects).
+  const reconnectTimerRef = useRef<Map<DeviceType, ReturnType<typeof setTimeout> | null>>(
+    new Map<DeviceType, ReturnType<typeof setTimeout> | null>([
+      ['terminal',     null],
+      ['printer',      null],
+      ['labelPrinter', null],
+    ])
+  );
+  // Track consecutive reopen failures per device (same Map-based isolation).
+  const reconnectAttemptsRef = useRef<Map<DeviceType, number>>(
+    new Map<DeviceType, number>([
+      ['terminal',     0],
+      ['printer',      0],
+      ['labelPrinter', 0],
+    ])
+  );
 
   // ── Auto-reconnect on mount ──────────────────────────────────────────────────
   useEffect(() => {
@@ -216,7 +222,7 @@ export function useHardwareDevices(): HardwareDevices {
 
       // Null out the ref — the port handle is no longer usable
       refs[type].current = null;
-      reconnectAttemptsRef.current[type] = 0;
+      reconnectAttemptsRef.current.set(type, 0);
 
       setters[type](s => ({ ...s, status: 'connecting', port: null }));
       toast({
@@ -229,10 +235,10 @@ export function useHardwareDevices(): HardwareDevices {
       const hint = hints[type];
 
       const attempt = () => {
-        const attemptNumber = reconnectAttemptsRef.current[type] + 1;
-        reconnectAttemptsRef.current[type] = attemptNumber;
+        const attemptNumber = (reconnectAttemptsRef.current.get(type) ?? 0) + 1;
+        reconnectAttemptsRef.current.set(type, attemptNumber);
 
-        reconnectTimerRef.current[type] = setTimeout(async () => {
+        reconnectTimerRef.current.set(type, setTimeout(async () => {
           // The browser keeps the SerialPort object even after disconnect;
           // try to reopen it directly.
           try {
@@ -241,7 +247,7 @@ export function useHardwareDevices(): HardwareDevices {
             refs[type].current = disconnectedPort;
             const name = hint?.friendlyName ?? rawDeviceLabel(disconnectedPort);
             setters[type]({ status: 'connected', deviceName: name, port: disconnectedPort, baudRate: baud });
-            reconnectAttemptsRef.current[type] = 0;
+            reconnectAttemptsRef.current.set(type, 0);
             toast({
               title: 'Hardware reconnected',
               description: name,
@@ -261,7 +267,7 @@ export function useHardwareDevices(): HardwareDevices {
               });
             }
           }
-        }, AUTO_RECONNECT_DELAY_MS);
+        }, AUTO_RECONNECT_DELAY_MS));
       };
 
       attempt();
@@ -273,10 +279,10 @@ export function useHardwareDevices(): HardwareDevices {
       serial.removeEventListener('disconnect', handleDisconnect);
       // Cancel any pending retry timers
       for (const type of (['terminal', 'printer', 'labelPrinter'] as DeviceType[])) {
-        const timer = reconnectTimerRef.current[type];
-        if (timer !== null) {
+        const timer = reconnectTimerRef.current.get(type);
+        if (timer != null) {
           clearTimeout(timer);
-          reconnectTimerRef.current[type] = null;
+          reconnectTimerRef.current.set(type, null);
         }
       }
     };
@@ -358,12 +364,12 @@ export function useHardwareDevices(): HardwareDevices {
   // ── Disconnect helper ─────────────────────────────────────────────────────────
   const disconnectDevice = useCallback(async (type: DeviceType): Promise<void> => {
     // Cancel any pending auto-reconnect timer so a manual disconnect stays disconnected
-    const timer = reconnectTimerRef.current[type];
-    if (timer !== null) {
+    const timer = reconnectTimerRef.current.get(type);
+    if (timer != null) {
       clearTimeout(timer);
-      reconnectTimerRef.current[type] = null;
+      reconnectTimerRef.current.set(type, null);
     }
-    reconnectAttemptsRef.current[type] = 0;
+    reconnectAttemptsRef.current.set(type, 0);
 
     const port = refs[type].current;
     if (port) {
