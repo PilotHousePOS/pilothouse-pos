@@ -285,9 +285,47 @@ async function readWithTimeout(
   return result;
 }
 
-// ── Main charge function ──────────────────────────────────────────────────────
-export async function sendTerminalCharge(
-  port: any, // SerialPort (Web Serial API)
+// ── Lock-recovery helper ──────────────────────────────────────────────────────
+// When a cable disconnect or mid-transaction timeout leaves the serial port's
+// readable/writable streams locked (the finally blocks may throw before they
+// can release the locks), subsequent calls to getWriter()/getReader() throw a
+// DOMException whose message contains "locked".  This helper detects that
+// condition and attempts a close → re-open cycle so the POS can recover
+// without a page reload.
+//
+// Returns true if the port was successfully recovered, false otherwise.
+async function recoverLockedPort(port: any): Promise<boolean> {
+  try {
+    // Forcibly close the port — this tears down all internal stream state and
+    // releases any outstanding locks held by the browser's serial implementation.
+    await port.close();
+  } catch {
+    // close() may throw if the port is already closed or the underlying
+    // device is gone; that is acceptable — we are just trying to clean up.
+  }
+
+  try {
+    await openTerminalPort(port);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Returns true when the error indicates an un-releasable stream lock.
+function isLockedPortError(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  const msg = err.message.toLowerCase();
+  // Chromium: "Failed to execute 'getWriter' on 'WritableStream': WritableStream is locked to a writer"
+  // Chromium: "Failed to execute 'getReader' on 'ReadableStream': ReadableStream is locked to a reader"
+  return msg.includes('locked');
+}
+
+// ── Inner charge attempt ──────────────────────────────────────────────────────
+// Separated from sendTerminalCharge so the recovery wrapper can call it twice
+// without duplicating the logic.
+async function attemptTerminalCharge(
+  port: any,
   params: TerminalChargeParams,
 ): Promise<TerminalChargeResult> {
   // Guard: the Web Serial API sets `readable` and `writable` to non-null only
@@ -301,30 +339,63 @@ export async function sendTerminalCharge(
     };
   }
 
+  // Write request — release lock in finally so the port is never left locked
+  const writer: WritableStreamDefaultWriter<Uint8Array> = port.writable.getWriter();
   try {
-    // Write request — release lock in finally so the port is never left locked
-    const writer: WritableStreamDefaultWriter<Uint8Array> = port.writable.getWriter();
-    try {
-      await writer.write(buildRequestFrame(params));
-    } finally {
-      writer.releaseLock();
-    }
+    await writer.write(buildRequestFrame(params));
+  } finally {
+    writer.releaseLock();
+  }
 
-    // Read response with timeout — same lock-release pattern
-    const reader: ReadableStreamDefaultReader<Uint8Array> = port.readable.getReader();
-    let responseBytes: Uint8Array;
-    try {
-      responseBytes = await readWithTimeout(reader, CHARGE_TIMEOUT_MS);
-    } finally {
-      reader.releaseLock();
-    }
+  // Read response with timeout — same lock-release pattern
+  const reader: ReadableStreamDefaultReader<Uint8Array> = port.readable.getReader();
+  let responseBytes: Uint8Array;
+  try {
+    responseBytes = await readWithTimeout(reader, CHARGE_TIMEOUT_MS);
+  } finally {
+    reader.releaseLock();
+  }
 
-    if (!responseBytes.length) {
-      return { approved: false, reason: 'No response from terminal' };
-    }
+  if (!responseBytes.length) {
+    return { approved: false, reason: 'No response from terminal' };
+  }
 
-    return parseResponseFrame(responseBytes);
+  return parseResponseFrame(responseBytes);
+}
+
+// ── Main charge function ──────────────────────────────────────────────────────
+export async function sendTerminalCharge(
+  port: any, // SerialPort (Web Serial API)
+  params: TerminalChargeParams,
+): Promise<TerminalChargeResult> {
+  try {
+    return await attemptTerminalCharge(port, params);
   } catch (err: any) {
+    // If the streams are locked (stale lock from a previous timeout or cable
+    // disconnect), attempt a close → re-open → single retry before giving up.
+    if (isLockedPortError(err)) {
+      console.warn('[Terminal] Detected locked serial port — attempting recovery (close + re-open)…');
+
+      const recovered = await recoverLockedPort(port);
+      if (!recovered) {
+        return {
+          approved: false,
+          reason: 'Reconnect terminal — port is locked and could not be re-opened automatically',
+        };
+      }
+
+      // One retry on the freshly opened port
+      try {
+        return await attemptTerminalCharge(port, params);
+      } catch (retryErr: any) {
+        return {
+          approved: false,
+          reason: 'Reconnect terminal — port was re-opened but the transaction still failed: ' +
+            (retryErr?.message ?? 'unknown error'),
+        };
+      }
+    }
+
     return {
       approved: false,
       reason: err?.message ?? 'Terminal communication error',
