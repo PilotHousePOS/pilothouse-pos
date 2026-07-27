@@ -20,7 +20,7 @@ import {
 import { useHardwareDevices, type DeviceState, type DeviceType } from "@/hooks/useHardwareDevices";
 import { HardwareWizard } from "@/components/pos/HardwareWizard";
 import { printReceipt, openDrawer, printTestPage, sendPrintJob } from "@/lib/hardware/escpos";
-import { sendTerminalCharge } from "@/lib/hardware/terminal";
+import { sendTerminalCharge, sendTerminalChargeTcp } from "@/lib/hardware/terminal";
 import { printLabel } from "@/lib/hardware/zpl";
 
 interface PosOverrideConfig {
@@ -888,6 +888,14 @@ export default function PosPage() {
   const clearAll       = () => { setOrderItems([]); setSelectedCatId(null); };
 
   // ── Async credit-pay handler (terminal → server) ──────────────────────────
+  //
+  // Transport priority:
+  //   1. TCP via server proxy (sendTerminalChargeTcp) — when terminalIp is
+  //      configured in Hardware Settings.  No browser permission prompt; works
+  //      in any browser.
+  //   2. Web Serial fallback (sendTerminalCharge) — when no terminalIp is set
+  //      but the cashier has paired a serial port via the Hardware Wizard.
+  //   3. Manual card entry — when no terminal is available at all.
   const handleCreditPay = async () => {
     // Hard re-entrancy guard — exactly one terminal charge at a time
     if (terminalProcessing) return;
@@ -898,11 +906,62 @@ export default function PosPage() {
       paymentMethod: 'credit', operatorName: posOperatorName,
     };
 
-    if (hw.terminal.status === 'connected' && hw.terminal.port) {
-      // ── Terminal path: send to paired card terminal ──
+    // Shared handler for an approved TerminalChargeResult regardless of transport
+    const handleApproved = (result: { approved: true; authCode?: string; last4?: string; cardType?: string }) => {
+      saveOrderMutation.mutate(
+        {
+          orderNumber, items: orderItems, subtotal, tax, total,
+          paymentMethod: 'credit',
+          authCode:  result.authCode,
+          cardLast4: result.last4,
+          cardType:  result.cardType,
+        },
+        {
+          onSuccess: () => {
+            lastCompletedSaleRef.current = {
+              ...saleSnapshot,
+              paymentMethod: `credit${result.cardType ? ` (${result.cardType})` : ''}`,
+            };
+          },
+          onSettled: () => setTerminalProcessing(false),
+        },
+      );
+      toast({ title: `Approved — ****${result.last4 ?? ''}`, description: result.cardType ?? '' });
+    };
+
+    if (terminalConfig?.terminalIp) {
+      // ── Transport 1: TCP via server-side proxy (preferred) ──────────────
+      // No browser permission prompt.  The server opens a TCP socket to the
+      // terminal's IP stored in Hardware Settings.
       setTerminalProcessing(true);
-      // Track whether we handed off to the mutation so we only release the
-      // guard after the order is fully persisted (not just after terminal ack).
+      let handedOffToMutation = false;
+      try {
+        const result = await sendTerminalChargeTcp({
+          amountCents: Math.round(total * 100),
+          orderRef:    orderNumber,
+        });
+        if (result.approved) {
+          handedOffToMutation = true;
+          handleApproved(result as any);
+        } else {
+          toast({
+            title:       'Card Declined',
+            description: result.reason ?? 'Try a different card.',
+            variant:     'destructive',
+          });
+        }
+      } catch {
+        toast({ title: 'Terminal Error', description: 'Could not reach terminal. Try again.', variant: 'destructive' });
+      } finally {
+        if (!handedOffToMutation) setTerminalProcessing(false);
+      }
+
+    } else if (hw.terminal.status === 'connected' && hw.terminal.port) {
+      // ── Transport 2: Web Serial fallback ────────────────────────────────
+      // Used when no terminal IP is configured.  Requires a USB-to-serial
+      // adapter physically attached to the cashier's machine and a prior
+      // port-pairing via the Hardware Wizard.
+      setTerminalProcessing(true);
       let handedOffToMutation = false;
       try {
         const result = await sendTerminalCharge(hw.terminal.port, {
@@ -911,28 +970,7 @@ export default function PosPage() {
         });
         if (result.approved) {
           handedOffToMutation = true;
-          saveOrderMutation.mutate(
-            {
-              orderNumber, items: orderItems, subtotal, tax, total,
-              paymentMethod: 'credit',
-              authCode:  result.authCode,
-              cardLast4: result.last4,
-              cardType:  result.cardType,
-            },
-            {
-              onSuccess: () => {
-                // Store for the "Print Sale" reprint button — card sales too
-                lastCompletedSaleRef.current = {
-                  ...saleSnapshot,
-                  paymentMethod: `credit${result.cardType ? ` (${result.cardType})` : ''}`,
-                };
-              },
-              // Release the guard only after the order is fully persisted so
-              // the Credit button cannot fire a second charge before the basket clears.
-              onSettled: () => setTerminalProcessing(false),
-            },
-          );
-          toast({ title: `Approved — ****${result.last4 ?? ''}`, description: result.cardType ?? '' });
+          handleApproved(result as any);
         } else if (result.reason?.startsWith('Terminal port is not open')) {
           // Port exists in state but was never opened (or timed out) — give
           // the cashier a clear, actionable message instead of a generic error.
@@ -943,9 +981,7 @@ export default function PosPage() {
           });
         } else if (result.reason?.startsWith('Terminal NAK')) {
           // The terminal rejected the frame with a NAK byte (0x15) — most
-          // likely a baud-rate mismatch or a bad cable.  Surface the full
-          // reason string (which already contains the fix hint) under a
-          // title that makes clear this is a hardware issue, not a decline.
+          // likely a baud-rate mismatch or a bad cable.
           toast({
             title:       'Terminal Communication Error',
             description: result.reason,
@@ -961,12 +997,11 @@ export default function PosPage() {
       } catch {
         toast({ title: 'Terminal Error', description: 'Could not reach terminal. Try again.', variant: 'destructive' });
       } finally {
-        // For declined / error paths the mutation never runs — release here.
-        // For approved path, onSettled releases the guard after persistence.
         if (!handedOffToMutation) setTerminalProcessing(false);
       }
+
     } else {
-      // ── No terminal paired — record as manual card entry ──
+      // ── No terminal configured or paired — record as manual card entry ──
       saveOrderMutation.mutate(
         { orderNumber, items: orderItems, subtotal, tax, total, paymentMethod: "credit" },
         {
@@ -1436,7 +1471,13 @@ export default function PosPage() {
           <button
             onClick={() => pay("credit")}
             disabled={!orderItems.length || !isOnline || terminalProcessing}
-            title={terminalProcessing ? "Terminal processing — please wait" : !isOnline ? "Card unavailable offline" : undefined}
+            title={
+              terminalProcessing ? "Terminal processing — please wait"
+              : !isOnline ? "Card unavailable offline"
+              : terminalConfig?.terminalIp ? `LAN terminal (TCP): ${terminalConfig.terminalIp}`
+              : hw.terminal.status === 'connected' ? `Web Serial: ${hw.terminal.deviceName}`
+              : "No terminal configured — will log as card payment"
+            }
             className="bg-blue-700 hover:bg-blue-600 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed text-white rounded py-3 text-xs font-bold text-center flex items-center justify-center gap-1"
           >
             {terminalProcessing ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
@@ -1580,15 +1621,25 @@ export default function PosPage() {
           title={
             !isOnline ? "Card payments unavailable — no internet connection"
             : terminalProcessing ? "Terminal processing — please wait"
-            : hw.terminal.status === 'connected' ? `Terminal: ${hw.terminal.deviceName}`
-            : "No terminal paired — will log as card payment"
+            : terminalConfig?.terminalIp ? `LAN terminal (TCP): ${terminalConfig.terminalIp}`
+            : hw.terminal.status === 'connected' ? `Web Serial fallback: ${hw.terminal.deviceName}`
+            : "No terminal configured — will log as card payment"
           }
-          className={`flex-1 ${isOnline ? "bg-blue-700 hover:bg-blue-600" : "bg-gray-700 opacity-50 cursor-not-allowed"} disabled:text-gray-500 text-white rounded py-3 font-bold text-sm flex items-center justify-center gap-2 transition-colors`}
+          className={`flex-1 ${isOnline ? "bg-blue-700 hover:bg-blue-600" : "bg-gray-700 opacity-50 cursor-not-allowed"} disabled:text-gray-500 text-white rounded py-3 font-bold text-sm flex flex-col items-center justify-center transition-colors`}
         >
           {terminalProcessing
-            ? <><Loader2 className="h-4 w-4 animate-spin" /> Processing…</>
+            ? <><Loader2 className="h-4 w-4 animate-spin mb-0.5" /> Processing…</>
             : isOnline
-              ? <><CreditCard className="h-4 w-4" /> Credit</>
+              ? <>
+                  <span className="flex items-center gap-2"><CreditCard className="h-4 w-4" /> Credit</span>
+                  <span className="text-[10px] font-normal opacity-70 mt-0.5">
+                    {terminalConfig?.terminalIp
+                      ? `LAN / TCP`
+                      : hw.terminal.status === 'connected'
+                        ? 'Web Serial'
+                        : 'manual entry'}
+                  </span>
+                </>
               : <><WifiOff className="h-4 w-4" /> Card — Offline</>
           }
         </button>
