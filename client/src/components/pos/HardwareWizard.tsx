@@ -234,7 +234,7 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
         className="bg-gray-900 border-gray-700 text-white sm:max-w-md"
-        onInteractOutside={e => { if (state.step === 'probing' || state.step === 'connecting') e.preventDefault(); }}
+        onInteractOutside={e => { if (state.step === 'probing' || state.step === 'connecting' || state.step === 'replace-confirm') e.preventDefault(); }}
       >
         <DialogHeader>
           <DialogTitle className="text-white">Add Hardware Device</DialogTitle>
