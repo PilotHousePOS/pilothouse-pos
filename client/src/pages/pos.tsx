@@ -670,11 +670,19 @@ export default function PosPage() {
   };
 
   // ── Data queries ──
-  const { data: currentTenant } = useQuery<{ id: number; name: string; slug: string }>({
+  const {
+    data: currentTenant,
+    isLoading: isTenantLoading,
+    isError: isTenantError,
+  } = useQuery<{ id: number; name: string; slug: string }>({
     queryKey: ["/api/tenants/current"],
     staleTime: 5 * 60_000,
   });
   const storeName = currentTenant?.name || 'PilotHouse POS';
+  // True whenever the receipt will carry the fallback name instead of the
+  // real store name — either because the query hasn't resolved yet or because
+  // it failed.  Used to warn the operator before printing.
+  const isTenantNameFallback = !currentTenant?.name;
 
   const { data: layoutData } = useQuery<PosConfig | null>({
     queryKey: ["/api/pos/layout"],
@@ -873,6 +881,17 @@ export default function PosPage() {
     amountTendered?: number; changeDue?: number; operatorName?: string;
   }) => {
     if (hw.printer.status !== 'connected' || !hw.printer.port) return;
+    // Warn the operator when the store name could not be fetched — either
+    // the query is still loading or it failed.  The receipt will still print
+    // with the 'PilotHouse POS' fallback so no sale is blocked.
+    if (isTenantNameFallback) {
+      const reason = isTenantLoading ? 'Store info is still loading' : 'Store info could not be loaded';
+      toast({
+        title: 'Store name may be incorrect',
+        description: `${reason} — receipt will show "PilotHouse POS" instead of your store name.`,
+        variant: 'destructive',
+      });
+    }
     try {
       await sendPrintJob(hw.printer.port, async (writer) => {
         await printReceipt(writer, { storeName, ...saleData });
@@ -1313,6 +1332,10 @@ export default function PosPage() {
               if (!orderItems.length || hw.printer.status !== 'connected' || !hw.printer.port) return;
               (async () => {
                 try {
+                  if (isTenantNameFallback) {
+                    const reason = isTenantLoading ? 'Store info is still loading' : 'Store info could not be loaded';
+                    toast({ title: 'Store name may be incorrect', description: `${reason} — receipt will show "PilotHouse POS".`, variant: 'destructive' });
+                  }
                   await sendPrintJob(hw.printer.port, async (w) => {
                     await printReceipt(w, { storeName, orderNumber, items: orderItems, subtotal, tax, total, paymentMethod: 'pending' });
                   });
@@ -1329,6 +1352,10 @@ export default function PosPage() {
               if (!sale || hw.printer.status !== 'connected' || !hw.printer.port) return;
               (async () => {
                 try {
+                  if (isTenantNameFallback) {
+                    const reason = isTenantLoading ? 'Store info is still loading' : 'Store info could not be loaded';
+                    toast({ title: 'Store name may be incorrect', description: `${reason} — receipt will show "PilotHouse POS".`, variant: 'destructive' });
+                  }
                   await sendPrintJob(hw.printer.port, async (w) => {
                     await printReceipt(w, { storeName, ...sale });
                   });
