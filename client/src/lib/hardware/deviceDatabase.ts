@@ -118,10 +118,47 @@ export function deviceTypeLabel(type: DeviceType): string {
 // Used when VID/PID is not in the database.
 // Each probe opens the port independently (open → write → read → close).
 
+/**
+ * Maximum milliseconds to wait for port.open() to resolve.
+ *
+ * If a driver takes longer than this (e.g. loading a kernel module for an
+ * unusual USB-serial chip) the probe is abandoned and returns false so that
+ * probeDevice() falls through to 'unknown' instead of hanging the wizard.
+ */
+export const PROBE_OPEN_TIMEOUT_MS = 3_000;
+
+/**
+ * Race port.open() against a hard deadline.
+ * Rejects with a TimeoutError if the open call does not resolve in time.
+ * The caller's outer try/catch turns any rejection into `return false`.
+ */
+async function openWithTimeout(
+  port: any,
+  options: object,
+  timeoutMs: number,
+): Promise<void> {
+  let timerId: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timerId = setTimeout(
+      () => reject(new Error(`port.open() timed out after ${timeoutMs} ms`)),
+      timeoutMs,
+    );
+  });
+  try {
+    await Promise.race([port.open(options), timeoutPromise]);
+  } finally {
+    clearTimeout(timerId);
+  }
+}
+
 /** Try ESC/POS DLE EOT 1 probe. Returns true if the port responds. */
 export async function probeEscPos(port: any): Promise<boolean> {
   try {
-    await port.open({ baudRate: 9600, dataBits: 8, stopBits: 1, parity: 'none' });
+    await openWithTimeout(
+      port,
+      { baudRate: 9600, dataBits: 8, stopBits: 1, parity: 'none' },
+      PROBE_OPEN_TIMEOUT_MS,
+    );
 
     const writer = port.writable.getWriter();
     try {
@@ -152,7 +189,11 @@ export async function probeEscPos(port: any): Promise<boolean> {
 /** Try ZPL ~HI host-identification probe. Returns true if the port responds with 'Y'. */
 export async function probeZpl(port: any): Promise<boolean> {
   try {
-    await port.open({ baudRate: 9600, dataBits: 8, stopBits: 1, parity: 'none' });
+    await openWithTimeout(
+      port,
+      { baudRate: 9600, dataBits: 8, stopBits: 1, parity: 'none' },
+      PROBE_OPEN_TIMEOUT_MS,
+    );
 
     const writer = port.writable.getWriter();
     try {
