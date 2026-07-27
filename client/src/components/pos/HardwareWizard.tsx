@@ -362,7 +362,7 @@ function StepRecognized({
           <ChevronDown className={`h-3 w-3 transition-transform ${showOverride ? 'rotate-180' : ''}`} />
         </button>
         {showOverride && (
-          <div className="mt-2">
+          <div className="mt-2 space-y-2">
             <Select value={type} onValueChange={(v) => setType(v as DeviceType)}>
               <SelectTrigger className="bg-gray-800 border-gray-600 text-white h-9 text-sm">
                 <SelectValue />
@@ -373,6 +373,15 @@ function StepRecognized({
                 <SelectItem value="terminal">Card Terminal</SelectItem>
               </SelectContent>
             </Select>
+            {initialType === 'labelPrinter' && type !== 'labelPrinter' && (
+              <div className="flex items-start gap-2 bg-amber-900/30 border border-amber-700/60 rounded p-2">
+                <AlertTriangle className="h-3.5 w-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-amber-300 leading-relaxed">
+                  This device was identified as a <strong>ZPL label printer</strong>. Saving it as a
+                  different type may cause incorrect commands to be sent to the device.
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>
