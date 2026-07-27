@@ -181,12 +181,17 @@ function makeScrambledPad(): string[] {
 // ─── Connected device compact card (used in new Hardware tab) ────────────────
 
 function ConnectedDeviceCard({
-  type, device, onRemove,
+  type, device, onRemove, onTestPrint, onOpenDrawer, onTestLabel,
 }: {
   type: DeviceType;
   device: DeviceState;
   onRemove: () => void;
+  onTestPrint?:  () => Promise<void>;
+  onOpenDrawer?: () => Promise<void>;
+  onTestLabel?:  () => Promise<void>;
 }) {
+  const [testBusy, setTestBusy] = useState<string | null>(null);
+
   const icons: Record<DeviceType, React.ReactNode> = {
     terminal:     <CreditCard    className="h-5 w-5" />,
     printer:      <Printer       className="h-5 w-5" />,
@@ -202,28 +207,80 @@ function ConnectedDeviceCard({
     device.status === 'connecting' ? 'bg-yellow-400 animate-pulse' :
     device.status === 'error'      ? 'bg-red-500' : 'bg-gray-600';
 
+  const isConnected = device.status === 'connected';
+
+  const runAction = async (key: string, fn: () => Promise<void>) => {
+    if (testBusy) return;
+    setTestBusy(key);
+    try { await fn(); } finally { setTestBusy(null); }
+  };
+
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-lg p-3.5 flex items-center gap-3">
-      <div className="text-gray-400 flex-shrink-0">{icons[type]}</div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-0.5">
-          <span className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${statusColor}`} />
-          <span className="text-sm font-semibold text-white truncate">
-            {device.deviceName || typeLabels[type]}
-          </span>
+    <div className="bg-gray-800 border border-gray-700 rounded-lg p-3.5">
+      <div className="flex items-center gap-3">
+        <div className="text-gray-400 flex-shrink-0">{icons[type]}</div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${statusColor}`} />
+            <span className="text-sm font-semibold text-white truncate">
+              {device.deviceName || typeLabels[type]}
+            </span>
+          </div>
+          <p className="text-xs text-gray-500 ml-4">
+            {typeLabels[type]}
+            {device.status === 'connecting' && ' — connecting…'}
+            {device.status === 'error'      && ' — connection error'}
+          </p>
         </div>
-        <p className="text-xs text-gray-500 ml-4">
-          {typeLabels[type]}
-          {device.status === 'connecting' && ' — connecting…'}
-          {device.status === 'error'      && ' — connection error'}
-        </p>
+        <button
+          onClick={onRemove}
+          className="text-xs text-gray-500 hover:text-red-400 hover:bg-red-900/30 px-2.5 py-1.5 rounded border border-gray-700 hover:border-red-800 transition-colors flex-shrink-0"
+        >
+          Remove
+        </button>
       </div>
-      <button
-        onClick={onRemove}
-        className="text-xs text-gray-500 hover:text-red-400 hover:bg-red-900/30 px-2.5 py-1.5 rounded border border-gray-700 hover:border-red-800 transition-colors flex-shrink-0"
-      >
-        Remove
-      </button>
+
+      {/* Per-device test actions */}
+      {type === 'printer' && (onTestPrint || onOpenDrawer) && (
+        <div className="flex gap-2 mt-2.5 ml-8">
+          {onTestPrint && (
+            <button
+              onClick={() => runAction('print', onTestPrint)}
+              disabled={!isConnected || !!testBusy}
+              title={!isConnected ? 'Connect the printer first' : 'Print a column-alignment test page'}
+              className="text-xs bg-gray-700 hover:bg-gray-600 disabled:opacity-40 disabled:cursor-not-allowed text-gray-200 rounded px-3 py-1.5 flex items-center gap-1.5 transition-colors"
+            >
+              {testBusy === 'print' ? <Loader2 className="h-3 w-3 animate-spin" /> : <Printer className="h-3 w-3" />}
+              Test Print
+            </button>
+          )}
+          {onOpenDrawer && (
+            <button
+              onClick={() => runAction('drawer', onOpenDrawer)}
+              disabled={!isConnected || !!testBusy}
+              title={!isConnected ? 'Connect the printer first' : 'Send a cash-drawer kick signal'}
+              className="text-xs bg-gray-700 hover:bg-gray-600 disabled:opacity-40 disabled:cursor-not-allowed text-gray-200 rounded px-3 py-1.5 flex items-center gap-1.5 transition-colors"
+            >
+              {testBusy === 'drawer' ? <Loader2 className="h-3 w-3 animate-spin" /> : <DollarSign className="h-3 w-3" />}
+              Open Drawer
+            </button>
+          )}
+        </div>
+      )}
+
+      {type === 'labelPrinter' && onTestLabel && (
+        <div className="flex gap-2 mt-2.5 ml-8">
+          <button
+            onClick={() => runAction('label', onTestLabel)}
+            disabled={!isConnected || !!testBusy}
+            title={!isConnected ? 'Connect the printer first' : 'Print a minimal ZPL test label'}
+            className="text-xs bg-gray-700 hover:bg-gray-600 disabled:opacity-40 disabled:cursor-not-allowed text-gray-200 rounded px-3 py-1.5 flex items-center gap-1.5 transition-colors"
+          >
+            {testBusy === 'label' ? <Loader2 className="h-3 w-3 animate-spin" /> : <Tag className="h-3 w-3" />}
+            Test Label
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -2031,6 +2088,34 @@ export default function PosPage() {
                           type={type}
                           device={device}
                           onRemove={() => hw.disconnectDevice(type)}
+                          {...(type === 'printer' ? {
+                            onTestPrint: async () => {
+                              try {
+                                await sendPrintJob(hw.printer.port, async (w) => { await printTestPage(w); });
+                                toast({ title: 'Test page sent', description: 'Check the printout — ruler should reach the paper edge.' });
+                              } catch {
+                                toast({ title: 'Print error', description: 'Printer did not respond.', variant: 'destructive' });
+                              }
+                            },
+                            onOpenDrawer: async () => {
+                              try {
+                                await sendPrintJob(hw.printer.port, async (w) => { await openDrawer(w); });
+                                toast({ title: 'Drawer kick sent', description: 'If the drawer did not open, check the RJ11 pin wiring (see escpos.ts).' });
+                              } catch {
+                                toast({ title: 'Drawer error', description: 'Printer did not respond.', variant: 'destructive' });
+                              }
+                            },
+                          } : {})}
+                          {...(type === 'labelPrinter' ? {
+                            onTestLabel: async () => {
+                              try {
+                                await printLabel(hw.labelPrinter.port, { name: 'TEST LABEL', price: 0.00 });
+                                toast({ title: 'Test label sent', description: 'Check that the label printed correctly.' });
+                              } catch {
+                                toast({ title: 'Label error', description: 'Label printer did not respond.', variant: 'destructive' });
+                              }
+                            },
+                          } : {})}
                         />
                       ))}
 
@@ -2044,38 +2129,6 @@ export default function PosPage() {
                         </div>
                       )}
                     </div>
-
-                    {/* Printer diagnostic buttons — visible when the receipt printer is connected */}
-                    {hw.printer.status === 'connected' && hw.printer.port && (
-                      <div className="flex gap-3 pl-1">
-                        <button
-                          onClick={async () => {
-                            try {
-                              await sendPrintJob(hw.printer.port, async (w) => { await printTestPage(w); });
-                              toast({ title: 'Test page sent', description: 'Check the printout — ruler should reach the paper edge.' });
-                            } catch {
-                              toast({ title: 'Print error', description: 'Printer did not respond.', variant: 'destructive' });
-                            }
-                          }}
-                          className="text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 rounded px-3 py-1.5"
-                        >
-                          Test Print
-                        </button>
-                        <button
-                          onClick={async () => {
-                            try {
-                              await sendPrintJob(hw.printer.port, async (w) => { await openDrawer(w); });
-                              toast({ title: 'Drawer kick sent', description: 'If the drawer did not open, check the RJ11 pin wiring (see escpos.ts).' });
-                            } catch {
-                              toast({ title: 'Drawer error', description: 'Printer did not respond.', variant: 'destructive' });
-                            }
-                          }}
-                          className="text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 rounded px-3 py-1.5"
-                        >
-                          Test Drawer
-                        </button>
-                      </div>
-                    )}
 
                     <button
                       onClick={() => setShowHardwareWizard(true)}
