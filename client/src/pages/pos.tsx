@@ -219,6 +219,18 @@ function ConnectedDeviceCard({
   const runAction = async (key: string, fn: () => Promise<void>) => {
     if (testBusy) return;
     setTestBusy(key);
+    // Re-check connection status after acquiring the busy lock. The device may
+    // have dropped between the user's click and this async continuation.
+    if (device.status !== 'connected') {
+      const deviceLabel = typeLabels[type];
+      toast({
+        title: `${deviceLabel} disconnected`,
+        description: 'The device disconnected before the action could run. Reconnect and try again.',
+        variant: 'destructive',
+      });
+      setTestBusy(null);
+      return;
+    }
     const timeout = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error('hardware-timeout')), HARDWARE_TIMEOUT_MS)
     );
