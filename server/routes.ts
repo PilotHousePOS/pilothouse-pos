@@ -3689,6 +3689,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     }
   });
 
+  // IMPORTANT: The receipt footer is stored separately under the "pos_receipt_footer" key
+  // (see PUT /api/admin/pos/receipt-footer below).  This handler MUST NOT read, merge, or
+  // overwrite "pos_receipt_footer" — even if pos_layout is ever refactored into a single JSON
+  // blob.  Any merge here would silently destroy footer text saved by another tab or request.
   app.put("/api/admin/pos/layout", requireAdminMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);
@@ -3707,7 +3711,10 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   });
 
   // Receipt footer message — store-owner customisation for the bottom of every receipt.
-  // Stored as a plain string under the "pos_receipt_footer" key in grooming_settings.
+  // Stored as a plain string under the "pos_receipt_footer" key in grooming_settings,
+  // intentionally separate from "pos_layout".  The PUT /api/admin/pos/layout handler
+  // above must never touch this key — keeping them separate ensures a stale pos_layout
+  // save from another browser tab cannot silently overwrite the footer.
   app.get("/api/admin/pos/receipt-footer", requireAdminMiddleware, async (req: any, res) => {
     try {
       const tenantId: number | undefined = (req as any).tenantId;
