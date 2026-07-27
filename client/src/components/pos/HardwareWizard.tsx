@@ -133,7 +133,19 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
       return;
     }
 
-    // 2. Probe-based identification (opens + closes port briefly)
+    // 2. Guard: if the port is already open (port.readable is non-null in the
+    //    Web Serial API), probeDevice would silently return 'unknown' and drop
+    //    the user on the manual fallback form with no explanation.  Catch it
+    //    here and show a targeted message so staff know what to do.
+    if (port.readable != null) {
+      setState({
+        step: 'error',
+        message: 'This device is already in use — disconnect it and try again.',
+      });
+      return;
+    }
+
+    // 3. Probe-based identification (opens + closes port briefly)
     const probeResult = await probeDevice(port);
     const suggestedType = probeResultToDeviceType(probeResult);
     const suggestedName = probeResultToName(probeResult);
