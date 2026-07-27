@@ -16,6 +16,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import {
   probeDevice,
+  probeEscPos,
+  probeZpl,
   probeResultToDeviceType,
   probeResultToName,
   type ProbeResult,
@@ -201,5 +203,55 @@ describe('probeDevice — guard does not fire when port is closed', () => {
     const result = await probeDevice(port);
     expect(result).toBe('unknown');
     expect(port.open).not.toHaveBeenCalled();
+  });
+});
+
+// ── Suite 4: inner probe functions handle InvalidStateError directly ───────────
+//
+// probeDevice()'s guard normally short-circuits before probeEscPos / probeZpl
+// are called.  But each inner function also has its own outer try/catch that
+// wraps port.open().  These tests confirm that if the guard is ever refactored
+// away the inner catches still return false (defence-in-depth) rather than
+// re-throwing InvalidStateError and crashing the wizard.
+
+describe('probeEscPos — handles InvalidStateError from already-open port', () => {
+
+  it('returns false rather than throwing when port.open() throws InvalidStateError', async () => {
+    const port = makeAlreadyOpenPort();
+    // Call the inner probe directly, bypassing the probeDevice guard.
+    const result = await probeEscPos(port);
+    expect(result).toBe(false);
+  });
+
+  it('does not re-throw InvalidStateError — resolves cleanly', async () => {
+    const port = makeAlreadyOpenPort();
+    await expect(probeEscPos(port)).resolves.not.toThrow();
+  });
+
+  it('calls port.open() exactly once (the throw is the failure path)', async () => {
+    const port = makeAlreadyOpenPort();
+    await probeEscPos(port);
+    expect(port.open).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('probeZpl — handles InvalidStateError from already-open port', () => {
+
+  it('returns false rather than throwing when port.open() throws InvalidStateError', async () => {
+    const port = makeAlreadyOpenPort();
+    // Call the inner probe directly, bypassing the probeDevice guard.
+    const result = await probeZpl(port);
+    expect(result).toBe(false);
+  });
+
+  it('does not re-throw InvalidStateError — resolves cleanly', async () => {
+    const port = makeAlreadyOpenPort();
+    await expect(probeZpl(port)).resolves.not.toThrow();
+  });
+
+  it('calls port.open() exactly once (the throw is the failure path)', async () => {
+    const port = makeAlreadyOpenPort();
+    await probeZpl(port);
+    expect(port.open).toHaveBeenCalledTimes(1);
   });
 });

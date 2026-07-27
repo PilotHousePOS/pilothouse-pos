@@ -119,7 +119,7 @@ export function deviceTypeLabel(type: DeviceType): string {
 // Each probe opens the port independently (open → write → read → close).
 
 /** Try ESC/POS DLE EOT 1 probe. Returns true if the port responds. */
-async function probeEscPos(port: any): Promise<boolean> {
+export async function probeEscPos(port: any): Promise<boolean> {
   try {
     await port.open({ baudRate: 9600, dataBits: 8, stopBits: 1, parity: 'none' });
 
@@ -150,7 +150,7 @@ async function probeEscPos(port: any): Promise<boolean> {
 }
 
 /** Try ZPL ~HI host-identification probe. Returns true if the port responds with 'Y'. */
-async function probeZpl(port: any): Promise<boolean> {
+export async function probeZpl(port: any): Promise<boolean> {
   try {
     await port.open({ baudRate: 9600, dataBits: 8, stopBits: 1, parity: 'none' });
 
