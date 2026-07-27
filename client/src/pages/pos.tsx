@@ -259,8 +259,7 @@ function ConnectedDeviceCard({
           </div>
           <p className="text-xs text-gray-500 ml-4">
             {typeLabels[type]}
-            {device.status === 'connecting' && ' — connecting…'}
-            {device.status === 'error'      && ' — connection error'}
+            {device.status === 'error' && ' — connection error'}
           </p>
         </div>
         <button
@@ -270,6 +269,14 @@ function ConnectedDeviceCard({
           Remove
         </button>
       </div>
+
+      {/* Reconnecting banner — shown when a previously-connected device is re-establishing its port */}
+      {device.status === 'connecting' && (
+        <div className="flex items-center gap-2 mt-2.5 ml-8 px-2.5 py-1.5 rounded bg-yellow-900/30 border border-yellow-700/50 w-fit">
+          <Loader2 className="h-3 w-3 animate-spin text-yellow-400 flex-shrink-0" />
+          <span className="text-xs font-medium text-yellow-300">Reconnecting…</span>
+        </div>
+      )}
 
       {/* Per-device test actions */}
       {type === 'printer' && (onTestPrint || onOpenDrawer) && (
