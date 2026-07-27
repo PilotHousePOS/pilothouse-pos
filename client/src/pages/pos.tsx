@@ -191,6 +191,7 @@ function ConnectedDeviceCard({
   onTestLabel?:  () => Promise<void>;
 }) {
   const [testBusy, setTestBusy] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const icons: Record<DeviceType, React.ReactNode> = {
     terminal:     <CreditCard    className="h-5 w-5" />,
@@ -209,10 +210,27 @@ function ConnectedDeviceCard({
 
   const isConnected = device.status === 'connected';
 
+  // 10-second hardware timeout guards against a port that hangs without
+  // ever resolving or rejecting, which would leave the button in a loading
+  // state indefinitely. The finally block clears testBusy unconditionally
+  // so the button always returns to its idle state.
+  const HARDWARE_TIMEOUT_MS = 10_000;
   const runAction = async (key: string, fn: () => Promise<void>) => {
     if (testBusy) return;
     setTestBusy(key);
-    try { await fn(); } finally { setTestBusy(null); }
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('hardware-timeout')), HARDWARE_TIMEOUT_MS)
+    );
+    try {
+      await Promise.race([fn(), timeout]);
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message === 'hardware-timeout') {
+        toast({ title: 'Hardware timeout', description: 'The device did not respond. Check the connection and try again.', variant: 'destructive' });
+      }
+      // Other errors are handled (and toasted) inside each action callback.
+    } finally {
+      setTestBusy(null);
+    }
   };
 
   return (
