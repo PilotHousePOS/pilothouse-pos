@@ -9,7 +9,7 @@
 //
 // The wizard never asks for COM ports, baud rates, or other technical details.
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
@@ -27,7 +27,9 @@ import {
   lookupDevice, probeDevice,
   categoryToDeviceType, deviceTypeLabel,
   probeResultToDeviceType, probeResultToName,
+  createScanSequence,
   type KnownDevice,
+  type ScanSequence,
 } from '@/lib/hardware/deviceDatabase';
 import type { DeviceType, HardwareDevices } from '@/hooks/useHardwareDevices';
 
@@ -79,6 +81,11 @@ interface HardwareWizardProps {
 export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardProps) {
   const [state, setState] = useState<WizardStep>(INITIAL);
 
+  // Scan-sequence guard: prevents a stale probe from overwriting state when a
+  // second scan starts before the first probe resolves (e.g. user unplugs and
+  // replugs a device while the wizard is identifying the first one).
+  const scanSeq = useRef<ScanSequence>(createScanSequence());
+
   // Reset to initial step when wizard is opened
   const handleOpenChange = (o: boolean) => {
     if (!o) { onClose(); setTimeout(() => setState(INITIAL), 200); }
@@ -99,6 +106,12 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
       setState({ step: 'error', message: err?.message ?? 'Could not open device picker.' });
       return;
     }
+
+    // Capture scan ID before any async work so we can discard stale results.
+    // If the user triggers a second scan while this probe is in-flight the
+    // counter advances; isStale(myScanId) will then return true and we bail
+    // before committing state, preventing last-write-wins corruption.
+    const myScanId = scanSeq.current.next();
 
     setState({ step: 'probing' });
 
@@ -128,6 +141,7 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
     const known = lookupDevice(info.usbVendorId, info.usbProductId);
 
     if (known) {
+      if (scanSeq.current.isStale(myScanId)) return;
       const suggestedType = categoryToDeviceType(known.deviceCategory);
       setState({ step: 'recognized', port, device: known, suggestedType });
       return;
@@ -138,6 +152,7 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
     //    the user on the manual fallback form with no explanation.  Catch it
     //    here and show a targeted message so staff know what to do.
     if (port.readable != null) {
+      if (scanSeq.current.isStale(myScanId)) return;
       setState({
         step: 'error',
         message: 'This device is already in use — disconnect it and try again.',
@@ -147,6 +162,10 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
 
     // 3. Probe-based identification (opens + closes port briefly)
     const probeResult = await probeDevice(port);
+
+    // Discard if a newer scan has already taken over.
+    if (scanSeq.current.isStale(myScanId)) return;
+
     const suggestedType = probeResultToDeviceType(probeResult);
     const suggestedName = probeResultToName(probeResult);
 

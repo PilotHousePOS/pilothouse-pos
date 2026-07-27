@@ -28,6 +28,7 @@ import {
   probeDevice,
   probeResultToDeviceType,
   probeResultToName,
+  createScanSequence,
   type ProbeResult,
 } from './deviceDatabase';
 
@@ -312,5 +313,245 @@ describe('HardwareWizard fallback — probe retry on delayed device startup', ()
     expect(result).toBe('unknown');
     expect(suggestedType).toBeNull();
     expect(wizardStep).toBe('fallback');
+  });
+});
+
+// ── Suite: overlapping probe race — second scan before first probe finishes ────
+//
+// Scenario: the user plugs in device A, the wizard starts probing it (slow —
+// still in-flight).  Before that probe resolves the user unplugs A and plugs in
+// device B.  The wizard starts a second probe.
+//
+//   Timeline:
+//     t=0  scan 1 starts  → probe for port A (will return 'zpl',   slow)
+//     t=10 scan 2 starts  → probe for port B (will return 'escpos', fast)
+//     t=20 probe B resolves first  → wizard commits 'escpos'
+//     t=50 probe A resolves later  → wizard MUST discard this stale result
+//
+// Correct behaviour: HardwareWizard.handleScan calls createScanSequence().next()
+// at the start of each scan and createScanSequence().isStale(id) after every
+// await before committing state.  These tests validate that contract directly
+// against the exported createScanSequence utility from deviceDatabase.ts — the
+// same function the component uses.
+//
+// The handleScan pattern under test:
+//
+//   const myScanId = scanSeq.current.next();          // start of scan
+//   const probeResult = await probeDevice(port);
+//   if (scanSeq.current.isStale(myScanId)) return;    // discard stale
+//   setState({ step: ..., suggestedType: ... });       // commit
+
+describe('HardwareWizard race condition — second scan started before first probe resolves', () => {
+
+  /**
+   * Thin wrapper that replicates the wizard's handleScan pattern using the
+   * real createScanSequence from deviceDatabase.ts.  This is NOT a synthetic
+   * helper — it directly exercises the exported guard that the component uses.
+   */
+  function makeWizardHandleScan() {
+    const seq = createScanSequence();
+    let committedResult: ProbeResult | null = null;
+    let committedStep: 'recognized' | 'fallback' | 'probing' = 'probing';
+    let committedType: ReturnType<typeof probeResultToDeviceType> = null;
+
+    async function handleScan(probeImpl: () => Promise<ProbeResult>) {
+      // Mirrors: const myScanId = scanSeq.current.next();
+      const myScanId = seq.next();
+      const result = await probeImpl();
+
+      // Mirrors: if (scanSeq.current.isStale(myScanId)) return;
+      if (seq.isStale(myScanId)) return;
+
+      committedResult = result;
+      committedType   = probeResultToDeviceType(result);
+      committedStep   = result !== 'unknown' ? 'recognized' : 'fallback';
+    }
+
+    return {
+      handleScan,
+      seq,
+      getState: () => ({ committedResult, committedStep, committedType }),
+    };
+  }
+
+  // ── createScanSequence unit contract ────────────────────────────────────────
+
+  it('createScanSequence.next() increments monotonically from 0', () => {
+    const seq = createScanSequence();
+    expect(seq.current()).toBe(0);
+    expect(seq.next()).toBe(1);
+    expect(seq.next()).toBe(2);
+    expect(seq.next()).toBe(3);
+    expect(seq.current()).toBe(3);
+  });
+
+  it('createScanSequence.isStale returns false for the latest ID', () => {
+    const seq = createScanSequence();
+    const id = seq.next();
+    expect(seq.isStale(id)).toBe(false);
+  });
+
+  it('createScanSequence.isStale returns true once a newer scan starts', () => {
+    const seq = createScanSequence();
+    const firstId = seq.next();   // scan 1
+    seq.next();                   // scan 2 — firstId is now stale
+    expect(seq.isStale(firstId)).toBe(true);
+  });
+
+  it('createScanSequence.isStale returns true for any earlier scan when three scans start', () => {
+    const seq = createScanSequence();
+    const id1 = seq.next();
+    const id2 = seq.next();
+    const id3 = seq.next();
+    expect(seq.isStale(id1)).toBe(true);
+    expect(seq.isStale(id2)).toBe(true);
+    expect(seq.isStale(id3)).toBe(false); // latest
+  });
+
+  // ── Race-condition scenarios using the real guard ────────────────────────────
+
+  it('when probe 2 resolves before probe 1, the wizard shows probe 2 result (escpos/printer)', async () => {
+    // probe 1 is slow (returns 'zpl'); probe 2 is fast (returns 'escpos').
+    // Both are in-flight simultaneously.  Probe 2 resolves first → escpos wins.
+    const wizard = makeWizardHandleScan();
+
+    let resolveProbe1!: (r: ProbeResult) => void;
+    const slowProbe = (): Promise<ProbeResult> =>
+      new Promise<ProbeResult>((res) => { resolveProbe1 = res; });
+
+    let resolveProbe2!: (r: ProbeResult) => void;
+    const fastProbe = (): Promise<ProbeResult> =>
+      new Promise<ProbeResult>((res) => { resolveProbe2 = res; });
+
+    // Start scan 1 (still in-flight)
+    const scan1 = wizard.handleScan(slowProbe);
+    // Start scan 2 — seq.next() advances counter; scan 1's id is now stale
+    const scan2 = wizard.handleScan(fastProbe);
+
+    // Probe 2 resolves first
+    resolveProbe2('escpos');
+    await scan2;
+
+    // Probe 1 resolves later — isStale must prevent it from overwriting state
+    resolveProbe1('zpl');
+    await scan1;
+
+    const { committedResult, committedStep, committedType } = wizard.getState();
+    expect(committedResult).toBe('escpos');
+    expect(committedType).toBe('printer');
+    expect(committedStep).toBe('recognized');
+  });
+
+  it('intermediate state after scan 2 and final state after scan 1 both reflect escpos', async () => {
+    // Verifies state is stable both immediately after scan 2 resolves and after
+    // the stale scan 1 resolves later.
+    const wizard = makeWizardHandleScan();
+
+    let resolveProbe1!: (r: ProbeResult) => void;
+    const slowProbe = (): Promise<ProbeResult> =>
+      new Promise<ProbeResult>((res) => { resolveProbe1 = res; });
+
+    let resolveProbe2!: (r: ProbeResult) => void;
+    const fastProbe = (): Promise<ProbeResult> =>
+      new Promise<ProbeResult>((res) => { resolveProbe2 = res; });
+
+    const scan1 = wizard.handleScan(slowProbe);
+    const scan2 = wizard.handleScan(fastProbe);
+
+    resolveProbe2('escpos');
+    await scan2;
+
+    // State immediately after scan 2
+    expect(wizard.getState().committedResult).toBe('escpos');
+    expect(wizard.getState().committedStep).toBe('recognized');
+
+    // Stale scan 1 resolves with a different type — must not overwrite
+    resolveProbe1('zpl');
+    await scan1;
+
+    expect(wizard.getState().committedResult).toBe('escpos');
+    expect(wizard.getState().committedType).toBe('printer');
+    expect(wizard.getState().committedStep).toBe('recognized');
+  });
+
+  it('a stale recognized result cannot overwrite a committed fallback step', async () => {
+    // Scan 2 returns 'unknown' → fallback step committed.
+    // Scan 1 (stale) later returns 'escpos' — must not bump user off fallback form.
+    const wizard = makeWizardHandleScan();
+
+    let resolveProbe1!: (r: ProbeResult) => void;
+    const slowProbe = (): Promise<ProbeResult> =>
+      new Promise<ProbeResult>((res) => { resolveProbe1 = res; });
+
+    let resolveProbe2!: (r: ProbeResult) => void;
+    const fastProbe = (): Promise<ProbeResult> =>
+      new Promise<ProbeResult>((res) => { resolveProbe2 = res; });
+
+    const scan1 = wizard.handleScan(slowProbe);
+    const scan2 = wizard.handleScan(fastProbe);
+
+    resolveProbe2('unknown');
+    await scan2;
+
+    expect(wizard.getState().committedStep).toBe('fallback');
+
+    resolveProbe1('escpos'); // stale — must be ignored
+    await scan1;
+
+    expect(wizard.getState().committedResult).toBe('unknown');
+    expect(wizard.getState().committedType).toBeNull();
+    expect(wizard.getState().committedStep).toBe('fallback');
+  });
+
+  it('with three overlapping scans the last-started scan always wins regardless of resolve order', async () => {
+    // Scans resolve in reverse order (oldest last) — the worst case for
+    // last-write-wins bugs.  Only scan 3 should commit.
+    const wizard = makeWizardHandleScan();
+
+    const resolvers: Array<(r: ProbeResult) => void> = [];
+    const results: ProbeResult[] = ['escpos', 'zpl', 'escpos'];
+
+    const scans = results.map((result) =>
+      wizard.handleScan((): Promise<ProbeResult> =>
+        new Promise<ProbeResult>((res) => { resolvers.push(() => res(result)); }),
+      ),
+    );
+
+    // Resolve newest first, oldest last
+    resolvers[2](); await scans[2]; // scan 3 (current) — commits 'escpos'
+    resolvers[1](); await scans[1]; // scan 2 (stale)   — discarded
+    resolvers[0](); await scans[0]; // scan 1 (stale)   — discarded
+
+    expect(wizard.getState().committedResult).toBe('escpos');
+    expect(wizard.getState().committedType).toBe('printer');
+    expect(wizard.getState().committedStep).toBe('recognized');
+    // Confirm the sequence counter advanced three times
+    expect(wizard.seq.current()).toBe(3);
+  });
+
+  it('suggestedType from a stale zpl probe never reaches the wizard state', async () => {
+    // Verifies probeResultToDeviceType is only applied to the current scan;
+    // 'labelPrinter' (from stale 'zpl') must never appear in committed state.
+    const wizard = makeWizardHandleScan();
+
+    let resolveStale!: (r: ProbeResult) => void;
+    const staleProbe = (): Promise<ProbeResult> =>
+      new Promise<ProbeResult>((res) => { resolveStale = res; });
+
+    let resolveFresh!: (r: ProbeResult) => void;
+    const freshProbe = (): Promise<ProbeResult> =>
+      new Promise<ProbeResult>((res) => { resolveFresh = res; });
+
+    const scan1 = wizard.handleScan(staleProbe);  // stale: will return 'zpl'
+    const scan2 = wizard.handleScan(freshProbe);  // fresh: will return 'escpos'
+
+    resolveFresh('escpos');
+    await scan2;
+
+    resolveStale('zpl');
+    await scan1;
+
+    expect(wizard.getState().committedType).not.toBe('labelPrinter');
+    expect(wizard.getState().committedType).toBe('printer');
   });
 });

@@ -224,3 +224,40 @@ export function probeResultToName(result: ProbeResult): string {
     default:       return 'Serial Device';
   }
 }
+
+// ── Scan-sequence guard ────────────────────────────────────────────────────────
+// Prevents a stale probe from overwriting state when a second scan starts
+// before the first probe resolves.
+//
+// Usage in the wizard:
+//   const scanSeq = useRef(createScanSequence());
+//   ...
+//   const id = scanSeq.current.next();           // start of handleScan
+//   const result = await probeDevice(port);
+//   if (scanSeq.current.isStale(id)) return;     // discard stale probe
+//   setState(...)                                 // safe to commit
+
+export interface ScanSequence {
+  /** Increment the sequence counter and return the new ID for this scan. */
+  next(): number;
+  /**
+   * Returns true when a newer scan has started since this ID was issued,
+   * meaning this probe's result is stale and must be discarded.
+   */
+  isStale(id: number): boolean;
+  /** Current counter value — for inspection in tests. */
+  current(): number;
+}
+
+/**
+ * Create a scan-sequence guard.
+ * Call `next()` at the start of each scan and `isStale(id)` after each await.
+ */
+export function createScanSequence(): ScanSequence {
+  let counter = 0;
+  return {
+    next()           { return ++counter; },
+    isStale(id)      { return id !== counter; },
+    current()        { return counter; },
+  };
+}
