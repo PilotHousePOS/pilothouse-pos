@@ -629,6 +629,7 @@ export default function PosPage() {
     orderNumber: string; items: OrderItem[]; subtotal: number;
     tax: number; total: number; paymentMethod: string;
     amountTendered?: number; changeDue?: number; operatorName?: string;
+    storeName?: string;
   } | null>(null);
 
   // Admin PIN sign-in on the lock screen (no employee code needed)
@@ -904,6 +905,7 @@ export default function PosPage() {
     const saleSnapshot = {
       orderNumber, items: [...orderItems], subtotal, tax, total,
       paymentMethod: 'credit', operatorName: posOperatorName,
+      storeName: currentTenant?.name || 'PilotHouse POS',
     };
 
     // Shared handler for an approved TerminalChargeResult regardless of transport
@@ -1068,6 +1070,7 @@ export default function PosPage() {
       orderNumber, items: [...orderItems], subtotal, tax, total,
       paymentMethod: "cash", amountTendered: tendered, changeDue: change,
       operatorName: posOperatorName,
+      storeName: currentTenant?.name || 'PilotHouse POS',
     };
 
     if (!isOnline) {
@@ -1510,12 +1513,12 @@ export default function PosPage() {
               if (!sale || hw.printer.status !== 'connected' || !hw.printer.port) return;
               (async () => {
                 try {
-                  if (isTenantNameFallback) {
-                    const reason = isTenantLoading ? 'Store info is still loading' : 'Store info could not be loaded';
-                    toast({ title: 'Store name may be incorrect', description: `${reason} — receipt will show "PilotHouse POS".`, variant: 'destructive' });
-                  }
+                  // Use the store name that was captured at sale time so a
+                  // tenant query reload between the sale and the reprint cannot
+                  // change what appears on the reprinted receipt.
+                  const reprintStoreName = sale.storeName ?? storeName;
                   await sendPrintJob(hw.printer.port, async (w) => {
-                    await printReceipt(w, { storeName, footerMessage: receiptFooter || undefined, ...sale });
+                    await printReceipt(w, { storeName: reprintStoreName, footerMessage: receiptFooter || undefined, ...sale });
                   });
                 } catch { toast({ title: 'Print error', description: 'Check printer.', variant: 'destructive' }); }
               })();
