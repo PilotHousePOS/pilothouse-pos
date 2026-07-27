@@ -11,11 +11,12 @@
 // PERSISTENCE
 // The Web Serial API remembers granted ports across reloads via
 // navigator.serial.getPorts(). On mount, the hook tries to auto-reconnect to
-// previously paired devices using stored { usbVendorId, usbProductId } hints
-// from localStorage. This is best-effort — if the hint can't find a port the
-// user just clicks Connect again.
+// previously paired devices using stored { usbVendorId, usbProductId, baudRate,
+// friendlyName } hints from localStorage. On successful reconnect, a brief
+// "Hardware reconnected" toast is shown (not on the very first connection).
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useToast } from '@/hooks/use-toast';
 import { TERMINAL_BAUD_RATE } from '@/lib/hardware/terminal';
 import { LABEL_PRINTER_BAUD_RATE } from '@/lib/hardware/zpl';
 
@@ -24,8 +25,9 @@ export type DeviceStatus = 'disconnected' | 'connecting' | 'connected' | 'error'
 
 export interface DeviceState {
   status:     DeviceStatus;
-  deviceName: string;     // e.g. "USB Serial Device (0x0483:0x5740)"
+  deviceName: string;     // friendly name e.g. "Epson TM-T88VI Receipt Printer"
   port:       any | null; // SerialPort handle — null when disconnected
+  baudRate?:  number;     // baud rate in use
 }
 
 export interface HardwareDevices {
@@ -33,23 +35,38 @@ export interface HardwareDevices {
   terminal:          DeviceState;
   printer:           DeviceState;
   labelPrinter:      DeviceState;
+  // Legacy individual connect helpers (used by old HardwareDeviceCard UI)
   connectTerminal:     () => Promise<void>;
   connectPrinter:      () => Promise<void>;
   connectLabelPrinter: () => Promise<void>;
   disconnectDevice:    (type: DeviceType) => Promise<void>;
+  // New: connect a port that the wizard has already identified
+  connectWithPort: (
+    type: DeviceType,
+    port: any,
+    baudRate: number,
+    friendlyName: string,
+  ) => Promise<void>;
 }
 
 const EMPTY_DEVICE: DeviceState = { status: 'disconnected', deviceName: '', port: null };
 
-const BAUD_RATES: Record<DeviceType, number> = {
-  terminal:    TERMINAL_BAUD_RATE,
-  printer:     9600,
+const DEFAULT_BAUD_RATES: Record<DeviceType, number> = {
+  terminal:     TERMINAL_BAUD_RATE,
+  printer:      9600,
   labelPrinter: LABEL_PRINTER_BAUD_RATE,
 };
 
 const LS_KEY = 'pilothouse-hw-devices'; // localStorage key
 
-function loadStoredHints(): Record<DeviceType, { usbVendorId?: number; usbProductId?: number } | null> {
+interface StoredHint {
+  usbVendorId?:  number;
+  usbProductId?: number;
+  baudRate?:     number;
+  friendlyName?: string;
+}
+
+function loadStoredHints(): Record<DeviceType, StoredHint | null> {
   try {
     const raw = localStorage.getItem(LS_KEY);
     return raw ? JSON.parse(raw) : { terminal: null, printer: null, labelPrinter: null };
@@ -58,15 +75,15 @@ function loadStoredHints(): Record<DeviceType, { usbVendorId?: number; usbProduc
   }
 }
 
-function saveHint(type: DeviceType, info: { usbVendorId?: number; usbProductId?: number } | null) {
+function saveHint(type: DeviceType, hint: StoredHint | null) {
   try {
     const hints = loadStoredHints();
-    hints[type] = info;
+    hints[type] = hint;
     localStorage.setItem(LS_KEY, JSON.stringify(hints));
   } catch {}
 }
 
-function deviceLabel(port: any): string {
+function rawDeviceLabel(port: any): string {
   try {
     const info = port.getInfo?.();
     if (info?.usbVendorId && info?.usbProductId) {
@@ -78,12 +95,12 @@ function deviceLabel(port: any): string {
 
 export function useHardwareDevices(): HardwareDevices {
   const hardwareSupported = typeof navigator !== 'undefined' && 'serial' in navigator;
+  const { toast } = useToast();
 
   const [terminal,     setTerminal]     = useState<DeviceState>(EMPTY_DEVICE);
   const [printer,      setPrinter]      = useState<DeviceState>(EMPTY_DEVICE);
   const [labelPrinter, setLabelPrinter] = useState<DeviceState>(EMPTY_DEVICE);
 
-  // Keep port refs so callbacks always see the latest port without stale closures
   const terminalRef     = useRef<any>(null);
   const printerRef      = useRef<any>(null);
   const labelPrinterRef = useRef<any>(null);
@@ -104,9 +121,7 @@ export function useHardwareDevices(): HardwareDevices {
   useEffect(() => {
     if (!hardwareSupported) return;
 
-    const serial = (navigator as any).serial as {
-      getPorts(): Promise<any[]>;
-    };
+    const serial = (navigator as any).serial as { getPorts(): Promise<any[]> };
 
     (async () => {
       let ports: any[] = [];
@@ -115,12 +130,12 @@ export function useHardwareDevices(): HardwareDevices {
 
       const hints = loadStoredHints();
       const types: DeviceType[] = ['terminal', 'printer', 'labelPrinter'];
+      const reconnected: string[] = [];
 
       for (const type of types) {
         const hint = hints[type];
         if (!hint) continue;
 
-        // Find a previously granted port matching the stored vid/pid
         const match = ports.find((p: any) => {
           const info = p.getInfo?.();
           return (
@@ -132,18 +147,29 @@ export function useHardwareDevices(): HardwareDevices {
         if (match) {
           try {
             setters[type](s => ({ ...s, status: 'connecting' }));
-            await match.open({ baudRate: BAUD_RATES[type] });
+            const baud = hint.baudRate ?? DEFAULT_BAUD_RATES[type];
+            await match.open({ baudRate: baud, dataBits: 8, stopBits: 1, parity: 'none' });
             refs[type].current = match;
-            setters[type]({ status: 'connected', deviceName: deviceLabel(match), port: match });
+            const name = hint.friendlyName ?? rawDeviceLabel(match);
+            setters[type]({ status: 'connected', deviceName: name, port: match, baudRate: baud });
+            // Only toast if it was a previous session (friendlyName stored = came from wizard)
+            if (hint.friendlyName) reconnected.push(name);
           } catch {
             setters[type](EMPTY_DEVICE);
           }
         }
       }
+
+      if (reconnected.length) {
+        toast({
+          title: 'Hardware reconnected',
+          description: reconnected.join(', '),
+          duration: 2500,
+        });
+      }
     })();
 
     return () => {
-      // Close all ports on unmount to avoid locked handles
       for (const ref of [terminalRef, printerRef, labelPrinterRef]) {
         if (ref.current) {
           try { ref.current.close(); } catch {}
@@ -154,7 +180,41 @@ export function useHardwareDevices(): HardwareDevices {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Connect helper ────────────────────────────────────────────────────────────
+  // ── Connect a port that was already identified by the wizard ─────────────────
+  const connectWithPort = useCallback(async (
+    type: DeviceType,
+    port: any,
+    baudRate: number,
+    friendlyName: string,
+  ): Promise<void> => {
+    if (!hardwareSupported) return;
+
+    // Close existing connection for this device type
+    if (refs[type].current) {
+      try { await refs[type].current.close(); } catch {}
+      refs[type].current = null;
+    }
+
+    setters[type](s => ({ ...s, status: 'connecting' }));
+
+    await port.open({ baudRate, dataBits: 8, stopBits: 1, parity: 'none' });
+    refs[type].current = port;
+
+    // Save VID/PID + baud rate + friendly name for auto-reconnect
+    try {
+      const info = port.getInfo?.() ?? {};
+      saveHint(type, {
+        usbVendorId:  info.usbVendorId,
+        usbProductId: info.usbProductId,
+        baudRate,
+        friendlyName,
+      });
+    } catch {}
+
+    setters[type]({ status: 'connected', deviceName: friendlyName, port, baudRate });
+  }, [hardwareSupported]);
+
+  // ── Legacy connect helper (opens browser picker + connects) ──────────────────
   const connectDevice = useCallback(async (type: DeviceType): Promise<void> => {
     if (!hardwareSupported) return;
 
@@ -167,26 +227,23 @@ export function useHardwareDevices(): HardwareDevices {
     try {
       const port = await serial.requestPort({ filters: [] });
 
-      // Close existing port of this type if one is open
       if (refs[type].current) {
         try { await refs[type].current.close(); } catch {}
       }
 
-      await port.open({ baudRate: BAUD_RATES[type] });
-
+      const baud = DEFAULT_BAUD_RATES[type];
+      await port.open({ baudRate: baud, dataBits: 8, stopBits: 1, parity: 'none' });
       refs[type].current = port;
 
-      // Save VID/PID hint for auto-reconnect
       try {
         const info = port.getInfo?.();
         if (info?.usbVendorId || info?.usbProductId) {
-          saveHint(type, info);
+          saveHint(type, { ...info, baudRate: baud });
         }
       } catch {}
 
-      setters[type]({ status: 'connected', deviceName: deviceLabel(port), port });
+      setters[type]({ status: 'connected', deviceName: rawDeviceLabel(port), port, baudRate: baud });
     } catch (err: any) {
-      // User cancelled the picker: err.name === 'NotFoundError' — treat as aborted
       if (err?.name === 'NotFoundError') {
         setters[type](s => ({ ...s, status: s.status === 'connecting' ? 'disconnected' : s.status }));
       } else {
@@ -215,5 +272,6 @@ export function useHardwareDevices(): HardwareDevices {
     connectPrinter:      () => connectDevice('printer'),
     connectLabelPrinter: () => connectDevice('labelPrinter'),
     disconnectDevice,
+    connectWithPort,
   };
 }

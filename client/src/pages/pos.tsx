@@ -17,7 +17,8 @@ import { OfflineBanner } from "@/components/offline-banner";
 import {
   queueOfflineSale, getPendingOfflineSales, removeOfflineSale,
 } from "@/lib/offline-db";
-import { useHardwareDevices, type DeviceState } from "@/hooks/useHardwareDevices";
+import { useHardwareDevices, type DeviceState, type DeviceType } from "@/hooks/useHardwareDevices";
+import { HardwareWizard } from "@/components/pos/HardwareWizard";
 import { printReceipt, openDrawer, sendPrintJob } from "@/lib/hardware/escpos";
 import { sendTerminalCharge } from "@/lib/hardware/terminal";
 import { printLabel } from "@/lib/hardware/zpl";
@@ -175,6 +176,56 @@ function makeScrambledPad(): string[] {
     [d[i], d[j]] = [d[j], d[i]];
   }
   return [...d.slice(0, 9), "", d[9], "⌫"];
+}
+
+// ─── Connected device compact card (used in new Hardware tab) ────────────────
+
+function ConnectedDeviceCard({
+  type, device, onRemove,
+}: {
+  type: DeviceType;
+  device: DeviceState;
+  onRemove: () => void;
+}) {
+  const icons: Record<DeviceType, React.ReactNode> = {
+    terminal:     <CreditCard    className="h-5 w-5" />,
+    printer:      <Printer       className="h-5 w-5" />,
+    labelPrinter: <Tag           className="h-5 w-5" />,
+  };
+  const typeLabels: Record<DeviceType, string> = {
+    terminal:     'Card Terminal',
+    printer:      'Receipt Printer + Cash Drawer',
+    labelPrinter: 'Label Printer',
+  };
+  const statusColor =
+    device.status === 'connected'  ? 'bg-green-500' :
+    device.status === 'connecting' ? 'bg-yellow-400 animate-pulse' :
+    device.status === 'error'      ? 'bg-red-500' : 'bg-gray-600';
+
+  return (
+    <div className="bg-gray-800 border border-gray-700 rounded-lg p-3.5 flex items-center gap-3">
+      <div className="text-gray-400 flex-shrink-0">{icons[type]}</div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-0.5">
+          <span className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${statusColor}`} />
+          <span className="text-sm font-semibold text-white truncate">
+            {device.deviceName || typeLabels[type]}
+          </span>
+        </div>
+        <p className="text-xs text-gray-500 ml-4">
+          {typeLabels[type]}
+          {device.status === 'connecting' && ' — connecting…'}
+          {device.status === 'error'      && ' — connection error'}
+        </p>
+      </div>
+      <button
+        onClick={onRemove}
+        className="text-xs text-gray-500 hover:text-red-400 hover:bg-red-900/30 px-2.5 py-1.5 rounded border border-gray-700 hover:border-red-800 transition-colors flex-shrink-0"
+      >
+        Remove
+      </button>
+    </div>
+  );
 }
 
 // ─── Hardware device card sub-component ──────────────────────────────────────
@@ -483,6 +534,7 @@ export default function PosPage() {
 
   // ── Hardware devices (Web Serial) ──
   const hw = useHardwareDevices();
+  const [showHardwareWizard, setShowHardwareWizard] = useState(false);
   // Terminal is processing a card charge right now
   const [terminalProcessing, setTerminalProcessing] = useState(false);
   // Stores the last completed sale for the "Print Sale" reprint button
@@ -1908,70 +1960,91 @@ export default function PosPage() {
 
             {/* ── HARDWARE TAB ── */}
             {settingsTab === "hardware" && (
-              <div className="flex-1 overflow-y-auto p-6 space-y-5 max-w-2xl">
-                <div>
-                  <h2 className="text-base font-bold text-white mb-1">Hardware Devices</h2>
-                  <p className="text-xs text-gray-400 leading-relaxed">
-                    Connect physical POS hardware using the browser's built-in device picker.
-                    <strong className="text-gray-300"> Chrome and Edge only.</strong> The browser remembers
-                    paired devices so you only need to connect once per machine per browser session.
-                  </p>
-                </div>
+              <div className="flex-1 overflow-y-auto p-6 space-y-5 max-w-xl">
 
+                {/* ── Unsupported browser ──────────────────────────────────── */}
                 {!hw.hardwareSupported && (
-                  <div className="bg-amber-900/30 border border-amber-700 rounded-lg p-4 flex items-start gap-3">
-                    <AlertCircle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                  <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 text-center space-y-4">
+                    <div className="w-16 h-16 rounded-full bg-gray-700 flex items-center justify-center mx-auto">
+                      <WifiOff className="h-8 w-8 text-gray-500" />
+                    </div>
                     <div>
-                      <p className="text-sm font-semibold text-amber-300">Web Serial not supported in this browser</p>
-                      <p className="text-xs text-amber-400 mt-1">
-                        Hardware connections require Chrome 89+ or Edge 89+.
-                        Safari (iOS/Mac) and Firefox are not supported.
-                        Network-based printer support (for iOS) will be added in a future update.
+                      <p className="text-sm font-semibold text-gray-200 mb-1">
+                        Hardware requires Chrome or Edge
+                      </p>
+                      <p className="text-xs text-gray-400 leading-relaxed">
+                        Web Serial — the technology that connects receipt printers, card terminals,
+                        and label printers — is not supported in this browser (Safari and Firefox).
                       </p>
                     </div>
+                    <div className="text-left bg-gray-900/60 rounded-lg p-3 space-y-1.5">
+                      <p className="text-xs font-semibold text-gray-300">To use POS hardware:</p>
+                      <ol className="text-xs text-gray-400 space-y-1 list-decimal list-inside">
+                        <li>Copy this page's URL</li>
+                        <li>Open <strong className="text-gray-200">Google Chrome</strong> or <strong className="text-gray-200">Microsoft Edge</strong></li>
+                        <li>Paste the URL and sign in</li>
+                      </ol>
+                    </div>
+                    <p className="text-xs text-gray-600">
+                      Network-based printer support for Safari / iOS is planned for a future update.
+                    </p>
                   </div>
                 )}
 
-                {/* Card Terminal */}
-                <HardwareDeviceCard
-                  title="Card Terminal"
-                  subtitle="Dejavoo / Electronic Payments — semi-integrated serial"
-                  icon={<CreditCard className="h-5 w-5" />}
-                  device={hw.terminal}
-                  onConnect={hw.connectTerminal}
-                  onDisconnect={() => hw.disconnectDevice('terminal')}
-                  supported={hw.hardwareSupported}
-                  hint="Select the terminal's USB-Serial COM port. The Credit button will send charges directly to the terminal when connected."
-                />
+                {/* ── Devices panel (Chrome / Edge) ────────────────────────── */}
+                {hw.hardwareSupported && (
+                  <>
+                    <div>
+                      <h2 className="text-base font-bold text-white mb-1">Hardware Devices</h2>
+                      <p className="text-xs text-gray-400 leading-relaxed">
+                        Paired devices reconnect automatically each session. Click{' '}
+                        <strong className="text-gray-300">Add Device</strong> to connect new hardware —
+                        the system identifies the make and model automatically.
+                      </p>
+                    </div>
 
-                {/* Receipt Printer + Drawer */}
-                <HardwareDeviceCard
-                  title="Receipt Printer + Cash Drawer"
-                  subtitle="ESC/POS thermal — cash drawer auto-opens on cash sales"
-                  icon={<Printer className="h-5 w-5" />}
-                  device={hw.printer}
-                  onConnect={hw.connectPrinter}
-                  onDisconnect={() => hw.disconnectDevice('printer')}
-                  supported={hw.hardwareSupported}
-                  hint="The cash drawer must be plugged into the printer's RJ11 port. Use the Open Drawer button to test it."
-                />
+                    {/* Connected device cards */}
+                    <div className="space-y-2">
+                      {([
+                        { type: 'terminal'     as DeviceType, device: hw.terminal },
+                        { type: 'printer'      as DeviceType, device: hw.printer },
+                        { type: 'labelPrinter' as DeviceType, device: hw.labelPrinter },
+                      ]).filter(({ device }) => device.status !== 'disconnected').map(({ type, device }) => (
+                        <ConnectedDeviceCard
+                          key={type}
+                          type={type}
+                          device={device}
+                          onRemove={() => hw.disconnectDevice(type)}
+                        />
+                      ))}
 
-                {/* Label Printer */}
-                <HardwareDeviceCard
-                  title="Label Printer"
-                  subtitle="ZPL II thermal — for product price + barcode labels"
-                  icon={<Tag className="h-5 w-5" />}
-                  device={hw.labelPrinter}
-                  onConnect={hw.connectLabelPrinter}
-                  onDisconnect={() => hw.disconnectDevice('labelPrinter')}
-                  supported={hw.hardwareSupported}
-                  hint="Zebra or compatible ZPL II printer. A label icon will appear on each product tile when connected."
-                />
+                      {hw.terminal.status     === 'disconnected' &&
+                       hw.printer.status      === 'disconnected' &&
+                       hw.labelPrinter.status === 'disconnected' && (
+                        <div className="border border-dashed border-gray-700 rounded-lg p-8 text-center space-y-2">
+                          <Printer className="h-8 w-8 text-gray-600 mx-auto" />
+                          <p className="text-sm text-gray-500">No devices connected</p>
+                          <p className="text-xs text-gray-600">Click Add Device below to get started</p>
+                        </div>
+                      )}
+                    </div>
 
-                <div className="text-xs text-gray-600 pt-2 border-t border-gray-800 space-y-1">
-                  <p>Serial baud rates: Card terminal 9,600 • Receipt printer 9,600 • Label printer 9,600</p>
-                  <p>If a device does not respond, check its COM port settings match the above.</p>
-                </div>
+                    <button
+                      onClick={() => setShowHardwareWizard(true)}
+                      className="flex items-center gap-2 text-sm bg-blue-700 hover:bg-blue-600 text-white px-4 py-2.5 rounded-lg font-semibold transition-colors"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Device
+                    </button>
+                  </>
+                )}
+
+                <HardwareWizard
+                  open={showHardwareWizard}
+                  onClose={() => setShowHardwareWizard(false)}
+                  hw={hw}
+                  onSuccess={(_, name) => toast({ title: `${name} connected`, duration: 2000 })}
+                />
               </div>
             )}
 
