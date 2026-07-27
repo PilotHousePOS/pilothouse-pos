@@ -160,6 +160,36 @@ describe('sendTerminalCharge — frame chunking and parsing', () => {
     expect(result.reason).toContain('99');
   });
 
+  // ── Port-closed guard ───────────────────────────────────────────────────────
+  // Simulates a USB cable being pulled mid-session: the port object exists in
+  // React state (hw.terminal.port is truthy) but Web Serial has set both
+  // readable and writable to null because the physical connection dropped.
+  // sendTerminalCharge must detect this immediately and return the exact reason
+  // string that handleCreditPay uses to branch to the targeted toast.
+
+  it('returns port-not-open reason when readable is null (port closed mid-session)', async () => {
+    const closedPort = { readable: null, writable: {} };
+    const result = await sendTerminalCharge(closedPort, { amountCents: 1000, orderRef: 'POS-CLOSED' });
+
+    expect(result.approved).toBe(false);
+    expect(result.reason).toBe('Terminal port is not open — call openTerminalPort() first');
+  });
+
+  it('returns port-not-open reason when writable is null (port closed mid-session)', async () => {
+    const closedPort = { readable: {}, writable: null };
+    const result = await sendTerminalCharge(closedPort, { amountCents: 500, orderRef: 'POS-CLOSED2' });
+
+    expect(result.approved).toBe(false);
+    expect(result.reason).toBe('Terminal port is not open — call openTerminalPort() first');
+  });
+
+  it('returns port-not-open reason when port itself is null', async () => {
+    const result = await sendTerminalCharge(null, { amountCents: 100, orderRef: 'POS-NULL' });
+
+    expect(result.approved).toBe(false);
+    expect(result.reason).toBe('Terminal port is not open — call openTerminalPort() first');
+  });
+
   it('write captures the correct request frame bytes', async () => {
     // Verify the request is formatted correctly: STX + CMD + SEP + amount(12) + SEP + ref + ETX + LRC
     const frame = makeResponseFrame('00', 'W1N123', '0007', 'VISA');
