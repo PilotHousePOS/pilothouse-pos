@@ -8,7 +8,7 @@ async function main() {
   console.log('');
   let totalSize = 0;
   files.forEach(f => {
-    const size = parseInt(f.metadata?.size || '0');
+    const size = parseInt(String(f.metadata?.size || '0'));
     totalSize += size;
     console.log(`${f.name.replace('public/products/zilla/', '')} - ${size} bytes`);
   });

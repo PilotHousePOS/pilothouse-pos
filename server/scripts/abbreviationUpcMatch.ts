@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { db } from '../db';
 import { supplies } from '@shared/schema';
 import { eq, sql, isNull, or } from 'drizzle-orm';

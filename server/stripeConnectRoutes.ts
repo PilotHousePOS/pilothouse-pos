@@ -202,7 +202,7 @@ export function registerStripeConnectRoutes(app: Express): void {
       const nonce = crypto.randomBytes(32).toString('hex');
       pendingOAuthFlows.set(nonce, { tenantId, expiresAt: Date.now() + STATE_TTL_MS });
 
-      const base = getBaseUrl(req);
+      const base = getBaseUrl();
       const redirectUri = `${base}/api/billing/stripe-connect/callback`;
       const state = buildOAuthState(nonce);
 

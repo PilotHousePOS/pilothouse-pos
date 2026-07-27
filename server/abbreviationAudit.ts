@@ -1,4 +1,5 @@
 import { storage } from './storage';
+import type { IStorage } from './storage';
 import { expandAbbreviationsAsync } from './abbreviationExpansion';
 
 /**
@@ -29,7 +30,7 @@ export async function auditUnknownAbbreviations() {
       console.log(`Audit Progress: ${total}/${totalCount} (${Math.round(total/totalCount*100)}%)`);
     }
     
-    const result = await expandAbbreviationsAsync(supply.name, storage);
+    const result = await expandAbbreviationsAsync(supply.name, storage as IStorage);
     
     // Track catalog hits (items that used brand catalog)
     if (result.catalogUsed) {

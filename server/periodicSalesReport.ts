@@ -263,7 +263,7 @@ export async function sendMonthlySalesReport(
   const label = periodLabel('monthly', startDate, endDate);
   const html  = buildEmailHtml('Monthly', label, data);
 
-  await client.request({
+  await (client as any).request({
     url: '/v3/mail/send',
     method: 'POST',
     body: {
@@ -292,7 +292,7 @@ export async function sendYearlySalesReport(
   const label = String(year);
   const html  = buildEmailHtml('Yearly', label, data);
 
-  await client.request({
+  await (client as any).request({
     url: '/v3/mail/send',
     method: 'POST',
     body: {

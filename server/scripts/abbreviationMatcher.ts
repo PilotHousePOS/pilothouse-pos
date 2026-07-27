@@ -117,7 +117,6 @@ const ABBR_MAP: Record<string, string> = {
   
   // Food types
   'dry': 'dry',
-  'can': 'canned',
   'canned': 'canned',
   'wet': 'wet',
   'stew': 'stew',

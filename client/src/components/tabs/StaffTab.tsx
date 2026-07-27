@@ -54,6 +54,7 @@ interface EmployeePermissions {
   canManageMemberships: boolean;
   canManageSpecials: boolean;
   canManageChargeAccounts: boolean;
+  canEditHomepage: boolean;
   // Feature-toggle permissions
   canToggleAppointments: boolean;
   canToggleLoyalty: boolean;
@@ -106,6 +107,7 @@ const DEFAULT_PERMS: EmployeePermissions = {
   canManageStaff: false, canManageEmail: false, canManageWaitlist: false,
   canManageEstimates: false, canManageInvoicing: false, canManageSmsBlasts: false,
   canManageMemberships: false, canManageSpecials: false, canManageChargeAccounts: false,
+  canEditHomepage: false,
   canToggleAppointments: false, canToggleLoyalty: false, canToggleBoarding: false,
   canToggleHiring: false, canToggleEmailMarketing: false, canTogglePets: false,
 };

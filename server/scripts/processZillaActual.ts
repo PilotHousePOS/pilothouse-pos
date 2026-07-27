@@ -126,7 +126,7 @@ async function main() {
       metadata: { cacheControl: 'public, max-age=31536000' }
     });
     
-    await setObjectAclPolicy(file, { visibility: 'public' });
+    await setObjectAclPolicy(file, { owner: '', visibility: 'public' });
     
     await db.update(supplies).set({ imageUrl: `/public-objects/${objectFileName}` }).where(eq(supplies.id, product.id));
     

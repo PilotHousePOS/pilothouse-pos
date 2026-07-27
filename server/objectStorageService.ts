@@ -277,7 +277,7 @@ export class ObjectStorageService {
         },
       });
 
-      await setObjectAclPolicy(file, { visibility: 'public' });
+      await setObjectAclPolicy(file, { owner: '', visibility: 'public' });
 
       const storedPath = `/public-objects/${fileName}`;
       return { success: true, storedPath };
@@ -342,7 +342,7 @@ export class ObjectStorageService {
         },
       });
 
-      await setObjectAclPolicy(file, { visibility: 'public' });
+      await setObjectAclPolicy(file, { owner: '', visibility: 'public' });
 
       const storedPath = `/public-objects/${fileName}`;
       return { success: true, storedPath };

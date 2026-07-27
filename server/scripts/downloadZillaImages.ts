@@ -121,7 +121,7 @@ async function downloadZillaImages() {
         },
       });
       
-      await setObjectAclPolicy(file, { visibility: 'public' });
+      await setObjectAclPolicy(file, { owner: '' , visibility: 'public' });
       
       // Update database
       const newImageUrl = `/public-objects/${objectFileName}`;

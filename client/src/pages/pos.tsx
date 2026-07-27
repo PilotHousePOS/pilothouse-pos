@@ -10,12 +10,17 @@ import {
   ChevronLeft, DollarSign, CreditCard, Search, Settings, X,
   ChevronUp, ChevronDown, Pencil, Trash2, Plus, Check, GripVertical,
   Lock, Unlock, Delete, LogOut, UserCircle, Eye, EyeOff, WifiOff,
+  Printer, Tag, AlertCircle, Loader2, Zap,
 } from "lucide-react";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { OfflineBanner } from "@/components/offline-banner";
 import {
   queueOfflineSale, getPendingOfflineSales, removeOfflineSale,
 } from "@/lib/offline-db";
+import { useHardwareDevices, type DeviceState } from "@/hooks/useHardwareDevices";
+import { printReceipt, openDrawer, sendPrintJob } from "@/lib/hardware/escpos";
+import { sendTerminalCharge } from "@/lib/hardware/terminal";
+import { printLabel } from "@/lib/hardware/zpl";
 
 interface PosOverrideConfig {
   requirePinForRefund?: boolean;
@@ -172,6 +177,79 @@ function makeScrambledPad(): string[] {
   return [...d.slice(0, 9), "", d[9], "⌫"];
 }
 
+// ─── Hardware device card sub-component ──────────────────────────────────────
+
+function HardwareDeviceCard({
+  title, subtitle, icon, device, onConnect, onDisconnect, supported, hint,
+}: {
+  title:       string;
+  subtitle:    string;
+  icon:        React.ReactNode;
+  device:      DeviceState;
+  onConnect:   () => Promise<void>;
+  onDisconnect: () => Promise<void>;
+  supported:   boolean;
+  hint?:       string;
+}) {
+  const statusColor =
+    device.status === 'connected'   ? 'bg-green-500' :
+    device.status === 'connecting'  ? 'bg-yellow-400 animate-pulse' :
+    device.status === 'error'       ? 'bg-red-500' :
+    'bg-gray-600';
+
+  return (
+    <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-3">
+          <div className="text-gray-400">{icon}</div>
+          <div>
+            <div className="text-sm font-semibold text-white flex items-center gap-2">
+              <span className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${statusColor}`} />
+              {title}
+            </div>
+            <div className="text-xs text-gray-400">{subtitle}</div>
+          </div>
+        </div>
+
+        {supported ? (
+          device.status === 'connected' ? (
+            <button
+              onClick={onDisconnect}
+              className="text-xs bg-red-900/60 hover:bg-red-800 text-red-300 px-3 py-1.5 rounded border border-red-800/60"
+            >
+              Disconnect
+            </button>
+          ) : (
+            <button
+              onClick={onConnect}
+              disabled={device.status === 'connecting'}
+              className="text-xs bg-blue-700 hover:bg-blue-600 disabled:opacity-50 text-white px-3 py-1.5 rounded flex items-center gap-1.5"
+            >
+              {device.status === 'connecting' ? (
+                <><Loader2 className="h-3 w-3 animate-spin" /> Connecting…</>
+              ) : (
+                <><Zap className="h-3 w-3" /> Connect</>
+              )}
+            </button>
+          )
+        ) : (
+          <span className="text-xs text-amber-500 bg-amber-900/30 px-2 py-1 rounded">Not supported</span>
+        )}
+      </div>
+
+      {device.status === 'connected' && device.deviceName && (
+        <div className="text-xs text-green-400 ml-5 mt-1">
+          Connected — {device.deviceName}
+        </div>
+      )}
+
+      {hint && device.status !== 'connected' && (
+        <div className="text-xs text-gray-500 ml-5 mt-1">{hint}</div>
+      )}
+    </div>
+  );
+}
+
 // ─── Main POS Page ─────────────────────────────────────────────────────────────
 
 export default function PosPage() {
@@ -309,7 +387,7 @@ export default function PosPage() {
 
   // ── Settings state ──
   const [showSettings, setShowSettings]         = useState(false);
-  const [settingsTab, setSettingsTab]           = useState<"categories" | "amounts">("categories");
+  const [settingsTab, setSettingsTab]           = useState<"categories" | "amounts" | "hardware">("categories");
   const [editingCatId, setEditingCatId]         = useState<string | null>(null); // cat id being edited, or "new"
   const [editDraft, setEditDraft]               = useState<PosCategory | null>(null);
   const [editSvcIdx, setEditSvcIdx]             = useState<number | null>(null); // sub-button being edited
@@ -402,6 +480,17 @@ export default function PosPage() {
 
   // ── Offline status ──
   const isOnline = useOnlineStatus();
+
+  // ── Hardware devices (Web Serial) ──
+  const hw = useHardwareDevices();
+  // Terminal is processing a card charge right now
+  const [terminalProcessing, setTerminalProcessing] = useState(false);
+  // Stores the last completed sale for the "Print Sale" reprint button
+  const lastCompletedSaleRef = useRef<{
+    orderNumber: string; items: OrderItem[]; subtotal: number;
+    tax: number; total: number; paymentMethod: string;
+    amountTendered?: number; changeDue?: number; operatorName?: string;
+  } | null>(null);
 
   // Admin PIN sign-in on the lock screen (no employee code needed)
   const handleLockAdminPinDigit = async (d: string) => {
@@ -568,6 +657,70 @@ export default function PosPage() {
   const removeLastLine = () => setOrderItems(prev => prev.slice(0, -1));
   const clearAll       = () => { setOrderItems([]); setSelectedCatId(null); };
 
+  // ── Async credit-pay handler (terminal → server) ──────────────────────────
+  const handleCreditPay = async () => {
+    // Hard re-entrancy guard — exactly one terminal charge at a time
+    if (terminalProcessing) return;
+
+    // Snapshot sale data now — state is cleared on mutation success
+    const saleSnapshot = {
+      orderNumber, items: [...orderItems], subtotal, tax, total,
+      paymentMethod: 'credit', operatorName: posOperatorName,
+    };
+
+    if (hw.terminal.status === 'connected' && hw.terminal.port) {
+      // ── Terminal path: send to paired card terminal ──
+      setTerminalProcessing(true);
+      try {
+        const result = await sendTerminalCharge(hw.terminal.port, {
+          amountCents: Math.round(total * 100),
+          orderRef:    orderNumber,
+        });
+        if (result.approved) {
+          saveOrderMutation.mutate(
+            {
+              orderNumber, items: orderItems, subtotal, tax, total,
+              paymentMethod: 'credit',
+              authCode:  result.authCode,
+              cardLast4: result.last4,
+              cardType:  result.cardType,
+            },
+            {
+              onSuccess: () => {
+                // Store for the "Print Sale" reprint button — card sales too
+                lastCompletedSaleRef.current = {
+                  ...saleSnapshot,
+                  paymentMethod: `credit${result.cardType ? ` (${result.cardType})` : ''}`,
+                };
+              },
+            },
+          );
+          toast({ title: `Approved — ****${result.last4 ?? ''}`, description: result.cardType ?? '' });
+        } else {
+          toast({
+            title:       'Card Declined',
+            description: result.reason ?? 'Try a different card.',
+            variant:     'destructive',
+          });
+        }
+      } catch {
+        toast({ title: 'Terminal Error', description: 'Could not reach terminal. Try again.', variant: 'destructive' });
+      } finally {
+        setTerminalProcessing(false);
+      }
+    } else {
+      // ── No terminal paired — record as manual card entry ──
+      saveOrderMutation.mutate(
+        { orderNumber, items: orderItems, subtotal, tax, total, paymentMethod: "credit" },
+        {
+          onSuccess: () => {
+            lastCompletedSaleRef.current = saleSnapshot;
+          },
+        },
+      );
+    }
+  };
+
   const pay = (method: "cash" | "credit") => {
     if (!orderItems.length) return;
     if (method === "credit") {
@@ -575,9 +728,29 @@ export default function PosPage() {
         toast({ title: "Card unavailable offline", description: "Accept cash. The sale will record normally — cards require an internet connection.", variant: "destructive" });
         return;
       }
-      saveOrderMutation.mutate({ orderNumber, items: orderItems, subtotal, tax, total, paymentMethod: "credit" });
+      handleCreditPay(); // async, non-blocking
     } else {
       setShowPayment(true);
+    }
+  };
+
+  // ── Print receipt + open drawer helper ────────────────────────────────────
+  const printReceiptAndOpenDrawer = async (saleData: {
+    orderNumber: string; items: OrderItem[]; subtotal: number;
+    tax: number; total: number; paymentMethod: string;
+    amountTendered?: number; changeDue?: number; operatorName?: string;
+  }) => {
+    if (hw.printer.status !== 'connected' || !hw.printer.port) return;
+    try {
+      await sendPrintJob(hw.printer.port, async (writer) => {
+        await printReceipt(writer, { storeName: 'PilotHouse POS', ...saleData });
+        // Only open drawer on cash sales
+        if (saleData.paymentMethod === 'cash') {
+          await openDrawer(writer);
+        }
+      });
+    } catch {
+      toast({ title: 'Printer error', description: 'Sale saved — printer did not respond.', variant: 'destructive' });
     }
   };
 
@@ -586,6 +759,14 @@ export default function PosPage() {
       toast({ title: "Insufficient payment", description: `Need $${total.toFixed(2)}, received $${tendered.toFixed(2)}`, variant: "destructive" });
       return;
     }
+
+    // Snapshot sale data before state is cleared on success
+    const saleSnapshot = {
+      orderNumber, items: [...orderItems], subtotal, tax, total,
+      paymentMethod: "cash", amountTendered: tendered, changeDue: change,
+      operatorName: posOperatorName,
+    };
+
     if (!isOnline) {
       // Queue to IndexedDB — syncs automatically when connection returns
       try {
@@ -603,12 +784,23 @@ export default function PosPage() {
         setOrderItems([]);
         setShowPayment(false);
         setCashTendered("");
+        lastCompletedSaleRef.current = saleSnapshot;
+        await printReceiptAndOpenDrawer(saleSnapshot); // printer is local — works offline
       } catch {
         toast({ title: "Error", description: "Could not save offline sale. Try again.", variant: "destructive" });
       }
       return;
     }
-    saveOrderMutation.mutate({ orderNumber, items: orderItems, subtotal, tax, total, paymentMethod: "cash", amountTendered: tendered, changeDue: change });
+
+    saveOrderMutation.mutate(
+      { orderNumber, items: orderItems, subtotal, tax, total, paymentMethod: "cash", amountTendered: tendered, changeDue: change },
+      {
+        onSuccess: async () => {
+          lastCompletedSaleRef.current = saleSnapshot;
+          await printReceiptAndOpenDrawer(saleSnapshot);
+        },
+      },
+    );
   };
 
   // Auto-drain the offline queue 2 s after coming back online
@@ -892,11 +1084,39 @@ export default function PosPage() {
             {selectedCat?.dbCategory && (
               <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2">
                 {(categoryItems as SupplyItem[]).map(item => (
-                  <button key={item.id} onClick={() => addItem(item.name, Number(item.price), selectedCatId!, item.sku)}
-                    className="bg-gray-700 hover:bg-gray-600 active:scale-95 text-white rounded p-2 text-center transition-all min-h-[70px] flex flex-col items-center justify-center border border-gray-600 hover:border-gray-400">
-                    <div className="text-xs font-medium leading-tight line-clamp-3">{item.name}</div>
-                    <div className="text-xs text-green-400 font-semibold mt-1">${Number(item.price).toFixed(2)}</div>
-                  </button>
+                  <div key={item.id} className="relative group">
+                    <button
+                      onClick={() => addItem(item.name, Number(item.price), selectedCatId!, item.sku)}
+                      className="w-full bg-gray-700 hover:bg-gray-600 active:scale-95 text-white rounded p-2 text-center transition-all min-h-[70px] flex flex-col items-center justify-center border border-gray-600 hover:border-gray-400"
+                    >
+                      <div className="text-xs font-medium leading-tight line-clamp-3">{item.name}</div>
+                      <div className="text-xs text-green-400 font-semibold mt-1">${Number(item.price).toFixed(2)}</div>
+                    </button>
+                    {/* Label print button — visible on hover when label printer is connected */}
+                    {hw.labelPrinter.status === 'connected' && hw.labelPrinter.port && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          (async () => {
+                            try {
+                              await printLabel(hw.labelPrinter.port, {
+                                name:    item.name,
+                                price:   Number(item.price),
+                                barcode: item.sku || undefined,
+                              });
+                              toast({ title: 'Label sent', description: item.name });
+                            } catch {
+                              toast({ title: 'Label print failed', variant: 'destructive' });
+                            }
+                          })();
+                        }}
+                        className="absolute top-1 right-1 p-1 bg-gray-900/80 hover:bg-purple-700 rounded text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Print price label"
+                      >
+                        <Tag className="h-3 w-3" />
+                      </button>
+                    )}
+                  </div>
                 ))}
                 {(categoryItems as SupplyItem[]).length === 0 && (
                   <div className="col-span-3 text-center text-gray-500 text-sm py-8">No items in this category</div>
@@ -944,11 +1164,48 @@ export default function PosPage() {
         <div className="w-28 bg-gray-800 border-l border-gray-700 flex flex-col gap-1 p-1.5 flex-shrink-0">
           <button onClick={() => setLocation("/admin")} className="bg-green-700 hover:bg-green-600 text-white rounded py-3 text-xs font-bold text-center">Register</button>
           <button disabled className="bg-gray-700 text-gray-500 rounded py-3 text-xs text-center cursor-not-allowed">Order Details</button>
-          <button onClick={() => pay("credit")} disabled={!orderItems.length} className="bg-blue-700 hover:bg-blue-600 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded py-3 text-xs font-bold text-center">Pay</button>
+          <button
+            onClick={() => pay("credit")}
+            disabled={!orderItems.length || !isOnline || terminalProcessing}
+            title={terminalProcessing ? "Terminal processing — please wait" : !isOnline ? "Card unavailable offline" : undefined}
+            className="bg-blue-700 hover:bg-blue-600 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed text-white rounded py-3 text-xs font-bold text-center flex items-center justify-center gap-1"
+          >
+            {terminalProcessing ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+            Pay
+          </button>
           <button disabled className="bg-gray-700 text-gray-500 rounded py-3 text-xs text-center cursor-not-allowed">Save Order</button>
           <button disabled className="bg-gray-700 text-gray-500 rounded py-3 text-xs text-center cursor-not-allowed">Get Order</button>
-          <button disabled className="bg-gray-700 text-gray-500 rounded py-3 text-xs text-center cursor-not-allowed">Print Order</button>
-          <button disabled className="bg-gray-700 text-gray-500 rounded py-3 text-xs text-center cursor-not-allowed">Print Sale</button>
+          <button
+            onClick={() => {
+              if (!orderItems.length || hw.printer.status !== 'connected' || !hw.printer.port) return;
+              (async () => {
+                try {
+                  await sendPrintJob(hw.printer.port, async (w) => {
+                    await printReceipt(w, { storeName: 'PilotHouse POS', orderNumber, items: orderItems, subtotal, tax, total, paymentMethod: 'pending' });
+                  });
+                } catch { toast({ title: 'Print error', description: 'Check printer.', variant: 'destructive' }); }
+              })();
+            }}
+            disabled={!orderItems.length || hw.printer.status !== 'connected'}
+            title={hw.printer.status !== 'connected' ? 'Connect a receipt printer first' : 'Print current order ticket'}
+            className={`${orderItems.length && hw.printer.status === 'connected' ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-700 text-gray-500 cursor-not-allowed'} rounded py-3 text-xs text-center`}
+          >Print Order</button>
+          <button
+            onClick={() => {
+              const sale = lastCompletedSaleRef.current;
+              if (!sale || hw.printer.status !== 'connected' || !hw.printer.port) return;
+              (async () => {
+                try {
+                  await sendPrintJob(hw.printer.port, async (w) => {
+                    await printReceipt(w, { storeName: 'PilotHouse POS', ...sale });
+                  });
+                } catch { toast({ title: 'Print error', description: 'Check printer.', variant: 'destructive' }); }
+              })();
+            }}
+            disabled={hw.printer.status !== 'connected' || !lastCompletedSaleRef.current}
+            title={hw.printer.status !== 'connected' ? 'Connect a receipt printer first' : 'Reprint last receipt'}
+            className={`${hw.printer.status === 'connected' && lastCompletedSaleRef.current ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-700 text-gray-500 cursor-not-allowed'} rounded py-3 text-xs text-center`}
+          >Print Sale</button>
           <button onClick={() => setShowSearch(true)} className="bg-indigo-700 hover:bg-indigo-600 text-white rounded py-3 text-xs font-bold text-center">Find Items</button>
 
           {/* Refund — gated per posOverrideConfig.requirePinForRefund for employees */}
@@ -1010,7 +1267,17 @@ export default function PosPage() {
                 return;
               }
               consumeOverride('requirePinForDrawer');
-              // TODO: open cash drawer
+              (async () => {
+                if (hw.printer.status === 'connected' && hw.printer.port) {
+                  try {
+                    await sendPrintJob(hw.printer.port, async (w) => { await openDrawer(w); });
+                  } catch {
+                    toast({ title: 'Drawer error', description: 'Check printer connection.', variant: 'destructive' });
+                  }
+                } else {
+                  toast({ title: 'No printer connected', description: 'Connect a receipt printer to open the drawer.', variant: 'destructive' });
+                }
+              })();
             }}
             className={`${needsOverride('requirePinForDrawer') ? "bg-gray-700 text-gray-400" : unlockedActions.has('requirePinForDrawer') ? "bg-amber-600 hover:bg-amber-500 text-white ring-1 ring-amber-400" : "bg-teal-700 hover:bg-teal-600 text-white"} rounded py-3 text-xs font-bold text-center flex items-center justify-center gap-1 transition-all`}
             title={needsOverride('requirePinForDrawer') ? "Manager override required" : unlockedActions.has('requirePinForDrawer') ? "Override active — tap to open" : "Open cash drawer"}
@@ -1032,12 +1299,21 @@ export default function PosPage() {
         </button>
         <button
           onClick={() => pay("credit")}
-          disabled={!orderItems.length || !isOnline}
-          title={!isOnline ? "Card payments unavailable — no internet connection" : undefined}
+          disabled={!orderItems.length || !isOnline || terminalProcessing}
+          title={
+            !isOnline ? "Card payments unavailable — no internet connection"
+            : terminalProcessing ? "Terminal processing — please wait"
+            : hw.terminal.status === 'connected' ? `Terminal: ${hw.terminal.deviceName}`
+            : "No terminal paired — will log as card payment"
+          }
           className={`flex-1 ${isOnline ? "bg-blue-700 hover:bg-blue-600" : "bg-gray-700 opacity-50 cursor-not-allowed"} disabled:text-gray-500 text-white rounded py-3 font-bold text-sm flex items-center justify-center gap-2 transition-colors`}
         >
-          {isOnline ? <CreditCard className="h-4 w-4" /> : <WifiOff className="h-4 w-4" />}
-          {isOnline ? "Credit" : "Card — Offline"}
+          {terminalProcessing
+            ? <><Loader2 className="h-4 w-4 animate-spin" /> Processing…</>
+            : isOnline
+              ? <><CreditCard className="h-4 w-4" /> Credit</>
+              : <><WifiOff className="h-4 w-4" /> Card — Offline</>
+          }
         </button>
         <button onClick={() => setShowSearch(true)}
           className="px-8 bg-gray-600 hover:bg-gray-500 text-white rounded py-3 font-semibold text-sm flex items-center justify-center gap-2">
@@ -1354,10 +1630,14 @@ export default function PosPage() {
 
           {/* Tab bar */}
           <div className="bg-gray-800 border-b border-gray-700 px-5 flex gap-0 flex-shrink-0">
-            {(["categories", "amounts"] as const).map(tab => (
-              <button key={tab} onClick={() => { setSettingsTab(tab); cancelEdit(); }}
-                className={`px-5 py-2.5 text-sm font-semibold capitalize border-b-2 transition-colors ${settingsTab === tab ? "border-blue-500 text-blue-400" : "border-transparent text-gray-400 hover:text-white"}`}>
-                {tab === "categories" ? "Category Buttons" : "Quick Amounts"}
+            {([
+              { key: "categories", label: "Category Buttons" },
+              { key: "amounts",    label: "Quick Amounts" },
+              { key: "hardware",   label: "Hardware" },
+            ] as const).map(({ key, label }) => (
+              <button key={key} onClick={() => { setSettingsTab(key); cancelEdit(); }}
+                className={`px-5 py-2.5 text-sm font-semibold border-b-2 transition-colors ${settingsTab === key ? "border-blue-500 text-blue-400" : "border-transparent text-gray-400 hover:text-white"}`}>
+                {label}
               </button>
             ))}
           </div>
@@ -1625,6 +1905,76 @@ export default function PosPage() {
                 </div>
               </div>
             )}
+
+            {/* ── HARDWARE TAB ── */}
+            {settingsTab === "hardware" && (
+              <div className="flex-1 overflow-y-auto p-6 space-y-5 max-w-2xl">
+                <div>
+                  <h2 className="text-base font-bold text-white mb-1">Hardware Devices</h2>
+                  <p className="text-xs text-gray-400 leading-relaxed">
+                    Connect physical POS hardware using the browser's built-in device picker.
+                    <strong className="text-gray-300"> Chrome and Edge only.</strong> The browser remembers
+                    paired devices so you only need to connect once per machine per browser session.
+                  </p>
+                </div>
+
+                {!hw.hardwareSupported && (
+                  <div className="bg-amber-900/30 border border-amber-700 rounded-lg p-4 flex items-start gap-3">
+                    <AlertCircle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-amber-300">Web Serial not supported in this browser</p>
+                      <p className="text-xs text-amber-400 mt-1">
+                        Hardware connections require Chrome 89+ or Edge 89+.
+                        Safari (iOS/Mac) and Firefox are not supported.
+                        Network-based printer support (for iOS) will be added in a future update.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Card Terminal */}
+                <HardwareDeviceCard
+                  title="Card Terminal"
+                  subtitle="Dejavoo / Electronic Payments — semi-integrated serial"
+                  icon={<CreditCard className="h-5 w-5" />}
+                  device={hw.terminal}
+                  onConnect={hw.connectTerminal}
+                  onDisconnect={() => hw.disconnectDevice('terminal')}
+                  supported={hw.hardwareSupported}
+                  hint="Select the terminal's USB-Serial COM port. The Credit button will send charges directly to the terminal when connected."
+                />
+
+                {/* Receipt Printer + Drawer */}
+                <HardwareDeviceCard
+                  title="Receipt Printer + Cash Drawer"
+                  subtitle="ESC/POS thermal — cash drawer auto-opens on cash sales"
+                  icon={<Printer className="h-5 w-5" />}
+                  device={hw.printer}
+                  onConnect={hw.connectPrinter}
+                  onDisconnect={() => hw.disconnectDevice('printer')}
+                  supported={hw.hardwareSupported}
+                  hint="The cash drawer must be plugged into the printer's RJ11 port. Use the Open Drawer button to test it."
+                />
+
+                {/* Label Printer */}
+                <HardwareDeviceCard
+                  title="Label Printer"
+                  subtitle="ZPL II thermal — for product price + barcode labels"
+                  icon={<Tag className="h-5 w-5" />}
+                  device={hw.labelPrinter}
+                  onConnect={hw.connectLabelPrinter}
+                  onDisconnect={() => hw.disconnectDevice('labelPrinter')}
+                  supported={hw.hardwareSupported}
+                  hint="Zebra or compatible ZPL II printer. A label icon will appear on each product tile when connected."
+                />
+
+                <div className="text-xs text-gray-600 pt-2 border-t border-gray-800 space-y-1">
+                  <p>Serial baud rates: Card terminal 9,600 • Receipt printer 9,600 • Label printer 9,600</p>
+                  <p>If a device does not respond, check its COM port settings match the above.</p>
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
       )}

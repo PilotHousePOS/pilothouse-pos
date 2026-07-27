@@ -160,7 +160,7 @@ async function main() {
       metadata: { cacheControl: 'public, max-age=31536000' }
     });
     
-    await setObjectAclPolicy(file, { visibility: 'public' });
+    await setObjectAclPolicy(file, { owner: '', visibility: 'public' });
     
     const newImageUrl = `/public-objects/${objectFileName}`;
     await db.update(supplies).set({ imageUrl: newImageUrl }).where(eq(supplies.id, product.id));

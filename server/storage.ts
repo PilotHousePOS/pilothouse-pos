@@ -160,7 +160,7 @@ import {
   type InsertMemberSubscription,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, asc, and, or, not, ilike, lt, lte, isNull, isNotNull, count, sql, inArray, ne, notInArray } from "drizzle-orm";
+import { eq, desc, asc, and, or, not, ilike, lt, lte, gte, isNull, isNotNull, count, sql, inArray, ne, notInArray } from "drizzle-orm";
 import { phoneNumbersMatch, normalizePhoneNumber } from "./phoneUtils";
 import { SUPPLY_FILTERS, type FilterType } from "./filterConfig";
 import { 
@@ -190,7 +190,7 @@ export interface IStorage {
   getEmployees(tenantId: number): Promise<User[]>;
   updateEmployee(id: string, data: Partial<{ firstName: string; lastName: string; email: string; password: string; phoneNumber: string; isAdmin: boolean; defaultWorkDays: string[]; defaultTimeSlot: string; defaultDaySlots: Record<string, string> }>, tenantId: number): Promise<User>;
   setEmployeePin(userId: string, tenantId: number, pin: string): Promise<void>;
-  authenticateEmployeeByPin(tenantId: number, employeeCode: string, pin: string): Promise<User | null>;
+  authenticateEmployeeByPin(tenantId: number, employeeCode: string, pin: string): Promise<User | { locked: true; lockedUntil: Date } | null>;
   deleteEmployee(id: string, tenantId: number): Promise<void>;
   getEmployeePermissions(userId: string, tenantId: number): Promise<EmployeePermissions | undefined>;
   upsertEmployeePermissions(userId: string, tenantId: number, perms: Partial<Omit<InsertEmployeePermissions, 'userId' | 'tenantId' | 'id' | 'createdAt' | 'updatedAt'>>): Promise<EmployeePermissions>;
@@ -2105,6 +2105,7 @@ export class DatabaseStorage implements IStorage {
       food: 0,
       toys: 0,
       beds: 0,
+      leashes: 0,
       leashesAndCollars: 0,
       healthcare: 0,
       accessories: 0,
@@ -3311,10 +3312,10 @@ export class DatabaseStorage implements IStorage {
       contact = await this.createContact({
         name: contactName,
         phoneNumber: appointment.ownerPhoneNumber,
-        email: appointment.ownerEmail || null,
+        email: (appointment as any).ownerEmail || null,
         petNames: appointment.petName ? [appointment.petName] : null,
         animalType: appointment.petType || null,
-        breed: appointment.breed || null,
+        breed: (appointment as any).breed || null,
         source: appointment.source || 'manual',
         notes: null,
         linkedUserId: null,
@@ -3348,15 +3349,15 @@ export class DatabaseStorage implements IStorage {
       tenantId: tenantId ?? null,
       contactId: contact.id,
       ownerPhoneNumber: appointment.ownerPhoneNumber,
-      ownerEmail: appointment.ownerEmail || null,
+      ownerEmail: (appointment as any).ownerEmail || null,
       ownerFirstName: appointment.ownerFirstName || null,
       ownerLastName: appointment.ownerLastName || null,
       appointmentDate: appointment.appointmentDate,
       appointmentTime: appointment.appointmentTime,
       petName: resolvedPetName,
       petType: resolvedPetType,
-      breed: appointment.breed || null,
-      serviceType: appointment.serviceType || appointment.service || null,
+      breed: (appointment as any).breed || null,
+      serviceType: appointment.serviceType || (appointment as any).service || null,
       groomerName: groomerName,
       status: appointment.status,
       source: appointment.source || null,

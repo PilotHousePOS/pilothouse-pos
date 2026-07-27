@@ -15,6 +15,7 @@ import {
   insertAppointmentSchema,
   insertCustomerPetSchema,
   insertSupplySchema,
+  insertCartItemSchema,
   users,
   orderItems,
   orders,
@@ -249,7 +250,7 @@ const excelUpload = multer({
 // In-memory store for pending contact-change OTPs (email/phone).
 // Keyed by a random pendingToken returned to the client.
 const pendingContactChanges = new Map<string, {
-  userId: number;
+  userId: string;
   type: 'email' | 'phone';
   newValue: string;
   otp: string;
@@ -1042,9 +1043,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         password,
         firstName,
         lastName,
-        isAdmin: isAdmin || false,
-        isGroomer: isGroomer || false,
-      });
+      } as any);
 
       // Update phone number if provided
       if (phoneNumber) {
@@ -1085,7 +1084,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       }
 
       // Verify password using bcrypt (handles both hashed and legacy plain text)
-      const passwordValid = await verifyPassword(password, user.password);
+      const passwordValid = await verifyPassword(password, user.password ?? '');
       if (!passwordValid) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
@@ -1400,7 +1399,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       }
 
       // Require password re-verification before initiating the change
-      const passwordValid = await verifyPassword(currentPassword, currentUser.password);
+      const passwordValid = await verifyPassword(currentPassword, currentUser.password ?? '');
       if (!passwordValid) {
         return res.status(401).json({ message: "Current password is incorrect" });
       }
@@ -1536,13 +1535,13 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       }
 
       // Verify current password using bcrypt
-      const currentPasswordValid = await verifyPassword(currentPassword, currentUser.password);
+      const currentPasswordValid = await verifyPassword(currentPassword, currentUser.password ?? '');
       if (!currentPasswordValid) {
         return res.status(401).json({ message: "Current password is incorrect" });
       }
 
       // Prevent reuse of the same password
-      const isSamePassword = await verifyPassword(newPassword, currentUser.password);
+      const isSamePassword = await verifyPassword(newPassword, currentUser.password ?? '');
       if (isSamePassword) {
         return res.status(400).json({ message: "New password cannot be the same as your current password" });
       }
@@ -1637,7 +1636,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       }
 
       // Require password re-verification before initiating the change
-      const passwordValid = await verifyPassword(currentPassword, currentUser.password);
+      const passwordValid = await verifyPassword(currentPassword, currentUser.password ?? '');
       if (!passwordValid) {
         return res.status(401).json({ message: "Current password is incorrect" });
       }
@@ -1833,7 +1832,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       }
 
       // Prevent reuse of the same password
-      const isSamePassword = await verifyPassword(newPassword, user.password);
+      const isSamePassword = await verifyPassword(newPassword, user.password ?? '');
       if (isSamePassword) {
         return res.status(400).json({ message: "New password cannot be the same as your previous password. Please choose a different password." });
       }
@@ -2050,7 +2049,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       });
       
       // Set public ACL
-      await setObjectAclPolicy(file, { visibility: 'public' });
+      await setObjectAclPolicy(file, { owner: '', visibility: 'public' });
       
       // Clean up local file
       fs.unlinkSync(filePath);
@@ -2119,7 +2118,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
         contentType: 'image/jpeg',
         metadata: { cacheControl: 'public, max-age=31536000' },
       });
-      await setObjectAclPolicy(file, { visibility: 'public' });
+      await setObjectAclPolicy(file, { owner: '', visibility: 'public' });
 
       console.log(`[reprocess-image] Re-processed ${imageUrl}: ${rawBuffer.length} → ${processedBuffer.length} bytes`);
       res.json({ success: true, imageUrl, originalSize: rawBuffer.length, processedSize: processedBuffer.length });
@@ -2320,7 +2319,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     } catch (error) {
       console.error("Error creating pet:", error);
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid pet data", errors: error.errors });
+        return res.status(400).json({ message: "Invalid pet data", errors: error.issues });
       }
       res.status(500).json({ message: "Failed to create pet" });
     }
@@ -2353,7 +2352,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     } catch (error) {
       console.error("Error updating pet:", error);
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid pet data", errors: error.errors });
+        return res.status(400).json({ message: "Invalid pet data", errors: error.issues });
       }
       res.status(500).json({ message: "Failed to update pet" });
     }
@@ -2957,7 +2956,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     } catch (error) {
       console.error("Error creating supply:", error);
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid supply data", errors: error.errors });
+        return res.status(400).json({ message: "Invalid supply data", errors: error.issues });
       }
       res.status(500).json({ message: "Failed to create supply" });
     }
@@ -2988,7 +2987,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     } catch (error: any) {
       console.error("Error updating supply:", error);
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid supply data", errors: error.errors });
+        return res.status(400).json({ message: "Invalid supply data", errors: error.issues });
       }
       if (error?.message === "Supply not found or access denied") {
         return res.status(404).json({ message: "Supply not found" });
@@ -3973,7 +3972,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     } catch (error) {
       console.error("Error adding to cart:", error);
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid cart item data", errors: error.errors });
+        return res.status(400).json({ message: "Invalid cart item data", errors: error.issues });
       }
       res.status(500).json({ message: "Failed to add to cart" });
     }
@@ -4275,7 +4274,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
                   
                   serverComputedRewardDiscount += itemPrice;
                   usedRewardIds.add(applied.rewardId);
-                  verifiedAppliedRewards.push({ ...applied, supplyId: cartItem.supplyId });
+                  verifiedAppliedRewards.push({ ...applied, supplyId: cartItem.supplyId } as any);
                 }
                 
                 if (verifiedAppliedRewards.length > 0) {
@@ -4439,7 +4438,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     } catch (error) {
       console.error("Error creating order:", error);
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid order data", errors: error.errors });
+        return res.status(400).json({ message: "Invalid order data", errors: error.issues });
       }
       res.status(500).json({ message: "Failed to create order" });
     }
@@ -5997,7 +5996,7 @@ West Monroe LA 71291
         const aptDateRaw = apt.appointmentDate;
         const dateStr = typeof aptDateRaw === 'string' 
           ? aptDateRaw.split('T')[0] 
-          : aptDateRaw.toISOString().split('T')[0];
+          : (aptDateRaw as Date).toISOString().split('T')[0];
         const aptDate = new Date(dateStr);
         
         if (aptDate >= start && aptDate <= end) {
@@ -7935,7 +7934,7 @@ West Monroe LA 71291
     } catch (error) {
       console.error("Error creating appointment:", error);
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid appointment data", errors: error.errors });
+        return res.status(400).json({ message: "Invalid appointment data", errors: error.issues });
       }
       // Return more specific error message for debugging production issues
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -7965,7 +7964,7 @@ West Monroe LA 71291
     } catch (error) {
       console.error("Error creating customer pet:", error);
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid pet data", errors: error.errors });
+        return res.status(400).json({ message: "Invalid pet data", errors: error.issues });
       }
       res.status(500).json({ message: "Failed to create customer pet" });
     }
@@ -8211,7 +8210,7 @@ West Monroe LA 71291
       ]);
 
       // Helper: parse hours from time slot string
-      function parseHours(slot: string): number | null {
+      const parseHours = (slot: string): number | null => {
         if (!slot || slot.toUpperCase() === "OFF" || slot === "-") return 0;
         // Normalize: remove am/pm, collapse to "HH:MM-HH:MM"
         const norm = slot.toLowerCase().replace(/am|pm/g, "").trim();
@@ -8222,7 +8221,7 @@ West Monroe LA 71291
         // If end < start, assume PM (e.g. 9-5 means 9am-5pm)
         if (endH < startH) endH += 12;
         return (endH * 60 + endM - startH * 60 - startM) / 60;
-      }
+      };
 
       // Get all unique employee names appearing in template
       const employeeNames = [...new Set(templateEntries.map((e: any) => e.employeeName))];
@@ -8685,7 +8684,7 @@ West Monroe LA 71291
         linkType: linkType || 'none', linkId: linkId || null, externalUrl,
         isActive: isActive !== false, sortOrder: sortOrder ?? 0,
         tenantId,
-      });
+      } as any);
       res.json(created);
     } catch (error) {
       console.error("Error creating special:", error);
@@ -10492,7 +10491,7 @@ West Monroe LA 71291
       const syncContactTenantId = resolveWriteTenantId(req, res);
       if (syncContactTenantId === undefined) return;
 
-      console.log(`[ContactSync] Sync started by admin user id=${req.user?.id} (${user.username || user.email || 'unknown'})`);
+      console.log(`[ContactSync] Sync started by admin user id=${req.user?.id} (${user.email || 'unknown'})`);
 
       const allAppointments = await storage.getAppointments(undefined, syncContactTenantId);
       // Only process completed appointments — pet showed up, so the phone number is verified
@@ -11242,7 +11241,7 @@ West Monroe LA 71291
             await storage.updateSupply(existingSupply.id, {
               name,
               description,
-              price,
+              price: String(price),
               category: normalizedCategory,
               imageUrl: existingSupply.imageUrl || imageUrl,
               stockQuantity,
@@ -11256,7 +11255,7 @@ West Monroe LA 71291
             await storage.createSupply({
               name,
               description,
-              price,
+              price: String(price),
               category: normalizedCategory,
               imageUrl,
               stockQuantity,
@@ -12169,10 +12168,11 @@ West Monroe LA 71291
 
       console.log("Starting 'Process All' - Step 1/3: Expanding abbreviations...");
       const startTime = Date.now();
+      const tenantId: number = (req as any).tenantId;
       
       // Expand abbreviations using brand catalog
       const { expandAbbreviationsAsync } = await import('./abbreviationExpansion');
-      const supplies = await storage.getAllSupplies((req as any).tenantId);
+      const supplies = await storage.getAllSupplies(tenantId);
       const totalSupplies = supplies.length;
       let expandChanged = 0;
       let expandUnchanged = 0;
@@ -12860,7 +12860,7 @@ West Monroe LA 71291
 
       // Create the order photo record
       const orderPhoto = await storage.createOrderPhoto({
-        userId: user.id,
+        userId: user!.id,
         imageUrl: `/uploads/${req.file.filename}`,
         priceMultiplier: priceMultiplier.toString(),
         status: "processing"
@@ -13140,9 +13140,8 @@ West Monroe LA 71291
               price: extractedItem.markedUpPrice,
               age: null,
               description: extractedItem.notes || null,
-              isActive: true,
               tenantId,
-            });
+            } as any);
 
             // Mark item as added to inventory (linked to pet instead of supply)
             await storage.updateExtractedOrderItem(extractedItem.id, {
@@ -13300,7 +13299,7 @@ West Monroe LA 71291
         const currentPoints = parseFloat(String(astroCustomer.loyaltyPoints) || '0');
         if (liveStatus.pointsBalance !== currentPoints) {
           await storage.updateAstroCustomer(astroCustomer.id, {
-            loyaltyPoints: String(liveStatus.pointsBalance),
+            loyaltyPoints: liveStatus.pointsBalance,
             lastSyncedAt: new Date(),
             syncStatus: 'synced',
           });
@@ -13570,7 +13569,7 @@ West Monroe LA 71291
         internalCustomerId: `animalhouse-${order.userId}`,
         transactionId: orderId.toString(),
         items,
-        purchaseDate: order.orderDate,
+        purchaseDate: order.orderDate ?? new Date(),
         totalAmount: parseFloat(order.totalAmount),
       });
 
@@ -13674,7 +13673,7 @@ West Monroe LA 71291
         return res.status(503).json({ message: "Failed to redeem reward" });
       }
 
-      res.json({ success: true, message: "Reward redeemed successfully!", ...result });
+      res.json({ message: "Reward redeemed successfully!", ...result });
     } catch (error) {
       console.error("Error redeeming points:", error);
       res.status(500).json({ message: "Failed to redeem points" });
@@ -15840,7 +15839,7 @@ CRITICAL RULES:
       let sent = 0;
       for (const phone of phones) {
         try {
-          const ok = await notificationService.sendGenericSMS(phone, message, undefined, tenantId);
+          const ok = await (notificationService as any).sendGenericSMS(phone, message, undefined, tenantId);
           if (ok) sent++;
         } catch { /* skip failed sends */ }
       }

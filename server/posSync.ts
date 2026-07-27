@@ -36,7 +36,7 @@ export interface POSSyncResult {
 export async function syncSupplyFromPOS(posProduct: POSProduct): Promise<'updated' | 'skipped' | 'created'> {
   try {
     // Try to find existing supply by POS product ID
-    const existing = await db.query.supplies.findFirst({
+    const existing = await (db as any).query.supplies.findFirst({
       where: eq(supplies.posProductId, posProduct.posProductId)
     });
 
@@ -99,7 +99,7 @@ export async function syncSupplyFromPOS(posProduct: POSProduct): Promise<'update
 export async function syncPetFromPOS(posProduct: POSProduct): Promise<'updated' | 'skipped' | 'created'> {
   try {
     // Try to find existing pet by POS product ID
-    const existing = await db.query.pets.findFirst({
+    const existing = await (db as any).query.pets.findFirst({
       where: eq(pets.posProductId, posProduct.posProductId)
     });
 
@@ -210,7 +210,7 @@ export async function setPetManualOverride(
  * Get POS sync status for supplies
  */
 export async function getSuppliesPOSSyncStatus() {
-  const allSupplies = await db.query.supplies.findMany();
+  const allSupplies: any[] = await (db as any).query.supplies.findMany();
   
   return {
     total: allSupplies.length,

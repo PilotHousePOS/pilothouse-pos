@@ -82,9 +82,9 @@ async function debugCarousel() {
   `);
   
   console.log('\n=== Debug Results ===');
-  console.log('\nElements with data-bg:', debug.dataBgElements);
-  console.log('\nColumns with background:', debug.allColumns);
-  console.log('\nAll divs with NS_ background:', debug.allDivsWithBg);
+  console.log('\nElements with data-bg:', (debug as any).dataBgElements);
+  console.log('\nColumns with background:', (debug as any).allColumns);
+  console.log('\nAll divs with NS_ background:', (debug as any).allDivsWithBg);
   
   await browser.close();
 }

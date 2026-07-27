@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as fs from 'fs';
 
 // Brand code to full brand name - comprehensive list

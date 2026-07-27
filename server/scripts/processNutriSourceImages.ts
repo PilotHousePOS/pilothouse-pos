@@ -422,7 +422,7 @@ async function storeImage(imageBuffer: Buffer, product: any, suffix: string = ''
       metadata: { cacheControl: 'public, max-age=31536000' }
     });
     
-    await setObjectAclPolicy(file, { visibility: 'public' });
+    await setObjectAclPolicy(file, { owner: '', visibility: 'public' });
     
     return `/public-objects/${objectFileName}`;
   } catch (error) {

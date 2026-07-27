@@ -179,7 +179,7 @@ export function fuzzySearchFilter<T>(
   threshold: number = 75  // Raised from 70 to filter out false positives
 ): Array<T & { _relevance?: number }> {
   if (!query || !query.trim()) {
-    return items;
+    return items as Array<T & { _relevance?: number }>;
   }
   
   const lowerQuery = query.toLowerCase().trim();

@@ -86,7 +86,7 @@ async function getCredentials() {
 
   for (const cred of candidates) {
     try {
-      const testStripe = new Stripe(cred.secretKey, { apiVersion: '2025-08-27.basil' });
+      const testStripe = new Stripe(cred.secretKey, { apiVersion: '2025-11-17.clover' });
       const account = await testStripe.accounts.retrieve();
       console.log(`[Stripe] Using validated key from: ${cred.source} (account: ${account.id})`);
       validatedCredentials = { publishableKey: cred.publishableKey, secretKey: cred.secretKey };
@@ -151,7 +151,7 @@ export async function getUncachableStripeClient() {
   const { secretKey } = await getCredentials();
 
   return new Stripe(secretKey, {
-    apiVersion: '2025-08-27.basil',
+    apiVersion: '2025-11-17.clover',
   });
 }
 

@@ -52,11 +52,11 @@ async function debugDiscoverNS() {
   `);
   
   console.log('\nShopify product images found:');
-  images.shopifyImages.forEach((img: any, i: number) => {
+  (images as any).shopifyImages.forEach((img: any, i: number) => {
     console.log(`  ${i+1}. ${img.src.split('/').pop()} - "${img.alt}"`);
   });
   
-  console.log('\nThumbnails:', images.thumbnails);
+  console.log('\nThumbnails:', (images as any).thumbnails);
   
   await browser.close();
 }

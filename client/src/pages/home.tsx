@@ -559,7 +559,7 @@ export default function Home() {
             <img src={animalHouseLogoPath} alt="Logo" className="w-10 h-10 rounded-full object-cover flex-shrink-0 border-2 border-white shadow-md" />
             <div className="min-w-0">
               <h1 className="font-bold text-gray-900 dark:text-white text-base leading-tight truncate">{hc.brandName}</h1>
-              {user && (
+              {!!user && (
                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                   Welcome, {typedUser?.firstName || typedUser?.email || "Guest"}
                   {typedUser?.isSuperiorManager ? " (Owner)" : typedUser?.isAdmin ? " (Admin)" : typedUser?.isEmployee ? " (Staff)" : ""}

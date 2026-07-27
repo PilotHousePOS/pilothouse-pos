@@ -60,6 +60,32 @@ interface AstroDeal {
   autoApply: boolean;
 }
 
+// ── Local data-shape types (match server response shapes) ────────────────────
+
+interface CartItem {
+  id: number;
+  supplyId?: number | null;
+  petId?: number | null;
+  quantity: number;
+}
+
+interface Supply {
+  id: number;
+  name: string;
+  price: string;
+  imageUrl?: string | null;
+  category?: string | null;
+  sku?: string | null;
+}
+
+interface Pet {
+  id: number;
+  name: string;
+  price: string;
+  imageUrl?: string | null;
+  breed?: string | null;
+}
+
 interface CartSidebarProps {
   isOpen: boolean;
   onClose: () => void;
@@ -76,7 +102,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const [applyLoyaltyCredits, setApplyLoyaltyCredits] = useState(false);
   const [appliedRewards, setAppliedRewards] = useState<Record<number, AstroReward>>({});
 
-  const { data: cartItems = [], isLoading } = useQuery({
+  const { data: cartItems = [] as CartItem[], isLoading } = useQuery<CartItem[]>({
     queryKey: ["/api/cart"],
     enabled: isOpen,
   });
@@ -91,7 +117,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   // Get supply IDs from cart to fetch only what we need
   const supplyIds = cartItems.filter((item: any) => item.supplyId).map((item: any) => item.supplyId);
   
-  const { data: suppliesData } = useQuery({
+  const { data: suppliesData } = useQuery<{ items: Supply[] }>({
     queryKey: ["/api/supplies", { ids: supplyIds.join(',') }],
     queryFn: async () => {
       if (supplyIds.length === 0) return { items: [] };
@@ -103,13 +129,13 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     },
     enabled: isOpen && supplyIds.length > 0,
   });
-  const supplies = suppliesData?.items || [];
+  const supplies: Supply[] = suppliesData?.items ?? [];
 
-  const { data: petsData } = useQuery({
+  const { data: petsData } = useQuery<{ pets: Pet[] }>({
     queryKey: ["/api/pets"],
     enabled: isOpen && cartItems.length > 0,
   });
-  const pets = petsData?.pets || [];
+  const pets: Pet[] = petsData?.pets ?? [];
 
   // Fetch tax rate from public endpoint
   const { data: taxData } = useQuery<{ taxRate: number }>({

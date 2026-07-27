@@ -73,11 +73,11 @@ export default function OrderHistory() {
   const handleReorderSelected = () => {
     if (!selectedOrder?.items) return;
     const itemsToAdd = selectedOrder.items
-      .filter((item) => selectedItems.has(item.id))
+      .filter((item) => selectedItems.has(item.id!))
       .map((item) => ({
         supplyId: item.supplyId || undefined,
         petId: item.petId || undefined,
-        quantity: getReorderQuantity(item.id, item.quantity),
+        quantity: getReorderQuantity(item.id!, item.quantity ?? 1),
       }));
     addToCartMutation.mutate(itemsToAdd);
   };
@@ -87,7 +87,7 @@ export default function OrderHistory() {
     const itemsToAdd = selectedOrder.items.map((item) => ({
       supplyId: item.supplyId || undefined,
       petId: item.petId || undefined,
-      quantity: getReorderQuantity(item.id, item.quantity),
+      quantity: getReorderQuantity(item.id!, item.quantity ?? 1),
     }));
     addToCartMutation.mutate(itemsToAdd);
   };
@@ -411,18 +411,18 @@ export default function OrderHistory() {
                             size="icon"
                             variant="outline"
                             className="h-7 w-7"
-                            onClick={() => updateReorderQuantity(item.id, -1, item.quantity)}
+                            onClick={() => updateReorderQuantity(item.id!, -1, item.quantity ?? 1)}
                           >
                             <Minus className="h-3 w-3" />
                           </Button>
                           <span className="w-8 text-center font-medium">
-                            {getReorderQuantity(item.id, item.quantity)}
+                            {getReorderQuantity(item.id!, item.quantity ?? 1)}
                           </span>
                           <Button
                             size="icon"
                             variant="outline"
                             className="h-7 w-7"
-                            onClick={() => updateReorderQuantity(item.id, 1, item.quantity)}
+                            onClick={() => updateReorderQuantity(item.id!, 1, item.quantity ?? 1)}
                           >
                             <Plus className="h-3 w-3" />
                           </Button>
@@ -446,10 +446,10 @@ export default function OrderHistory() {
                       <div key={refund.id} className="p-3 bg-orange-50 rounded border border-orange-200">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm text-gray-600">
-                            {formatDate(refund.refundDate || new Date())}
+                            {formatDate(refund.createdAt ? new Date(refund.createdAt) : new Date())}
                           </span>
                           <span className="font-bold text-orange-600">
-                            -${refund.refundAmount}
+                            -${refund.totalRefunded}
                           </span>
                         </div>
                         {refund.reason && (
@@ -457,15 +457,12 @@ export default function OrderHistory() {
                             <span className="font-medium">Reason:</span> {refund.reason}
                           </p>
                         )}
-                        {refund.notes && (
-                          <p className="text-sm text-gray-500 mt-1">{refund.notes}</p>
-                        )}
                       </div>
                     ))}
                     <div className="flex justify-between items-center pt-2 border-t border-orange-200">
                       <span className="font-medium text-gray-700">Total Refunded:</span>
                       <span className="font-bold text-orange-600">
-                        -${selectedOrder.refunds.reduce((sum, r) => sum + parseFloat(r.refundAmount), 0).toFixed(2)}
+                        -${selectedOrder.refunds.reduce((sum, r) => sum + parseFloat(r.totalRefunded), 0).toFixed(2)}
                       </span>
                     </div>
                   </div>

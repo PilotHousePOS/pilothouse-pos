@@ -299,7 +299,7 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
         if (dbCategory === undefined) {
           try {
             const [supply] = await db.select({ category: supplies.category }).from(supplies).where(eq(supplies.id, item.supplyId));
-            dbCategory = supply?.category || null;
+            dbCategory = supply?.category ?? undefined;
             supplyCategoryCache.set(item.supplyId, dbCategory || '');
           } catch { supplyCategoryCache.set(item.supplyId, ''); }
         }
@@ -427,7 +427,7 @@ export async function sendDailySalesReport(recipientEmails: string[], specificDa
     for (const appt of windowAppts) {
       const pets = await storage.getAppointmentPets(appt.id);
       paidGroomingAppts.push({ appt, pets });
-      groomingServiceTotal += parseFloat(appt.finalAmount) || 0;
+      groomingServiceTotal += parseFloat(appt.finalAmount ?? '0') || 0;
       groomingServiceCount++;
     }
   } catch (e) {

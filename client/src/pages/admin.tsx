@@ -1899,12 +1899,7 @@ function ContactsManager() {
                       </div>
                     )}
                     
-                    {/* Selection indicator for Google Calendar contacts */}
-                    {!contact.isDatabaseContact && isSelected && (
-                      <Badge variant="default" className="bg-blue-600 text-xs self-start mt-1">
-                        Selected
-                      </Badge>
-                    )}
+                    {/* Selection indicator for Google Calendar contacts — reserved for future use */}
                   </div>
                 </div>
               );
@@ -2888,7 +2883,7 @@ function BoardingManagement({ isAddOpen, setIsAddOpen }: { isAddOpen: boolean; s
   const queryClient = useQueryClient();
   const [editingRecord, setEditingRecord] = useState<any>(null);
   
-  const boardingQuery = useQuery({
+  const boardingQuery = useQuery<any[]>({
     queryKey: ['/api/admin/boarding'],
   });
   
@@ -3126,7 +3121,7 @@ function BoardingManagement({ isAddOpen, setIsAddOpen }: { isAddOpen: boolean; s
             <DialogTitle>New Boarding Record</DialogTitle>
           </DialogHeader>
           <BoardingForm
-            onSubmit={(data) => createMutation.mutate(data)}
+            onSubmit={(data: any) => createMutation.mutate(data)}
             onCancel={() => setIsAddOpen(false)}
             isPending={createMutation.isPending}
           />
@@ -3140,7 +3135,7 @@ function BoardingManagement({ isAddOpen, setIsAddOpen }: { isAddOpen: boolean; s
           </DialogHeader>
           <BoardingForm
             initialData={editingRecord}
-            onSubmit={(data) => updateMutation.mutate({ id: editingRecord.id, data })}
+            onSubmit={(data: any) => updateMutation.mutate({ id: editingRecord.id, data })}
             onCancel={() => setEditingRecord(null)}
             isPending={updateMutation.isPending}
           />
@@ -4647,7 +4642,7 @@ function StoreHoursPanel() {
     setHours(prev => ({ ...prev, [day]: { ...prev[day], [field]: value } }));
   };
 
-  const timeOptions = [];
+  const timeOptions: string[] = [];
   for (let h = 0; h < 24; h++) {
     for (let m = 0; m < 60; m += 30) {
       const val = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
@@ -6051,7 +6046,7 @@ function AstroLoyaltyManager() {
   const [connectionResult, setConnectionResult] = useState<any>(null);
   const [expandedCustomer, setExpandedCustomer] = useState<string | null>(null);
 
-  const { data: astroCustomers = [], isLoading } = useQuery({
+  const { data: astroCustomers = [] as any[], isLoading } = useQuery<any[]>({
     queryKey: ['/api/admin/astro/customers'],
     enabled: true
   });
@@ -6469,7 +6464,7 @@ function InvoiceScanDialog({ open, onClose, onEditSupply }: {
           const pageCanvas = document.createElement('canvas');
           pageCanvas.width = viewport.width;
           pageCanvas.height = viewport.height;
-          await page.render({ canvasContext: pageCanvas.getContext('2d')!, viewport }).promise;
+          await (page.render as any)({ canvasContext: pageCanvas.getContext('2d')!, viewport }).promise;
           pageCanvases.push(pageCanvas);
         }
         const totalWidth = Math.max(...pageCanvases.map(c => c.width));
@@ -12424,7 +12419,7 @@ export default function Admin() {
                           size="sm"
                           className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
                           onClick={() => approveAppointmentMutation.mutate(currentAppointment.id)}
-                          disabled={approveAppointmentMutation.isPending || rejectAppointmentMutation.isPending || (typedUser?.isGroomer && !typedUser?.isAdmin)}
+                          disabled={approveAppointmentMutation.isPending || rejectAppointmentMutation.isPending || (!!typedUser?.isGroomer && !typedUser?.isAdmin)}
                           data-testid={`approve-appointment-${currentAppointment.id}`}
                         >
                           {approveAppointmentMutation.isPending ? 'Approving...' : 'Approve'}
@@ -12434,7 +12429,7 @@ export default function Admin() {
                           variant="destructive"
                           className="w-full sm:w-auto"
                           onClick={() => rejectAppointmentMutation.mutate(currentAppointment.id)}
-                          disabled={approveAppointmentMutation.isPending || rejectAppointmentMutation.isPending || (typedUser?.isGroomer && !typedUser?.isAdmin)}
+                          disabled={approveAppointmentMutation.isPending || rejectAppointmentMutation.isPending || (!!typedUser?.isGroomer && !typedUser?.isAdmin)}
                           data-testid={`reject-appointment-${currentAppointment.id}`}
                         >
                           {rejectAppointmentMutation.isPending ? 'Rejecting...' : 'Reject'}
