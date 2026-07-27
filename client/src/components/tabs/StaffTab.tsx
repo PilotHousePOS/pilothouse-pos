@@ -249,6 +249,11 @@ export default function StaffTab({ typedUser }: Props) {
     onError: (e: any) => toast({ title: "Failed to save permissions", description: e.message, variant: "destructive" }),
   });
 
+  const unlockPinMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("POST", `/api/admin/employees/${id}/unlock-pin`, {}),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["/api/admin/employees"] }),
+  });
+
   const pinMutation = useMutation({
     mutationFn: ({ id, pin }: { id: string; pin: string }) =>
       apiRequest("POST", `/api/admin/employees/${id}/set-pin`, { pin }),
@@ -444,6 +449,24 @@ export default function StaffTab({ typedUser }: Props) {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1 justify-end">
+                          {/* Red lock icon when PIN is locked — click to unlock */}
+                          {(() => {
+                            const lockedUntil: Date | null = (emp as any).pinLockedUntil ? new Date((emp as any).pinLockedUntil) : null;
+                            const isLocked = lockedUntil && lockedUntil > new Date();
+                            if (!isLocked) return null;
+                            return (
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                title={`PIN locked until ${lockedUntil!.toLocaleString()}. Click to unlock.`}
+                                className="text-red-500 hover:text-red-700"
+                                disabled={unlockPinMutation.isPending}
+                                onClick={() => unlockPinMutation.mutate(emp.id)}
+                              >
+                                <Lock className="h-4 w-4" />
+                              </Button>
+                            );
+                          })()}
                           <Button size="icon" variant="ghost" title="Set PIN" onClick={() => { setPinEmployee(emp); setNewPin(""); }}>
                             <KeyRound className="h-4 w-4" />
                           </Button>

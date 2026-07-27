@@ -12262,6 +12262,8 @@ West Monroe LA 71291
       await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS default_time_slot VARCHAR(50)`);
       await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS default_day_slots JSONB`);
       await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS pos_pin_plain VARCHAR(10)`);
+      await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS pin_failed_attempts INTEGER NOT NULL DEFAULT 0`);
+      await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS pin_locked_until TIMESTAMPTZ`);
       await db.execute(sql`ALTER TABLE groomers ADD COLUMN IF NOT EXISTS group_id VARCHAR(100) DEFAULT 'default'`);
       await db.execute(sql`
         CREATE TABLE IF NOT EXISTS schedule_overrides (
@@ -15945,6 +15947,17 @@ CRITICAL RULES:
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 
+  // POST /api/admin/employees/:id/unlock-pin — clear PIN lockout (admin only)
+  app.post("/api/admin/employees/:id/unlock-pin", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user?.id);
+      if (!user?.isAdmin) return res.status(403).json({ message: "Admin access required" });
+      const tenantId: number = req.tenantId;
+      await db.execute(sql`UPDATE users SET pin_failed_attempts = 0, pin_locked_until = NULL WHERE id = ${req.params.id} AND tenant_id = ${tenantId} AND is_employee = true`);
+      res.json({ success: true });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
   // POST /api/admin/employees/:id/set-pin — owner sets/resets employee PIN (admin only)
   app.post("/api/admin/employees/:id/set-pin", authMiddleware, async (req: any, res) => {
     try {
@@ -15981,12 +15994,15 @@ CRITICAL RULES:
       if (!tenantId) return res.status(400).json({ message: "Tenant required" });
       const { employeeCode, pin } = req.body;
       if (!employeeCode || !pin) return res.status(400).json({ message: "Employee code and PIN are required" });
-      const emp = await storage.authenticateEmployeeByPin(tenantId, String(employeeCode), String(pin));
-      if (!emp) return res.status(401).json({ message: "Invalid employee code or PIN" });
-      // Auto clock-in via time clock (if not already clocked in today)
-      const token = generateToken(emp);
+      const result = await storage.authenticateEmployeeByPin(tenantId, String(employeeCode), String(pin));
+      if (!result) return res.status(401).json({ message: "Incorrect PIN. Too many wrong attempts will lock this account for 24 hours." });
+      if ('locked' in result) {
+        const until = result.lockedUntil.toLocaleString('en-US', { timeZone: 'America/Chicago', hour: 'numeric', minute: '2-digit', hour12: true, month: 'short', day: 'numeric' });
+        return res.status(423).json({ message: `This account is locked due to too many failed PIN attempts. Try again after ${until} or ask your manager to unlock it.`, locked: true });
+      }
+      const token = generateToken(result);
       setAuthCookie(res, token);
-      res.json({ ...sanitizeUser(emp), token });
+      res.json({ ...sanitizeUser(result), token });
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 

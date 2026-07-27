@@ -95,7 +95,12 @@ export default function Auth() {
         queryClient.setQueryData(["/api/auth/user"], data);
         window.location.replace('/admin');
       } else {
-        setEmpError("Incorrect PIN. Try again.");
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 423 || data?.locked) {
+          setEmpError(data?.message ?? "This account is locked. Contact your manager.");
+        } else {
+          setEmpError("Incorrect PIN. Too many wrong attempts will lock this account for 24 hours.");
+        }
         setEmpPin("");
       }
     } catch {
@@ -555,13 +560,13 @@ export default function Auth() {
                         <LogIn className="h-6 w-6 text-white" />
                       </div>
                       <p className="text-white font-medium">Enter your store's sign-in code</p>
-                      <p className="text-gray-400 text-xs mt-1">Ask your manager — it looks like a short name (e.g. <span className="font-mono text-gray-300">paw-palace</span>), <em>not</em> your personal employee code like E01.</p>
+                      <p className="text-gray-400 text-xs mt-1">Ask your manager for your store's sign-in code.</p>
                     </div>
                     <form onSubmit={handleStoreCodeSubmit} className="space-y-3">
                       <Input
                         value={storeCodeInput}
                         onChange={e => { setStoreCodeInput(e.target.value); setStoreCodeError(""); }}
-                        placeholder="e.g. test-business-1"
+                        placeholder="Store sign-in code"
                         className="bg-white/10 border-white/30 text-white placeholder:text-gray-400"
                         dir="ltr"
                         autoCapitalize="none"

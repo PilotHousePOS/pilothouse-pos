@@ -5783,21 +5783,41 @@ export class DatabaseStorage implements IStorage {
     await db.update(users).set({ employeePin: hashed, posPinPlain: pin, updatedAt: new Date() }).where(and(eq(users.id, userId), eq(users.tenantId, tenantId), eq(users.isEmployee, true)));
   }
 
-  async authenticateEmployeeByPin(tenantId: number, employeeCode: string, pin: string): Promise<User | null> {
+  async authenticateEmployeeByPin(tenantId: number, employeeCode: string, pin: string): Promise<User | { locked: true; lockedUntil: Date } | null> {
     const [emp] = await db.select().from(users).where(and(eq(users.tenantId, tenantId), eq(users.employeeCode, employeeCode.toUpperCase()), eq(users.isEmployee, true)));
     if (!emp) return null;
+
+    // Check lockout — if pin_locked_until is in the future, reject immediately
+    const lockedUntil: Date | null = (emp as any).pinLockedUntil ?? null;
+    if (lockedUntil && lockedUntil > new Date()) {
+      return { locked: true, lockedUntil };
+    }
+
     const bcrypt = await import("bcryptjs");
+    let valid = false;
+
     // Primary: check the dedicated employee PIN
     if (emp.employeePin) {
-      const valid = await bcrypt.compare(pin, emp.employeePin);
-      return valid ? emp : null;
+      valid = await bcrypt.compare(pin, emp.employeePin);
+    } else if (emp.password) {
+      // Fallback: accept account password if no dedicated PIN set yet
+      valid = await bcrypt.compare(pin, emp.password);
     }
-    // Fallback: if no PIN has been set yet, accept their account password so the account
-    // still works right after creation (owner can set a dedicated PIN later via the key icon)
-    if (emp.password) {
-      const valid = await bcrypt.compare(pin, emp.password);
-      return valid ? emp : null;
+
+    if (valid) {
+      // Reset failed-attempt counter on success
+      await db.execute(sql`UPDATE users SET pin_failed_attempts = 0, pin_locked_until = NULL WHERE id = ${emp.id}`);
+      return emp;
     }
+
+    // Wrong PIN — increment counter; lock for 24 h after 5 failures
+    const newAttempts = ((emp as any).pinFailedAttempts ?? 0) + 1;
+    if (newAttempts >= 5) {
+      const lockUntil = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      await db.execute(sql`UPDATE users SET pin_failed_attempts = ${newAttempts}, pin_locked_until = ${lockUntil} WHERE id = ${emp.id}`);
+      return { locked: true, lockedUntil: lockUntil };
+    }
+    await db.execute(sql`UPDATE users SET pin_failed_attempts = ${newAttempts} WHERE id = ${emp.id}`);
     return null;
   }
 
