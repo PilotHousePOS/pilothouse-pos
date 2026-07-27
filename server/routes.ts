@@ -70,6 +70,7 @@ import { categorizeProduct, detectLiveAnimal } from './productCategorization';
 import { registerBillingRoutes } from './billingRoutes';
 import { registerStripeConnectRoutes } from './stripeConnectRoutes';
 import { registerTenantPaymentRoutes } from './tenantPaymentRoutes';
+import { registerTerminalRoutes } from './terminalRoutes';
 // Shared-pool limiters MUST be imported from sharedLimiters.ts — never
 // re-created inline.  See server/sharedLimiters.ts for the full explanation.
 import { getRealIp, authLimiter, searchLimiter, checkoutLimiter, uploadLimiter, overridePinLimiter, overridePinSlugLimiter, rosterLimiter } from './sharedLimiters';
@@ -460,6 +461,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   // tenantId via user record lookup rather than req.tenantId.
   registerStripeConnectRoutes(app);
   registerTenantPaymentRoutes(app);
+  registerTerminalRoutes(app);
 
   // Stripe API routes
   app.get("/api/stripe/config", async (req, res) => {

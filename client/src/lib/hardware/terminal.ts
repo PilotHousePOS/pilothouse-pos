@@ -1,16 +1,28 @@
 // ─── Semi-Integrated Card Terminal (Dejavoo / Electronic Payments) ───────────
 //
-// Implements the Electronic Payments (EP) semi-integrated serial protocol for
-// Dejavoo Z-series terminals configured in serial RS-232 semi-integration mode.
+// Implements the Electronic Payments (EP) semi-integrated protocol for
+// Dejavoo Z-series terminals.
 //
-// !! IMPORTANT — INTEGRATION PATH NOTE:
-// !! Dejavoo terminals also support an IP/TCP REST integration (preferred for
-// !! browser-based POS — no Web Serial API required). Before wiring live
-// !! transactions, confirm with your EP rep whether you are using:
-// !!   (a) RS-232 serial  →  use this file as-is (requires Web Serial API)
-// !!   (b) IP/TCP REST    →  replace with a simple fetch() to http://<terminal-ip>:<port>
-// !! The terminal's configuration sheet from EP will specify which transport
-// !! is active and the correct baud rate (serial) or TCP port (IP mode).
+// ── TRANSPORT OVERVIEW ───────────────────────────────────────────────────────
+//
+// Two transports are supported.  TCP is the default (preferred):
+//
+//   (a) IP/TCP via server proxy  [DEFAULT — sendTerminalChargeTcp()]
+//       The browser calls POST /api/terminal/charge on the app server.
+//       The server opens a raw TCP socket to the terminal on the store LAN.
+//       • No browser permission prompts — works in any browser / kiosk.
+//       • Terminal IP + port configured in Hardware Settings (stored in
+//         enabledFeatures.hardwareConfig.terminalIp / terminalPort).
+//       • Requires the app server to have LAN access to the terminal.
+//
+//   (b) RS-232 serial (Web Serial API)  [FALLBACK — sendTerminalCharge()]
+//       The browser opens a serial port directly via the Web Serial API.
+//       • Requires a browser permission click every session.
+//       • Only works in Chromium-based browsers on devices with a COM port.
+//       • Use when a USB-to-serial adapter is physically attached to the
+//         cashier's computer and the server cannot reach the terminal over IP.
+//
+// Both paths use the same binary frame format (STX/ETX/LRC, spec §3–5).
 //
 // ── PROTOCOL VERIFICATION NOTES (against EP semi-integrated developer guide) ─
 //
@@ -358,4 +370,108 @@ export async function openTerminalPort(port: any): Promise<void> {
     parity: 'none',
     flowControl: 'none', // spec §2.1: no hardware flow control required
   });
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// TCP/IP TRANSPORT (DEFAULT)
+// ════════════════════════════════════════════════════════════════════════════
+//
+// sendTerminalChargeTcp() is the preferred charge function.  Instead of
+// using the Web Serial API it calls the server-side proxy endpoint at
+// POST /api/terminal/charge, which opens a raw TCP socket to the terminal
+// on the store LAN.
+//
+// No browser permission prompt is required.  Works in any browser.
+//
+// The server endpoint (server/terminalRoutes.ts) resolves the terminal IP
+// and port from:
+//   1. The optional overrides passed in TcpChargeOptions (useful for testing)
+//   2. enabledFeatures.hardwareConfig.terminalIp / terminalPort stored on the
+//      tenant record (set via Hardware Settings by the store owner)
+//
+// TRAINING-MODE ROUND-TRIP VERIFICATION (TCP path)
+// ─────────────────────────────────────────────────
+// Before accepting live transactions, run a $1.00 test in Dejavoo Training
+// Mode (Supervisor → Training Mode → ON):
+//
+//   const result = await sendTerminalChargeTcp({ amountCents: 100, orderRef: 'TRAIN-001' });
+//   // Expected: result.approved === true, result.authCode non-empty
+//   // A NAK response means the terminal received a framing error — check that
+//   // the terminal's TCP port in Hardware Settings matches its configuration.
+//
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Terminal brands supported by the server-side adapter layer */
+export type TerminalBrand = "dejavoo" | "pax" | "stripe" | "ingenico" | "verifone";
+
+export interface TcpChargeOptions extends TerminalChargeParams {
+  /**
+   * Terminal brand — routes to the correct server-side adapter.
+   * Defaults to "dejavoo" for backwards compatibility.
+   *   "dejavoo"  — Dejavoo Z-series via Electronic Payments (TCP binary frame)
+   *   "pax"      — PAX S/A/Q/E series (HTTP binary frame, LAN, port 9100)
+   *   "stripe"   — Stripe Terminal (server-driven API, any network)
+   *   "ingenico" — Ingenico / Tetra (EP semi-integration, same frame as dejavoo)
+   */
+  terminalBrand?: TerminalBrand;
+  /** Override terminal IP — falls back to tenant's Hardware Settings config */
+  terminalIp?: string;
+  /** Override TCP/HTTP port — falls back to tenant config, then 9100 */
+  terminalPort?: number;
+  /** Stripe Terminal only: override reader ID (tmr_…) */
+  stripeReaderId?: string;
+  /** Optional tip in cents (PAX supports on-device tip; ignored by other brands) */
+  tipCents?: number;
+}
+
+/**
+ * Send a charge to the Dejavoo terminal via the server-side TCP proxy.
+ *
+ * This is the DEFAULT transport.  It requires no Web Serial API permission
+ * and works in every browser.  The app server must have LAN access to the
+ * terminal's IP address (set in Hardware Settings or passed as overrides).
+ *
+ * @example
+ *   const result = await sendTerminalChargeTcp({ amountCents: 1999, orderRef: 'POS-42' });
+ *   if (result.approved) { ... }
+ */
+export async function sendTerminalChargeTcp(
+  params: TcpChargeOptions,
+): Promise<TerminalChargeResult> {
+  try {
+    const body: Record<string, unknown> = {
+      amountCents: params.amountCents,
+      orderRef:    params.orderRef,
+    };
+    if (params.terminalBrand)  body.terminalBrand  = params.terminalBrand;
+    if (params.terminalIp)     body.terminalIp     = params.terminalIp;
+    if (params.terminalPort)   body.terminalPort   = params.terminalPort;
+    if (params.stripeReaderId) body.stripeReaderId = params.stripeReaderId;
+    if (params.tipCents != null) body.tipCents     = params.tipCents;
+
+    const response = await fetch("/api/terminal/charge", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      // Surface the server's reason if available
+      let reason = `Server error ${response.status}`;
+      try {
+        const json = await response.json();
+        if (json?.reason) reason = json.reason;
+      } catch {
+        // ignore parse errors
+      }
+      return { approved: false, reason };
+    }
+
+    return (await response.json()) as TerminalChargeResult;
+  } catch (err: any) {
+    return {
+      approved: false,
+      reason:   err?.message ?? "Failed to reach /api/terminal/charge",
+    };
+  }
 }
