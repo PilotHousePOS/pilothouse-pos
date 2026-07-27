@@ -103,6 +103,27 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
     setState({ step: 'probing' });
 
     // 1. VID/PID lookup (instant, no IO)
+    //
+    // EMPTY getInfo() FALLBACK PATH
+    // Some browsers or OS drivers return an empty object from port.getInfo()
+    // even for physically recognized devices (certain Linux kernels, devices
+    // connected through non-standard USB hubs, etc.).  When that happens:
+    //
+    //   info = {}  →  usbVendorId/usbProductId are both undefined
+    //   lookupDevice(undefined, undefined)  →  null
+    //
+    // A null result here is NOT an error — it is a deliberate branch to
+    // probe-based identification (step 2 below).  Only if the probe also
+    // fails ('unknown') does the user land on the manual fallback form.
+    // The error step is reserved for serial.requestPort() rejections and
+    // connectWithPort() failures; it is never triggered by a missing VID/PID.
+    //
+    // Expected fallback path when getInfo() returns {}:
+    //   getInfo() → {}
+    //   → lookupDevice(undefined, undefined) → null
+    //   → setState('probing') + probeDevice(port)
+    //   → probe 'escpos' / 'zpl' → setState('recognized') with synthetic device
+    //   → probe 'unknown'        → setState('fallback') with manual selection form
     const info = port.getInfo?.() ?? {};
     const known = lookupDevice(info.usbVendorId, info.usbProductId);
 
@@ -127,6 +148,9 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
       };
       setState({ step: 'recognized', port, device: synthetic, suggestedType: suggestedType! });
     } else {
+      // Both VID/PID lookup and probe failed — show the manual fallback form.
+      // This is a deliberate, clearly communicated path: staff can still connect
+      // the device by selecting its type manually.
       setState({ step: 'fallback', port, suggestedType, suggestedName });
     }
   }, []);
