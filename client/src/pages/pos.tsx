@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   ChevronLeft, DollarSign, CreditCard, Search, Settings, X,
   ChevronUp, ChevronDown, Pencil, Trash2, Plus, Check, GripVertical,
@@ -262,41 +263,73 @@ function ConnectedDeviceCard({
       {type === 'printer' && (onTestPrint || onOpenDrawer) && (
         <div className="flex gap-2 mt-2.5 ml-8">
           {onTestPrint && (
-            <button
-              onClick={() => runAction('print', onTestPrint)}
-              disabled={!isConnected || !!testBusy}
-              title={!isConnected ? 'Connect the printer first' : 'Print a column-alignment test page'}
-              className="text-xs bg-gray-700 hover:bg-gray-600 disabled:opacity-40 disabled:cursor-not-allowed text-gray-200 rounded px-3 py-1.5 flex items-center gap-1.5 transition-colors"
-            >
-              {testBusy === 'print' ? <Loader2 className="h-3 w-3 animate-spin" /> : <Printer className="h-3 w-3" />}
-              Test Print
-            </button>
+            <TooltipProvider delayDuration={0}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  {/* span wrapper ensures the trigger receives pointer/touch events
+                      even when the inner button is disabled */}
+                  <span tabIndex={!isConnected ? 0 : undefined} className="inline-flex">
+                    <button
+                      onClick={() => runAction('print', onTestPrint)}
+                      disabled={!isConnected || !!testBusy}
+                      className="text-xs bg-gray-700 hover:bg-gray-600 disabled:opacity-40 disabled:cursor-not-allowed text-gray-200 rounded px-3 py-1.5 flex items-center gap-1.5 transition-colors"
+                    >
+                      {testBusy === 'print' ? <Loader2 className="h-3 w-3 animate-spin" /> : <Printer className="h-3 w-3" />}
+                      Test Print
+                    </button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {!isConnected ? 'Connect the printer first' : 'Print a column-alignment test page'}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
           {onOpenDrawer && (
-            <button
-              onClick={() => runAction('drawer', onOpenDrawer)}
-              disabled={!isConnected || !!testBusy}
-              title={!isConnected ? 'Connect the printer first' : 'Send a cash-drawer kick signal'}
-              className="text-xs bg-gray-700 hover:bg-gray-600 disabled:opacity-40 disabled:cursor-not-allowed text-gray-200 rounded px-3 py-1.5 flex items-center gap-1.5 transition-colors"
-            >
-              {testBusy === 'drawer' ? <Loader2 className="h-3 w-3 animate-spin" /> : <DollarSign className="h-3 w-3" />}
-              Open Drawer
-            </button>
+            <TooltipProvider delayDuration={0}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span tabIndex={!isConnected ? 0 : undefined} className="inline-flex">
+                    <button
+                      onClick={() => runAction('drawer', onOpenDrawer)}
+                      disabled={!isConnected || !!testBusy}
+                      className="text-xs bg-gray-700 hover:bg-gray-600 disabled:opacity-40 disabled:cursor-not-allowed text-gray-200 rounded px-3 py-1.5 flex items-center gap-1.5 transition-colors"
+                    >
+                      {testBusy === 'drawer' ? <Loader2 className="h-3 w-3 animate-spin" /> : <DollarSign className="h-3 w-3" />}
+                      Open Drawer
+                    </button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {!isConnected ? 'Connect the printer first' : 'Send a cash-drawer kick signal'}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
       )}
 
       {type === 'labelPrinter' && onTestLabel && (
         <div className="flex gap-2 mt-2.5 ml-8">
-          <button
-            onClick={() => runAction('label', onTestLabel)}
-            disabled={!isConnected || !!testBusy}
-            title={!isConnected ? 'Connect the printer first' : 'Print a minimal ZPL test label'}
-            className="text-xs bg-gray-700 hover:bg-gray-600 disabled:opacity-40 disabled:cursor-not-allowed text-gray-200 rounded px-3 py-1.5 flex items-center gap-1.5 transition-colors"
-          >
-            {testBusy === 'label' ? <Loader2 className="h-3 w-3 animate-spin" /> : <Tag className="h-3 w-3" />}
-            Test Label
-          </button>
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span tabIndex={!isConnected ? 0 : undefined} className="inline-flex">
+                  <button
+                    onClick={() => runAction('label', onTestLabel)}
+                    disabled={!isConnected || !!testBusy}
+                    className="text-xs bg-gray-700 hover:bg-gray-600 disabled:opacity-40 disabled:cursor-not-allowed text-gray-200 rounded px-3 py-1.5 flex items-center gap-1.5 transition-colors"
+                  >
+                    {testBusy === 'label' ? <Loader2 className="h-3 w-3 animate-spin" /> : <Tag className="h-3 w-3" />}
+                    Test Label
+                  </button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                {!isConnected ? 'Connect the printer first' : 'Print a minimal ZPL test label'}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       )}
     </div>
