@@ -1,19 +1,23 @@
 // ─── POS Credit-Pay Toast Branch Tests ───────────────────────────────────────
 //
-// handleCreditPay in pos.tsx dispatches one of three toasts after calling
+// handleCreditPay in pos.tsx dispatches one of four toasts after calling
 // sendTerminalCharge:
 //
-//   1. "Approved …"               — result.approved === true
-//   2. "Connect to terminal first" — result.reason starts with
-//                                    'Terminal port is not open'
-//   3. "Card Declined"            — any other non-approved result
+//   1. "Approved …"                    — result.approved === true
+//   2. "Connect to terminal first"     — result.reason starts with
+//                                        'Terminal port is not open'
+//   3. "Terminal Communication Error"  — result.reason starts with
+//                                        'Terminal NAK'
+//   4. "Card Declined"                 — any other non-approved result
 //
 // These tests validate the branching condition in isolation so a future
-// refactor of the if/else cannot accidentally swap toasts 2 and 3.
+// refactor of the if/else cannot accidentally swap toasts.
 // They mirror the exact guard used in the component:
 //
 //   } else if (result.reason?.startsWith('Terminal port is not open')) {
 //     toast({ title: 'Connect to terminal first', ... })
+//   } else if (result.reason?.startsWith('Terminal NAK')) {
+//     toast({ title: 'Terminal Communication Error', description: result.reason, ... })
 //   } else {
 //     toast({ title: 'Card Declined', ... })
 //   }
@@ -34,6 +38,12 @@ function resolveToast(result: TerminalChargeResult): ToastCall {
     return {
       title:       'Connect to terminal first',
       description: 'The card terminal is paired but the port is not open. Disconnect and reconnect the terminal, then try again.',
+      variant:     'destructive',
+    };
+  } else if (result.reason?.startsWith('Terminal NAK')) {
+    return {
+      title:       'Terminal Communication Error',
+      description: result.reason,
       variant:     'destructive',
     };
   } else {
@@ -124,5 +134,56 @@ describe('handleCreditPay — toast dispatch for port-closed result', () => {
     // A prefixed wrapper does NOT start with the guard string → "Card Declined"
     expect(resolveToast({ approved: false, reason: containsButDoesNotStart }).title)
       .toBe('Card Declined');
+  });
+});
+
+// ── NAK branch tests ──────────────────────────────────────────────────────────
+
+describe('handleCreditPay — toast dispatch for NAK result', () => {
+
+  it('shows "Terminal Communication Error" — not "Card Declined" — for a NAK response', () => {
+    // parseResponseFrame returns this exact reason for a 0x15 NAK byte.
+    const result: TerminalChargeResult = {
+      approved: false,
+      reason: 'Terminal NAK — LRC or frame error; check baud rate and frame format',
+    };
+
+    const toast = resolveToast(result);
+
+    expect(toast.title).toBe('Terminal Communication Error');
+    expect(toast.title).not.toBe('Card Declined');
+    expect(toast.variant).toBe('destructive');
+  });
+
+  it('surfaces the full reason string so staff see the baud-rate / cable hint', () => {
+    const nakReason = 'Terminal NAK — LRC or frame error; check baud rate and frame format';
+    const result: TerminalChargeResult = { approved: false, reason: nakReason };
+
+    const toast = resolveToast(result);
+
+    // The description must carry the full hint, not a generic fallback.
+    expect(toast.description).toBe(nakReason);
+    expect(toast.description).toContain('baud rate');
+  });
+
+  it('NAK branch is triggered by the "Terminal NAK" prefix, not a substring match', () => {
+    const exactPrefix = 'Terminal NAK — LRC or frame error; check baud rate and frame format';
+    const containsButDoesNotStart = `Error: ${exactPrefix}`;
+
+    expect(resolveToast({ approved: false, reason: exactPrefix }).title)
+      .toBe('Terminal Communication Error');
+
+    // A prefixed wrapper does NOT start with the guard string → falls through to "Card Declined"
+    expect(resolveToast({ approved: false, reason: containsButDoesNotStart }).title)
+      .toBe('Card Declined');
+  });
+
+  it('NAK result does not trigger the "port not open" branch', () => {
+    const result: TerminalChargeResult = {
+      approved: false,
+      reason: 'Terminal NAK — LRC or frame error; check baud rate and frame format',
+    };
+
+    expect(resolveToast(result).title).not.toBe('Connect to terminal first');
   });
 });

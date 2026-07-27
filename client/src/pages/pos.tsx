@@ -875,6 +875,16 @@ export default function PosPage() {
             description: 'The card terminal is paired but the port is not open. Disconnect and reconnect the terminal, then try again.',
             variant:     'destructive',
           });
+        } else if (result.reason?.startsWith('Terminal NAK')) {
+          // The terminal rejected the frame with a NAK byte (0x15) — most
+          // likely a baud-rate mismatch or a bad cable.  Surface the full
+          // reason string (which already contains the fix hint) under a
+          // title that makes clear this is a hardware issue, not a decline.
+          toast({
+            title:       'Terminal Communication Error',
+            description: result.reason,
+            variant:     'destructive',
+          });
         } else {
           toast({
             title:       'Card Declined',
