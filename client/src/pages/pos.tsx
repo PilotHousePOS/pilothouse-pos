@@ -715,6 +715,17 @@ export default function PosPage() {
   // it failed.  Used to warn the operator before printing.
   const isTenantNameFallback = !currentTenant?.name;
 
+  // One-shot fallback warning: show the toast at most once per POS session.
+  // Reset automatically when the tenant query recovers (healthy → failed
+  // transition is re-armed so a subsequent failure shows the warning again).
+  const fallbackWarnShownRef = useRef(false);
+  useEffect(() => {
+    if (!isTenantNameFallback) {
+      // Query just recovered — re-arm so the next failure is announced.
+      fallbackWarnShownRef.current = false;
+    }
+  }, [isTenantNameFallback]);
+
   const { data: layoutData } = useQuery<PosConfig | null>({
     queryKey: ["/api/pos/layout"],
     staleTime: Infinity,
@@ -1038,7 +1049,9 @@ export default function PosPage() {
     // Warn the operator when the store name could not be fetched — either
     // the query is still loading or it failed.  The receipt will still print
     // with the 'PilotHouse POS' fallback so no sale is blocked.
-    if (isTenantNameFallback) {
+    // The warning fires at most once per session (until the query recovers).
+    if (isTenantNameFallback && !fallbackWarnShownRef.current) {
+      fallbackWarnShownRef.current = true;
       const reason = isTenantLoading ? 'Store info is still loading' : 'Store info could not be loaded';
       toast({
         title: 'Store name may be incorrect',
@@ -1493,7 +1506,8 @@ export default function PosPage() {
               if (!orderItems.length || hw.printer.status !== 'connected' || !hw.printer.port) return;
               (async () => {
                 try {
-                  if (isTenantNameFallback) {
+                  if (isTenantNameFallback && !fallbackWarnShownRef.current) {
+                    fallbackWarnShownRef.current = true;
                     const reason = isTenantLoading ? 'Store info is still loading' : 'Store info could not be loaded';
                     toast({ title: 'Store name may be incorrect', description: `${reason} — receipt will show "PilotHouse POS".`, variant: 'destructive' });
                   }
