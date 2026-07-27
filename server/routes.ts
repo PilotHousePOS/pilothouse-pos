@@ -3278,6 +3278,51 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
     } catch (e: any) { res.status(500).json({ message: e.message }); }
   });
 
+  // POST /api/pos/offline-sync — batch-save sales that were queued in IndexedDB
+  // while the POS terminal was offline. Each sale includes a localId (from the
+  // client) so duplicates can be detected, and offlineQueuedAt so the timestamp
+  // reflects when the sale actually happened rather than when it synced.
+  app.post("/api/pos/offline-sync", requireAdminMiddleware, async (req: any, res) => {
+    try {
+      const { sales } = req.body;
+      if (!Array.isArray(sales) || sales.length === 0) return res.status(400).json({ message: "sales must be a non-empty array" });
+      const tenantId = resolveWriteTenantId(req, res);
+      if (tenantId === undefined) return;
+      const results: { localId: string; success: boolean; error?: string }[] = [];
+      for (const sale of sales) {
+        try {
+          const { localId, orderNumber, items, subtotal, tax, total,
+                  paymentMethod, amountTendered, changeDue,
+                  operatorName, offlineQueuedAt } = sale;
+          await db.execute(sql`
+            INSERT INTO pos_orders
+              (order_number, items, subtotal, tax, total, payment_method,
+               amount_tendered, change_due, cashier_id, tenant_id,
+               offline_queued_at, operator_name)
+            VALUES (
+              ${orderNumber || null},
+              ${JSON.stringify(items || [])}::jsonb,
+              ${Number(subtotal) || 0},
+              ${Number(tax) || 0},
+              ${Number(total) || 0},
+              ${String(paymentMethod)},
+              ${amountTendered != null ? Number(amountTendered) : null},
+              ${changeDue     != null ? Number(changeDue)      : null},
+              ${req.user?.id?.toString() || null},
+              ${tenantId},
+              ${offlineQueuedAt ? offlineQueuedAt : null},
+              ${operatorName   ? String(operatorName) : null}
+            )
+          `);
+          results.push({ localId, success: true });
+        } catch (e: any) {
+          results.push({ localId: sale.localId || '', success: false, error: e.message });
+        }
+      }
+      res.json({ results, synced: results.filter(r => r.success).length, failed: results.filter(r => !r.success).length });
+    } catch (e: any) { res.status(500).json({ message: e.message }); }
+  });
+
   // ── POS Sales Reports ─────────────────────────────────────────────────────
 
   // Paginated order history — BOTH POS and online orders combined
@@ -12306,6 +12351,8 @@ West Monroe LA 71291
       await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS two_fa_code_expires TIMESTAMPTZ`);
       await db.execute(sql`ALTER TABLE tenants ADD COLUMN IF NOT EXISTS pos_pin_failed_attempts INTEGER NOT NULL DEFAULT 0`);
       await db.execute(sql`ALTER TABLE tenants ADD COLUMN IF NOT EXISTS pos_pin_locked_until TIMESTAMPTZ`);
+      await db.execute(sql`ALTER TABLE pos_orders ADD COLUMN IF NOT EXISTS offline_queued_at TIMESTAMPTZ`);
+      await db.execute(sql`ALTER TABLE pos_orders ADD COLUMN IF NOT EXISTS operator_name VARCHAR(200)`);
       await db.execute(sql`CREATE TABLE IF NOT EXISTS pin_attempt_log (id SERIAL PRIMARY KEY, tenant_id INTEGER, event_type VARCHAR(50) NOT NULL, employee_code VARCHAR(20), ip_address VARCHAR(45), success BOOLEAN NOT NULL DEFAULT false, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`);
       await db.execute(sql`CREATE INDEX IF NOT EXISTS idx_pin_attempt_log_tenant_created ON pin_attempt_log (tenant_id, created_at DESC)`);
       await db.execute(sql`ALTER TABLE groomers ADD COLUMN IF NOT EXISTS group_id VARCHAR(100) DEFAULT 'default'`);

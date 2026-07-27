@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient, getActiveTenantSlug } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -9,8 +9,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import {
   ChevronLeft, DollarSign, CreditCard, Search, Settings, X,
   ChevronUp, ChevronDown, Pencil, Trash2, Plus, Check, GripVertical,
-  Lock, Unlock, Delete, LogOut, UserCircle, Eye, EyeOff,
+  Lock, Unlock, Delete, LogOut, UserCircle, Eye, EyeOff, WifiOff,
 } from "lucide-react";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { OfflineBanner } from "@/components/offline-banner";
+import {
+  queueOfflineSale, getPendingOfflineSales, removeOfflineSale,
+} from "@/lib/offline-db";
 
 interface PosOverrideConfig {
   requirePinForRefund?: boolean;
@@ -153,6 +158,20 @@ function TypeBadge({ cat }: { cat: PosCategory }) {
   return <span className="text-[10px] bg-green-900 text-green-300 px-1.5 py-0.5 rounded">Products</span>;
 }
 
+// ─── PIN pad scrambler ────────────────────────────────────────────────────────
+// Returns a 12-slot grid (3×4) with the 10 digit positions randomly shuffled
+// on each call. The structural spacer (index 9) and backspace (index 11) never
+// move. Shoulder-surfing and screen-smudge attacks are defeated because the
+// digit positions are different every time the pad is shown.
+function makeScrambledPad(): string[] {
+  const d = ["1","2","3","4","5","6","7","8","9","0"];
+  for (let i = d.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [d[i], d[j]] = [d[j], d[i]];
+  }
+  return [...d.slice(0, 9), "", d[9], "⌫"];
+}
+
 // ─── Main POS Page ─────────────────────────────────────────────────────────────
 
 export default function PosPage() {
@@ -269,7 +288,8 @@ export default function PosPage() {
     }
   };
   const handleOverrideBack = () => { setOverridePinEntry(prev => prev.slice(0, -1)); setOverridePinError(""); };
-  const overrideDigits = ["1","2","3","4","5","6","7","8","9","","0","⌫"];
+  // Scramble override pad each time the modal opens
+  const overrideDigits = useMemo(() => makeScrambledPad(), [showOverridePinModal]);
 
   // POS override configuration (which actions require PIN) — readable by all authenticated users
   const { data: posOverrideConfig = {} } = useQuery<PosOverrideConfig>({
@@ -377,7 +397,11 @@ export default function PosPage() {
     }
   };
   const handleLockPinBack = () => { setLockPinEntry(p => p.slice(0, -1)); setLockPinError(""); };
-  const lockPadDigits = ["1","2","3","4","5","6","7","8","9","","0","⌫"];
+  // Scramble employee PIN pad each time a new employee is selected (or step changes)
+  const lockPadDigits = useMemo(() => makeScrambledPad(), [lockSelected?.id, lockStep]);
+
+  // ── Offline status ──
+  const isOnline = useOnlineStatus();
 
   // Admin PIN sign-in on the lock screen (no employee code needed)
   const handleLockAdminPinDigit = async (d: string) => {
@@ -546,17 +570,71 @@ export default function PosPage() {
 
   const pay = (method: "cash" | "credit") => {
     if (!orderItems.length) return;
-    if (method === "cash") { setShowPayment(true); }
-    else { saveOrderMutation.mutate({ orderNumber, items: orderItems, subtotal, tax, total, paymentMethod: "credit" }); }
+    if (method === "credit") {
+      if (!isOnline) {
+        toast({ title: "Card unavailable offline", description: "Accept cash. The sale will record normally — cards require an internet connection.", variant: "destructive" });
+        return;
+      }
+      saveOrderMutation.mutate({ orderNumber, items: orderItems, subtotal, tax, total, paymentMethod: "credit" });
+    } else {
+      setShowPayment(true);
+    }
   };
 
-  const completeCash = () => {
+  const completeCash = async () => {
     if (tendered < total) {
       toast({ title: "Insufficient payment", description: `Need $${total.toFixed(2)}, received $${tendered.toFixed(2)}`, variant: "destructive" });
       return;
     }
+    if (!isOnline) {
+      // Queue to IndexedDB — syncs automatically when connection returns
+      try {
+        await queueOfflineSale({
+          orderNumber,
+          items:          orderItems,
+          subtotal, tax,  total,
+          paymentMethod:  "cash",
+          amountTendered: tendered,
+          changeDue:      change,
+          operatorName:   posOperatorName,
+          offlineQueuedAt: new Date().toISOString(),
+        });
+        toast({ title: "Sale saved (offline)", description: `Order ${orderNumber} queued — syncs when internet returns.` });
+        setOrderItems([]);
+        setShowPayment(false);
+        setCashTendered("");
+      } catch {
+        toast({ title: "Error", description: "Could not save offline sale. Try again.", variant: "destructive" });
+      }
+      return;
+    }
     saveOrderMutation.mutate({ orderNumber, items: orderItems, subtotal, tax, total, paymentMethod: "cash", amountTendered: tendered, changeDue: change });
   };
+
+  // Auto-drain the offline queue 2 s after coming back online
+  useEffect(() => {
+    if (!isOnline) return;
+    let cancelled = false;
+    const sync = async () => {
+      const pending = await getPendingOfflineSales().catch(() => []);
+      if (!pending.length || cancelled) return;
+      try {
+        const headers: Record<string, string> = { "Content-Type": "application/json" };
+        if (slug) headers["X-Tenant-Slug"] = slug;
+        const res = await fetch("/api/pos/offline-sync", {
+          method: "POST", headers, credentials: "include",
+          body: JSON.stringify({ sales: pending }),
+        });
+        if (res.ok && !cancelled) {
+          const data = await res.json();
+          for (const r of data.results) { if (r.success) await removeOfflineSale(r.localId); }
+          if (data.synced > 0) toast({ title: `${data.synced} offline ${data.synced === 1 ? "sale" : "sales"} synced`, description: "Transactions recorded successfully." });
+        }
+      } catch { /* silent — will retry on next reconnect */ }
+    };
+    const t = setTimeout(sync, 2000);
+    return () => { cancelled = true; clearTimeout(t); };
+  }, [isOnline]);
 
   // ── Settings: category CRUD ──
   const startEditCat = (cat: PosCategory) => {
@@ -675,6 +753,7 @@ export default function PosPage() {
 
   return (
     <div className="h-screen bg-gray-900 text-white flex flex-col overflow-hidden select-none">
+      <OfflineBanner />
 
       {/* ── Top bar ── */}
       <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 flex items-center justify-between flex-shrink-0">
@@ -951,9 +1030,14 @@ export default function PosPage() {
           className="flex-1 bg-green-700 hover:bg-green-600 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded py-3 font-bold text-sm flex items-center justify-center gap-2">
           <DollarSign className="h-4 w-4" /> Cash
         </button>
-        <button onClick={() => pay("credit")} disabled={!orderItems.length}
-          className="flex-1 bg-blue-700 hover:bg-blue-600 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded py-3 font-bold text-sm flex items-center justify-center gap-2">
-          <CreditCard className="h-4 w-4" /> Credit
+        <button
+          onClick={() => pay("credit")}
+          disabled={!orderItems.length || !isOnline}
+          title={!isOnline ? "Card payments unavailable — no internet connection" : undefined}
+          className={`flex-1 ${isOnline ? "bg-blue-700 hover:bg-blue-600" : "bg-gray-700 opacity-50 cursor-not-allowed"} disabled:text-gray-500 text-white rounded py-3 font-bold text-sm flex items-center justify-center gap-2 transition-colors`}
+        >
+          {isOnline ? <CreditCard className="h-4 w-4" /> : <WifiOff className="h-4 w-4" />}
+          {isOnline ? "Credit" : "Card — Offline"}
         </button>
         <button onClick={() => setShowSearch(true)}
           className="px-8 bg-gray-600 hover:bg-gray-500 text-white rounded py-3 font-semibold text-sm flex items-center justify-center gap-2">

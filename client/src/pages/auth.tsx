@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { getActiveTenantSlug, setActiveTenantSlug, queryClient } from "@/lib/queryClient";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,16 @@ interface RosterEmployee {
   firstName: string | null;
   lastName: string | null;
   employeeCode: string | null;
+}
+
+// ─── PIN pad scrambler (same algorithm used in pos.tsx) ──────────────────────
+function makeScrambledPad(): string[] {
+  const d = ["1","2","3","4","5","6","7","8","9","0"];
+  for (let i = d.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [d[i], d[j]] = [d[j], d[i]];
+  }
+  return [...d.slice(0, 9), "", d[9], "⌫"];
 }
 
 export default function Auth() {
@@ -126,7 +136,9 @@ export default function Auth() {
   };
 
   const handleEmpBack = () => { setEmpPin(prev => prev.slice(0, -1)); setEmpError(""); };
-  const empDigits = ["1","2","3","4","5","6","7","8","9","","0","⌫"];
+  // Scramble each time a different employee is selected — digit positions change
+  // so muscle memory and smudge patterns on the glass can't reveal the PIN.
+  const empDigits = useMemo(() => makeScrambledPad(), [empSelected?.id]);
 
   // Detect missing tenant slug — sign-up requires it, sign-in does not.
   const tenantSlugFromUrl = new URLSearchParams(window.location.search).get('tenant');

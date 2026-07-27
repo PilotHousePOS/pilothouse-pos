@@ -1,9 +1,24 @@
-const CACHE_NAME = 'animal-house-v17';
-const IMAGE_CACHE_NAME = 'animal-house-images-v1';
+const CACHE_NAME       = 'pilothouse-v1';   // bumped — new offline strategy
+const IMAGE_CACHE_NAME = 'pilothouse-images-v1';
+const API_CACHE_NAME   = 'pilothouse-api-v1';
+
+// App shell resources cached at install time so the UI loads even when offline
 const OFFLINE_CACHE = [
+  '/',
   '/manifest.json',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png'
+];
+
+// API GET routes whose responses are cached with stale-while-revalidate so
+// the POS can serve products, the employee roster, and settings while offline.
+const API_CACHE_ROUTES = [
+  '/api/pos/layout',
+  '/api/settings/tax-rate',
+  '/api/admin/pos-override-config',
+  '/api/employee/roster',
+  '/api/admin/categories',
+  '/api/tenants/current',
 ];
 
 self.addEventListener('install', function(event) {
@@ -16,23 +31,17 @@ self.addEventListener('install', function(event) {
 });
 
 self.addEventListener('message', function(event) {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-  if (event.data && event.data.type === 'STORE_VAPID_KEY') {
-    self.__vapidPublicKey = event.data.key;
-  }
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
+  if (event.data && event.data.type === 'STORE_VAPID_KEY') self.__vapidPublicKey = event.data.key;
 });
 
 self.addEventListener('activate', function(event) {
   event.waitUntil(
     caches.keys().then(function(cacheNames) {
       return Promise.all(
-        cacheNames.filter(function(cacheName) {
-          return cacheName !== CACHE_NAME && cacheName !== IMAGE_CACHE_NAME;
-        }).map(function(cacheName) {
-          return caches.delete(cacheName);
-        })
+        cacheNames.filter(function(n) {
+          return n !== CACHE_NAME && n !== IMAGE_CACHE_NAME && n !== API_CACHE_NAME;
+        }).map(function(n) { return caches.delete(n); })
       );
     })
   );
@@ -43,44 +52,80 @@ self.addEventListener('fetch', function(event) {
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
-
-  // Never intercept cross-origin requests (e.g. Stripe CDN, Google, analytics).
-  // Intercepting third-party requests breaks iframes like Stripe's card element.
   if (url.origin !== self.location.origin) return;
 
-  // Never intercept API calls
+  // ── HTML navigate requests: network-first, fall back to cached '/' ──────
+  // This keeps the app loadable even if the user refreshes while offline.
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(function() {
+        return caches.match('/');
+      })
+    );
+    return;
+  }
+
+  // ── JS/CSS assets (content-hashed filenames): cache on first load ────────
+  // Because filenames include a content hash they never go stale; caching
+  // them lets the app boot offline after the first successful load.
+  if (url.pathname.startsWith('/assets/')) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then(function(cache) {
+        return cache.match(event.request).then(function(cached) {
+          if (cached) return cached;
+          return fetch(event.request).then(function(response) {
+            if (response.ok) cache.put(event.request, response.clone());
+            return response;
+          });
+        });
+      })
+    );
+    return;
+  }
+
+  // ── POS-critical API routes: stale-while-revalidate ──────────────────────
+  // Serve the cached response immediately (fast), then refresh in background.
+  // If completely offline, the cached response is all that's available —
+  // which is enough to browse products, see the roster, and check tax rates.
+  if (url.pathname.startsWith('/api/') &&
+      API_CACHE_ROUTES.some(function(r) { return url.pathname === r || url.pathname.startsWith(r + '?'); })) {
+    event.respondWith(
+      caches.open(API_CACHE_NAME).then(function(cache) {
+        return cache.match(event.request).then(function(cached) {
+          var networkFetch = fetch(event.request).then(function(response) {
+            if (response.ok) cache.put(event.request, response.clone());
+            return response;
+          }).catch(function() { return null; });
+
+          // Serve cached immediately; network refresh happens in background
+          return cached || networkFetch || new Response(JSON.stringify([]), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        });
+      })
+    );
+    return;
+  }
+
+  // ── All other API calls: pass through (no caching) ───────────────────────
   if (url.pathname.startsWith('/api/')) return;
 
-  // Never intercept HTML navigation requests — always fetch fresh from network
-  // This ensures index.html is always up to date after a deployment
-  if (event.request.mode === 'navigate') return;
-
-  // Never cache JS or CSS chunks — they have content hashes in the filename
-  // and must always be fresh. Let the browser's built-in HTTP cache handle them.
-  if (url.pathname.startsWith('/assets/')) return;
-
-  // Product/pet images served from object storage — cache-first with persistent fallback.
-  // Once an image loads successfully it is stored in a dedicated image cache.
-  // If the network ever fails (GCS hiccup, server restart, etc.) the cached copy
-  // is returned, so a stale request can NEVER break a previously-loaded image.
+  // ── Product/pet images: cache-first with background refresh ─────────────
   if (url.pathname.startsWith('/public-objects/')) {
     event.respondWith(
       caches.open(IMAGE_CACHE_NAME).then(function(imageCache) {
         return imageCache.match(event.request).then(function(cached) {
           if (cached) {
-            // Serve instantly from cache, then silently refresh in the background
-            var networkFetch = fetch(event.request).then(function(response) {
-              if (response.ok) imageCache.put(event.request, response.clone());
-              return response;
-            }).catch(function() {/* silent — cached copy already served */});
+            fetch(event.request).then(function(r) {
+              if (r.ok) imageCache.put(event.request, r.clone());
+            }).catch(function() {});
             return cached;
           }
-          // Not in cache yet — fetch from network and store on success
-          return fetch(event.request).then(function(response) {
-            if (response.ok) imageCache.put(event.request, response.clone());
-            return response;
-          }).catch(function(err) {
-            // Network completely unreachable and nothing cached — nothing we can do
+          return fetch(event.request).then(function(r) {
+            if (r.ok) imageCache.put(event.request, r.clone());
+            return r;
+          }).catch(function() {
             return new Response('', { status: 503, statusText: 'Offline' });
           });
         });
@@ -89,7 +134,7 @@ self.addEventListener('fetch', function(event) {
     return;
   }
 
-  // For everything else (icons, manifest), use cache-first
+  // ── Icons, manifest, everything else: cache-first ───────────────────────
   event.respondWith(
     caches.match(event.request).then(function(cached) {
       return cached || fetch(event.request);
@@ -97,11 +142,11 @@ self.addEventListener('fetch', function(event) {
   );
 });
 
-self.addEventListener('push', function(event) {
-  console.log('[SW] Push notification received');
+// ── Push notifications ───────────────────────────────────────────────────────
 
+self.addEventListener('push', function(event) {
   let notificationData = {
-    title: 'Animal House Pet Store',
+    title: 'PilotHouse',
     body: 'You have a new notification',
     icon: '/icons/icon-192x192.png',
     badge: '/icons/icon-72x72.png',
@@ -113,55 +158,46 @@ self.addEventListener('push', function(event) {
     try {
       const data = event.data.json();
       notificationData = {
-        title: data.title || notificationData.title,
-        body: data.body || notificationData.body,
-        icon: data.icon || notificationData.icon,
-        badge: data.badge || notificationData.badge,
-        tag: data.tag || notificationData.tag,
-        data: { url: data.url || '/' }
+        title:  data.title  || notificationData.title,
+        body:   data.body   || notificationData.body,
+        icon:   data.icon   || notificationData.icon,
+        badge:  data.badge  || notificationData.badge,
+        tag:    data.tag    || notificationData.tag,
+        data:   { url: data.url || '/' }
       };
     } catch (e) {
-      console.error('[SW] Error parsing push data:', e);
       notificationData.body = event.data.text() || notificationData.body;
     }
   }
 
-  const options = {
-    body: notificationData.body,
-    icon: notificationData.icon,
-    badge: notificationData.badge,
-    tag: notificationData.tag,
-    data: notificationData.data,
-    requireInteraction: true,
-    vibrate: [200, 100, 200],
-    renotify: true,
-    actions: [
-      { action: 'open', title: 'Open' },
-      { action: 'dismiss', title: 'Dismiss' }
-    ]
-  };
-
   event.waitUntil(
-    self.registration.showNotification(notificationData.title, options)
+    self.registration.showNotification(notificationData.title, {
+      body:              notificationData.body,
+      icon:              notificationData.icon,
+      badge:             notificationData.badge,
+      tag:               notificationData.tag,
+      data:              notificationData.data,
+      requireInteraction: true,
+      vibrate:           [200, 100, 200],
+      renotify:          true,
+      actions: [
+        { action: 'open',    title: 'Open' },
+        { action: 'dismiss', title: 'Dismiss' }
+      ]
+    })
   );
 });
 
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
-
   if (event.action === 'dismiss') return;
-
-  const targetUrl = event.notification.data?.url || '/';
-  const fullUrl = new URL(targetUrl, self.location.origin).href;
-
+  const fullUrl = new URL(event.notification.data?.url || '/', self.location.origin).href;
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(windowClients) {
       for (var i = 0; i < windowClients.length; i++) {
         var client = windowClients[i];
         if (client.url.startsWith(self.location.origin) && 'focus' in client) {
-          return client.navigate(fullUrl).then(function(c) {
-            return c.focus();
-          });
+          return client.navigate(fullUrl).then(function(c) { return c.focus(); });
         }
       }
       return clients.openWindow(fullUrl);
@@ -169,23 +205,12 @@ self.addEventListener('notificationclick', function(event) {
   );
 });
 
-self.addEventListener('notificationclose', function(event) {
-  console.log('[SW] Notification closed:', event.notification.tag);
-});
-
 self.addEventListener('pushsubscriptionchange', function(event) {
-  console.log('[SW] Push subscription changed - resubscribing');
-
   var subscribeOptions = event.oldSubscription ? event.oldSubscription.options : {
     userVisibleOnly: true,
     applicationServerKey: self.__vapidPublicKey || null
   };
-
-  if (!subscribeOptions || !subscribeOptions.applicationServerKey) {
-    console.warn('[SW] No applicationServerKey available for re-subscription');
-    return;
-  }
-
+  if (!subscribeOptions?.applicationServerKey) return;
   event.waitUntil(
     self.registration.pushManager.subscribe(subscribeOptions)
       .then(function(subscription) {
@@ -196,8 +221,6 @@ self.addEventListener('pushsubscriptionchange', function(event) {
           credentials: 'include'
         });
       })
-      .catch(function(err) {
-        console.error('[SW] Failed to resubscribe:', err);
-      })
+      .catch(function(err) { console.error('[SW] Failed to resubscribe:', err); })
   );
 });
