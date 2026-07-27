@@ -19,7 +19,7 @@ import {
 } from "@/lib/offline-db";
 import { useHardwareDevices, type DeviceState, type DeviceType } from "@/hooks/useHardwareDevices";
 import { HardwareWizard } from "@/components/pos/HardwareWizard";
-import { printReceipt, openDrawer, sendPrintJob } from "@/lib/hardware/escpos";
+import { printReceipt, openDrawer, printTestPage, sendPrintJob } from "@/lib/hardware/escpos";
 import { sendTerminalCharge } from "@/lib/hardware/terminal";
 import { printLabel } from "@/lib/hardware/zpl";
 
@@ -723,12 +723,16 @@ export default function PosPage() {
     if (hw.terminal.status === 'connected' && hw.terminal.port) {
       // ── Terminal path: send to paired card terminal ──
       setTerminalProcessing(true);
+      // Track whether we handed off to the mutation so we only release the
+      // guard after the order is fully persisted (not just after terminal ack).
+      let handedOffToMutation = false;
       try {
         const result = await sendTerminalCharge(hw.terminal.port, {
           amountCents: Math.round(total * 100),
           orderRef:    orderNumber,
         });
         if (result.approved) {
+          handedOffToMutation = true;
           saveOrderMutation.mutate(
             {
               orderNumber, items: orderItems, subtotal, tax, total,
@@ -745,6 +749,9 @@ export default function PosPage() {
                   paymentMethod: `credit${result.cardType ? ` (${result.cardType})` : ''}`,
                 };
               },
+              // Release the guard only after the order is fully persisted so
+              // the Credit button cannot fire a second charge before the basket clears.
+              onSettled: () => setTerminalProcessing(false),
             },
           );
           toast({ title: `Approved — ****${result.last4 ?? ''}`, description: result.cardType ?? '' });
@@ -758,7 +765,9 @@ export default function PosPage() {
       } catch {
         toast({ title: 'Terminal Error', description: 'Could not reach terminal. Try again.', variant: 'destructive' });
       } finally {
-        setTerminalProcessing(false);
+        // For declined / error paths the mutation never runs — release here.
+        // For approved path, onSettled releases the guard after persistence.
+        if (!handedOffToMutation) setTerminalProcessing(false);
       }
     } else {
       // ── No terminal paired — record as manual card entry ──
@@ -2028,6 +2037,38 @@ export default function PosPage() {
                         </div>
                       )}
                     </div>
+
+                    {/* Printer diagnostic buttons — visible when the receipt printer is connected */}
+                    {hw.printer.status === 'connected' && hw.printer.port && (
+                      <div className="flex gap-3 pl-1">
+                        <button
+                          onClick={async () => {
+                            try {
+                              await sendPrintJob(hw.printer.port, async (w) => { await printTestPage(w); });
+                              toast({ title: 'Test page sent', description: 'Check the printout — ruler should reach the paper edge.' });
+                            } catch {
+                              toast({ title: 'Print error', description: 'Printer did not respond.', variant: 'destructive' });
+                            }
+                          }}
+                          className="text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 rounded px-3 py-1.5"
+                        >
+                          Test Print
+                        </button>
+                        <button
+                          onClick={async () => {
+                            try {
+                              await sendPrintJob(hw.printer.port, async (w) => { await openDrawer(w); });
+                              toast({ title: 'Drawer kick sent', description: 'If the drawer did not open, check the RJ11 pin wiring (see escpos.ts).' });
+                            } catch {
+                              toast({ title: 'Drawer error', description: 'Printer did not respond.', variant: 'destructive' });
+                            }
+                          }}
+                          className="text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 rounded px-3 py-1.5"
+                        >
+                          Test Drawer
+                        </button>
+                      </div>
+                    )}
 
                     <button
                       onClick={() => setShowHardwareWizard(true)}
