@@ -261,6 +261,86 @@ describe('HardwareWizard replace-confirm — fallback (manual) device path', () 
   });
 });
 
+// ── Suite D: outside-click guard on probing and connecting ─────────────────────
+
+describe('HardwareWizard outside-click is blocked during probing', () => {
+  afterEach(() => vi.clearAllMocks());
+
+  it('9. clicking outside during probing calls e.preventDefault() and step stays probing', async () => {
+    // probeDevice hangs so the wizard stays on the probing step for the duration of the test
+    const { probeDevice } = await import('@/lib/hardware/deviceDatabase');
+    (probeDevice as ReturnType<typeof vi.fn>).mockReturnValue(new Promise(() => {}));
+
+    mockSerialWith(UNKNOWN_PORT);
+    const hw = makeHw('disconnected');
+    renderWizard(hw);
+    const user = userEvent.setup();
+
+    // Click Scan — requestPort resolves immediately; VID/PID lookup misses;
+    // wizard moves to 'probing' and then awaits the hanging probeDevice call.
+    await user.click(screen.getByRole('button', { name: /scan for device/i }));
+    await waitFor(() =>
+      expect(screen.getByText(/identifying device/i)).toBeInTheDocument(),
+    );
+
+    const preventDefaultSpy = vi.spyOn(Event.prototype, 'preventDefault');
+
+    document.body.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, cancelable: true }),
+    );
+
+    await waitFor(() => {
+      expect(preventDefaultSpy).toHaveBeenCalled();
+    });
+
+    // Wizard must still be on the probing step
+    expect(screen.getByText(/identifying device/i)).toBeInTheDocument();
+
+    preventDefaultSpy.mockRestore();
+  });
+});
+
+describe('HardwareWizard outside-click is blocked during connecting', () => {
+  beforeEach(() => mockSerialWith(EPSON_PORT));
+  afterEach(() => vi.clearAllMocks());
+
+  it('10. clicking outside during connecting calls e.preventDefault() and step stays connecting', async () => {
+    // connectWithPort hangs so the wizard stays on the connecting step
+    const hw = makeHw('disconnected');
+    (hw.connectWithPort as ReturnType<typeof vi.fn>).mockReturnValue(new Promise(() => {}));
+    renderWizard(hw);
+    const user = userEvent.setup();
+
+    // Navigate to recognized step
+    await user.click(screen.getByRole('button', { name: /scan for device/i }));
+    await waitFor(() =>
+      expect(screen.getByText(/device recognized/i)).toBeInTheDocument(),
+    );
+
+    // Click "Done — Connect Device" — slot is disconnected so no replace-confirm;
+    // wizard moves straight to 'connecting' and awaits the hanging connectWithPort.
+    await user.click(screen.getByRole('button', { name: /done.*connect device/i }));
+    await waitFor(() =>
+      expect(screen.getByText(/connecting/i)).toBeInTheDocument(),
+    );
+
+    const preventDefaultSpy = vi.spyOn(Event.prototype, 'preventDefault');
+
+    document.body.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, cancelable: true }),
+    );
+
+    await waitFor(() => {
+      expect(preventDefaultSpy).toHaveBeenCalled();
+    });
+
+    // Wizard must still be on the connecting step
+    expect(screen.getByText(/connecting/i)).toBeInTheDocument();
+
+    preventDefaultSpy.mockRestore();
+  });
+});
+
 // ── Suite C: outside-click guard on replace-confirm ────────────────────────────
 
 describe('HardwareWizard replace-confirm — outside-click is blocked', () => {
