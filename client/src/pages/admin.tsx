@@ -5142,6 +5142,255 @@ function LoyaltySettingsPanel() {
   );
 }
 
+// ─── Payment Processors Panel ─────────────────────────────────────────────────
+// Lets each tenant connect their own Stripe account (online payments) and
+// configure their physical card terminal processor (for the hardware layer).
+function PaymentProcessorsPanel() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // ── Physical terminal form state ────────────────────────────────────────────
+  const [processorName, setProcessorName]     = useState('');
+  const [terminalAddress, setTerminalAddress] = useState('');
+  const [apiToken, setApiToken]               = useState('');
+  const [showToken, setShowToken]             = useState(false);
+  const [savingTerminal, setSavingTerminal]   = useState(false);
+
+  // ── Stripe Connect status ────────────────────────────────────────────────────
+  const { data: connectStatus, isLoading: statusLoading, refetch: refetchStatus } = useQuery<any>({
+    queryKey: ['/api/billing/stripe-connect/status'],
+    refetchOnWindowFocus: false,
+  });
+
+  // Populate terminal form from existing config
+  useEffect(() => {
+    if (connectStatus?.processor) {
+      setProcessorName(connectStatus.processor.name || '');
+      setTerminalAddress(connectStatus.processor.terminalAddress || '');
+    }
+  }, [connectStatus]);
+
+  // Handle OAuth redirect params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const success = params.get('connectSuccess');
+    const error   = params.get('connectError');
+    if (success) {
+      toast({ title: 'Stripe account connected!', description: 'Online payments will now route to your Stripe account.' });
+      refetchStatus();
+      // Strip params from URL
+      const clean = window.location.pathname + (params.get('tab') ? `?tab=${params.get('tab')}` : '');
+      window.history.replaceState({}, '', clean);
+    } else if (error) {
+      toast({ title: 'Connection failed', description: decodeURIComponent(error), variant: 'destructive' });
+      const clean = window.location.pathname + (params.get('tab') ? `?tab=${params.get('tab')}` : '');
+      window.history.replaceState({}, '', clean);
+    }
+  }, []);
+
+  // ── Disconnect mutation ──────────────────────────────────────────────────────
+  const disconnectMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest('DELETE', '/api/billing/stripe-connect/disconnect');
+      if (!res.ok) throw new Error('Failed to disconnect');
+    },
+    onSuccess: () => {
+      toast({ title: 'Stripe account disconnected', description: 'Online payments will fall back to the platform account.' });
+      queryClient.invalidateQueries({ queryKey: ['/api/billing/stripe-connect/status'] });
+    },
+    onError: () => toast({ title: 'Error', description: 'Failed to disconnect Stripe account.', variant: 'destructive' }),
+  });
+
+  // ── Save terminal config ─────────────────────────────────────────────────────
+  const saveTerminal = async () => {
+    setSavingTerminal(true);
+    try {
+      const res = await apiRequest('PUT', '/api/admin/settings/processor-config', {
+        processorName, terminalAddress, apiToken: apiToken || undefined,
+      });
+      if (!res.ok) throw new Error('Save failed');
+      toast({ title: 'Terminal config saved' });
+      setApiToken('');
+      refetchStatus();
+    } catch {
+      toast({ title: 'Error', description: 'Failed to save terminal configuration.', variant: 'destructive' });
+    } finally {
+      setSavingTerminal(false);
+    }
+  };
+
+  // ── Clear terminal config ────────────────────────────────────────────────────
+  const clearTerminal = async () => {
+    try {
+      const res = await apiRequest('DELETE', '/api/admin/settings/processor-config');
+      if (!res.ok) throw new Error();
+      toast({ title: 'Terminal config cleared' });
+      setProcessorName(''); setTerminalAddress(''); setApiToken('');
+      refetchStatus();
+    } catch {
+      toast({ title: 'Error', description: 'Failed to clear terminal configuration.', variant: 'destructive' });
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <CreditCard className="h-5 w-5" />
+          Payment Processors
+        </CardTitle>
+        <CardDescription>
+          Connect your own Stripe account so online sales deposit directly to your bank.
+          Configure your physical card terminal for in-store payments.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+
+        {/* ── Online Payments — Stripe Connect ───────────────────────────────── */}
+        <div className="space-y-3">
+          <h3 className="font-semibold text-sm flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-blue-500" />
+            Online Payments (Stripe Connect)
+          </h3>
+
+          {statusLoading ? (
+            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+              <Loader2 className="h-4 w-4 animate-spin" /> Checking connection…
+            </div>
+          ) : connectStatus?.connected ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
+                <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-green-800 dark:text-green-300">
+                    Connected — {connectStatus.businessName || connectStatus.accountId}
+                  </p>
+                  <p className="text-xs text-green-600 dark:text-green-400">
+                    Online card sales route to your Stripe account
+                    {connectStatus.onboardedAt && ` · Connected ${new Date(connectStatus.onboardedAt).toLocaleDateString()}`}
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-red-600 border-red-200 hover:bg-red-50"
+                onClick={() => disconnectMutation.mutate()}
+                disabled={disconnectMutation.isPending}
+              >
+                {disconnectMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                Disconnect Stripe Account
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
+                <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-amber-800 dark:text-amber-300">No Stripe account connected</p>
+                  <p className="text-xs text-amber-600 dark:text-amber-400">
+                    Online card payments are currently routed through the platform account.
+                    Connect your own Stripe account so payouts go directly to your bank.
+                  </p>
+                </div>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => { window.location.href = '/api/billing/stripe-connect/authorize'; }}
+                className="bg-[#635BFF] hover:bg-[#5148d4] text-white"
+              >
+                <CreditCard className="h-4 w-4 mr-2" />
+                Connect your Stripe account
+              </Button>
+            </div>
+          )}
+        </div>
+
+        <div className="border-t" />
+
+        {/* ── Physical Terminal Config ────────────────────────────────────────── */}
+        <div className="space-y-3">
+          <h3 className="font-semibold text-sm flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-purple-500" />
+            Physical Card Terminal
+          </h3>
+          <p className="text-xs text-muted-foreground">
+            Enter your terminal processor's name and local network address so the POS
+            hardware layer can send payment requests directly to the terminal.
+            The API token (if required by your processor) is stored encrypted.
+          </p>
+
+          {connectStatus?.processor?.name && !processorName && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+              Currently configured: <strong>{connectStatus.processor.name}</strong>
+              {connectStatus.processor.terminalAddress && ` · ${connectStatus.processor.terminalAddress}`}
+              {connectStatus.processor.hasToken && ' · API token stored'}
+            </div>
+          )}
+
+          <div className="grid gap-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs">Processor / Company Name</Label>
+                <Input
+                  placeholder="e.g. Electronic Payments / Dejavoo"
+                  value={processorName}
+                  onChange={e => setProcessorName(e.target.value)}
+                  className="text-sm"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Terminal Address (IP:Port)</Label>
+                <Input
+                  placeholder="e.g. 192.168.1.50:8080"
+                  value={terminalAddress}
+                  onChange={e => setTerminalAddress(e.target.value)}
+                  className="text-sm font-mono"
+                />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">
+                API Token / Key {connectStatus?.processor?.hasToken && <span className="text-green-600">(stored — leave blank to keep current)</span>}
+              </Label>
+              <div className="relative">
+                <Input
+                  type={showToken ? 'text' : 'password'}
+                  placeholder={connectStatus?.processor?.hasToken ? '••••••••' : 'Paste token here (optional)'}
+                  value={apiToken}
+                  onChange={e => setApiToken(e.target.value)}
+                  className="text-sm pr-9"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowToken(v => !v)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex gap-2 pt-1">
+            <Button size="sm" onClick={saveTerminal} disabled={savingTerminal || (!processorName && !terminalAddress)}>
+              {savingTerminal ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+              Save Terminal Config
+            </Button>
+            {(connectStatus?.processor?.name || connectStatus?.processor?.terminalAddress) && (
+              <Button size="sm" variant="outline" className="text-red-600 border-red-200 hover:bg-red-50" onClick={clearTerminal}>
+                Clear
+              </Button>
+            )}
+          </div>
+        </div>
+
+      </CardContent>
+    </Card>
+  );
+}
+
 // Legal Pages Panel Component
 function LegalPagesPanel() {
   const { toast } = useToast();
@@ -14719,6 +14968,7 @@ export default function Admin() {
           <FeaturesPanel />
           {!typedUser?.isEmployee && <PayPeriodCard />}
           <StoreHoursPanel />
+          <PaymentProcessorsPanel />
           <SettingsPanel />
           <TrackedItemsSettingsPanel />
           <LoyaltySettingsPanel />

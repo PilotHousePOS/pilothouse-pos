@@ -36,6 +36,16 @@ export const tenants = pgTable("tenants", {
   onboardingStep: integer("onboarding_step").default(0).notNull(), // Highest onboarding step completed (0=none, 1=business details done, 2=features chosen)
   enabledFeatures: jsonb("enabled_features").$type<Record<string, any>>().default({}), // Feature flags + posOverrideRequirements etc.
   adminOverridePin: varchar("admin_override_pin", { length: 255 }), // bcrypt-hashed 4-digit PIN for POS manager overrides
+  // ── Per-tenant Stripe Connect (online storefront payments) ────────────────
+  stripeConnectAccountId: varchar("stripe_connect_account_id", { length: 255 }), // acct_xxx of the connected merchant Stripe account
+  stripeConnectRefreshToken: text("stripe_connect_refresh_token"), // OAuth refresh token (stored encrypted in DB via migration; column is text)
+  stripeConnectOnboardedAt: timestamp("stripe_connect_onboarded_at"), // when the tenant completed Connect OAuth
+  // ── Physical terminal processor config ────────────────────────────────────
+  processorConfig: jsonb("processor_config").$type<{
+    name?: string;           // e.g. "Electronic Payments / Dejavoo"
+    terminalAddress?: string; // e.g. "192.168.1.50:8080"
+    encryptedToken?: string;  // AES-256-CBC encrypted API token (IV prepended)
+  }>(), // stored encrypted; never returned plaintext in GET responses
   createdAt: timestamp("created_at").defaultNow(),
 });
 

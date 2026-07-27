@@ -67,6 +67,7 @@ async function withRetry<T>(operation: () => Promise<T>, maxRetries = 3, delayMs
 import { extractOrderFromPhoto, apply99Pricing } from './orderPhotoProcessor';
 import { categorizeProduct, detectLiveAnimal } from './productCategorization';
 import { registerBillingRoutes } from './billingRoutes';
+import { registerStripeConnectRoutes, getTenantConnectAccountId } from './stripeConnectRoutes';
 // Shared-pool limiters MUST be imported from sharedLimiters.ts — never
 // re-created inline.  See server/sharedLimiters.ts for the full explanation.
 import { getRealIp, authLimiter, searchLimiter, checkoutLimiter, uploadLimiter, overridePinLimiter, overridePinSlugLimiter, rosterLimiter } from './sharedLimiters';
@@ -450,6 +451,12 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
   // Regression guard: server/tests/upload-limiter-shared-pool.test.ts
   app.use('/api/upload', uploadLimiter);
   app.use('/api/admin/order-photos', uploadLimiter);
+
+  // Per-tenant Stripe Connect OAuth + processor config routes.
+  // Registered HERE (after tenantMiddleware at line ~362) so req.tenantId is
+  // available in every handler. billingRoutes is exempt because it resolves
+  // tenantId via user record lookup rather than req.tenantId.
+  registerStripeConnectRoutes(app);
 
   // Stripe API routes
   app.get("/api/stripe/config", async (req, res) => {
@@ -4542,7 +4549,11 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           const stripe = await getUncachableStripeClient();
           
           const amountCents = Math.round(orderTotalAmount * 100);
-          
+
+          // Route through the tenant's connected Stripe account when configured,
+          // so the merchant receives the funds directly (destination charge).
+          const _connectAcctApprove = await getTenantConnectAccountId((req as any).tenantId);
+
           // Create and confirm a PaymentIntent with the saved payment method
           const paymentIntent = await stripe.paymentIntents.create({
             amount: amountCents,
@@ -4556,6 +4567,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
               orderId: orderId.toString(),
               customerId: order.userId,
             },
+            ...(_connectAcctApprove ? { transfer_data: { destination: _connectAcctApprove } } : {}),
           }, {
             idempotencyKey: `order-approve-${orderId}`,
           });
@@ -4725,6 +4737,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
       const amountCents = Math.round(parseFloat(order.totalAmount) * 100);
       
       const retryKey = req.body?.idempotencyKey || `order-retry-${orderId}-${Date.now()}`;
+      const _connectAcctRetry = await getTenantConnectAccountId((req as any).tenantId);
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amountCents,
         currency: 'usd',
@@ -4737,6 +4750,7 @@ export async function registerRoutes(app: Express, server?: Server): Promise<voi
           orderId: orderId.toString(),
           customerId: order.userId,
         },
+        ...(_connectAcctRetry ? { transfer_data: { destination: _connectAcctRetry } } : {}),
       }, {
         idempotencyKey: retryKey,
       });
@@ -7059,6 +7073,7 @@ West Monroe LA 71291
       // Prefer charging the saved card directly (same as order payments — no redirect needed)
       const customer = await storage.getUser(req.user.id);
       if (customer?.stripeCustomerId && customer?.stripeDefaultPaymentMethod) {
+        const _connectAcctGroom = await getTenantConnectAccountId((req as any).tenantId);
         const paymentIntent = await stripe.paymentIntents.create({
           amount: Math.round(totalAmount * 100),
           currency: 'usd',
@@ -7068,6 +7083,7 @@ West Monroe LA 71291
           confirm: true,
           description: `Grooming appointment #${id} — ${appointment.petName}${tipNum > 0 ? ` (incl. $${tipNum.toFixed(2)} tip)` : ''}`,
           metadata: { appointmentId: String(id), type: 'grooming', tipAmount: String(tipNum) },
+          ...(_connectAcctGroom ? { transfer_data: { destination: _connectAcctGroom } } : {}),
         });
 
         if (paymentIntent.status === 'succeeded') {
@@ -7103,6 +7119,7 @@ West Monroe LA 71291
           quantity: 1,
         });
       }
+      const _connectAcctGroomSession = await getTenantConnectAccountId((req as any).tenantId);
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: lineItems,
@@ -7110,6 +7127,11 @@ West Monroe LA 71291
         success_url: `${origin}/my-appointments?groomingPaid=${id}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/my-appointments`,
         metadata: { appointmentId: String(id), type: 'grooming', tipAmount: String(tipNum) },
+        // For mode:'payment' sessions, connected-account routing goes inside
+        // payment_intent_data — NOT at the session top level (Stripe rejects that).
+        ...(_connectAcctGroomSession
+          ? { payment_intent_data: { transfer_data: { destination: _connectAcctGroomSession } } }
+          : {}),
       });
 
       res.json({ checkoutUrl: session.url, sessionId: session.id });
@@ -10821,7 +10843,8 @@ West Monroe LA 71291
       }
 
       const { getUncachableStripeClient } = await import('./stripeClient');
-      const stripeClient = getUncachableStripeClient();
+      const stripeClient = await getUncachableStripeClient();
+      const _connectAcctTip = await getTenantConnectAccountId((req as any).tenantId);
 
       const amountCents = Math.round(tipNum * 100);
       const paymentIntent = await stripeClient.paymentIntents.create({
@@ -10832,6 +10855,7 @@ West Monroe LA 71291
         confirm: true,
         off_session: true,
         description: `Grooming tip — ${appointment.ownerFirstName} ${appointment.ownerLastName} (appt #${appointment.id})`,
+        ...(_connectAcctTip ? { transfer_data: { destination: _connectAcctTip } } : {}),
       });
 
       await storage.updateAppointmentTip(id, tipAmount.toString(), paymentIntent.id);
@@ -12351,6 +12375,10 @@ West Monroe LA 71291
       await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS two_fa_code_expires TIMESTAMPTZ`);
       await db.execute(sql`ALTER TABLE tenants ADD COLUMN IF NOT EXISTS pos_pin_failed_attempts INTEGER NOT NULL DEFAULT 0`);
       await db.execute(sql`ALTER TABLE tenants ADD COLUMN IF NOT EXISTS pos_pin_locked_until TIMESTAMPTZ`);
+      await db.execute(sql`ALTER TABLE tenants ADD COLUMN IF NOT EXISTS stripe_connect_account_id VARCHAR(255)`);
+      await db.execute(sql`ALTER TABLE tenants ADD COLUMN IF NOT EXISTS stripe_connect_refresh_token TEXT`);
+      await db.execute(sql`ALTER TABLE tenants ADD COLUMN IF NOT EXISTS stripe_connect_onboarded_at TIMESTAMPTZ`);
+      await db.execute(sql`ALTER TABLE tenants ADD COLUMN IF NOT EXISTS processor_config JSONB`);
       await db.execute(sql`ALTER TABLE pos_orders ADD COLUMN IF NOT EXISTS offline_queued_at TIMESTAMPTZ`);
       await db.execute(sql`ALTER TABLE pos_orders ADD COLUMN IF NOT EXISTS operator_name VARCHAR(200)`);
       await db.execute(sql`CREATE TABLE IF NOT EXISTS pin_attempt_log (id SERIAL PRIMARY KEY, tenant_id INTEGER, event_type VARCHAR(50) NOT NULL, employee_code VARCHAR(20), ip_address VARCHAR(45), success BOOLEAN NOT NULL DEFAULT false, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`);

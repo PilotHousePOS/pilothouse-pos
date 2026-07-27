@@ -80,6 +80,20 @@ All limiters use `express-rate-limit` with in-memory store (per-process):
 
 ---
 
+## Per-tenant Stripe Connect & processor config
+
+**Rule:** Each tenant connects their own Stripe account via OAuth (`STRIPE_CONNECT_CLIENT_ID` env var required). Storefront PaymentIntents inject `transfer_data: { destination: connectedAccountId }` when configured. Subscription billing is unaffected.
+
+**Security invariants:**
+- OAuth state is HMAC-SHA256 signed (SESSION_SECRET); callback rejects unsigned or expired states — prevents tenant-account hijacking.
+- Stripe refresh tokens stored encrypted (AES-256-CBC, same key as processor API tokens).
+- Connect routes registered AFTER `app.use('/api', tenantMiddleware)` so `req.tenantId` is always set.
+- Processor config `GET` never returns the encrypted token (hardware layer gets address/name only).
+
+**Why:** Tenants need revenue in their own bank. HMAC state prevents a rogue OAuth redirect from overwriting another tenant's connected account.
+
+---
+
 ## Public route allowlist
 
 Routes that must work without a tenant slug go in `UNAUTHENTICATED_NO_SLUG_ALLOWLIST` in `server/tenantMiddleware.ts`:
