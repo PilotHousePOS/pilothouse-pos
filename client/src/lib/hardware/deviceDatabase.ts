@@ -190,9 +190,18 @@ export type ProbeResult = 'escpos' | 'zpl' | 'unknown';
 /**
  * Probe a port to identify its device type.
  * Tries ESC/POS first, then ZPL. Returns 'unknown' if neither probe responds.
- * The port must NOT be open when this is called.
+ *
+ * If the port is already open (port.readable is non-null) the probe is skipped
+ * entirely and 'unknown' is returned immediately.  Calling port.open() on an
+ * already-open port throws InvalidStateError, which would surface as an
+ * unhandled crash rather than a graceful fallback.  Returning 'unknown' here
+ * sends the wizard to the manual-selection form, which is the correct fallback.
  */
 export async function probeDevice(port: any): Promise<ProbeResult> {
+  // Guard: Web Serial sets port.readable to a non-null ReadableStream when the
+  // port is open.  Skip the probe to avoid a double-open InvalidStateError.
+  if (port.readable != null) return 'unknown';
+
   if (await probeEscPos(port)) return 'escpos';
   if (await probeZpl(port))    return 'zpl';
   return 'unknown';
