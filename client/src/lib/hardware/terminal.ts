@@ -324,6 +324,25 @@ export async function sendTerminalCharge(
 // Spec §2.1 "Physical Layer": factory default is 9600 baud, 8-N-1.
 // Some units are reconfigured to 19200 or 115200 — confirm with the terminal's
 // configuration sheet from your EP rep before changing this value.
+//
+// TRAINING-MODE ROUND-TRIP VERIFICATION
+// ──────────────────────────────────────
+// Before accepting live customer transactions, run at least one $1.00 sale in
+// Dejavoo Training Mode (Supervisor → Training Mode → ON) to confirm the baud
+// rate, LRC, and field order are correct end-to-end:
+//
+//   const port = await navigator.serial.requestPort();
+//   await openTerminalPort(port);
+//   const result = await sendTerminalCharge(port, { amountCents: 100, orderRef: 'TRAIN-001' });
+//   // Expected: result.approved === true, result.authCode non-empty (e.g. "123456")
+//   // A NAK response (result.reason includes "Terminal NAK") indicates an LRC or
+//   // baud-rate mismatch — verify TERMINAL_BAUD_RATE matches the terminal's
+//   // configuration sheet and that your RS-232 cable is straight-through (not null-modem).
+//
+// Once a training-mode $1.00 sale returns responseCode "00" with a non-empty
+// authCode, the frame format (STX/ETX delimiters, SEP 0x1C, LRC XOR, 2-char
+// transaction type, 12-digit amount) is confirmed correct for this unit.
+// At that point it is safe to disable Training Mode and process live transactions.
 export const TERMINAL_BAUD_RATE = 9600;
 
 // ── Convenience: open a serial port with the correct settings ─────────────────
