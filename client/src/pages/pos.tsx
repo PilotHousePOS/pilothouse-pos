@@ -818,6 +818,14 @@ export default function PosPage() {
             },
           );
           toast({ title: `Approved — ****${result.last4 ?? ''}`, description: result.cardType ?? '' });
+        } else if (result.reason?.startsWith('Terminal port is not open')) {
+          // Port exists in state but was never opened (or timed out) — give
+          // the cashier a clear, actionable message instead of a generic error.
+          toast({
+            title:       'Connect to terminal first',
+            description: 'The card terminal is paired but the port is not open. Disconnect and reconnect the terminal, then try again.',
+            variant:     'destructive',
+          });
         } else {
           toast({
             title:       'Card Declined',

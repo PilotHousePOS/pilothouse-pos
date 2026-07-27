@@ -278,6 +278,17 @@ export async function sendTerminalCharge(
   port: any, // SerialPort (Web Serial API)
   params: TerminalChargeParams,
 ): Promise<TerminalChargeResult> {
+  // Guard: the Web Serial API sets `readable` and `writable` to non-null only
+  // while the port is open.  If either is absent the port was never opened (or
+  // has already been closed), so reject immediately with an actionable message
+  // rather than letting the write throw an unhandled DOMException.
+  if (!port?.readable || !port?.writable) {
+    return {
+      approved: false,
+      reason: "Terminal port is not open — call openTerminalPort() first",
+    };
+  }
+
   try {
     // Write request — release lock in finally so the port is never left locked
     const writer: WritableStreamDefaultWriter<Uint8Array> = port.writable.getWriter();
