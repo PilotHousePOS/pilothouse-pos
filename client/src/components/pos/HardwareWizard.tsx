@@ -38,7 +38,7 @@ type WizardStep =
   | { step: 'probing' }
   | { step: 'recognized'; port: any; device: KnownDevice; suggestedType: DeviceType }
   | { step: 'fallback';   port: any; suggestedType: DeviceType | null; suggestedName: string }
-  | { step: 'replace-confirm'; deviceType: DeviceType; doConnect: () => Promise<void> }
+  | { step: 'replace-confirm'; deviceType: DeviceType; existingDeviceName: string; doConnect: () => Promise<void> }
   | { step: 'connecting' }
   | { step: 'error'; message: string };
 
@@ -166,6 +166,7 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
       setState({
         step: 'replace-confirm',
         deviceType: type,
+        existingDeviceName: hw[type].deviceName,
         doConnect: async () => {
           setState({ step: 'connecting' });
           try {
@@ -204,6 +205,7 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
       setState({
         step: 'replace-confirm',
         deviceType: type,
+        existingDeviceName: hw[type].deviceName,
         doConnect: async () => {
           setState({ step: 'connecting' });
           try {
@@ -262,6 +264,7 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
           {state.step === 'replace-confirm' && (
             <StepReplaceConfirm
               deviceType={state.deviceType}
+              existingDeviceName={state.existingDeviceName}
               onConfirm={state.doConnect}
               onCancel={() => setState(INITIAL)}
             />
@@ -494,9 +497,10 @@ function StepFallback({
 }
 
 function StepReplaceConfirm({
-  deviceType, onConfirm, onCancel,
+  deviceType, existingDeviceName, onConfirm, onCancel,
 }: {
   deviceType: DeviceType;
+  existingDeviceName: string;
   onConfirm: () => Promise<void>;
   onCancel: () => void;
 }) {
@@ -507,11 +511,14 @@ function StepReplaceConfirm({
         <AlertTriangle className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
         <div>
           <p className="text-sm font-semibold text-amber-300">
-            {label} already connected
+            {existingDeviceName.trim() ? existingDeviceName.trim() : label} already connected
           </p>
           <p className="text-xs text-amber-500 mt-1 leading-relaxed">
-            A {label} is already connected. Connecting this device will replace it.
-            The existing connection will be closed immediately.
+            {existingDeviceName.trim()
+              ? `${existingDeviceName.trim()} is already connected. Connecting this device will replace it.`
+              : `A ${label} is already connected. Connecting this device will replace it.`
+            }
+            {' '}The existing connection will be closed immediately.
           </p>
         </div>
       </div>
