@@ -19,6 +19,8 @@
 //   6. Cancel on the fallback replace-confirm also returns to pick without
 //      calling connectWithPort
 //   7. Replace on the fallback replace-confirm calls connectWithPort correctly
+//   8. Clicking outside the dialog on the replace-confirm step calls
+//      e.preventDefault() and leaves the dialog open
 
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -256,5 +258,46 @@ describe('HardwareWizard replace-confirm — fallback (manual) device path', () 
       9600,
       'Receipt Printer + Cash Drawer',
     );
+  });
+});
+
+// ── Suite C: outside-click guard on replace-confirm ────────────────────────────
+
+describe('HardwareWizard replace-confirm — outside-click is blocked', () => {
+  beforeEach(() => mockSerialWith(EPSON_PORT));
+  afterEach(() => vi.clearAllMocks());
+
+  it('8. clicking outside calls e.preventDefault() and dialog stays on replace-confirm', async () => {
+    const hw = makeHw('connected');
+    renderWizard(hw);
+    const user = userEvent.setup();
+
+    // Navigate to the replace-confirm step (same path as test 1)
+    await clickScan(user);
+    await waitFor(() => screen.getByText(/device recognized/i));
+    await user.click(screen.getByRole('button', { name: /done.*connect device/i }));
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: REPLACE_BTN_LABEL })).toBeInTheDocument(),
+    );
+
+    // Spy on preventDefault so we can assert it was called
+    const preventDefaultSpy = vi.spyOn(Event.prototype, 'preventDefault');
+
+    // Radix UI's DismissableLayer listens for pointerdown events on the document
+    // and calls onInteractOutside when the target is outside the dialog content.
+    // Firing a pointerdown on document.body simulates an outside click.
+    document.body.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, cancelable: true }),
+    );
+
+    // Allow any microtasks / event-loop ticks to settle
+    await waitFor(() => {
+      expect(preventDefaultSpy).toHaveBeenCalled();
+    });
+
+    // The replace-confirm step must still be visible — dialog did not close
+    expect(screen.getByRole('button', { name: REPLACE_BTN_LABEL })).toBeInTheDocument();
+
+    preventDefaultSpy.mockRestore();
   });
 });
