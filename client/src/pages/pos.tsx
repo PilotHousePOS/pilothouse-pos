@@ -181,7 +181,7 @@ function makeScrambledPad(): string[] {
 
 // ─── Connected device compact card (used in new Hardware tab) ────────────────
 
-function ConnectedDeviceCard({
+export function ConnectedDeviceCard({
   type, device, onRemove, onTestPrint, onOpenDrawer, onTestLabel,
 }: {
   type: DeviceType;
