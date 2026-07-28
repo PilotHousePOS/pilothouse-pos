@@ -582,11 +582,6 @@ export default function PosPage() {
     return () => clearInterval(t);
   }, []);
 
-  // Sync receipt footer draft whenever the settings panel opens or the saved value loads
-  useEffect(() => {
-    if (showSettings) setReceiptFooterDraft(receiptFooter);
-  }, [showSettings, receiptFooter]);
-
   // Block back-navigation while the POS is locked — the terminal must not be
   // abandoned mid-shift without a signed-in operator.
   useEffect(() => {
@@ -831,6 +826,12 @@ export default function PosPage() {
     staleTime: 5 * 60_000,
   });
   const receiptFooter = receiptFooterData?.footerMessage ?? "";
+
+  // Sync receipt footer draft whenever the settings panel opens or the saved value loads.
+  // Must appear after receiptFooter is declared.
+  useEffect(() => {
+    if (showSettings) setReceiptFooterDraft(receiptFooter);
+  }, [showSettings, receiptFooter]);
 
   const saveFooterMutation = useMutation({
     mutationFn: (footerMessage: string) =>

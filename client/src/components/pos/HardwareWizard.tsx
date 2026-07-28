@@ -9,7 +9,7 @@
 //
 // The wizard never asks for COM ports, baud rates, or other technical details.
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
@@ -42,7 +42,9 @@ type WizardStep =
   | { step: 'fallback';   port: any; suggestedType: DeviceType | null; suggestedName: string }
   | { step: 'replace-confirm'; deviceType: DeviceType; existingDeviceName: string; doConnect: () => Promise<void> }
   | { step: 'connecting' }
-  | { step: 'error'; message: string };
+  // busyPort: set when the error is specifically a "port already in use" error so that
+  // a 'disconnect' event on that port can auto-advance back to the 'pick' step.
+  | { step: 'error'; message: string; busyPort?: any };
 
 const INITIAL: WizardStep = { step: 'pick' };
 
@@ -90,6 +92,30 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
   const handleOpenChange = (o: boolean) => {
     if (!o) { onClose(); setTimeout(() => setState(INITIAL), 200); }
   };
+
+  // ── Auto-advance from busy-port error when the port is unplugged ─────────────
+  // When the wizard shows "device already in use", the user's natural recovery
+  // is to unplug and re-plug the cable.  If the disconnect event fires while we
+  // are on the error step and the disconnected port matches the one that caused
+  // the busy error, advance straight back to the 'pick' step so they only need
+  // to click Scan — not "Try Again" then Scan.
+  useEffect(() => {
+    if (!open) return;
+    if (state.step !== 'error' || !state.busyPort) return;
+    if (typeof navigator === 'undefined' || !('serial' in navigator)) return;
+
+    const serial = (navigator as any).serial;
+    const busyPort = state.busyPort;
+
+    const handleDisconnect = (event: any) => {
+      if (event.port === busyPort) {
+        setState(INITIAL);
+      }
+    };
+
+    serial.addEventListener('disconnect', handleDisconnect);
+    return () => serial.removeEventListener('disconnect', handleDisconnect);
+  }, [open, state]);
 
   // ── Step 1: browser picker + identification ──────────────────────────────────
   const handleScan = useCallback(async () => {
@@ -151,11 +177,17 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
     //    Web Serial API), probeDevice would silently return 'unknown' and drop
     //    the user on the manual fallback form with no explanation.  Catch it
     //    here and show a targeted message so staff know what to do.
+    //
+    //    busyPort is stored in the error state so the disconnect useEffect above
+    //    can auto-advance back to 'pick' when the cable is unplugged — staff
+    //    just need to plug it back in and click Scan rather than manually
+    //    clicking "Try Again" first.
     if (port.readable != null) {
       if (scanSeq.current.isStale(myScanId)) return;
       setState({
         step: 'error',
-        message: 'This device is already in use — disconnect it and try again.',
+        message: 'This device is already in use — unplug and reconnect it, then scan again.',
+        busyPort: port,
       });
       return;
     }
@@ -265,7 +297,18 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
         className="bg-gray-900 border-gray-700 text-white sm:max-w-md"
-        onInteractOutside={e => { if (state.step === 'probing' || state.step === 'connecting' || state.step === 'replace-confirm') e.preventDefault(); }}
+        onInteractOutside={e => {
+          // Block accidental outside-click dismissal during all non-interactive steps:
+          // • probing / connecting — async work in progress, closing would lose the scan
+          // • replace-confirm — requires explicit choice, not an accidental click
+          // • error — staff need to read the message and deliberately choose Try Again
+          if (
+            state.step === 'probing' ||
+            state.step === 'connecting' ||
+            state.step === 'replace-confirm' ||
+            state.step === 'error'
+          ) e.preventDefault();
+        }}
       >
         <DialogHeader>
           <DialogTitle className="text-white">Add Hardware Device</DialogTitle>

@@ -151,6 +151,27 @@ async function openWithTimeout(
   }
 }
 
+/**
+ * Attempt port.close() with a hard deadline.
+ *
+ * After a timed-out open(), the underlying port.open() promise may still be
+ * in-flight, which can cause port.close() to hang indefinitely waiting for the
+ * open to settle before it can begin teardown.  This wrapper races close()
+ * against a timer and silently resolves either way so the probe can return
+ * 'unknown' without blocking the wizard.
+ *
+ * We resolve (not reject) on timeout because a stuck close() is not an
+ * actionable error — we just want the async chain to continue.
+ */
+const PROBE_CLOSE_TIMEOUT_MS = 1_500;
+
+async function closeWithTimeout(port: any): Promise<void> {
+  await Promise.race([
+    port.close().catch(() => {}),
+    new Promise<void>(resolve => setTimeout(resolve, PROBE_CLOSE_TIMEOUT_MS)),
+  ]);
+}
+
 /** Try ESC/POS DLE EOT 1 probe. Returns true if the port responds. */
 export async function probeEscPos(port: any): Promise<boolean> {
   try {
@@ -178,10 +199,10 @@ export async function probeEscPos(port: any): Promise<boolean> {
     }
     clearTimeout(timeoutId);
     reader.releaseLock();
-    await port.close();
+    await closeWithTimeout(port);
     return received;
   } catch {
-    try { await port.close(); } catch {}
+    await closeWithTimeout(port);
     return false;
   }
 }
@@ -218,10 +239,10 @@ export async function probeZpl(port: any): Promise<boolean> {
     }
     clearTimeout(timeoutId);
     reader.releaseLock();
-    await port.close();
+    await closeWithTimeout(port);
     return received;
   } catch {
-    try { await port.close(); } catch {}
+    await closeWithTimeout(port);
     return false;
   }
 }
