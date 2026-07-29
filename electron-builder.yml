@@ -54,6 +54,13 @@ extraMetadata:
 # whenever a newer release tag exists on GitHub.
 # owner/repo are auto-detected from GITHUB_REPOSITORY in CI; set them
 # explicitly here if you build locally with `GH_TOKEN` configured.
+# ── Notarization hook (macOS only) ───────────────────────────────────────────
+# afterSign is a top-level electron-builder hook invoked after the .app bundle
+# is code-signed.  Our script zips the app, submits it to Apple via
+# `xcrun notarytool --wait`, then staples the ticket.
+# It is a no-op on non-macOS builds or when APPLE_ID is not set.
+afterSign: electron/notarize.js
+
 publish:
   - provider: github
     releaseType: release
@@ -65,10 +72,21 @@ mac:
       arch:
         - x64    # Intel Mac
         - arm64  # Apple Silicon
-  # Code signing (required for Gatekeeper on end-user machines):
-  # identity: "Developer ID Application: Your Name (XXXXXXXXXX)"
-  # For internal staff distribution, unsigned DMG works if staff allow it in
-  # System Preferences → Security & Privacy → "Open Anyway".
+
+  # Code-signing identity — must match the Common Name of the Developer ID
+  # Application certificate imported into the macOS keychain in CI.
+  # Leave as null locally if you don't have the cert; electron-builder will
+  # produce an unsigned build that still works for local testing.
+  # CI sets CSC_KEY_PASSWORD (via GitHub Actions secrets) and imports the cert
+  # into the keychain so electron-builder resolves the identity automatically.
+  identity: null   # resolved from the keychain import step in CI
+
+  # Hardened runtime is required for notarization.
+  hardenedRuntime: true
+
+  # Entitlements allow the JIT / unsigned-executable memory needed by Electron.
+  entitlements: electron/entitlements.mac.plist
+  entitlementsInherit: electron/entitlements.mac.plist
 
 # ── Windows NSIS installer ────────────────────────────────────────────────────
 win:
