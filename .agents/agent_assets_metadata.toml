@@ -102,3 +102,9 @@ id = "dEDQuslqgbXbTiepo4rqG"
 uri = "file://attached_assets/hw-export/HardwareWizard.tsx"
 type = "unspecified"
 title = "HardwareWizard.tsx — place at client/src/components/pos/"
+
+[[outputs]]
+id = "WyRh2mBlAOUWsbWWypTG2"
+uri = "file://attached_assets/hardware-files.zip"
+type = "unspecified"
+title = "hardware-files.zip — all 3 files ready to upload"
