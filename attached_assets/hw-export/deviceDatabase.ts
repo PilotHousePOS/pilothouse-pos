@@ -64,24 +64,14 @@ export const KNOWN_DEVICES: Record<string, KnownDevice> = {
   '0a5f:0168': { name: 'Zebra ZT400 Series Printer',  deviceCategory: 'label-printer', protocol: 'zpl', defaultBaudRate: 9600 },
   '0a5f:016a': { name: 'Zebra ZD230 Label Printer',   deviceCategory: 'label-printer', protocol: 'zpl', defaultBaudRate: 9600 },
 
-  // ── Common USB-Serial adapters (used by card terminals and older printers) ───
-  // Prolific PL2303
-  '067b:2303': { name: 'USB Serial Adapter (Prolific PL2303)', deviceCategory: 'card-terminal', protocol: 'dejavoo', defaultBaudRate: 9600 },
-  '067b:23a3': { name: 'USB Serial Adapter (Prolific PL2303TA)', deviceCategory: 'card-terminal', protocol: 'dejavoo', defaultBaudRate: 9600 },
-  // FTDI FT232/FT2232
-  '0403:6001': { name: 'USB Serial Adapter (FTDI FT232)',    deviceCategory: 'card-terminal', protocol: 'dejavoo', defaultBaudRate: 9600 },
-  '0403:6010': { name: 'USB Serial Adapter (FTDI FT2232)',   deviceCategory: 'card-terminal', protocol: 'dejavoo', defaultBaudRate: 9600 },
-  '0403:6011': { name: 'USB Serial Adapter (FTDI FT4232)',   deviceCategory: 'card-terminal', protocol: 'dejavoo', defaultBaudRate: 9600 },
-  '0403:6014': { name: 'USB Serial Adapter (FTDI FT232H)',   deviceCategory: 'card-terminal', protocol: 'dejavoo', defaultBaudRate: 9600 },
-  '0403:6015': { name: 'USB Serial Adapter (FTDI FT230X)',   deviceCategory: 'card-terminal', protocol: 'dejavoo', defaultBaudRate: 9600 },
-  // Silicon Labs CP210x
-  '10c4:ea60': { name: 'USB Serial Adapter (CP210x)',        deviceCategory: 'card-terminal', protocol: 'dejavoo', defaultBaudRate: 9600 },
-  '10c4:ea70': { name: 'USB Serial Adapter (CP2105)',        deviceCategory: 'card-terminal', protocol: 'dejavoo', defaultBaudRate: 9600 },
-  '10c4:ea71': { name: 'USB Serial Adapter (CP2108)',        deviceCategory: 'card-terminal', protocol: 'dejavoo', defaultBaudRate: 9600 },
-  // WCH CH340/CH341
-  '1a86:7523': { name: 'USB Serial Adapter (CH340)',         deviceCategory: 'card-terminal', protocol: 'dejavoo', defaultBaudRate: 9600 },
-  '1a86:5523': { name: 'USB Serial Adapter (CH341)',         deviceCategory: 'card-terminal', protocol: 'dejavoo', defaultBaudRate: 9600 },
-  '1a86:55d3': { name: 'USB Serial Adapter (CH340K)',        deviceCategory: 'card-terminal', protocol: 'dejavoo', defaultBaudRate: 9600 },
+  // NOTE: Generic USB-serial adapters (Prolific PL2303, FTDI FT232, CP210x,
+  // CH340, etc.) are intentionally NOT listed here. These chips are used by
+  // receipt printers, label printers, barcode scanners, card terminals, and
+  // countless other devices — hardcoding them as any particular device type
+  // would cause mis-identification. They fall through to probe-based
+  // identification (ESC/POS then ZPL), which correctly identifies the actual
+  // device behind the adapter. If both probes fail the user gets the manual
+  // selection fallback, which is the correct and safe outcome.
 };
 
 // ── Lookup helpers ────────────────────────────────────────────────────────────

@@ -152,21 +152,24 @@ export function useHardwareDevices(): HardwareDevices {
 
       const hints = loadStoredHints();
       const types: DeviceType[] = ['terminal', 'printer', 'labelPrinter'];
-      const reconnected: string[] = [];
 
-      for (const type of types) {
-        const hint = hints[type];
-        if (!hint) continue;
+      // Reconnect all matched devices in parallel so three devices open
+      // simultaneously rather than sequentially one after another.
+      const reconnected = (await Promise.all(
+        types.map(async (type) => {
+          const hint = hints[type];
+          if (!hint) return null;
 
-        const match = ports.find((p: any) => {
-          const info = p.getInfo?.();
-          return (
-            info?.usbVendorId  === hint.usbVendorId &&
-            info?.usbProductId === hint.usbProductId
-          );
-        });
+          const match = ports.find((p: any) => {
+            const info = p.getInfo?.();
+            return (
+              info?.usbVendorId  === hint.usbVendorId &&
+              info?.usbProductId === hint.usbProductId
+            );
+          });
 
-        if (match) {
+          if (!match) return null;
+
           try {
             setters[type](s => ({ ...s, status: 'connecting' }));
             const baud = hint.baudRate ?? DEFAULT_BAUD_RATES[type];
@@ -175,12 +178,13 @@ export function useHardwareDevices(): HardwareDevices {
             const name = hint.friendlyName ?? rawDeviceLabel(match);
             setters[type]({ status: 'connected', deviceName: name, port: match, baudRate: baud });
             // Only toast if it was a previous session (friendlyName stored = came from wizard)
-            if (hint.friendlyName) reconnected.push(name);
+            return hint.friendlyName ? name : null;
           } catch {
             setters[type](EMPTY_DEVICE);
+            return null;
           }
-        }
-      }
+        }),
+      )).filter((name): name is string => name !== null);
 
       if (reconnected.length) {
         toast({
@@ -273,10 +277,65 @@ export function useHardwareDevices(): HardwareDevices {
       attempt();
     };
 
+    // ── connect event: handle new SerialPort objects on replug ──────────────
+    // On some OS/driver combinations (Windows + CH340 adapters), unplugging a
+    // device and replugging it generates a brand-new SerialPort object via the
+    // 'connect' event rather than reusing the old one.  Without this listener
+    // the retry loop above keeps calling open() on the stale object and keeps
+    // failing, leaving the device permanently in error state until the cashier
+    // runs the wizard again.
+    //
+    // When a new port appears we match it against stored hints by VID/PID.  If
+    // it matches a device that is currently in 'connecting' state (i.e. the
+    // disconnect retry loop gave up or the old port is stale) we take over with
+    // the fresh port object.
+    const handleConnect = async (event: any) => {
+      const newPort = event.port;
+      if (!newPort) return;
+
+      const info = newPort.getInfo?.();
+      if (!info?.usbVendorId) return;
+
+      const hints = loadStoredHints();
+      const types: DeviceType[] = ['terminal', 'printer', 'labelPrinter'];
+
+      for (const type of types) {
+        const hint = hints[type];
+        if (!hint) continue;
+        if (
+          hint.usbVendorId  === info.usbVendorId &&
+          hint.usbProductId === info.usbProductId
+        ) {
+          // Cancel any pending retry timer for this device — we have a fresh port
+          const timer = reconnectTimerRef.current.get(type);
+          if (timer != null) {
+            clearTimeout(timer);
+            reconnectTimerRef.current.set(type, null);
+          }
+          reconnectAttemptsRef.current.set(type, 0);
+
+          try {
+            setters[type](s => ({ ...s, status: 'connecting' }));
+            const baud = hint.baudRate ?? DEFAULT_BAUD_RATES[type];
+            await newPort.open({ baudRate: baud, dataBits: 8, stopBits: 1, parity: 'none' });
+            refs[type].current = newPort;
+            const name = hint.friendlyName ?? rawDeviceLabel(newPort);
+            setters[type]({ status: 'connected', deviceName: name, port: newPort, baudRate: baud });
+            toast({ title: 'Hardware reconnected', description: name, duration: 2500 });
+          } catch {
+            setters[type](EMPTY_DEVICE);
+          }
+          break;
+        }
+      }
+    };
+
     serial.addEventListener('disconnect', handleDisconnect);
+    serial.addEventListener('connect',    handleConnect);
 
     return () => {
       serial.removeEventListener('disconnect', handleDisconnect);
+      serial.removeEventListener('connect',    handleConnect);
       // Cancel any pending retry timers
       for (const type of (['terminal', 'printer', 'labelPrinter'] as DeviceType[])) {
         const timer = reconnectTimerRef.current.get(type);
@@ -306,7 +365,17 @@ export function useHardwareDevices(): HardwareDevices {
 
     setters[type](s => ({ ...s, status: 'connecting' }));
 
-    await port.open({ baudRate, dataBits: 8, stopBits: 1, parity: 'none' });
+    // Wrap port.open() in try/finally so that any failure (e.g. InvalidStateError
+    // when the port is already open) always resets the device state back to
+    // 'disconnected'. Without this the UI gets stuck showing 'connecting'
+    // permanently until the page reloads.
+    try {
+      await port.open({ baudRate, dataBits: 8, stopBits: 1, parity: 'none' });
+    } catch (err) {
+      setters[type](EMPTY_DEVICE);
+      throw err; // re-throw so the wizard's catch block shows the error step
+    }
+
     refs[type].current = port;
 
     // Save VID/PID + baud rate + friendly name for auto-reconnect

@@ -88,10 +88,15 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
   // replugs a device while the wizard is identifying the first one).
   const scanSeq = useRef<ScanSequence>(createScanSequence());
 
-  // Reset to initial step when wizard is opened
-  const handleOpenChange = (o: boolean) => {
+  // Reset to initial step when wizard is closed.
+  // Memoized with useCallback so that handleConfirmRecognized,
+  // handleConfirmFallback, and the replace-confirm doConnect closure all hold a
+  // stable reference — without this they capture a stale onClose from the
+  // render in which they were created, which breaks if the parent re-renders
+  // and passes a new onClose identity.
+  const handleOpenChange = useCallback((o: boolean) => {
     if (!o) { onClose(); setTimeout(() => setState(INITIAL), 200); }
-  };
+  }, [onClose]);
 
   // ── Auto-advance from busy-port error when the port is unplugged ─────────────
   // When the wizard shows "device already in use", the user's natural recovery
@@ -119,6 +124,14 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
 
   // ── Step 1: browser picker + identification ──────────────────────────────────
   const handleScan = useCallback(async () => {
+    // Guard: Web Serial is Chrome/Edge desktop only. On Firefox, Safari, and
+    // any WKWebView wrapper hw.hardwareSupported is false. Crashing here with
+    // a TypeError is worse than a clear message, so bail early.
+    if (!hw.hardwareSupported) {
+      setState({ step: 'error', message: 'Web Serial is not supported in this browser. Use Chrome or Edge on desktop.' });
+      return;
+    }
+
     const serial = (navigator as any).serial as {
       requestPort(options?: { filters?: any[] }): Promise<any>;
     };
@@ -252,7 +265,7 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
     } catch (err: any) {
       setState({ step: 'error', message: err?.message ?? 'Failed to connect device.' });
     }
-  }, [hw, onSuccess]);
+  }, [hw, onSuccess, handleOpenChange]);
 
   // ── Step 3b → connect fallback (user-specified type) ────────────────────────
   const handleConfirmFallback = useCallback(async (
@@ -291,7 +304,7 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
     } catch (err: any) {
       setState({ step: 'error', message: err?.message ?? 'Failed to connect device.' });
     }
-  }, [hw, onSuccess]);
+  }, [hw, onSuccess, handleOpenChange]);
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
