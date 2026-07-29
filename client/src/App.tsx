@@ -108,7 +108,8 @@ const NotFound = safeLazy(() => import("@/pages/not-found"), "not-found");
 const Apply = safeLazy(() => import("@/pages/apply"), "apply");
 const About = safeLazy(() => import("@/pages/about"), "about");
 const SmsConsent = safeLazy(() => import("@/pages/sms-consent"), "sms-consent");
-const BillingPage = safeLazy(() => import("@/pages/billing"), "billing");
+const BillingPage   = safeLazy(() => import("@/pages/billing"),  "billing");
+const DownloadPage  = safeLazy(() => import("@/pages/download"), "download");
 const Signup = safeLazy(() => import("@/pages/signup"), "signup");
 const Onboarding = safeLazy(() => import("@/pages/onboarding"), "onboarding");
 
@@ -316,6 +317,7 @@ function Router() {
                 <Route path="/booking" component={Booking} />
                 <Route path="/profile" component={Profile} />
                 <Route path="/settings/billing" component={BillingPage} />
+                <Route path="/download" component={DownloadPage} />
                 <Route path="/settings" component={Settings} />
                 <Route path="/admin" component={Admin} />
                 <Route path="/pos" component={PosPage} />

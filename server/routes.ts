@@ -9637,6 +9637,47 @@ West Monroe LA 71291
     }
   });
 
+  // GET /api/download/desktop ─────────────────────────────────────────────────
+  // Returns desktop-app download URLs for admin/owner users with an active or
+  // trial subscription.  URLs are configured via WINDOWS_DOWNLOAD_URL and
+  // MAC_DOWNLOAD_URL environment variables (set in Replit Secrets) pointing to
+  // GitHub Release assets once a tagged CI build has been published.
+  app.get("/api/download/desktop", authMiddleware, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.userId);
+      if (!user?.isAdmin && !(user as any)?.isSuperiorManager) {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const tenantId = req.tenantId;
+      if (!tenantId) return res.status(400).json({ message: "Tenant not found" });
+
+      const [tenant] = await db
+        .select({
+          subscriptionStatus: tenants.subscriptionStatus,
+          subscriptionTier:   tenants.subscriptionTier,
+        })
+        .from(tenants)
+        .where(eq(tenants.id, tenantId));
+
+      if (!tenant) return res.status(404).json({ message: "Tenant not found" });
+
+      const eligible = ["active", "trial"].includes(tenant.subscriptionStatus ?? "");
+
+      return res.json({
+        version:            process.env.npm_package_version ?? "1.0.0",
+        windows:            eligible ? (process.env.WINDOWS_DOWNLOAD_URL ?? null) : null,
+        mac:                eligible ? (process.env.MAC_DOWNLOAD_URL     ?? null) : null,
+        available:          eligible,
+        subscriptionStatus: tenant.subscriptionStatus,
+        subscriptionTier:   tenant.subscriptionTier,
+      });
+    } catch (error) {
+      console.error("Error fetching desktop download info:", error);
+      res.status(500).json({ message: "Failed to fetch download info" });
+    }
+  });
+
   app.put("/api/admin/settings/store-hours", authMiddleware, async (req: any, res) => {
     try {
       const user = await storage.getUser(req.user?.id);

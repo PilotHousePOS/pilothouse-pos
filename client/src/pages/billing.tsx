@@ -465,6 +465,34 @@ export default function BillingPage() {
         </Card>
       )}
 
+      {/* Desktop app download — shown to active/trial admins */}
+      {isOwner && (isActive || billing?.subscriptionStatus === "trial") && (
+        <Card className="border-gray-200">
+          <CardContent className="p-4 flex items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 bg-gray-900 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Zap className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <div className="font-semibold text-gray-900 text-sm">PilotHouse POS Desktop</div>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Windows &amp; macOS app — works offline, included with your plan
+                </p>
+              </div>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="flex-shrink-0 gap-1.5"
+              onClick={() => setLocation("/download")}
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              Download
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       <p className="text-xs text-gray-400 text-center pb-4">
         Payments are processed securely by Stripe. Cancel anytime from the billing portal.
       </p>
