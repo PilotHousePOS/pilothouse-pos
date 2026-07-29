@@ -506,15 +506,22 @@ async function createWindow(): Promise<void> {
   mainWindow.on('closed', () => { mainWindow = null; });
 }
 
+
 // ── App lifecycle ─────────────────────────────────────────────────────────────
 
 app.whenReady().then(async () => {
   await createWindow();
   startHealthCheckLoop();
 
+  // Check for updates on launch (production only)
   if (!isDev) {
-    autoUpdater.checkForUpdatesAndNotify().catch(() => {
-      // Auto-update errors are non-fatal
+    autoUpdater.checkForUpdatesAndNotify().catch((err: unknown) => {
+      // Auto-update errors are non-fatal — the app still works without it.
+      // Log so support staff can diagnose missing GH_TOKEN / private-release issues.
+      const message = err instanceof Error ? err.message : String(err);
+      console.error('[auto-updater] Could not check for updates:', message);
+      // Notify the renderer (About screen / toast) so the failure is visible to staff.
+      mainWindow?.webContents.send('app:update-error', message);
     });
   }
 
@@ -570,24 +577,19 @@ ipcMain.handle('serial:list', async () => SerialPort.list());
 ipcMain.handle('serial:open', async (_event, portPath: string, baudRate: number) => {
   if (openPorts.has(portPath)) return;
 
-  const port = new SerialPort({ path: portPath, baudRate, autoOpen: false });
+  const port = openPorts.get(portPath);
+  if (!port) throw new Error(`Port ${portPath} is not open`);
+
   await new Promise<void>((resolve, reject) => {
-    port.open((err) => (err ? reject(err) : resolve()));
+    port.write(Buffer.from(bytes), (err) => (err ? reject(err) : resolve()));
   });
 
-  port.on('data', (data: Buffer) => {
-    mainWindow?.webContents.send('serial:data', portPath, Array.from(data));
+  await new Promise<void>((resolve, reject) => {
+    port.drain((err) => (err ? reject(err) : resolve()));
   });
-
-  port.on('error', (err) => {
-    mainWindow?.webContents.send('serial:error', portPath, err.message);
-    openPorts.delete(portPath);
-  });
-
-  openPorts.set(portPath, port);
 });
 
-ipcMain.handle('serial:write', async (_event, portPath: string, bytes: number[]) => {
+ipcMain.handle('serial:close', async (_event, portPath: string) => {
   const port = openPorts.get(portPath);
   if (!port) throw new Error(`Port ${portPath} is not open`);
 

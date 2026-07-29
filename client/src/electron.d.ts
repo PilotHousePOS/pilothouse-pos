@@ -26,6 +26,7 @@ interface ElectronAPI {
   // Auto-update
   onUpdateAvailable:  (callback: () => void) => () => void;
   onUpdateDownloaded: (callback: () => void) => () => void;
+  onUpdateError:      (callback: (message: string) => void) => () => void;
   installUpdate:      () => Promise<void>;
 
   // Local store — offline mutation queue
