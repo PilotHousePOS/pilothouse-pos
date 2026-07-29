@@ -47,9 +47,17 @@ buildDependenciesFromSource: false
 extraMetadata:
   main: dist/electron/main.js
 
-# Set this to your production server URL before building for distribution:
-# env:
-#   PILOTHOUSE_SERVER_URL: https://your-domain.com
+# SERVER_URL is baked into the binary by scripts/write-electron-env.js, which
+# runs as part of `npm run build:electron:main` (before tsc compiles main.ts).
+# The script reads PILOTHOUSE_SERVER_URL from the environment and writes it to
+# electron/env-constants.ts, which is imported by main.ts.
+#
+# In CI (GitHub Actions), set the PILOTHOUSE_SERVER_URL Actions secret to your
+# production URL (e.g. https://pilothouse.replit.app) so the packaged binary
+# connects to the correct host out of the box.
+#
+# For a local distribution build without the secret, the script falls back to
+# https://pilothouse.replit.app, which is the production default.
 
 # ── Auto-update — GitHub Releases ────────────────────────────────────────────
 # electron-updater checks this provider on launch and prompts staff to update

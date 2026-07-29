@@ -57,6 +57,27 @@ jobs:
         env:
           PILOTHOUSE_SERVER_URL: ${{ secrets.PILOTHOUSE_SERVER_URL }}
 
+      # Verify that the compiled env-constants.js exports the expected server URL
+      # before packaging.  tsc emits BAKED_SERVER_URL to dist/electron/env-constants.js
+      # (not main.js), so we check that file for the precise export assignment.
+      # A missing or incorrect value here means staff machines would connect to
+      # the wrong host after installing.
+      - name: Verify SERVER_URL is baked into compiled env-constants.js
+        shell: pwsh
+        run: |
+          $url = "${{ secrets.PILOTHOUSE_SERVER_URL }}"
+          if (-not $url) { $url = "https://pilothouse.replit.app" }
+          $content = Get-Content dist/electron/env-constants.js -Raw
+          # Match the exact CommonJS export assignment tsc emits, e.g.:
+          #   exports.BAKED_SERVER_URL = 'https://pilothouse.replit.app';
+          $pattern = "exports\.BAKED_SERVER_URL\s*=\s*['""]" + [regex]::Escape($url) + "['""]"
+          if ($content -notmatch $pattern) {
+            Write-Error "exports.BAKED_SERVER_URL = '$url' not found in dist/electron/env-constants.js"
+            Write-Error "Actual content: $content"
+            exit 1
+          }
+          Write-Host "✓ SERVER_URL verified in dist/electron/env-constants.js: $url"
+
       - name: Package and publish Windows installer
         run: npx electron-builder --win --publish always
         env:
@@ -129,6 +150,22 @@ jobs:
       # electron-builder reads CSC_LINK / CSC_KEY_PASSWORD for signing and
       # our afterSign hook (electron/notarize.js) reads APPLE_ID,
       # APPLE_APP_SPECIFIC_PASSWORD, and APPLE_TEAM_ID for notarization.
+      # Same URL verification as the Windows step — check dist/electron/env-constants.js
+      # (where tsc emits the BAKED_SERVER_URL export) before signing and notarizing.
+      - name: Verify SERVER_URL is baked into compiled env-constants.js
+        run: |
+          URL="${{ secrets.PILOTHOUSE_SERVER_URL }}"
+          if [ -z "$URL" ]; then URL="https://pilothouse.replit.app"; fi
+          # Match the exact CommonJS export tsc emits, e.g.:
+          #   exports.BAKED_SERVER_URL = 'https://pilothouse.replit.app';
+          if ! grep -qE "exports\.BAKED_SERVER_URL\s*=\s*['\"]${URL}['\"]" dist/electron/env-constants.js; then
+            echo "ERROR: exports.BAKED_SERVER_URL = '$URL' not found in dist/electron/env-constants.js" >&2
+            echo "--- actual content ---" >&2
+            cat dist/electron/env-constants.js >&2
+            exit 1
+          fi
+          echo "✓ SERVER_URL verified in dist/electron/env-constants.js: $URL"
+
       - name: Package, sign, notarize, and publish macOS DMG
         run: npx electron-builder --mac --publish always
         env:

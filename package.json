@@ -12,7 +12,7 @@
     "db:push": "drizzle-kit push",
     "pretest": "tsx server/scripts/apply-missing-columns.ts",
     "test": "vitest run",
-    "build:electron:main": "tsc -p electron/tsconfig.json",
+    "build:electron:main": "node scripts/write-electron-env.js && tsc -p electron/tsconfig.json",
     "build:electron:frontend": "vite build",
     "build:electron": "npm run build:electron:frontend && npm run build:electron:main && electron-builder",
     "dev:electron": "concurrently -k \"npm run dev\" \"wait-on http://localhost:5000 && electron .\""

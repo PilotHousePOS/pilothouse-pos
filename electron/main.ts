@@ -19,12 +19,14 @@
 //   In dev mode the app still loads from the Vite dev server (hot reload works).
 //
 // SERVER URL
-//   Set PILOTHOUSE_SERVER_URL in electron-builder.yml env config or as a system
-//   environment variable.  This is the remote PilotHouse server that handles
-//   API calls, authentication, and card payments.
-//   Default: https://pilothouse.replit.app
+//   REMOTE_URL is the remote PilotHouse server that handles API calls,
+//   authentication, and card payments.  It is baked into the binary at build
+//   time by scripts/write-electron-env.js, which reads PILOTHOUSE_SERVER_URL
+//   from the environment (GitHub Actions secret) and writes it to
+//   electron/env-constants.ts before tsc runs.
+//   Default fallback: https://pilothouse.replit.app
 
-import { app, BrowserWindow, ipcMain, Menu, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, session, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
 import http from 'http';
@@ -32,6 +34,10 @@ import https from 'https';
 import fs from 'fs';
 import net from 'net';
 import { SerialPort } from 'serialport';
+// BAKED_SERVER_URL is written by scripts/write-electron-env.js at build time
+// from the PILOTHOUSE_SERVER_URL environment variable (falls back to the
+// production default when the variable is absent).
+import { BAKED_SERVER_URL } from './env-constants';
 
 // ── Environment ──────────────────────────────────────────────────────────────
 
@@ -39,10 +45,15 @@ const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
 
 /**
  * The remote PilotHouse server.  API calls are proxied here when online.
- * Set PILOTHOUSE_SERVER_URL at build time via electron-builder.yml `env` block.
+ *
+ * In production this value is baked in at build time by write-electron-env.js
+ * (set via the PILOTHOUSE_SERVER_URL GitHub Actions secret) so staff machines
+ * never need an env var.
+ * In development the env var or localhost:5000 is used instead.
  */
-const REMOTE_URL: string =
-  process.env.PILOTHOUSE_SERVER_URL ?? 'https://pilothouse.replit.app';
+const REMOTE_URL: string = isDev
+  ? (process.env.PILOTHOUSE_SERVER_URL ?? 'http://localhost:5000')
+  : BAKED_SERVER_URL;
 
 /**
  * The directory containing the built React frontend.
@@ -98,84 +109,55 @@ function serveStatic(filePath: string, res: http.ServerResponse): void {
       fs.readFile(path.join(STATIC_DIR, 'index.html'), (err2, html) => {
         if (err2) { res.writeHead(404); res.end('Not found'); return; }
         res.writeHead(200, {
-          'Content-Type': 'text/html; charset=utf-8',
-          'Cache-Control': 'no-cache',
+          'Content-Type': MIME['.html'],
+          'Cache-Control': 'no-store',
         });
         res.end(html);
       });
       return;
     }
+
     const ext = path.extname(filePath).toLowerCase();
-    const contentType = MIME[ext] || 'application/octet-stream';
-    // Content-hashed assets (/assets/*.js) can be cached aggressively
-    const cacheControl = filePath.includes('/assets/')
-      ? 'public, max-age=31536000, immutable'
-      : 'no-cache';
-    res.writeHead(200, { 'Content-Type': contentType, 'Cache-Control': cacheControl });
+    const contentType = MIME[ext] ?? 'application/octet-stream';
+    // Cache immutable assets (hashed filenames) aggressively; everything else no-store
+    const isImmutable = /\.[0-9a-f]{8,}\.(js|css|woff2?)$/i.test(filePath);
+    res.writeHead(200, {
+      'Content-Type': contentType,
+      'Cache-Control': isImmutable ? 'public, max-age=31536000, immutable' : 'no-store',
+    });
     res.end(data);
   });
 }
 
-/** Proxy a request to the remote server, rewriting cookies for localhost compat */
-function proxyToRemote(
-  req:  http.IncomingMessage,
-  res:  http.ServerResponse,
-  urlPath: string,
-): void {
-  const target  = new URL(REMOTE_URL);
+/** Forward a request to the remote PilotHouse server */
+function proxyToRemote(req: http.IncomingMessage, res: http.ServerResponse, urlPath: string): void {
+  const target = new URL(urlPath, REMOTE_URL);
   const isHttps = target.protocol === 'https:';
+  const transport = isHttps ? https : http;
 
-  // Strip hop-by-hop headers; override Host to match the remote server
-  const reqHeaders = { ...req.headers };
-  delete reqHeaders['connection'];
-  delete reqHeaders['transfer-encoding'];
-  delete reqHeaders['host'];
-  reqHeaders['host'] = target.hostname;
-
-  const options: https.RequestOptions = {
+  const options: http.RequestOptions = {
     hostname: target.hostname,
-    port:     isHttps ? 443 : (Number(target.port) || 80),
-    path:     urlPath,
+    port:     target.port || (isHttps ? 443 : 80),
+    path:     target.pathname + target.search,
     method:   req.method,
-    headers:  reqHeaders,
+    headers:  { ...req.headers, host: target.hostname },
   };
 
-  const mod = isHttps ? https : http;
-
-  const proxyReq = (mod as typeof https).request(options, (proxyRes) => {
-    // Rewrite Set-Cookie so cookies work on http://localhost (not just the remote domain)
-    const resHeaders: http.OutgoingHttpHeaders = {};
-    for (const [k, v] of Object.entries(proxyRes.headers)) {
-      if (k.toLowerCase() === 'set-cookie') {
-        resHeaders[k] = (Array.isArray(v) ? v : [String(v)]).map(c =>
-          c
-            .replace(/;\s*Domain=[^;]+/gi, '')  // remove Domain=... so cookie binds to localhost
-            .replace(/;\s*Secure\b/gi,    '')   // remove Secure so http://localhost accepts it
-            .replace(/;\s*SameSite=[^;]+/gi, '; SameSite=Lax'),
-        );
-      } else {
-        resHeaders[k] = v as string | string[];
-      }
-    }
-    res.writeHead(proxyRes.statusCode!, resHeaders);
-    proxyRes.pipe(res);
+  const proxyReq = transport.request(options, (proxyRes) => {
+    res.writeHead(proxyRes.statusCode ?? 200, proxyRes.headers);
+    proxyRes.pipe(res, { end: true });
   });
 
-  proxyReq.on('error', () => {
+  proxyReq.on('error', (err) => {
+    // Remote is unreachable — return a 502 so the frontend offline handler fires
     if (!res.headersSent) {
-      res.writeHead(503, { 'Content-Type': 'application/json' });
-    }
-    if (!res.writableEnded) {
-      res.end(JSON.stringify({ message: 'Server unreachable — you are offline' }));
+      res.writeHead(502, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'upstream_unavailable', message: err.message }));
     }
   });
 
-  // Forward request body for POST/PUT/PATCH
-  if (req.method !== 'GET' && req.method !== 'HEAD' && req.method !== 'DELETE') {
-    req.pipe(proxyReq);
-  } else {
-    proxyReq.end();
-  }
+  req.pipe(proxyReq);
+  proxyReq.end();
 }
 
 /** Start the local HTTP server; returns the port it bound to */
@@ -257,8 +239,7 @@ async function createWindow(): Promise<void> {
 
   if (isDev) {
     // Dev mode: load from the Vite + Express dev server (hot reload works)
-    const devUrl = process.env.PILOTHOUSE_SERVER_URL ?? 'http://localhost:5000';
-    mainWindow.loadURL(devUrl);
+    mainWindow.loadURL(REMOTE_URL);
     mainWindow.webContents.openDevTools({ mode: 'detach' });
   } else {
     // Production: start local server, load from it — works without internet
@@ -274,21 +255,26 @@ async function createWindow(): Promise<void> {
 app.whenReady().then(async () => {
   await createWindow();
 
+  // Check for updates on launch (production only)
   if (!isDev) {
     autoUpdater.checkForUpdatesAndNotify().catch(() => {
-      // Auto-update errors are non-fatal
+      // Auto-update errors are non-fatal — the app still works without it
     });
   }
 
+  // macOS: re-create the window when the dock icon is clicked and no windows are open
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
+// Quit when all windows are closed on Windows/Linux.
+// On macOS, keep the process alive until the user explicitly quits (Cmd+Q).
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
+// Close all open serial ports on quit so the OS releases them
 app.on('will-quit', async () => {
   for (const [portPath, port] of openPorts) {
     await closePort(portPath, port);
@@ -305,6 +291,7 @@ autoUpdater.on('update-downloaded', () => {
   mainWindow?.webContents.send('app:update-downloaded');
 });
 
+// Renderer can call this to trigger the install-and-restart
 ipcMain.handle('app:install-update', () => {
   autoUpdater.quitAndInstall();
 });
@@ -313,6 +300,8 @@ ipcMain.handle('app:install-update', () => {
 ipcMain.handle('app:server-url', () => REMOTE_URL);
 
 // ── Serial port IPC ───────────────────────────────────────────────────────────
+// All serial port access runs in the main process where Node.js is available.
+// The renderer calls these handlers via window.electronAPI (exposed by preload.ts).
 
 const openPorts = new Map<string, SerialPort>();
 
@@ -323,8 +312,14 @@ async function closePort(portPath: string, port: SerialPort): Promise<void> {
   });
 }
 
+/** serial:list — returns all ports visible to the OS */
 ipcMain.handle('serial:list', async () => SerialPort.list());
 
+/**
+ * serial:open — opens a port at the requested baud rate.
+ * Silently succeeds if the port is already open at the same baud rate.
+ * Data arriving on the port is forwarded to the renderer via 'serial:data'.
+ */
 ipcMain.handle('serial:open', async (_event, portPath: string, baudRate: number) => {
   if (openPorts.has(portPath)) return;
 
@@ -345,6 +340,7 @@ ipcMain.handle('serial:open', async (_event, portPath: string, baudRate: number)
   openPorts.set(portPath, port);
 });
 
+/** serial:write — write raw bytes to an already-open port */
 ipcMain.handle('serial:write', async (_event, portPath: string, bytes: number[]) => {
   const port = openPorts.get(portPath);
   if (!port) throw new Error(`Port ${portPath} is not open`);
@@ -353,11 +349,13 @@ ipcMain.handle('serial:write', async (_event, portPath: string, bytes: number[])
     port.write(Buffer.from(bytes), (err) => (err ? reject(err) : resolve()));
   });
 
+  // Drain the write buffer before resolving so the caller knows bytes were sent
   await new Promise<void>((resolve, reject) => {
     port.drain((err) => (err ? reject(err) : resolve()));
   });
 });
 
+/** serial:close — close an open port */
 ipcMain.handle('serial:close', async (_event, portPath: string) => {
   const port = openPorts.get(portPath);
   if (!port) return;
