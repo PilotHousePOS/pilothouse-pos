@@ -114,3 +114,9 @@ id = "Qodt8AyNt4J4ryvBXu7MK"
 uri = "file://pilothouse-distribution.zip"
 type = "unspecified"
 title = "PilotHouse Distribution Package"
+
+[[outputs]]
+id = "x4XNhLG-p0cYfX7os5OUH"
+uri = "file://pilothouse-desktop-runnable.zip"
+type = "unspecified"
+title = "PilotHouse POS — Desktop App (Runnable)"
