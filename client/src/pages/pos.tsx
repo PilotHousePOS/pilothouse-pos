@@ -14,9 +14,10 @@ import {
   Printer, Tag, AlertCircle, Loader2, Zap, Save, Wifi,
 } from "lucide-react";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { useServerReachable } from "@/hooks/useServerReachable";
 // OfflineBanner is now rendered globally in App.tsx
 import {
-  queueOfflineSale, getPendingOfflineSales, removeOfflineSale,
+  queueOfflineSale, getPendingOfflineSales, removeOfflineSale, countPendingOfflineSales,
 } from "@/lib/offline-db";
 import { useHardwareDevices, type DeviceState, type DeviceType } from "@/hooks/useHardwareDevices";
 import { HardwareWizard } from "@/components/pos/HardwareWizard";
@@ -695,6 +696,25 @@ export default function PosPage() {
 
   // ── Offline status ──
   const isOnline = useOnlineStatus();
+  const { reachable, checking: reachableChecking } = useServerReachable();
+  // Treat as offline when either the browser is offline OR the server health probe fails.
+  // reachableChecking is true only during the very first probe — avoids a flash of
+  // the "offline" state on load before the first check has returned.
+  const isOffline = !isOnline || (!reachableChecking && !reachable);
+
+  // Queue count badge — poll every 5 s and refresh eagerly when connectivity changes
+  const [queueCount, setQueueCount] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    const refresh = async () => {
+      const count = await countPendingOfflineSales().catch(() => 0);
+      if (!cancelled) setQueueCount(count);
+    };
+    refresh();
+    const t = setInterval(refresh, 5_000);
+    return () => { cancelled = true; clearInterval(t); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOffline]); // re-arm eagerly on connectivity change
 
   // ── Hardware devices (Web Serial) ──
   const hw = useHardwareDevices();
@@ -1120,7 +1140,7 @@ export default function PosPage() {
   const pay = (method: "cash" | "credit") => {
     if (!orderItems.length) return;
     if (method === "credit") {
-      if (!isOnline) {
+      if (isOffline) {
         toast({ title: "Card unavailable offline", description: "Accept cash. The sale will record normally — cards require an internet connection.", variant: "destructive" });
         return;
       }
@@ -1177,7 +1197,7 @@ export default function PosPage() {
       storeName: currentTenant?.name || 'PilotHouse POS',
     };
 
-    if (!isOnline) {
+    if (isOffline) {
       // Queue to IndexedDB — syncs automatically when connection returns
       try {
         await queueOfflineSale({
@@ -1195,6 +1215,7 @@ export default function PosPage() {
         setShowPayment(false);
         setCashTendered("");
         lastCompletedSaleRef.current = saleSnapshot;
+        setQueueCount(c => c + 1);
         await printReceiptAndOpenDrawer(saleSnapshot); // printer is local — works offline
       } catch {
         toast({ title: "Error", description: "Could not save offline sale. Try again.", variant: "destructive" });
@@ -1215,7 +1236,7 @@ export default function PosPage() {
 
   // Auto-drain the offline queue 2 s after coming back online
   useEffect(() => {
-    if (!isOnline) return;
+    if (isOffline) return;
     let cancelled = false;
     const sync = async () => {
       const pending = await getPendingOfflineSales().catch(() => []);
@@ -1230,13 +1251,18 @@ export default function PosPage() {
         if (res.ok && !cancelled) {
           const data = await res.json();
           for (const r of data.results) { if (r.success) await removeOfflineSale(r.localId); }
-          if (data.synced > 0) toast({ title: `${data.synced} offline ${data.synced === 1 ? "sale" : "sales"} synced`, description: "Transactions recorded successfully." });
+          if (data.synced > 0) {
+            toast({ title: `${data.synced} offline ${data.synced === 1 ? "sale" : "sales"} synced`, description: "Transactions recorded successfully." });
+            // Refresh badge count after sync
+            const remaining = await countPendingOfflineSales().catch(() => 0);
+            if (!cancelled) setQueueCount(remaining);
+          }
         }
       } catch { /* silent — will retry on next reconnect */ }
     };
     const t = setTimeout(sync, 2000);
     return () => { cancelled = true; clearTimeout(t); };
-  }, [isOnline]);
+  }, [isOffline]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Settings: category CRUD ──
   const startEditCat = (cat: PosCategory) => {
@@ -1369,6 +1395,17 @@ export default function PosPage() {
           <span className="text-xs bg-blue-700 px-2 py-0.5 rounded font-semibold">IN STORE</span>
         </div>
         <div className="flex items-center gap-3">
+          {/* Offline / queue badge */}
+          {(isOffline || queueCount > 0) && !posLocked && (
+            <div className={`flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded border ${isOffline ? "bg-orange-900/80 border-orange-700 text-orange-200" : "bg-amber-900/70 border-amber-700 text-amber-200"}`}>
+              <WifiOff className="h-3.5 w-3.5 flex-shrink-0" />
+              {isOffline ? (
+                <span className="font-semibold">Offline{queueCount > 0 ? ` — ${queueCount} queued` : " — cash only"}</span>
+              ) : (
+                <span className="font-semibold">{queueCount} queued sale{queueCount !== 1 ? "s" : ""} syncing…</span>
+              )}
+            </div>
+          )}
           {/* Current operator chip + sign-out */}
           {!posLocked && posOperatorName && (
             <div className="flex items-center gap-2">
@@ -1577,10 +1614,10 @@ export default function PosPage() {
           <button disabled className="bg-gray-700 text-gray-500 rounded py-3 text-xs text-center cursor-not-allowed">Order Details</button>
           <button
             onClick={() => pay("credit")}
-            disabled={!orderItems.length || !isOnline || terminalProcessing}
+            disabled={!orderItems.length || isOffline || terminalProcessing}
             title={
               terminalProcessing ? "Terminal processing — please wait"
-              : !isOnline ? "Card unavailable offline"
+              : isOffline ? "Card unavailable offline"
               : terminalConfig?.terminalIp ? `LAN terminal (TCP): ${terminalConfig.terminalIp}`
               : hw.terminal.status === 'connected' ? `Web Serial: ${hw.terminal.deviceName}`
               : "No terminal configured — will log as card payment"
@@ -1725,19 +1762,19 @@ export default function PosPage() {
         </button>
         <button
           onClick={() => pay("credit")}
-          disabled={!orderItems.length || !isOnline || terminalProcessing}
+          disabled={!orderItems.length || isOffline || terminalProcessing}
           title={
-            !isOnline ? "Card payments unavailable — no internet connection"
+            isOffline ? "Card payments unavailable — no internet connection"
             : terminalProcessing ? "Terminal processing — please wait"
             : terminalConfig?.terminalIp ? `LAN terminal (TCP): ${terminalConfig.terminalIp}`
             : hw.terminal.status === 'connected' ? `Web Serial fallback: ${hw.terminal.deviceName}`
             : "No terminal configured — will log as card payment"
           }
-          className={`flex-1 ${isOnline ? "bg-blue-700 hover:bg-blue-600" : "bg-gray-700 opacity-50 cursor-not-allowed"} disabled:text-gray-500 text-white rounded py-3 font-bold text-sm flex flex-col items-center justify-center transition-colors`}
+          className={`flex-1 ${!isOffline ? "bg-blue-700 hover:bg-blue-600" : "bg-gray-700 opacity-50 cursor-not-allowed"} disabled:text-gray-500 text-white rounded py-3 font-bold text-sm flex flex-col items-center justify-center transition-colors`}
         >
           {terminalProcessing
             ? <><Loader2 className="h-4 w-4 animate-spin mb-0.5" /> Processing…</>
-            : isOnline
+            : !isOffline
               ? <>
                   <span className="flex items-center gap-2"><CreditCard className="h-4 w-4" /> Credit</span>
                   <span className="text-[10px] font-normal opacity-70 mt-0.5">
