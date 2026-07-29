@@ -1,24 +1,29 @@
 // ─── PilotHouse Hardware Device Manager ──────────────────────────────────────
-// Manages Web Serial connections to three POS peripherals:
+// Manages connections to three POS peripherals:
 //   - Card terminal (Dejavoo/EP semi-integrated)
 //   - Receipt printer + cash drawer (ESC/POS)
 //   - Label printer (ZPL II)
 //
 // BROWSER SUPPORT
-// Chrome 89+, Edge 89+, Opera 75+. NOT supported on iOS Safari / Firefox.
-// The hook sets hardwareSupported = false gracefully on unsupported browsers.
+// Primary:  Chrome 89+, Edge 89+, Android Chrome (Web Serial API).
+// Fallback: Any browser + QZ Tray desktop app (Firefox, Safari, iOS indirect).
+// The hook auto-detects which transport is available on mount.
 //
 // PERSISTENCE
-// The Web Serial API remembers granted ports across reloads via
-// navigator.serial.getPorts(). On mount, the hook tries to auto-reconnect to
-// previously paired devices using stored { usbVendorId, usbProductId, baudRate,
-// friendlyName } hints from localStorage. On successful reconnect, a brief
-// "Hardware reconnected" toast is shown (not on the very first connection).
+// Web Serial: uses navigator.serial.getPorts() + localStorage VID/PID hints.
+// QZ Tray:    stores port name in localStorage for display; user re-selects on
+//             reconnect (QZ Tray serial ports don't persist across app restarts).
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { TERMINAL_BAUD_RATE } from '@/lib/hardware/terminal';
 import { LABEL_PRINTER_BAUD_RATE } from '@/lib/hardware/zpl';
+import {
+  probeQzTray, connectQzTray, closeQzPort, openQzPort,
+} from '@/lib/hardware/qzTray';
+import {
+  isElectronAvailable, openElectronPort, closeElectronPort,
+} from '@/lib/hardware/electronSerial';
 
 const AUTO_RECONNECT_DELAY_MS = 2_000; // wait 2 s before first reopen attempt
 const AUTO_RECONNECT_MAX_RETRIES = 3;  // give up after 3 consecutive failures
@@ -29,12 +34,14 @@ export type DeviceStatus = 'disconnected' | 'connecting' | 'connected' | 'error'
 export interface DeviceState {
   status:     DeviceStatus;
   deviceName: string;     // friendly name e.g. "Epson TM-T88VI Receipt Printer"
-  port:       any | null; // SerialPort handle — null when disconnected
-  baudRate?:  number;     // baud rate in use
+  port:       any | null; // SerialPort (Web Serial) or port name string (QZ Tray)
+  baudRate?:  number;     // baud rate in use (Web Serial only)
 }
 
 export interface HardwareDevices {
   hardwareSupported: boolean;
+  /** Active transport: 'webserial' | 'qztray' | 'electron' | 'none' */
+  transport:         'webserial' | 'qztray' | 'electron' | 'none';
   terminal:          DeviceState;
   printer:           DeviceState;
   labelPrinter:      DeviceState;
@@ -43,13 +50,27 @@ export interface HardwareDevices {
   connectPrinter:      () => Promise<void>;
   connectLabelPrinter: () => Promise<void>;
   disconnectDevice:    (type: DeviceType) => Promise<void>;
-  // New: connect a port that the wizard has already identified
+  // Connect a Web Serial port that the wizard has already identified
   connectWithPort: (
     type: DeviceType,
     port: any,
     baudRate: number,
     friendlyName: string,
   ) => Promise<void>;
+  // Connect a QZ Tray serial port (port = COM name string)
+  connectWithQzPort: (
+    type: DeviceType,
+    portName: string,
+    friendlyName: string,
+  ) => Promise<void>;
+  // Connect an Electron IPC serial port (port = COM name / device path string)
+  connectWithElectronPort: (
+    type: DeviceType,
+    portName: string,
+    friendlyName: string,
+  ) => Promise<void>;
+  // Re-probe for QZ Tray / Electron after user installs/starts it
+  recheckTransport: () => Promise<void>;
 }
 
 const EMPTY_DEVICE: DeviceState = { status: 'disconnected', deviceName: '', port: null };
@@ -63,10 +84,12 @@ const DEFAULT_BAUD_RATES: Record<DeviceType, number> = {
 const LS_KEY = 'pilothouse-hw-devices'; // localStorage key
 
 interface StoredHint {
-  usbVendorId?:  number;
-  usbProductId?: number;
-  baudRate?:     number;
-  friendlyName?: string;
+  usbVendorId?:       number;
+  usbProductId?:      number;
+  baudRate?:          number;
+  friendlyName?:      string;
+  qzPortName?:        string; // QZ Tray: port name (COM3, /dev/ttyUSB0, etc.)
+  electronPortName?:  string; // Electron IPC: port path (COM3, /dev/ttyUSB0, etc.)
 }
 
 function loadStoredHints(): Record<DeviceType, StoredHint | null> {
@@ -104,6 +127,12 @@ export function useHardwareDevices(): HardwareDevices {
   const [printer,      setPrinter]      = useState<DeviceState>(EMPTY_DEVICE);
   const [labelPrinter, setLabelPrinter] = useState<DeviceState>(EMPTY_DEVICE);
 
+  // Transport detection: Electron > Web Serial > QZ Tray > none.
+  // Electron is detected synchronously (window.electronAPI exists immediately).
+  const [transport, setTransport] = useState<'webserial' | 'qztray' | 'electron' | 'none'>(
+    isElectronAvailable() ? 'electron' : hardwareSupported ? 'webserial' : 'none',
+  );
+
   const terminalRef     = useRef<any>(null);
   const printerRef      = useRef<any>(null);
   const labelPrinterRef = useRef<any>(null);
@@ -119,6 +148,15 @@ export function useHardwareDevices(): HardwareDevices {
     printer:      setPrinter,
     labelPrinter: setLabelPrinter,
   };
+
+  // Tracks which transport owns each currently-connected device.
+  const deviceTransportRef = useRef<Map<DeviceType, 'webserial' | 'qztray' | 'electron'>>(
+    new Map([
+      ['terminal',     'webserial'],
+      ['printer',      'webserial'],
+      ['labelPrinter', 'webserial'],
+    ]),
+  );
 
   // Track per-device retry timers so we can cancel them on unmount / manual disconnect.
   // Using a Map keyed by DeviceType so each device has its own isolated slot and no
@@ -141,7 +179,18 @@ export function useHardwareDevices(): HardwareDevices {
 
   // ── Auto-reconnect on mount ──────────────────────────────────────────────────
   useEffect(() => {
-    if (!hardwareSupported) return;
+    if (!hardwareSupported) {
+      // Electron provides its own IPC transport — no need to probe QZ Tray.
+      if (isElectronAvailable()) return;
+      // Web Serial unavailable — probe for QZ Tray as a fallback transport.
+      probeQzTray().then(available => {
+        if (!available) return;
+        connectQzTray()
+          .then(() => setTransport('qztray'))
+          .catch(() => {/* QZ Tray answered probe but failed persistent connect — ignore */});
+      });
+      return;
+    }
 
     const serial = (navigator as any).serial as { getPorts(): Promise<any[]> };
 
@@ -175,6 +224,7 @@ export function useHardwareDevices(): HardwareDevices {
             const baud = hint.baudRate ?? DEFAULT_BAUD_RATES[type];
             await match.open({ baudRate: baud, dataBits: 8, stopBits: 1, parity: 'none' });
             refs[type].current = match;
+            deviceTransportRef.current.set(type, 'webserial');
             const name = hint.friendlyName ?? rawDeviceLabel(match);
             setters[type]({ status: 'connected', deviceName: name, port: match, baudRate: baud });
             // Only toast if it was a previous session (friendlyName stored = came from wizard)
@@ -249,6 +299,7 @@ export function useHardwareDevices(): HardwareDevices {
             const baud = hint?.baudRate ?? DEFAULT_BAUD_RATES[type];
             await disconnectedPort.open({ baudRate: baud, dataBits: 8, stopBits: 1, parity: 'none' });
             refs[type].current = disconnectedPort;
+            deviceTransportRef.current.set(type, 'webserial');
             const name = hint?.friendlyName ?? rawDeviceLabel(disconnectedPort);
             setters[type]({ status: 'connected', deviceName: name, port: disconnectedPort, baudRate: baud });
             reconnectAttemptsRef.current.set(type, 0);
@@ -319,6 +370,7 @@ export function useHardwareDevices(): HardwareDevices {
             const baud = hint.baudRate ?? DEFAULT_BAUD_RATES[type];
             await newPort.open({ baudRate: baud, dataBits: 8, stopBits: 1, parity: 'none' });
             refs[type].current = newPort;
+            deviceTransportRef.current.set(type, 'webserial');
             const name = hint.friendlyName ?? rawDeviceLabel(newPort);
             setters[type]({ status: 'connected', deviceName: name, port: newPort, baudRate: baud });
             toast({ title: 'Hardware reconnected', description: name, duration: 2500 });
@@ -348,7 +400,7 @@ export function useHardwareDevices(): HardwareDevices {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hardwareSupported, toast]);
 
-  // ── Connect a port that was already identified by the wizard ─────────────────
+  // ── Connect a Web Serial port identified by the wizard ────────────────────────
   const connectWithPort = useCallback(async (
     type: DeviceType,
     port: any,
@@ -359,7 +411,11 @@ export function useHardwareDevices(): HardwareDevices {
 
     // Close existing connection for this device type
     if (refs[type].current) {
-      try { await refs[type].current.close(); } catch {}
+      if (deviceTransportRef.current.get(type) === 'qztray') {
+        await closeQzPort(refs[type].current as string);
+      } else {
+        try { await refs[type].current.close(); } catch {}
+      }
       refs[type].current = null;
     }
 
@@ -377,6 +433,7 @@ export function useHardwareDevices(): HardwareDevices {
     }
 
     refs[type].current = port;
+    deviceTransportRef.current.set(type, 'webserial');
 
     // Save VID/PID + baud rate + friendly name for auto-reconnect
     try {
@@ -390,6 +447,90 @@ export function useHardwareDevices(): HardwareDevices {
     } catch {}
 
     setters[type]({ status: 'connected', deviceName: friendlyName, port, baudRate });
+  }, [hardwareSupported]);
+
+  // ── Connect a QZ Tray serial port ─────────────────────────────────────────────
+  const connectWithQzPort = useCallback(async (
+    type: DeviceType,
+    portName: string,
+    friendlyName: string,
+  ): Promise<void> => {
+    // Close any existing connection for this device type
+    const currentPort = refs[type].current;
+    if (currentPort !== null) {
+      if (deviceTransportRef.current.get(type) === 'qztray') {
+        await closeQzPort(currentPort as string);
+      } else {
+        try { await currentPort.close(); } catch {}
+      }
+      refs[type].current = null;
+    }
+
+    setters[type](s => ({ ...s, status: 'connecting' }));
+
+    // Verify the port is accessible (brief open → close confirms device is ready)
+    try {
+      await openQzPort(portName, { baudRate: 9600 });
+      await closeQzPort(portName);
+    } catch (err) {
+      setters[type](EMPTY_DEVICE);
+      throw err; // re-throw so the wizard shows the error step
+    }
+
+    refs[type].current = portName;
+    deviceTransportRef.current.set(type, 'qztray');
+    saveHint(type, { qzPortName: portName, friendlyName });
+    setters[type]({ status: 'connected', deviceName: friendlyName, port: portName });
+  }, []);
+
+  // ── Connect an Electron IPC serial port ──────────────────────────────────────
+  const connectWithElectronPort = useCallback(async (
+    type: DeviceType,
+    portName: string,
+    friendlyName: string,
+  ): Promise<void> => {
+    // Close any existing connection for this device type
+    const currentPort = refs[type].current;
+    if (currentPort !== null) {
+      const priorTransport = deviceTransportRef.current.get(type);
+      if (priorTransport === 'electron') {
+        await closeElectronPort(currentPort as string);
+      } else if (priorTransport === 'qztray') {
+        await closeQzPort(currentPort as string);
+      } else {
+        try { await currentPort.close(); } catch {}
+      }
+      refs[type].current = null;
+    }
+
+    setters[type](s => ({ ...s, status: 'connecting' }));
+
+    // Verify the port is accessible (brief open → close confirms device is ready)
+    try {
+      await openElectronPort(portName, { baudRate: 9600 });
+      await closeElectronPort(portName);
+    } catch (err) {
+      setters[type](EMPTY_DEVICE);
+      throw err; // re-throw so the wizard shows the error step
+    }
+
+    refs[type].current = portName;
+    deviceTransportRef.current.set(type, 'electron');
+    saveHint(type, { electronPortName: portName, friendlyName });
+    setters[type]({ status: 'connected', deviceName: friendlyName, port: portName });
+  }, []);
+
+  // ── Re-probe transport after user installs QZ Tray / connects hardware ────────
+  const recheckTransport = useCallback(async (): Promise<void> => {
+    // Electron is always available synchronously if we're running inside it
+    if (isElectronAvailable()) { setTransport('electron'); return; }
+    if (hardwareSupported) return; // already on Web Serial
+    const available = await probeQzTray();
+    if (!available) return;
+    try {
+      await connectQzTray();
+      setTransport('qztray');
+    } catch {}
   }, [hardwareSupported]);
 
   // ── Legacy connect helper (opens browser picker + connects) ──────────────────
@@ -412,6 +553,7 @@ export function useHardwareDevices(): HardwareDevices {
       const baud = DEFAULT_BAUD_RATES[type];
       await port.open({ baudRate: baud, dataBits: 8, stopBits: 1, parity: 'none' });
       refs[type].current = port;
+      deviceTransportRef.current.set(type, 'webserial');
 
       try {
         const info = port.getInfo?.();
@@ -442,15 +584,24 @@ export function useHardwareDevices(): HardwareDevices {
 
     const port = refs[type].current;
     if (port) {
-      try { await port.close(); } catch {}
+      const portTransport = deviceTransportRef.current.get(type);
+      if (portTransport === 'electron') {
+        await closeElectronPort(port as string);
+      } else if (portTransport === 'qztray') {
+        await closeQzPort(port as string);
+      } else {
+        try { await port.close(); } catch {}
+      }
       refs[type].current = null;
     }
+    deviceTransportRef.current.set(type, 'webserial'); // reset to default
     saveHint(type, null);
     setters[type](EMPTY_DEVICE);
   }, []);
 
   return {
     hardwareSupported,
+    transport,
     terminal,
     printer,
     labelPrinter,
@@ -459,5 +610,8 @@ export function useHardwareDevices(): HardwareDevices {
     connectLabelPrinter: () => connectDevice('labelPrinter'),
     disconnectDevice,
     connectWithPort,
+    connectWithQzPort,
+    connectWithElectronPort,
+    recheckTransport,
   };
 }

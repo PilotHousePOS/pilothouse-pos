@@ -310,3 +310,78 @@ export async function sendPrintJob(
     }
   }
 }
+
+// ── QZ Tray print support ─────────────────────────────────────────────────────
+
+/**
+ * Create a writer that buffers all written bytes in memory instead of
+ * sending them to a serial port.
+ *
+ * Pass the writer to printReceipt / printTestPage / openDrawer, then call
+ * getBytes() to get the complete byte sequence for sending via QZ Tray.
+ *
+ * @example
+ * const { writer, getBytes } = createBufferedWriter();
+ * await printReceipt(writer, saleData);
+ * await sendQzOneShot(portName, getBytes());
+ */
+export function createBufferedWriter(): {
+  writer: WritableStreamDefaultWriter<Uint8Array>;
+  getBytes: () => Uint8Array;
+} {
+  const chunks: Uint8Array[] = [];
+  const writer = {
+    async write(data: Uint8Array) { chunks.push(new Uint8Array(data)); },
+    releaseLock() {},
+  } as unknown as WritableStreamDefaultWriter<Uint8Array>;
+  return {
+    writer,
+    getBytes() {
+      const total = chunks.reduce((s, c) => s + c.length, 0);
+      const out = new Uint8Array(total);
+      let offset = 0;
+      for (const c of chunks) { out.set(c, offset); offset += c.length; }
+      return out;
+    },
+  };
+}
+
+/**
+ * QZ Tray variant of sendPrintJob.
+ *
+ * Collects the bytes produced by `fn` (using a buffered in-memory writer),
+ * then sends them to the named serial port via QZ Tray in a single
+ * open → send → close sequence.
+ *
+ * @example
+ * await sendPrintJobQz('COM3', writer => printReceipt(writer, saleData));
+ */
+export async function sendPrintJobQz(
+  portName: string,
+  fn: (writer: WritableStreamDefaultWriter<Uint8Array>) => Promise<void>,
+): Promise<void> {
+  const { sendQzOneShot } = await import('./qzTray');
+  const { writer, getBytes } = createBufferedWriter();
+  await fn(writer);
+  await sendQzOneShot(portName, getBytes());
+}
+
+/**
+ * Electron IPC variant of sendPrintJob.
+ *
+ * Collects the bytes produced by `fn` (using a buffered in-memory writer),
+ * then sends them to the named serial port via Electron IPC in a single
+ * open → send → close sequence.
+ *
+ * @example
+ * await sendPrintJobElectron('COM3', writer => printReceipt(writer, saleData));
+ */
+export async function sendPrintJobElectron(
+  portName: string,
+  fn: (writer: WritableStreamDefaultWriter<Uint8Array>) => Promise<void>,
+): Promise<void> {
+  const { sendElectronOneShot } = await import('./electronSerial');
+  const { writer, getBytes } = createBufferedWriter();
+  await fn(writer);
+  await sendElectronOneShot(portName, getBytes());
+}

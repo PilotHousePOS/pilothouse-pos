@@ -1,0 +1,88 @@
+# ─── PilotHouse POS — Electron Builder Configuration ──────────────────────────
+#
+# BUILD INSTRUCTIONS (run on your local dev machine, not on Replit):
+#
+#   1.  npm install          # installs electron-builder + other devDeps
+#   2.  npm run build:electron
+#
+# OUTPUT: dist/installers/
+#   Windows:  PilotHouse POS Setup x.y.z.exe  (NSIS one-click)
+#   macOS:    PilotHouse POS-x.y.z.dmg        (drag-to-Applications)
+#
+# SERVER URL
+#   Set PILOTHOUSE_SERVER_URL below (or as an env var) before distributing.
+#   Staff will connect to whatever URL you specify here.
+
+appId: com.pilothouse.pos
+productName: PilotHouse POS
+
+# The compiled Electron main process entry point
+main: dist/electron/main.js
+
+directories:
+  buildResources: electron/assets
+  output: dist/installers
+
+# ── What to include in the installer ─────────────────────────────────────────
+# We only bundle the Electron shell + its native modules.
+# The React frontend is served from the remote server (SERVER_URL) — not bundled.
+files:
+  # Compiled main process and preload
+  - dist/electron/**/*
+  # Required for electron-updater and serialport
+  - package.json
+  - node_modules/electron-updater/**/*
+  - node_modules/builder-util-runtime/**/*
+  - node_modules/serialport/**/*
+  - node_modules/@serialport/**/*
+  - node_modules/node-addon-api/**/*
+
+# Native modules must be rebuilt against Electron's Node.js ABI
+nativeRebuilder: sequential
+buildDependenciesFromSource: false
+
+# ── Environment variables baked into the app at build time ───────────────────
+extraMetadata:
+  main: dist/electron/main.js
+
+# Set this to your production server URL before building for distribution:
+# env:
+#   PILOTHOUSE_SERVER_URL: https://your-domain.com
+
+# ── Auto-update — GitHub Releases ────────────────────────────────────────────
+# Create a GitHub release with the installer files; electron-updater will
+# pick up new versions automatically on app launch.
+# Uncomment and fill in your owner/repo before distributing:
+# publish:
+#   - provider: github
+#     owner: your-github-org
+#     repo:  pilothouse-pos
+
+# ── macOS DMG ─────────────────────────────────────────────────────────────────
+mac:
+  target:
+    - target: dmg
+      arch:
+        - x64    # Intel Mac
+        - arm64  # Apple Silicon
+  # Code signing (required for Gatekeeper on end-user machines):
+  # identity: "Developer ID Application: Your Name (XXXXXXXXXX)"
+  # For internal staff distribution, unsigned DMG works if staff allow it in
+  # System Preferences → Security & Privacy → "Open Anyway".
+
+# ── Windows NSIS installer ────────────────────────────────────────────────────
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+        - ia32
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  installerIcon: electron/assets/icon.ico
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: PilotHouse POS

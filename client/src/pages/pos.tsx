@@ -20,9 +20,45 @@ import {
 } from "@/lib/offline-db";
 import { useHardwareDevices, type DeviceState, type DeviceType } from "@/hooks/useHardwareDevices";
 import { HardwareWizard } from "@/components/pos/HardwareWizard";
-import { printReceipt, openDrawer, printTestPage, sendPrintJob, wrapText, PAPER_WIDTH } from "@/lib/hardware/escpos";
+import { printReceipt, openDrawer, printTestPage, sendPrintJob, sendPrintJobQz, sendPrintJobElectron, wrapText, PAPER_WIDTH } from "@/lib/hardware/escpos";
 import { sendTerminalCharge, sendTerminalChargeTcp } from "@/lib/hardware/terminal";
-import { printLabel } from "@/lib/hardware/zpl";
+import { printLabel, printLabelQz, printLabelElectron, type LabelData } from "@/lib/hardware/zpl";
+import type { HardwareDevices } from "@/hooks/useHardwareDevices";
+
+// ── Transport-aware print dispatch ────────────────────────────────────────────
+// Routes print jobs to the correct transport:
+//   'webserial' → Web Serial API (sendPrintJob / printLabel)
+//   'qztray'    → QZ Tray WebSocket (sendPrintJobQz / printLabelQz)
+//   'electron'  → Electron IPC bridge (sendPrintJobElectron / printLabelElectron)
+// Call these instead of the raw functions anywhere hw.printer.port is used.
+
+async function dispatchPrintJob(
+  port: any,
+  transport: HardwareDevices['transport'],
+  fn: (w: WritableStreamDefaultWriter<Uint8Array>) => Promise<void>,
+): Promise<void> {
+  if (transport === 'electron' && typeof port === 'string') {
+    await sendPrintJobElectron(port, fn);
+  } else if (transport === 'qztray' && typeof port === 'string') {
+    await sendPrintJobQz(port, fn);
+  } else {
+    await sendPrintJob(port, fn);
+  }
+}
+
+async function dispatchLabelJob(
+  port: any,
+  transport: HardwareDevices['transport'],
+  data: LabelData,
+): Promise<void> {
+  if (transport === 'electron' && typeof port === 'string') {
+    await printLabelElectron(port, data);
+  } else if (transport === 'qztray' && typeof port === 'string') {
+    await printLabelQz(port, data);
+  } else {
+    await printLabel(port, data);
+  }
+}
 
 interface PosOverrideConfig {
   requirePinForRefund?: boolean;
@@ -1022,11 +1058,13 @@ export default function PosPage() {
         if (!handedOffToMutation) setTerminalProcessing(false);
       }
 
-    } else if (hw.terminal.status === 'connected' && hw.terminal.port) {
+    } else if (hw.terminal.status === 'connected' && hw.terminal.port && hw.transport !== 'qztray') {
       // ── Transport 2: Web Serial fallback ────────────────────────────────
       // Used when no terminal IP is configured.  Requires a USB-to-serial
       // adapter physically attached to the cashier's machine and a prior
       // port-pairing via the Hardware Wizard.
+      // NOTE: QZ Tray transport is excluded here — card terminals use TCP
+      // (sendTerminalChargeTcp), not QZ Tray serial.
       setTerminalProcessing(true);
       let handedOffToMutation = false;
       try {
@@ -1113,7 +1151,7 @@ export default function PosPage() {
       });
     }
     try {
-      await sendPrintJob(hw.printer.port, async (writer) => {
+      await dispatchPrintJob(hw.printer.port, hw.transport, async (writer) => {
         await printReceipt(writer, { storeName, footerMessage: receiptFooter || undefined, ...saleData });
         // Only open drawer on cash sales
         if (saleData.paymentMethod === 'cash') {
@@ -1471,7 +1509,7 @@ export default function PosPage() {
                           e.stopPropagation();
                           (async () => {
                             try {
-                              await printLabel(hw.labelPrinter.port, {
+                              await dispatchLabelJob(hw.labelPrinter.port, hw.transport, {
                                 name:      item.name,
                                 price:     Number(item.price),
                                 barcode:   item.sku || undefined,
@@ -1564,7 +1602,7 @@ export default function PosPage() {
                     const reason = isTenantLoading ? 'Store info is still loading' : 'Store info could not be loaded';
                     toast({ title: 'Store name may be incorrect', description: `${reason} — receipt will show "PilotHouse POS".`, variant: 'destructive' });
                   }
-                  await sendPrintJob(hw.printer.port, async (w) => {
+                  await dispatchPrintJob(hw.printer.port, hw.transport, async (w) => {
                     await printReceipt(w, { storeName, orderNumber, items: orderItems, subtotal, tax, total, paymentMethod: 'pending', footerMessage: receiptFooter || undefined });
                   });
                 } catch { toast({ title: 'Print error', description: 'Check printer.', variant: 'destructive' }); }
@@ -1584,7 +1622,7 @@ export default function PosPage() {
                   // tenant query reload between the sale and the reprint cannot
                   // change what appears on the reprinted receipt.
                   const reprintStoreName = sale.storeName ?? storeName;
-                  await sendPrintJob(hw.printer.port, async (w) => {
+                  await dispatchPrintJob(hw.printer.port, hw.transport, async (w) => {
                     await printReceipt(w, { storeName: reprintStoreName, footerMessage: receiptFooter || undefined, ...sale });
                   });
                 } catch { toast({ title: 'Print error', description: 'Check printer.', variant: 'destructive' }); }
@@ -1658,7 +1696,7 @@ export default function PosPage() {
               (async () => {
                 if (hw.printer.status === 'connected' && hw.printer.port) {
                   try {
-                    await sendPrintJob(hw.printer.port, async (w) => { await openDrawer(w); });
+                    await dispatchPrintJob(hw.printer.port, hw.transport, async (w) => { await openDrawer(w); });
                   } catch {
                     toast({ title: 'Drawer error', description: 'Check printer connection.', variant: 'destructive' });
                   }
@@ -2445,7 +2483,7 @@ export default function PosPage() {
                           {...(type === 'printer' ? {
                             onTestPrint: async () => {
                               try {
-                                await sendPrintJob(hw.printer.port, async (w) => { await printTestPage(w); });
+                                await dispatchPrintJob(hw.printer.port, hw.transport, async (w) => { await printTestPage(w); });
                                 toast({ title: 'Test page sent', description: 'Check the printout — ruler should reach the paper edge.' });
                               } catch {
                                 toast({ title: 'Print error', description: 'Printer did not respond.', variant: 'destructive' });
@@ -2453,7 +2491,7 @@ export default function PosPage() {
                             },
                             onOpenDrawer: async () => {
                               try {
-                                await sendPrintJob(hw.printer.port, async (w) => { await openDrawer(w); });
+                                await dispatchPrintJob(hw.printer.port, hw.transport, async (w) => { await openDrawer(w); });
                                 toast({ title: 'Drawer kick sent', description: 'If the drawer did not open, check the RJ11 pin wiring (see escpos.ts).' });
                               } catch {
                                 toast({ title: 'Drawer error', description: 'Printer did not respond.', variant: 'destructive' });
@@ -2463,7 +2501,7 @@ export default function PosPage() {
                           {...(type === 'labelPrinter' ? {
                             onTestLabel: async () => {
                               try {
-                                await printLabel(hw.labelPrinter.port, { name: 'TEST LABEL', price: 0.00 });
+                                await dispatchLabelJob(hw.labelPrinter.port, hw.transport, { name: 'TEST LABEL', price: 0.00 });
                                 toast({ title: 'Test label sent', description: 'Check that the label printed correctly.' });
                               } catch {
                                 toast({ title: 'Label error', description: 'Label printer did not respond.', variant: 'destructive' });

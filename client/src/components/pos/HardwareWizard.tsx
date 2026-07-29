@@ -1,13 +1,21 @@
 // ─── Hardware Setup Wizard ────────────────────────────────────────────────────
 // Step-by-step wizard that guides staff through connecting POS hardware.
 //
-// FLOW
-// 1. "Scan for Device" → browser's native serial-port picker (security requirement)
+// FLOW — Web Serial (Chrome / Edge desktop)
+// 1. "Scan for Device" → browser's native serial-port picker
 // 2. Auto-identification: VID/PID lookup → probe (ESC/POS then ZPL) if not found
 // 3. Recognized: friendly confirmation card → "Done"
 //    Unrecognized: simple fallback form (device type + optional name) → "Connect"
 //
-// The wizard never asks for COM ports, baud rates, or other technical details.
+// FLOW — QZ Tray (Firefox / Safari / any browser with QZ Tray installed)
+// 1. StepPick shows "Scan with QZ Tray" button
+// 2. Lists available serial ports → StepQzTrayPick
+// 3. User selects a port → probe → Recognized / Fallback (same as above)
+// 4. Connect via hw.connectWithQzPort instead of hw.connectWithPort
+//
+// FLOW — Unsupported (no Web Serial, no QZ Tray)
+// 1. StepPick shows browser-specific message + QZ Tray install prompt
+// 2. StepQzTrayInstall: download link + "I've started it" retry button
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
@@ -22,6 +30,7 @@ import {
 import {
   Printer, Tag, CreditCard, CheckCircle2, AlertCircle,
   Loader2, Search, ChevronDown, AlertTriangle, SmartphoneNfc,
+  Download, List,
 } from 'lucide-react';
 import {
   lookupDevice, probeDevice,
@@ -31,20 +40,34 @@ import {
   type KnownDevice,
   type ScanSequence,
 } from '@/lib/hardware/deviceDatabase';
+import {
+  listQzPorts, probeQzPort, connectQzTray,
+} from '@/lib/hardware/qzTray';
+import {
+  listElectronPorts, probeElectronPort,
+} from '@/lib/hardware/electronSerial';
 import type { DeviceType, HardwareDevices } from '@/hooks/useHardwareDevices';
 
 // ── Internal types ────────────────────────────────────────────────────────────
 
+/** Which transport owns the currently-probed port. */
+type PortTransport = 'webserial' | 'qztray' | 'electron';
+
 type WizardStep =
   | { step: 'pick' }
   | { step: 'probing' }
-  | { step: 'recognized'; port: any; device: KnownDevice; suggestedType: DeviceType }
-  | { step: 'fallback';   port: any; suggestedType: DeviceType | null; suggestedName: string }
+  | { step: 'recognized'; port: any; device: KnownDevice; suggestedType: DeviceType; portTransport?: PortTransport }
+  | { step: 'fallback';   port: any; suggestedType: DeviceType | null; suggestedName: string; portTransport?: PortTransport }
   | { step: 'replace-confirm'; deviceType: DeviceType; existingDeviceName: string; doConnect: () => Promise<void> }
   | { step: 'connecting' }
   // busyPort: set when the error is specifically a "port already in use" error so that
   // a 'disconnect' event on that port can auto-advance back to the 'pick' step.
-  | { step: 'error'; message: string; busyPort?: any };
+  | { step: 'error'; message: string; busyPort?: any }
+  // QZ Tray-specific steps:
+  | { step: 'qztray-install' }
+  | { step: 'qztray-pick'; ports: string[] }
+  // Electron-specific steps:
+  | { step: 'electron-pick'; ports: ElectronPortInfo[] };
 
 const INITIAL: WizardStep = { step: 'pick' };
 
@@ -52,9 +75,6 @@ const INITIAL: WizardStep = { step: 'pick' };
 // Web Serial is Chrome 89+, Edge 89+, Android Chrome 89+.
 // It is NOT supported on: iOS Safari, iOS Chrome (WKWebView), Firefox (any OS),
 // desktop Safari, or any other browser engine.
-//
-// We detect the specific situation so we can give targeted advice rather than
-// a generic "not supported" message.
 
 type UnsupportedReason = 'ios' | 'firefox' | 'safari' | 'other';
 
@@ -112,26 +132,15 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
   const [state, setState] = useState<WizardStep>(INITIAL);
 
   // Scan-sequence guard: prevents a stale probe from overwriting state when a
-  // second scan starts before the first probe resolves (e.g. user unplugs and
-  // replugs a device while the wizard is identifying the first one).
+  // second scan starts before the first probe resolves.
   const scanSeq = useRef<ScanSequence>(createScanSequence());
 
   // Reset to initial step when wizard is closed.
-  // Memoized with useCallback so that handleConfirmRecognized,
-  // handleConfirmFallback, and the replace-confirm doConnect closure all hold a
-  // stable reference — without this they capture a stale onClose from the
-  // render in which they were created, which breaks if the parent re-renders
-  // and passes a new onClose identity.
   const handleOpenChange = useCallback((o: boolean) => {
     if (!o) { onClose(); setTimeout(() => setState(INITIAL), 200); }
   }, [onClose]);
 
   // ── Auto-advance from busy-port error when the port is unplugged ─────────────
-  // When the wizard shows "device already in use", the user's natural recovery
-  // is to unplug and re-plug the cable.  If the disconnect event fires while we
-  // are on the error step and the disconnected port matches the one that caused
-  // the busy error, advance straight back to the 'pick' step so they only need
-  // to click Scan — not "Try Again" then Scan.
   useEffect(() => {
     if (!open) return;
     if (state.step !== 'error' || !state.busyPort) return;
@@ -141,20 +150,15 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
     const busyPort = state.busyPort;
 
     const handleDisconnect = (event: any) => {
-      if (event.port === busyPort) {
-        setState(INITIAL);
-      }
+      if (event.port === busyPort) setState(INITIAL);
     };
 
     serial.addEventListener('disconnect', handleDisconnect);
     return () => serial.removeEventListener('disconnect', handleDisconnect);
   }, [open, state]);
 
-  // ── Step 1: browser picker + identification ──────────────────────────────────
+  // ── Step 1: Web Serial browser picker + identification ───────────────────────
   const handleScan = useCallback(async () => {
-    // Guard: Web Serial is Chrome/Edge desktop only. On Firefox, Safari, and
-    // any WKWebView wrapper hw.hardwareSupported is false. Crashing here with
-    // a TypeError is worse than a clear message, so bail early.
     if (!hw.hardwareSupported) {
       setState({ step: 'error', message: 'Web Serial is not supported in this browser. Use Chrome or Edge on desktop.' });
       return;
@@ -168,61 +172,24 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
     try {
       port = await serial.requestPort({ filters: [] });
     } catch (err: any) {
-      // User cancelled the picker — treat as abort, stay on step 1
       if (err?.name === 'NotFoundError' || err?.name === 'AbortError') return;
       setState({ step: 'error', message: err?.message ?? 'Could not open device picker.' });
       return;
     }
 
-    // Capture scan ID before any async work so we can discard stale results.
-    // If the user triggers a second scan while this probe is in-flight the
-    // counter advances; isStale(myScanId) will then return true and we bail
-    // before committing state, preventing last-write-wins corruption.
     const myScanId = scanSeq.current.next();
-
     setState({ step: 'probing' });
 
-    // 1. VID/PID lookup (instant, no IO)
-    //
-    // EMPTY getInfo() FALLBACK PATH
-    // Some browsers or OS drivers return an empty object from port.getInfo()
-    // even for physically recognized devices (certain Linux kernels, devices
-    // connected through non-standard USB hubs, etc.).  When that happens:
-    //
-    //   info = {}  →  usbVendorId/usbProductId are both undefined
-    //   lookupDevice(undefined, undefined)  →  null
-    //
-    // A null result here is NOT an error — it is a deliberate branch to
-    // probe-based identification (step 2 below).  Only if the probe also
-    // fails ('unknown') does the user land on the manual fallback form.
-    // The error step is reserved for serial.requestPort() rejections and
-    // connectWithPort() failures; it is never triggered by a missing VID/PID.
-    //
-    // Expected fallback path when getInfo() returns {}:
-    //   getInfo() → {}
-    //   → lookupDevice(undefined, undefined) → null
-    //   → setState('probing') + probeDevice(port)
-    //   → probe 'escpos' / 'zpl' → setState('recognized') with synthetic device
-    //   → probe 'unknown'        → setState('fallback') with manual selection form
     const info = port.getInfo?.() ?? {};
     const known = lookupDevice(info.usbVendorId, info.usbProductId);
 
     if (known) {
       if (scanSeq.current.isStale(myScanId)) return;
       const suggestedType = categoryToDeviceType(known.deviceCategory);
-      setState({ step: 'recognized', port, device: known, suggestedType });
+      setState({ step: 'recognized', port, device: known, suggestedType, portTransport: 'webserial' });
       return;
     }
 
-    // 2. Guard: if the port is already open (port.readable is non-null in the
-    //    Web Serial API), probeDevice would silently return 'unknown' and drop
-    //    the user on the manual fallback form with no explanation.  Catch it
-    //    here and show a targeted message so staff know what to do.
-    //
-    //    busyPort is stored in the error state so the disconnect useEffect above
-    //    can auto-advance back to 'pick' when the cable is unplugged — staff
-    //    just need to plug it back in and click Scan rather than manually
-    //    clicking "Try Again" first.
     if (port.readable != null) {
       if (scanSeq.current.isStale(myScanId)) return;
       setState({
@@ -233,29 +200,71 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
       return;
     }
 
-    // 3. Probe-based identification (opens + closes port briefly)
     const probeResult = await probeDevice(port);
-
-    // Discard if a newer scan has already taken over.
     if (scanSeq.current.isStale(myScanId)) return;
 
     const suggestedType = probeResultToDeviceType(probeResult);
     const suggestedName = probeResultToName(probeResult);
 
     if (probeResult !== 'unknown') {
-      // Build a synthetic "known device" from probe result for the recognized UI
       const synthetic: KnownDevice = {
         name:            suggestedName,
         deviceCategory:  probeResult === 'escpos' ? 'receipt-printer' : 'label-printer',
         protocol:        probeResult === 'escpos' ? 'escpos' : 'zpl',
         defaultBaudRate: 9600,
       };
-      setState({ step: 'recognized', port, device: synthetic, suggestedType: suggestedType! });
+      setState({ step: 'recognized', port, device: synthetic, suggestedType: suggestedType!, portTransport: 'webserial' });
     } else {
-      // Both VID/PID lookup and probe failed — show the manual fallback form.
-      // This is a deliberate, clearly communicated path: staff can still connect
-      // the device by selecting its type manually.
-      setState({ step: 'fallback', port, suggestedType, suggestedName });
+      setState({ step: 'fallback', port, suggestedType, suggestedName, portTransport: 'webserial' });
+    }
+  }, [hw.hardwareSupported]);
+
+  // ── Step 1 (QZ Tray): list available serial ports ────────────────────────────
+  const handleQzScan = useCallback(async () => {
+    setState({ step: 'probing' });
+    try {
+      // Ensure we have a live connection to QZ Tray
+      await connectQzTray();
+      const ports = await listQzPorts();
+      if (ports.length === 0) {
+        // QZ Tray is running but found no ports (no devices plugged in)
+        setState({
+          step: 'error',
+          message: 'QZ Tray found no serial ports. Make sure the device is plugged in, then try again.',
+        });
+      } else {
+        setState({ step: 'qztray-pick', ports });
+      }
+    } catch {
+      // QZ Tray connection dropped or was never up
+      setState({ step: 'qztray-install' });
+    }
+  }, []);
+
+  // ── Step 2 (QZ Tray): probe a selected port ──────────────────────────────────
+  const handleQzPortSelected = useCallback(async (portName: string) => {
+    setState({ step: 'probing' });
+
+    const result = await probeQzPort(portName);
+    const suggestedType = result !== 'unknown'
+      ? (result === 'escpos' ? 'printer' : 'labelPrinter') as DeviceType
+      : ('printer' as DeviceType);
+    const suggestedName = result === 'escpos'
+      ? 'ESC/POS Receipt Printer'
+      : result === 'zpl'
+        ? 'ZPL Label Printer'
+        : '';
+
+    if (result !== 'unknown') {
+      const synthetic: KnownDevice = {
+        name:            suggestedName,
+        deviceCategory:  result === 'escpos' ? 'receipt-printer' : 'label-printer',
+        protocol:        result === 'escpos' ? 'escpos' : 'zpl',
+        defaultBaudRate: 9600,
+      };
+      setState({ step: 'recognized', port: portName, device: synthetic, suggestedType, portTransport: 'qztray' });
+    } else {
+      setState({ step: 'fallback', port: portName, suggestedType, suggestedName, portTransport: 'qztray' });
     }
   }, []);
 
@@ -264,35 +273,36 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
     port: any,
     device: KnownDevice,
     type: DeviceType,
+    portTransport?: PortTransport,
   ) => {
-    // If this slot already has a connected device, require explicit confirmation first
+    const doConnect = async () => {
+      setState({ step: 'connecting' });
+      try {
+        if (portTransport === 'electron') {
+          await hw.connectWithElectronPort(type, port as string, device.name);
+        } else if (portTransport === 'qztray') {
+          await hw.connectWithQzPort(type, port as string, device.name);
+        } else {
+          await hw.connectWithPort(type, port, device.defaultBaudRate, device.name);
+        }
+        onSuccess?.(type, device.name);
+        handleOpenChange(false);
+      } catch (err: any) {
+        setState({ step: 'error', message: err?.message ?? 'Failed to connect device.' });
+      }
+    };
+
     if (hw[type].status === 'connected') {
       setState({
         step: 'replace-confirm',
         deviceType: type,
         existingDeviceName: hw[type].deviceName,
-        doConnect: async () => {
-          setState({ step: 'connecting' });
-          try {
-            await hw.connectWithPort(type, port, device.defaultBaudRate, device.name);
-            onSuccess?.(type, device.name);
-            handleOpenChange(false);
-          } catch (err: any) {
-            setState({ step: 'error', message: err?.message ?? 'Failed to connect device.' });
-          }
-        },
+        doConnect,
       });
       return;
     }
 
-    setState({ step: 'connecting' });
-    try {
-      await hw.connectWithPort(type, port, device.defaultBaudRate, device.name);
-      onSuccess?.(type, device.name);
-      handleOpenChange(false);
-    } catch (err: any) {
-      setState({ step: 'error', message: err?.message ?? 'Failed to connect device.' });
-    }
+    await doConnect();
   }, [hw, onSuccess, handleOpenChange]);
 
   // ── Step 3b → connect fallback (user-specified type) ────────────────────────
@@ -301,48 +311,113 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
     type: DeviceType,
     name: string,
     baudRate: number,
+    portTransport?: PortTransport,
   ) => {
     const resolvedName = name || deviceTypeLabel(type);
 
-    // If this slot already has a connected device, require explicit confirmation first
+    const doConnect = async () => {
+      setState({ step: 'connecting' });
+      try {
+        if (portTransport === 'electron') {
+          await hw.connectWithElectronPort(type, port as string, resolvedName);
+        } else if (portTransport === 'qztray') {
+          await hw.connectWithQzPort(type, port as string, resolvedName);
+        } else {
+          await hw.connectWithPort(type, port, baudRate, resolvedName);
+        }
+        onSuccess?.(type, resolvedName);
+        handleOpenChange(false);
+      } catch (err: any) {
+        setState({ step: 'error', message: err?.message ?? 'Failed to connect device.' });
+      }
+    };
+
     if (hw[type].status === 'connected') {
       setState({
         step: 'replace-confirm',
         deviceType: type,
         existingDeviceName: hw[type].deviceName,
-        doConnect: async () => {
-          setState({ step: 'connecting' });
-          try {
-            await hw.connectWithPort(type, port, baudRate, resolvedName);
-            onSuccess?.(type, resolvedName);
-            handleOpenChange(false);
-          } catch (err: any) {
-            setState({ step: 'error', message: err?.message ?? 'Failed to connect device.' });
-          }
-        },
+        doConnect,
       });
       return;
     }
 
-    setState({ step: 'connecting' });
-    try {
-      await hw.connectWithPort(type, port, baudRate, resolvedName);
-      onSuccess?.(type, resolvedName);
-      handleOpenChange(false);
-    } catch (err: any) {
-      setState({ step: 'error', message: err?.message ?? 'Failed to connect device.' });
-    }
+    await doConnect();
   }, [hw, onSuccess, handleOpenChange]);
+
+  // ── Step 1 (Electron IPC): list available serial ports ───────────────────────
+  const handleElectronScan = useCallback(async () => {
+    setState({ step: 'probing' });
+    try {
+      const ports = await listElectronPorts();
+      if (ports.length === 0) {
+        setState({
+          step: 'error',
+          message: 'No serial ports found. Make sure the device is plugged in, then try again.',
+        });
+      } else {
+        setState({ step: 'electron-pick', ports });
+      }
+    } catch (err: any) {
+      setState({ step: 'error', message: err?.message ?? 'Failed to list serial ports.' });
+    }
+  }, []);
+
+  // ── Step 2 (Electron IPC): probe a selected port ─────────────────────────────
+  const handleElectronPortSelected = useCallback(async (portName: string) => {
+    setState({ step: 'probing' });
+
+    const result = await probeElectronPort(portName);
+    const suggestedType = result !== 'unknown'
+      ? (result === 'escpos' ? 'printer' : 'labelPrinter') as DeviceType
+      : ('printer' as DeviceType);
+    const suggestedName = result === 'escpos'
+      ? 'ESC/POS Receipt Printer'
+      : result === 'zpl'
+        ? 'ZPL Label Printer'
+        : '';
+
+    if (result !== 'unknown') {
+      const synthetic: KnownDevice = {
+        name:            suggestedName,
+        deviceCategory:  result === 'escpos' ? 'receipt-printer' : 'label-printer',
+        protocol:        result === 'escpos' ? 'escpos' : 'zpl',
+        defaultBaudRate: 9600,
+      };
+      setState({ step: 'recognized', port: portName, device: synthetic, suggestedType, portTransport: 'electron' });
+    } else {
+      setState({ step: 'fallback', port: portName, suggestedType, suggestedName, portTransport: 'electron' });
+    }
+  }, []);
+
+  // ── QZ Tray install step → re-probe after user starts QZ Tray ────────────────
+  const handleQzRetry = useCallback(async () => {
+    setState({ step: 'probing' });
+    await hw.recheckTransport();
+    // After recheckTransport, transport state in hook updates.
+    // If now 'qztray', proceed to scan; otherwise show install again.
+    try {
+      await connectQzTray();
+      const ports = await listQzPorts();
+      if (ports.length === 0) {
+        setState({
+          step: 'error',
+          message: 'QZ Tray is running but no serial ports were found. Plug in the device and try again.',
+        });
+      } else {
+        setState({ step: 'qztray-pick', ports });
+      }
+    } catch {
+      setState({ step: 'qztray-install' });
+    }
+  }, [hw]);
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
         className="bg-gray-900 border-gray-700 text-white sm:max-w-md"
         onInteractOutside={e => {
-          // Block accidental outside-click dismissal during all non-interactive steps:
-          // • probing / connecting — async work in progress, closing would lose the scan
-          // • replace-confirm — requires explicit choice, not an accidental click
-          // • error — staff need to read the message and deliberately choose Try Again
+          // Block accidental outside-click dismissal during non-interactive steps
           if (
             state.step === 'probing' ||
             state.step === 'connecting' ||
@@ -356,13 +431,22 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
         </DialogHeader>
 
         <div className="pt-2">
-          {state.step === 'pick'      && <StepPick onScan={handleScan} supported={hw.hardwareSupported} />}
+          {state.step === 'pick' && (
+            <StepPick
+              transport={hw.transport}
+              onScan={handleScan}
+              onQzScan={handleQzScan}
+              onQzInstall={() => setState({ step: 'qztray-install' })}
+              onElectronScan={handleElectronScan}
+            />
+          )}
           {state.step === 'probing'   && <StepProbing />}
           {state.step === 'recognized' && (
             <StepRecognized
               port={state.port}
               device={state.device}
               initialType={state.suggestedType}
+              portTransport={state.portTransport}
               onConfirm={handleConfirmRecognized}
               onBack={() => setState(INITIAL)}
             />
@@ -372,6 +456,7 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
               port={state.port}
               initialType={state.suggestedType}
               initialName={state.suggestedName}
+              portTransport={state.portTransport}
               onConfirm={handleConfirmFallback}
               onBack={() => setState(INITIAL)}
             />
@@ -384,9 +469,26 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
               onCancel={() => setState(INITIAL)}
             />
           )}
-          {state.step === 'connecting' && <StepConnecting />}
-          {state.step === 'error' && (
+          {state.step === 'connecting'    && <StepConnecting />}
+          {state.step === 'error'         && (
             <StepError message={state.message} onRetry={() => setState(INITIAL)} />
+          )}
+          {state.step === 'qztray-install' && (
+            <StepQzTrayInstall onRetry={handleQzRetry} />
+          )}
+          {state.step === 'qztray-pick' && (
+            <StepQzTrayPick
+              ports={state.ports}
+              onSelect={handleQzPortSelected}
+              onBack={() => setState(INITIAL)}
+            />
+          )}
+          {state.step === 'electron-pick' && (
+            <StepQzTrayPick
+              ports={state.ports.map(p => p.path)}
+              onSelect={handleElectronPortSelected}
+              onBack={() => setState(INITIAL)}
+            />
           )}
         </div>
       </DialogContent>
@@ -396,28 +498,97 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
 
 // ── Step components ───────────────────────────────────────────────────────────
 
-function StepPick({ onScan, supported }: { onScan: () => void; supported: boolean }) {
-  // Show a targeted unsupported message immediately rather than letting the
-  // user click Scan and then hit an error step.
-  if (!supported) {
+function StepPick({
+  transport,
+  onScan,
+  onQzScan,
+  onQzInstall,
+  onElectronScan,
+}: {
+  transport: 'webserial' | 'qztray' | 'electron' | 'none';
+  onScan: () => void;
+  onQzScan: () => void;
+  onQzInstall: () => void;
+  onElectronScan: () => void;
+}) {
+  // ── Electron desktop app transport ────────────────────────────────────────
+  if (transport === 'electron') {
+    return (
+      <div className="flex flex-col items-center gap-5 py-4">
+        <div className="w-16 h-16 rounded-full bg-indigo-900/40 flex items-center justify-center">
+          <List className="h-8 w-8 text-indigo-400" />
+        </div>
+        <div className="text-center space-y-1.5 px-4">
+          <p className="text-sm font-semibold text-gray-100">Scan for Device</p>
+          <p className="text-xs text-gray-400 leading-relaxed">
+            The desktop app has direct USB access. Click below to list available
+            serial ports and connect your receipt printer or label printer.
+          </p>
+        </div>
+        <Button
+          onClick={onElectronScan}
+          className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 h-10 gap-2"
+        >
+          <List className="h-4 w-4" />
+          List Serial Ports
+        </Button>
+        <p className="text-xs text-gray-600 text-center px-4">
+          Card terminals connect via IP address — configure that in Terminal Settings.
+        </p>
+      </div>
+    );
+  }
+
+  // ── QZ Tray transport ─────────────────────────────────────────────────────
+  if (transport === 'qztray') {
+    return (
+      <div className="flex flex-col items-center gap-5 py-4">
+        <div className="w-16 h-16 rounded-full bg-blue-900/40 flex items-center justify-center">
+          <List className="h-8 w-8 text-blue-400" />
+        </div>
+        <div className="text-center space-y-1.5 px-4">
+          <p className="text-sm font-semibold text-gray-100">Scan with QZ Tray</p>
+          <p className="text-xs text-gray-400 leading-relaxed">
+            QZ Tray is running on this machine. Click below to list available serial ports
+            and connect your receipt printer or label printer.
+          </p>
+        </div>
+        <Button
+          onClick={onQzScan}
+          className="bg-blue-600 hover:bg-blue-500 text-white px-6 h-10 gap-2"
+        >
+          <List className="h-4 w-4" />
+          List Serial Ports
+        </Button>
+        <p className="text-xs text-gray-600 text-center px-4">
+          QZ Tray gives Firefox, Safari, and other browsers access to USB hardware.
+        </p>
+      </div>
+    );
+  }
+
+  // ── No transport available — show unsupported message + QZ Tray option ───
+  if (transport === 'none') {
     const reason = detectUnsupportedReason();
+
+    const isIOS = reason === 'ios';
 
     const messages: Record<UnsupportedReason, { title: string; body: string }> = {
       ios: {
         title: 'USB hardware not available on iOS',
-        body: 'iPhone and iPad do not support USB serial connections from a browser. Use Chrome or Edge on a Windows/Mac/Android device to add hardware.',
+        body: 'iPhone and iPad do not support USB serial connections from a browser. Use Chrome or Edge on a Windows, Mac, or Android device to add hardware.',
       },
       firefox: {
-        title: 'Firefox doesn\'t support USB hardware',
-        body: 'Web Serial is not available in Firefox. Open this page in Chrome or Edge to connect receipt printers, card terminals, and label printers.',
+        title: 'Firefox doesn\'t support USB hardware directly',
+        body: 'Web Serial is not available in Firefox. Install QZ Tray (a free desktop app) to connect hardware from this browser — or switch to Chrome or Edge.',
       },
       safari: {
-        title: 'Safari doesn\'t support USB hardware',
-        body: 'Web Serial is not available in Safari. Open this page in Chrome or Edge to connect hardware.',
+        title: 'Safari doesn\'t support USB hardware directly',
+        body: 'Web Serial is not available in Safari. Install QZ Tray (a free desktop app) to connect hardware from this browser — or switch to Chrome or Edge.',
       },
       other: {
         title: 'USB hardware not supported in this browser',
-        body: 'Use Chrome 89+ or Edge 89+ on Windows, Mac, or Android to connect POS hardware.',
+        body: 'Install QZ Tray (a free desktop app) to add hardware support — or use Chrome 89+ or Edge 89+.',
       },
     };
 
@@ -432,10 +603,23 @@ function StepPick({ onScan, supported }: { onScan: () => void; supported: boolea
           <p className="text-sm font-semibold text-amber-300">{title}</p>
           <p className="text-xs text-gray-400 leading-relaxed">{body}</p>
         </div>
+        {/* Only show QZ Tray option on non-iOS (iOS can't run desktop apps) */}
+        {!isIOS && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-gray-600 text-gray-300 hover:bg-gray-800 gap-2"
+            onClick={onQzInstall}
+          >
+            <Download className="h-4 w-4" />
+            Set up QZ Tray
+          </Button>
+        )}
       </div>
     );
   }
 
+  // ── Web Serial transport (default) ────────────────────────────────────────
   return (
     <div className="flex flex-col items-center gap-5 py-4">
       <div className="w-16 h-16 rounded-full bg-blue-900/40 flex items-center justify-center">
@@ -475,13 +659,129 @@ function StepProbing() {
   );
 }
 
+// ── QZ Tray install / launch step ─────────────────────────────────────────────
+
+function StepQzTrayInstall({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="flex flex-col gap-4 py-2">
+      <div className="flex items-start gap-3 bg-blue-900/30 border border-blue-700/60 rounded-lg p-4">
+        <Download className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+        <div>
+          <p className="text-sm font-semibold text-blue-300">QZ Tray required</p>
+          <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+            QZ Tray is a free desktop app that lets any browser connect to USB
+            hardware. Install it once per machine, then it runs in the background.
+          </p>
+        </div>
+      </div>
+
+      <ol className="space-y-2 text-xs text-gray-400 pl-2">
+        <li className="flex gap-2">
+          <span className="text-blue-400 font-semibold flex-shrink-0">1.</span>
+          Download QZ Tray from{' '}
+          <a
+            href="https://qz.io/download/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-400 hover:text-blue-300 underline"
+          >
+            qz.io/download
+          </a>
+        </li>
+        <li className="flex gap-2">
+          <span className="text-blue-400 font-semibold flex-shrink-0">2.</span>
+          Install and launch it — a QZ icon will appear in your system tray.
+        </li>
+        <li className="flex gap-2">
+          <span className="text-blue-400 font-semibold flex-shrink-0">3.</span>
+          Click <strong className="text-gray-200">"I've started QZ Tray"</strong> below.
+        </li>
+      </ol>
+
+      <div className="flex gap-2 pt-1">
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-gray-600 text-gray-400 hover:bg-gray-800"
+          asChild
+        >
+          <a href="https://qz.io/download/" target="_blank" rel="noopener noreferrer">
+            <Download className="h-3.5 w-3.5 mr-1.5" />
+            Download QZ Tray
+          </a>
+        </Button>
+        <Button
+          className="flex-1 bg-blue-600 hover:bg-blue-500 text-white h-9"
+          onClick={onRetry}
+        >
+          I've started QZ Tray
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// ── QZ Tray port picker step ──────────────────────────────────────────────────
+
+function StepQzTrayPick({
+  ports,
+  onSelect,
+  onBack,
+}: {
+  ports: string[];
+  onSelect: (portName: string) => void;
+  onBack: () => void;
+}) {
+  return (
+    <div className="flex flex-col gap-4 py-2">
+      <div className="text-sm text-gray-300 px-1">
+        Select the port your device is connected to.
+        <span className="text-xs text-gray-500 block mt-0.5">
+          Not sure which port? Unplug the device, note which port disappears, then replug and select it.
+        </span>
+      </div>
+
+      <div className="flex flex-col gap-1.5 max-h-52 overflow-y-auto">
+        {ports.map(port => (
+          <button
+            key={port}
+            onClick={() => onSelect(port)}
+            className="flex items-center gap-3 p-3 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-gray-500 transition-colors text-left group"
+          >
+            <div className="w-8 h-8 rounded bg-gray-700 flex items-center justify-center flex-shrink-0">
+              <List className="h-4 w-4 text-gray-400 group-hover:text-blue-400 transition-colors" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-gray-100 truncate">{port}</p>
+              <p className="text-xs text-gray-500">Serial port</p>
+            </div>
+            <ChevronDown className="h-4 w-4 text-gray-500 -rotate-90 flex-shrink-0" />
+          </button>
+        ))}
+      </div>
+
+      <Button
+        variant="ghost"
+        size="sm"
+        className="text-gray-400 hover:text-white hover:bg-gray-800 self-start"
+        onClick={onBack}
+      >
+        Back
+      </Button>
+    </div>
+  );
+}
+
+// ── Recognized device step ────────────────────────────────────────────────────
+
 function StepRecognized({
-  port, device, initialType, onConfirm, onBack,
+  port, device, initialType, portTransport, onConfirm, onBack,
 }: {
   port: any;
   device: KnownDevice;
   initialType: DeviceType;
-  onConfirm: (port: any, device: KnownDevice, type: DeviceType) => void;
+  portTransport?: PortTransport;
+  onConfirm: (port: any, device: KnownDevice, type: DeviceType, portTransport?: PortTransport) => void;
   onBack: () => void;
 }) {
   const [type, setType] = useState<DeviceType>(initialType);
@@ -498,6 +798,9 @@ function StepRecognized({
           <div className="flex items-center gap-2 flex-wrap mb-1">
             <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
             <span className="text-sm font-semibold text-green-300">Device recognized</span>
+            {portTransport === 'qztray' && (
+              <span className="text-xs px-1.5 py-0.5 rounded bg-indigo-900/60 text-indigo-300">via QZ Tray</span>
+            )}
           </div>
           <p className="text-sm text-white font-medium truncate">{device.name}</p>
           <div className="mt-1.5">
@@ -506,7 +809,7 @@ function StepRecognized({
         </div>
       </div>
 
-      {/* Override type (in case auto-identification was wrong) */}
+      {/* Override type */}
       <div>
         <button
           onClick={() => setShowOverride(v => !v)}
@@ -524,7 +827,10 @@ function StepRecognized({
               <SelectContent className="bg-gray-800 border-gray-700 text-white">
                 <SelectItem value="printer">Receipt Printer + Cash Drawer</SelectItem>
                 <SelectItem value="labelPrinter">Label Printer</SelectItem>
-                <SelectItem value="terminal">Card Terminal</SelectItem>
+                {/* Card terminal uses TCP, not serial — exclude from QZ Tray / Electron paths */}
+                {portTransport !== 'qztray' && portTransport !== 'electron' && (
+                  <SelectItem value="terminal">Card Terminal</SelectItem>
+                )}
               </SelectContent>
             </Select>
             {initialType === 'labelPrinter' && type !== 'labelPrinter' && (
@@ -540,9 +846,15 @@ function StepRecognized({
         )}
       </div>
 
+      {/* Technical details — hide baud rate for QZ Tray (managed internally) */}
       <div className="text-xs text-gray-500 bg-gray-800/60 rounded p-3 space-y-0.5">
         <div>Protocol: <span className="text-gray-300">{device.protocol.toUpperCase()}</span></div>
-        <div>Baud rate: <span className="text-gray-300">{device.defaultBaudRate.toLocaleString()}</span></div>
+        {portTransport !== 'qztray' && (
+          <div>Baud rate: <span className="text-gray-300">{device.defaultBaudRate.toLocaleString()}</span></div>
+        )}
+        {portTransport === 'qztray' && (
+          <div>Transport: <span className="text-gray-300">QZ Tray serial</span></div>
+        )}
       </div>
 
       <div className="flex gap-2 pt-1">
@@ -556,7 +868,7 @@ function StepRecognized({
         </Button>
         <Button
           className="flex-1 bg-blue-600 hover:bg-blue-500 text-white h-9"
-          onClick={() => onConfirm(port, device, type)}
+          onClick={() => onConfirm(port, device, type, portTransport)}
         >
           Done — Connect Device
         </Button>
@@ -565,13 +877,16 @@ function StepRecognized({
   );
 }
 
+// ── Fallback (unknown device) step ────────────────────────────────────────────
+
 function StepFallback({
-  port, initialType, initialName, onConfirm, onBack,
+  port, initialType, initialName, portTransport, onConfirm, onBack,
 }: {
   port: any;
   initialType: DeviceType | null;
   initialName: string;
-  onConfirm: (port: any, type: DeviceType, name: string, baudRate: number) => void;
+  portTransport?: PortTransport;
+  onConfirm: (port: any, type: DeviceType, name: string, baudRate: number, portTransport?: PortTransport) => void;
   onBack: () => void;
 }) {
   const [type, setType] = useState<DeviceType>(initialType ?? 'printer');
@@ -617,11 +932,14 @@ function StepFallback({
                 <Tag className="h-4 w-4" /> Label Printer
               </span>
             </SelectItem>
-            <SelectItem value="terminal">
-              <span className="flex items-center gap-2">
-                <CreditCard className="h-4 w-4" /> Card Terminal
-              </span>
-            </SelectItem>
+            {/* Card terminal uses TCP — exclude from QZ Tray and Electron serial paths */}
+            {portTransport !== 'qztray' && portTransport !== 'electron' && (
+              <SelectItem value="terminal">
+                <span className="flex items-center gap-2">
+                  <CreditCard className="h-4 w-4" /> Card Terminal
+                </span>
+              </SelectItem>
+            )}
           </SelectContent>
         </Select>
       </div>
@@ -650,7 +968,7 @@ function StepFallback({
         </Button>
         <Button
           className="flex-1 bg-blue-600 hover:bg-blue-500 text-white h-9"
-          onClick={() => onConfirm(port, type, name.trim(), defaultBaudRate[type])}
+          onClick={() => onConfirm(port, type, name.trim(), defaultBaudRate[type], portTransport)}
         >
           Connect Device
         </Button>
@@ -658,6 +976,8 @@ function StepFallback({
     </div>
   );
 }
+
+// ── Replace-confirm step ──────────────────────────────────────────────────────
 
 function StepReplaceConfirm({
   deviceType, existingDeviceName, onConfirm, onCancel,
@@ -706,6 +1026,8 @@ function StepReplaceConfirm({
   );
 }
 
+// ── Connecting step ───────────────────────────────────────────────────────────
+
 function StepConnecting() {
   return (
     <div className="flex flex-col items-center gap-4 py-8">
@@ -714,6 +1036,8 @@ function StepConnecting() {
     </div>
   );
 }
+
+// ── Error step ────────────────────────────────────────────────────────────────
 
 function StepError({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (

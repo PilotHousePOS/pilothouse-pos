@@ -18,7 +18,7 @@ const LABEL_HEIGHT_DOTS = 203;  // 1"   at 203 dpi
 
 // ── ZPL builder ──────────────────────────────────────────────────────────────
 
-function buildZpl(data: LabelData): string {
+export function buildZpl(data: LabelData): string {
   const { name, price, barcode, storeName } = data;
 
   // Sanitise: remove ZPL control characters (^ ~)
@@ -78,3 +78,35 @@ export async function printLabel(
 // Default: 9600. Many Zebra printers default to 9600; check ^SCa on the
 // printer config label to confirm.
 export const LABEL_PRINTER_BAUD_RATE = 9600;
+
+// ── QZ Tray variant ───────────────────────────────────────────────────────────
+
+/**
+ * QZ Tray variant of printLabel.
+ *
+ * Encodes the ZPL string and sends it to the named serial port via QZ Tray
+ * in a single open → send → close sequence.
+ *
+ * @example
+ * await printLabelQz('COM3', { name: 'Coffee Mug', price: 12.99 });
+ */
+export async function printLabelQz(portName: string, data: LabelData): Promise<void> {
+  const { sendQzOneShot } = await import('./qzTray');
+  const zpl = buildZpl(data);
+  await sendQzOneShot(portName, new TextEncoder().encode(zpl), { baudRate: LABEL_PRINTER_BAUD_RATE });
+}
+
+/**
+ * Electron IPC variant of printLabel.
+ *
+ * Encodes the ZPL string and sends it to the named serial port via Electron IPC
+ * in a single open → send → close sequence.
+ *
+ * @example
+ * await printLabelElectron('COM3', { name: 'Coffee Mug', price: 12.99 });
+ */
+export async function printLabelElectron(portName: string, data: LabelData): Promise<void> {
+  const { sendElectronOneShot } = await import('./electronSerial');
+  const zpl = buildZpl(data);
+  await sendElectronOneShot(portName, new TextEncoder().encode(zpl), { baudRate: LABEL_PRINTER_BAUD_RATE });
+}

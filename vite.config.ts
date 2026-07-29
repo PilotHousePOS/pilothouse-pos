@@ -73,6 +73,8 @@ export default defineConfig({
       "jsbarcode",
       "pdfjs-dist",
       "@zxing/browser",
+      // QZ Tray (CJS module — pre-bundle so dynamic import resolves correctly)
+      "qz-tray",
       // Radix UI
       "@radix-ui/react-accordion",
       "@radix-ui/react-alert-dialog",

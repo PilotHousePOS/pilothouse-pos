@@ -67,6 +67,10 @@ function makeHw(printerStatus: DeviceState['status'] = 'disconnected'): MockHw {
     connectLabelPrinter: vi.fn(),
     disconnectDevice:    vi.fn(),
     connectWithPort,
+    connectWithQzPort:        vi.fn().mockResolvedValue(undefined),
+    connectWithElectronPort:  vi.fn().mockResolvedValue(undefined),
+    recheckTransport:         vi.fn().mockResolvedValue(undefined),
+    transport:         'webserial' as const,
   };
 }
 
@@ -79,7 +83,12 @@ function renderWizard(hw: HardwareDevices) {
 
 function mockSerialWith(port: typeof EPSON_PORT | typeof UNKNOWN_PORT) {
   Object.defineProperty(navigator, 'serial', {
-    value:        { requestPort: vi.fn().mockResolvedValue(port) },
+    value: {
+      requestPort:         vi.fn().mockResolvedValue(port),
+      getPorts:            vi.fn().mockResolvedValue([]),
+      addEventListener:    vi.fn(),
+      removeEventListener: vi.fn(),
+    },
     writable:     true,
     configurable: true,
   });

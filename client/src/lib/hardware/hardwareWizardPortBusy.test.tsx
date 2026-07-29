@@ -64,12 +64,21 @@ function makeHw(): HardwareDevices {
     connectLabelPrinter: vi.fn(),
     disconnectDevice:    vi.fn(),
     connectWithPort:     vi.fn().mockResolvedValue(undefined),
+    connectWithQzPort:        vi.fn().mockResolvedValue(undefined),
+    connectWithElectronPort:  vi.fn().mockResolvedValue(undefined),
+    recheckTransport:         vi.fn().mockResolvedValue(undefined),
+    transport:           'webserial' as const,
   };
 }
 
 function mockSerialWith(port: ReturnType<typeof makeAlreadyOpenPort> | ReturnType<typeof makeClosedUnknownPort>) {
   Object.defineProperty(navigator, 'serial', {
-    value:        { requestPort: vi.fn().mockResolvedValue(port) },
+    value: {
+      requestPort:       vi.fn().mockResolvedValue(port),
+      getPorts:          vi.fn().mockResolvedValue([]),
+      addEventListener:    vi.fn(),
+      removeEventListener: vi.fn(),
+    },
     writable:     true,
     configurable: true,
   });
