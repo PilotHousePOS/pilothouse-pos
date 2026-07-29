@@ -4,3 +4,6 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+# electron/env-constants.ts is committed with a default URL; the build script
+# overwrites it at build time with PILOTHOUSE_SERVER_URL — do not gitignore it
+# or tsc will fail on a fresh checkout.
