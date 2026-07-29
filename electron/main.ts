@@ -30,7 +30,7 @@
 // DEV
 //   npm run dev:electron            → Vite dev server + Electron side-by-side
 
-import { app, BrowserWindow, ipcMain, Menu, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent, Menu, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import path  from 'path';
 import http  from 'http';
@@ -562,7 +562,7 @@ async function createWindow(): Promise<void> {
 
   Menu.setApplicationMenu(null);
 
-  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+  mainWindow.webContents.setWindowOpenHandler(({ url }: { url: string }) => {
     const localBase = `http://localhost:${localPort}`;
     if (!url.startsWith(REMOTE_URL) && !url.startsWith(localBase)) {
       shell.openExternal(url);
@@ -646,18 +646,18 @@ const openPorts = new Map<string, SerialPort>();
 async function closePort(portPath: string, port: SerialPort): Promise<void> {
   return new Promise<void>((resolve) => {
     if (!port.isOpen) { openPorts.delete(portPath); resolve(); return; }
-    port.close((_err) => { openPorts.delete(portPath); resolve(); });
+    port.close((_err: Error | null) => { openPorts.delete(portPath); resolve(); });
   });
 }
 
 ipcMain.handle('serial:list', async () => SerialPort.list());
 
-ipcMain.handle('serial:open', async (_event, portPath: string, baudRate: number) => {
+ipcMain.handle('serial:open', async (_event: IpcMainInvokeEvent, portPath: string, baudRate: number) => {
   if (openPorts.has(portPath)) return;
 
   const port = new SerialPort({ path: portPath, baudRate, autoOpen: false });
   await new Promise<void>((resolve, reject) => {
-    port.open((err) => (err ? reject(err) : resolve()));
+    port.open((err: Error | null) => (err ? reject(err) : resolve()));
   });
 
   port.on('data', (data: Buffer) => {
@@ -670,12 +670,12 @@ ipcMain.handle('serial:open', async (_event, portPath: string, baudRate: number)
   openPorts.set(portPath, port);
 });
 
-ipcMain.handle('serial:write', async (_event, portPath: string, bytes: number[]) => {
+ipcMain.handle('serial:write', async (_event: IpcMainInvokeEvent, portPath: string, bytes: number[]) => {
   const port = openPorts.get(portPath);
   if (!port) throw new Error(`Port ${portPath} is not open`);
 
   await new Promise<void>((resolve, reject) => {
-    port.write(Buffer.from(bytes), (err) => (err ? reject(err) : resolve()));
+    port.write(Buffer.from(bytes), (err: Error | null | undefined) => (err ? reject(err) : resolve()));
   });
 
   await new Promise<void>((resolve, reject) => {
