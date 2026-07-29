@@ -138,6 +138,73 @@ describe('ConnectedDeviceCard — Reconnecting… banner', () => {
     expect(dot!.className).not.toContain('animate-pulse');
   });
 
+  it('banner reappears on second disconnect after first reconnect succeeded', () => {
+    const { rerender, container } = renderCard(makeDevice('connecting'));
+
+    // ── First connecting phase ──────────────────────────────────────────────
+    expect(screen.getByText('Reconnecting…')).toBeInTheDocument();
+    expect(container.querySelector('.animate-spin')).not.toBeNull();
+
+    // ── First reconnect succeeds ────────────────────────────────────────────
+    rerender(
+      <ConnectedDeviceCard
+        type="printer"
+        device={makeDevice('connected')}
+        onRemove={vi.fn()}
+        onTestPrint={async () => {}}
+        onOpenDrawer={async () => {}}
+      />,
+    );
+
+    expect(screen.queryByText('Reconnecting…')).not.toBeInTheDocument();
+    expect(container.querySelector('.animate-spin')).toBeNull();
+
+    // ── Second disconnect — banner must reappear ────────────────────────────
+    rerender(
+      <ConnectedDeviceCard
+        type="printer"
+        device={makeDevice('connecting')}
+        onRemove={vi.fn()}
+        onTestPrint={async () => {}}
+        onOpenDrawer={async () => {}}
+      />,
+    );
+
+    expect(screen.getByText('Reconnecting…')).toBeInTheDocument();
+    expect(container.querySelector('.animate-spin')).not.toBeNull();
+  });
+
+  it('spinner is present in both connecting phases of connect → reconnect cycle', () => {
+    const { rerender, container } = renderCard(makeDevice('connecting'));
+
+    // First connecting phase — spinner visible
+    expect(container.querySelector('.animate-spin')).not.toBeNull();
+
+    // Reconnected
+    rerender(
+      <ConnectedDeviceCard
+        type="printer"
+        device={makeDevice('connected')}
+        onRemove={vi.fn()}
+        onTestPrint={async () => {}}
+        onOpenDrawer={async () => {}}
+      />,
+    );
+    expect(container.querySelector('.animate-spin')).toBeNull();
+
+    // Second connecting phase — spinner must be back
+    rerender(
+      <ConnectedDeviceCard
+        type="printer"
+        device={makeDevice('connecting')}
+        onRemove={vi.fn()}
+        onTestPrint={async () => {}}
+        onOpenDrawer={async () => {}}
+      />,
+    );
+    expect(container.querySelector('.animate-spin')).not.toBeNull();
+  });
+
   it('works the same for terminal and labelPrinter device types', () => {
     for (const type of ['terminal', 'labelPrinter'] as const) {
       const { rerender, container, unmount } = render(
