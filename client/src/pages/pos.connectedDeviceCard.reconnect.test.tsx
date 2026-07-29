@@ -233,3 +233,64 @@ describe('ConnectedDeviceCard — Reconnecting… banner', () => {
     }
   });
 });
+
+// ── Keyboard / accessibility: Remove button reachable while banner is showing ──
+
+describe('ConnectedDeviceCard — Remove button keyboard accessibility during Reconnecting banner', () => {
+
+  it('Remove button is present in the DOM when status is "connecting"', () => {
+    renderCard(makeDevice('connecting'));
+    expect(screen.getByRole('button', { name: /remove/i })).toBeInTheDocument();
+  });
+
+  it('Remove button is visible (not hidden from assistive tech) when the banner is showing', () => {
+    renderCard(makeDevice('connecting'));
+    const removeBtn = screen.getByRole('button', { name: /remove/i });
+    expect(removeBtn).toBeVisible();
+  });
+
+  it('Remove button has a non-negative tabIndex so keyboard focus can reach it', () => {
+    renderCard(makeDevice('connecting'));
+    const removeBtn = screen.getByRole('button', { name: /remove/i });
+    // A native <button> defaults to tabIndex 0 unless explicitly set to -1.
+    // tabIndex >= 0 means it is in the natural tab order.
+    expect(removeBtn.tabIndex).toBeGreaterThanOrEqual(0);
+  });
+
+  it('Remove button does not have pointer-events disabled when the banner is showing', () => {
+    renderCard(makeDevice('connecting'));
+    const removeBtn = screen.getByRole('button', { name: /remove/i });
+    // An inline style of pointer-events:none would block both mouse and
+    // synthesised keyboard-click events.
+    expect(removeBtn.style.pointerEvents).not.toBe('none');
+  });
+
+  it('Reconnecting banner appears after the Remove button in DOM order (cannot cover it in normal flow)', () => {
+    const { container } = renderCard(makeDevice('connecting'));
+
+    const removeBtn = screen.getByRole('button', { name: /remove/i });
+    // The banner carries bg-yellow-900/30 — use attribute selector to find it
+    const banner = container.querySelector('[class*="bg-yellow-900"]');
+
+    expect(banner).not.toBeNull();
+
+    // Node.DOCUMENT_POSITION_FOLLOWING (4) means banner comes *after* removeBtn.
+    // Elements that appear later in the DOM cannot cover earlier siblings in
+    // normal (non-positioned) flow, so this guards against the banner being
+    // accidentally moved above the header row.
+    const position = removeBtn.compareDocumentPosition(banner!);
+    expect(position & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('banner element carries no inline z-index that could overlay the Remove button', () => {
+    const { container } = renderCard(makeDevice('connecting'));
+
+    const banner = container.querySelector('[class*="bg-yellow-900"]');
+    expect(banner).not.toBeNull();
+
+    // jsdom does not compute stylesheet-derived z-index values, but inline
+    // styles are always reflected. An inline z-index on the banner would be a
+    // red flag that it was positioned to float over the header row.
+    expect((banner as HTMLElement).style.zIndex).toBe('');
+  });
+});
