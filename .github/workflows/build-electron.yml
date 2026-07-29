@@ -243,6 +243,95 @@ jobs:
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
+      # ── Post-build Gatekeeper verification ───────────────────────────────────
+      # Mount each DMG produced by electron-builder, then run the same checks
+      # Gatekeeper performs on a fresh Mac:
+      #   1. codesign --verify --deep --strict  — cert chain + entitlements OK
+      #   2. xcrun stapler validate             — notarization ticket stapled
+      #   3. spctl --assess --type execute      — Gatekeeper would silently open it
+      # The job fails here rather than after distributing to staff if any check fails.
+      - name: Verify Gatekeeper acceptance of built DMGs
+        run: |
+          set -euo pipefail
+
+          # electron-builder places DMGs in dist/installers/
+          DMG_DIR="dist/installers"
+          PASS=0
+          FAIL=0
+
+          for DMG in "$DMG_DIR"/*.dmg; do
+            [ -f "$DMG" ] || { echo "No DMGs found in $DMG_DIR"; exit 1; }
+            echo ""
+            echo "══════════════════════════════════════════════════════"
+            echo "  Verifying: $(basename "$DMG")"
+            echo "══════════════════════════════════════════════════════"
+
+            # Mount the DMG (quietly, agree to any EULA automatically)
+            MOUNT_POINT=$(mktemp -d)
+            hdiutil attach "$DMG" -mountpoint "$MOUNT_POINT" -nobrowse -quiet
+
+            # Find the .app inside the mounted volume
+            APP_PATH=$(find "$MOUNT_POINT" -maxdepth 1 -name "*.app" | head -1)
+            if [ -z "$APP_PATH" ]; then
+              echo "ERROR: No .app bundle found inside $DMG" >&2
+              hdiutil detach "$MOUNT_POINT" -quiet || true
+              FAIL=$((FAIL + 1))
+              continue
+            fi
+            echo "  App bundle: $APP_PATH"
+
+            # 1. Code-signature integrity (cert chain + entitlements)
+            echo ""
+            echo "  [1/3] codesign --verify --deep --strict"
+            if codesign --verify --deep --strict --verbose=2 "$APP_PATH" 2>&1; then
+              echo "  ✓ Code-signature valid"
+            else
+              echo "  ✗ Code-signature check FAILED" >&2
+              hdiutil detach "$MOUNT_POINT" -quiet || true
+              FAIL=$((FAIL + 1))
+              continue
+            fi
+
+            # 2. Notarization ticket stapled
+            echo ""
+            echo "  [2/3] xcrun stapler validate"
+            if xcrun stapler validate "$APP_PATH" 2>&1; then
+              echo "  ✓ Notarization ticket stapled"
+            else
+              echo "  ✗ Stapler validation FAILED" >&2
+              hdiutil detach "$MOUNT_POINT" -quiet || true
+              FAIL=$((FAIL + 1))
+              continue
+            fi
+
+            # 3. Gatekeeper assessment (simulates what a fresh Mac would do)
+            echo ""
+            echo "  [3/3] spctl --assess --type execute"
+            if spctl --assess --type execute --verbose "$APP_PATH" 2>&1; then
+              echo "  ✓ Gatekeeper accepts the app"
+            else
+              echo "  ✗ Gatekeeper assessment FAILED" >&2
+              hdiutil detach "$MOUNT_POINT" -quiet || true
+              FAIL=$((FAIL + 1))
+              continue
+            fi
+
+            hdiutil detach "$MOUNT_POINT" -quiet || true
+            PASS=$((PASS + 1))
+            echo ""
+            echo "  ✓ $(basename "$DMG") passes all Gatekeeper checks"
+          done
+
+          echo ""
+          echo "══════════════════════════════════════════════════════"
+          echo "  Results: $PASS passed, $FAIL failed"
+          echo "══════════════════════════════════════════════════════"
+
+          if [ "$FAIL" -gt 0 ]; then
+            echo "ERROR: $FAIL DMG(s) failed Gatekeeper verification." >&2
+            exit 1
+          fi
+
       # Delete the temporary keychain to keep the runner clean
       - name: Clean up keychain
         if: always()
