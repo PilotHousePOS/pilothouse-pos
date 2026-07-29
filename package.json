@@ -13,7 +13,7 @@
     "pretest": "tsx server/scripts/apply-missing-columns.ts",
     "test": "vitest run",
     "build:electron:main": "node scripts/write-electron-env.js && node node_modules/typescript/bin/tsc -p electron/tsconfig.json --noCheck",
-    "build:electron:frontend": "node node_modules/vite/bin/vite.js build",
+    "build:electron:frontend": "node node_modules/vite/bin/vite.js build --config vite.electron.config.ts",
     "build:electron": "npm run build:electron:frontend && npm run build:electron:main && electron-builder",
     "dev:electron": "concurrently -k \"npm run dev\" \"wait-on http://localhost:5000 && electron .\""
   },
