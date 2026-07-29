@@ -20,5 +20,24 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      // qz-tray is loaded via dynamic import at runtime — Rollup can't bundle
+      // it because the package uses a CJS module format that differs between
+      // browser and Node. Leave it as an external so Electron resolves it from
+      // node_modules at launch.
+      external: ["qz-tray"],
+    },
+  },
+  optimizeDeps: {
+    include: [
+      "react", "react-dom", "react-dom/client",
+      "wouter", "@tanstack/react-query",
+      "clsx", "tailwind-merge", "class-variance-authority",
+      "lucide-react", "recharts",
+      "zod", "react-hook-form", "@hookform/resolvers/zod",
+      "react-day-picker", "date-fns",
+    ],
+    // qz-tray is CJS and loaded dynamically at runtime — exclude from pre-bundling.
+    exclude: ["qz-tray"],
   },
 });
