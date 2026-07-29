@@ -4,6 +4,7 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "lib": ["ES2020"],
+    "baseUrl": "..",
     "outDir": "../dist/electron",
     "rootDir": ".",
     "strict": true,
@@ -12,9 +13,9 @@
     "resolveJsonModule": true,
     "types": ["node"],
     "paths": {
-      "electron": ["../node_modules/electron/electron.d.ts"],
-      "electron-updater": ["../node_modules/electron-updater/out/main.d.ts"],
-      "serialport": ["../node_modules/serialport/dist/index.d.ts"]
+      "electron":         ["node_modules/electron/electron.d.ts"],
+      "electron-updater": ["node_modules/electron-updater/out/main.d.ts"],
+      "serialport":       ["node_modules/serialport/dist/index.d.ts"]
     }
   },
   "include": ["*.ts"],
