@@ -120,3 +120,9 @@ id = "x4XNhLG-p0cYfX7os5OUH"
 uri = "file://pilothouse-desktop-runnable.zip"
 type = "unspecified"
 title = "PilotHouse POS — Desktop App (Runnable)"
+
+[[outputs]]
+id = "KWekS_rvNNqnX_N2uIIzr"
+uri = "file://pilothouse-pos-windows.zip"
+type = "unspecified"
+title = "PilotHouse POS — Windows (Portable)"
