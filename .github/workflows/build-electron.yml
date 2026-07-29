@@ -50,11 +50,11 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Pin npm to v10 (avoids npm 12 exit-handler crash on Node 24 runners)
-        run: npm install -g npm@10
-
       - name: Install dependencies
-        run: npm ci
+        # --ignore-scripts skips native-addon compilation (serialport crashes npm
+        # on the Node 24 runner); electron-builder rebuilds native modules for the
+        # correct Electron ABI at package time via nativeRebuilder: sequential.
+        run: npm ci --ignore-scripts
 
       - name: Compile Electron main process (TypeScript → JS)
         run: npm run build:electron:main
@@ -108,11 +108,11 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Pin npm to v10 (avoids npm 12 exit-handler crash on Node 24 runners)
-        run: npm install -g npm@10
-
       - name: Install dependencies
-        run: npm ci
+        # --ignore-scripts skips native-addon compilation (serialport crashes npm
+        # on the Node 24 runner); electron-builder rebuilds native modules for the
+        # correct Electron ABI at package time via nativeRebuilder: sequential.
+        run: npm ci --ignore-scripts
 
       # ── Pre-build certificate guard ──────────────────────────────────────────
       # Fail fast if the signing certificate is missing or within 30 days of
