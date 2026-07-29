@@ -37,6 +37,7 @@ import http  from 'http';
 import https from 'https';
 import fs    from 'fs';
 import net   from 'net';
+import tls   from 'tls';
 import { SerialPort } from 'serialport';
 import {
   cacheResponse,
@@ -350,6 +351,83 @@ async function startLocalServer(): Promise<number> {
     }
 
     serveStatic(filePath, res);
+  });
+
+  // ── WebSocket upgrade proxy ───────────────────────────────────────────────
+  //
+  // The HTTP request handler above only processes regular HTTP traffic.
+  // WebSocket connections arrive as an HTTP Upgrade request, which Node's
+  // http.Server emits via the 'upgrade' event — it is never passed to the
+  // normal request handler.  Without this listener the upgrade request is
+  // silently dropped, breaking:
+  //   • /ws  — admin-notifications.tsx real-time push (orders, appointments,
+  //             new-account alerts)
+  //
+  // For each upgrade request destined for a proxied path we open a raw TCP
+  // (or TLS) socket to the remote server, replay the exact HTTP Upgrade
+  // headers, then pipe the two sockets together.  The browser's WebSocket
+  // never knows it's going through a local relay.
+  //
+  // QZ Tray (receipt printer) connects directly to its own local Java app on
+  // localhost:8181/8282 and does NOT go through this proxy — no change needed.
+
+  server.on('upgrade', (req: http.IncomingMessage, socket: net.Socket, head: Buffer) => {
+    const rawUrl  = req.url || '/';
+    // Strip query string for path-prefix matching (e.g. /ws?token=xxx → /ws)
+    const urlPath = rawUrl.split('?')[0];
+
+    // Tunnel upgrades for:
+    //   • /ws   — admin-notifications real-time push (orders, appointments, new accounts)
+    //   • any other proxied HTTP path that might also accept WS upgrades
+    const shouldTunnel =
+      urlPath === '/ws' ||
+      urlPath.startsWith('/ws/') ||
+      shouldProxy(rawUrl);
+
+    if (!shouldTunnel) {
+      socket.end('HTTP/1.1 404 Not Found\r\n\r\n');
+      return;
+    }
+
+    const target     = new URL(REMOTE_URL);
+    const isHttps    = target.protocol === 'https:';
+    const remotePort = isHttps ? 443 : (Number(target.port) || 80);
+
+    // Callback invoked once the upstream TCP/TLS connection is established.
+    const onUpstreamConnect = (upstream: net.Socket) => {
+      // Rebuild the HTTP Upgrade request for the remote host.
+      const headerLines: string[] = [
+        `${req.method ?? 'GET'} ${rawUrl} HTTP/1.1`,
+        `host: ${target.hostname}`,
+      ];
+      for (const [k, v] of Object.entries(req.headers)) {
+        if (k.toLowerCase() === 'host') continue;
+        headerLines.push(`${k}: ${Array.isArray(v) ? v.join(', ') : v}`);
+      }
+      headerLines.push('', '');                     // blank line terminates headers
+      upstream.write(headerLines.join('\r\n'));
+      if (head && head.length > 0) upstream.write(head);
+
+      // Bidirectional pipe: browser ↔ remote server.
+      upstream.pipe(socket);
+      socket.pipe(upstream);
+    };
+
+    let upstream: net.Socket;
+    if (isHttps) {
+      upstream = tls.connect(
+        { host: target.hostname, port: remotePort, servername: target.hostname },
+        () => onUpstreamConnect(upstream),
+      );
+    } else {
+      upstream = net.connect(
+        { host: target.hostname, port: remotePort },
+        () => onUpstreamConnect(upstream),
+      );
+    }
+
+    upstream.on('error', () => { try { socket.destroy(); } catch { /* ignore */ } });
+    socket.on('error',   () => { try { upstream.destroy(); } catch { /* ignore */ } });
   });
 
   await new Promise<void>((resolve, reject) => {
