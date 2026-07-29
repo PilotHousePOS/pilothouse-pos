@@ -655,19 +655,22 @@ ipcMain.handle('serial:list', async () => SerialPort.list());
 ipcMain.handle('serial:open', async (_event, portPath: string, baudRate: number) => {
   if (openPorts.has(portPath)) return;
 
-  const port = openPorts.get(portPath);
-  if (!port) throw new Error(`Port ${portPath} is not open`);
-
+  const port = new SerialPort({ path: portPath, baudRate, autoOpen: false });
   await new Promise<void>((resolve, reject) => {
-    port.write(Buffer.from(bytes), (err) => (err ? reject(err) : resolve()));
+    port.open((err) => (err ? reject(err) : resolve()));
   });
 
-  await new Promise<void>((resolve, reject) => {
-    port.drain((err) => (err ? reject(err) : resolve()));
+  port.on('data', (data: Buffer) => {
+    mainWindow?.webContents.send('serial:data', portPath, Array.from(data));
   });
+  port.on('error', (err: Error) => {
+    mainWindow?.webContents.send('serial:error', portPath, err.message);
+  });
+
+  openPorts.set(portPath, port);
 });
 
-ipcMain.handle('serial:close', async (_event, portPath: string) => {
+ipcMain.handle('serial:write', async (_event, portPath: string, bytes: number[]) => {
   const port = openPorts.get(portPath);
   if (!port) throw new Error(`Port ${portPath} is not open`);
 
