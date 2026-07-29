@@ -85,7 +85,7 @@ jobs:
           Write-Host "✓ SERVER_URL verified in dist/electron/env-constants.js: $url"
 
       - name: Package and publish Windows installer
-        run: npx electron-builder --win --publish always
+        run: node node_modules/electron-builder/cli.js --win --publish always
         env:
           PILOTHOUSE_SERVER_URL: ${{ secrets.PILOTHOUSE_SERVER_URL }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -236,7 +236,7 @@ jobs:
           echo "✓ SERVER_URL verified in dist/electron/env-constants.js: $URL"
 
       - name: Package, sign, notarize, and publish macOS DMG
-        run: npx electron-builder --mac --publish always
+        run: node node_modules/electron-builder/cli.js --mac --publish always
         env:
           PILOTHOUSE_SERVER_URL: ${{ secrets.PILOTHOUSE_SERVER_URL }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
