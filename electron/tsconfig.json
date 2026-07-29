@@ -10,7 +10,12 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "electron": ["../node_modules/electron/electron.d.ts"],
+      "electron-updater": ["../node_modules/electron-updater/out/main.d.ts"],
+      "serialport": ["../node_modules/serialport/dist/index.d.ts"]
+    }
   },
   "include": ["*.ts"],
   "exclude": ["node_modules", "*.test.ts", "*.spec.ts"]

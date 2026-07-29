@@ -110,7 +110,7 @@ const electronAPI = {
    * `syncedCount` is how many mutations were successfully sent.
    */
   onMutationsSynced(callback: (syncedCount: number) => void): () => void {
-    const listener = (_: Electron.IpcRendererEvent, count: number) => callback(count);
+    const listener = (_: IpcRendererEvent, count: number) => callback(count);
     ipcRenderer.on('store:mutations-synced', listener);
     return () => ipcRenderer.removeListener('store:mutations-synced', listener);
   },
