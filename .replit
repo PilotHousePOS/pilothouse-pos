@@ -46,6 +46,9 @@ VAPID_PUBLIC_KEY = "BKD3C8rqqUQKdtFhZDiIyoGZ2-q9gfv5tZ4TyckWF3rSIjdZ9W7gSzwRSThO
 VAPID_PRIVATE_KEY = "G2E9rThV1O1P3XYQQ0ogb-EzMrHHm7mK0zn5fpukZQ8"
 VAPID_SUBJECT = "mailto:theanimalhouse@comcast.net"
 
+[userenv.production]
+NODE_ENV = "production"
+
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 120000

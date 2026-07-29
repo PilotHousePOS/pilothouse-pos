@@ -115,6 +115,16 @@ All limiters use `express-rate-limit` with in-memory store (per-process):
 
 ---
 
+## Production deployment & domain
+
+- **Production URL (current):** `https://pet-pal-tracker-1.replit.app`
+- **Intended custom domain:** `pilothousepos.com` (not yet purchased — configure via Replit Deployments → Custom Domain once purchased; DNS A/CNAME points to Replit)
+- **GitHub repo:** `https://github.com/PilotHousePOS/pilothouse` (private)
+- **Installer build:** GitHub Actions on tag push; set `WINDOWS_DOWNLOAD_URL` + `MAC_DOWNLOAD_URL` Replit Secrets to GitHub Release asset URLs once first build completes
+- **Why:** Replit hosts the server (autoscale), GitHub Actions builds the Electron installers, download page at `/download` gates installs behind active subscription
+
+---
+
 ## Public route allowlist
 
 Routes that must work without a tenant slug go in `UNAUTHENTICATED_NO_SLUG_ALLOWLIST` in `server/tenantMiddleware.ts`:
