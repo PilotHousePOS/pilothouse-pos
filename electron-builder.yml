@@ -29,6 +29,8 @@ directories:
 files:
   # Compiled main process and preload
   - dist/electron/**/*
+  # Bundled React frontend — served locally so the app loads without internet
+  - dist/public/**/*
   # Required for electron-updater and serialport
   - package.json
   - node_modules/electron-updater/**/*
