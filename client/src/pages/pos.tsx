@@ -14,7 +14,7 @@ import {
   Printer, Tag, AlertCircle, Loader2, Zap, Save, Wifi,
 } from "lucide-react";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
-import { OfflineBanner } from "@/components/offline-banner";
+// OfflineBanner is now rendered globally in App.tsx
 import {
   queueOfflineSale, getPendingOfflineSales, removeOfflineSale,
 } from "@/lib/offline-db";
@@ -1355,7 +1355,7 @@ export default function PosPage() {
 
   return (
     <div className="h-screen bg-gray-900 text-white flex flex-col overflow-hidden select-none">
-      <OfflineBanner />
+      {/* OfflineBanner is rendered globally in App.tsx */}
 
       {/* ── Top bar ── */}
       <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 flex items-center justify-between flex-shrink-0">

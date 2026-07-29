@@ -97,7 +97,7 @@ describe('useHardwareDevices — Electron transport detection', () => {
 
   it('reports transport = "electron" when window.electronAPI is present', async () => {
     const { isElectronAvailable } = await import('@/lib/hardware/electronSerial');
-    expect((isElectronAvailable as ReturnType<typeof vi.fn>)()).toBe(true);
+    expect((isElectronAvailable as any)()).toBe(true);
   });
 
   it('isElectronAvailable returns false when window.electronAPI is absent', async () => {
@@ -195,7 +195,7 @@ describe('Hardware wizard — Electron flow', () => {
     // Since HardwareWizard uses internal components, we test via the transport
     // routing logic: isElectronAvailable() returns true → transport = 'electron'.
     const { isElectronAvailable } = await import('@/lib/hardware/electronSerial');
-    expect((isElectronAvailable as ReturnType<typeof vi.fn>)()).toBe(true);
+    expect((isElectronAvailable as any)()).toBe(true);
     // In the real wizard, this would cause StepPick to render the Electron branch
     // with "List Serial Ports" button. Verified via integration tests.
   });

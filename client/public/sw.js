@@ -1,6 +1,6 @@
-const CACHE_NAME       = 'pilothouse-v1';   // bumped — new offline strategy
+const CACHE_NAME       = 'pilothouse-v2';   // bumped — full offline API caching
 const IMAGE_CACHE_NAME = 'pilothouse-images-v1';
-const API_CACHE_NAME   = 'pilothouse-api-v1';
+const API_CACHE_NAME   = 'pilothouse-api-v2';
 
 // App shell resources cached at install time so the UI loads even when offline
 const OFFLINE_CACHE = [
@@ -10,15 +10,12 @@ const OFFLINE_CACHE = [
   '/icons/icon-512x512.png'
 ];
 
-// API GET routes whose responses are cached with stale-while-revalidate so
-// the POS can serve products, the employee roster, and settings while offline.
-const API_CACHE_ROUTES = [
-  '/api/pos/layout',
-  '/api/settings/tax-rate',
-  '/api/admin/pos-override-config',
-  '/api/employee/roster',
-  '/api/admin/categories',
-  '/api/tenants/current',
+// API GET routes that should NEVER be cached (real-time / sensitive)
+// Everything else uses stale-while-revalidate for full offline coverage.
+const API_NO_CACHE = [
+  '/api/stripe/',           // payment intents, setup intents — always live
+  '/api/auth/verify-email', // one-time tokens
+  '/api/auth/reset-password',
 ];
 
 self.addEventListener('install', function(event) {
@@ -83,12 +80,16 @@ self.addEventListener('fetch', function(event) {
     return;
   }
 
-  // ── POS-critical API routes: stale-while-revalidate ──────────────────────
+  // ── All API GET calls: stale-while-revalidate ────────────────────────────
   // Serve the cached response immediately (fast), then refresh in background.
-  // If completely offline, the cached response is all that's available —
-  // which is enough to browse products, see the roster, and check tax rates.
-  if (url.pathname.startsWith('/api/') &&
-      API_CACHE_ROUTES.some(function(r) { return url.pathname === r || url.pathname.startsWith(r + '?'); })) {
+  // This makes every data-browsing page (inventory, appointments, customers,
+  // orders, employees, settings) work offline after the first online visit.
+  // Real-time / payment routes are excluded via API_NO_CACHE above.
+  if (url.pathname.startsWith('/api/')) {
+    // Skip caching for real-time or sensitive endpoints
+    var isExcluded = API_NO_CACHE.some(function(r) { return url.pathname.startsWith(r); });
+    if (isExcluded) return;
+
     event.respondWith(
       caches.open(API_CACHE_NAME).then(function(cache) {
         return cache.match(event.request).then(function(cached) {
@@ -97,19 +98,23 @@ self.addEventListener('fetch', function(event) {
             return response;
           }).catch(function() { return null; });
 
-          // Serve cached immediately; network refresh happens in background
-          return cached || networkFetch || new Response(JSON.stringify([]), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' }
+          if (cached) {
+            // Serve cache immediately; refresh in background (stale-while-revalidate)
+            networkFetch.catch(function() {});
+            return cached;
+          }
+          // No cache yet — wait for network, fall back to empty JSON array
+          return networkFetch.then(function(r) {
+            return r || new Response(JSON.stringify([]), {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' }
+            });
           });
         });
       })
     );
     return;
   }
-
-  // ── All other API calls: pass through (no caching) ───────────────────────
-  if (url.pathname.startsWith('/api/')) return;
 
   // ── Product/pet images: cache-first with background refresh ─────────────
   if (url.pathname.startsWith('/public-objects/')) {

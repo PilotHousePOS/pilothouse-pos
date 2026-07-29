@@ -214,12 +214,28 @@ export const queryClient = new QueryClient({
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),
       refetchInterval: false,
-      refetchOnWindowFocus: import.meta.env.PROD,   // off in dev — saves dozens of requests on every tab switch
-      staleTime: import.meta.env.DEV ? 5 * 60_000 : 30_000,  // 5 min in dev, 30 s in prod
-      retry: 1,
+      refetchOnWindowFocus: import.meta.env.PROD,
+      // Keep data fresh for 8 hours in production so cached pages remain
+      // usable throughout a full business day without constant re-fetching.
+      staleTime: import.meta.env.DEV ? 5 * 60_000 : 8 * 60 * 60_000,
+      // Serve stale in-memory data when the network is unavailable instead
+      // of throwing an error.  The service worker provides the persistent
+      // layer (Cache API) so data also survives page refreshes while offline.
+      networkMode: 'offlineFirst',
+      // Don't retry on network failure — the service worker already serves
+      // cached data; a retry would just add latency before the cached
+      // response arrives.
+      retry: (failureCount, error: any) => {
+        // Retry once for server errors (5xx); never retry for network errors
+        // (TypeError: Failed to fetch) or auth errors (4xx).
+        if (error?.message?.includes('Failed to fetch')) return false;
+        if (error?.status >= 400 && error?.status < 500) return false;
+        return failureCount < 1;
+      },
     },
     mutations: {
       retry: false,
+      networkMode: 'offlineFirst',
     },
   },
 });

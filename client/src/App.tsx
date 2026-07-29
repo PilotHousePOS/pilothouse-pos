@@ -10,6 +10,7 @@ import BackToTop from "@/components/back-to-top";
 import TrialBanner from "@/components/trial-banner";
 import Paywall from "@/components/paywall";
 import { ServerUnreachableBanner } from "@/components/server-unreachable-banner";
+import { OfflineBanner } from "@/components/offline-banner";
 
 // Seed the tenant slug from ?tenant= as early as possible so that public-page
 // API calls (store front, apply, product pages) always include X-Tenant-Slug
@@ -275,6 +276,8 @@ function Router() {
       <TenantSlugSync />
       {/* Trial countdown banner — only shown when authenticated and in trial */}
       {isAuthenticated && <TrialBanner />}
+      {/* Offline banner — shown on every page when the device loses internet */}
+      <OfflineBanner />
       {/* Server-unreachable banner — only shown in the Electron desktop app */}
       <ServerUnreachableBanner />
 
