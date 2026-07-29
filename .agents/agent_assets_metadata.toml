@@ -84,3 +84,21 @@ id = "wZuE0nMzAO4UTrze5KO07"
 uri = "file://attached_assets/InProd_ZeroStock_POS_072026.csv"
 type = "table"
 title = "Production Items at 0 Stock in POS — 072026"
+
+[[outputs]]
+id = "uP4CbPQdusQZW7xaTOGFq"
+uri = "file://attached_assets/hw-export/deviceDatabase.ts"
+type = "unspecified"
+title = "deviceDatabase.ts — place at client/src/lib/hardware/"
+
+[[outputs]]
+id = "bNnDvYoN3KMl6TR8BL0lp"
+uri = "file://attached_assets/hw-export/useHardwareDevices.ts"
+type = "unspecified"
+title = "useHardwareDevices.ts — place at client/src/hooks/"
+
+[[outputs]]
+id = "dEDQuslqgbXbTiepo4rqG"
+uri = "file://attached_assets/hw-export/HardwareWizard.tsx"
+type = "unspecified"
+title = "HardwareWizard.tsx — place at client/src/components/pos/"

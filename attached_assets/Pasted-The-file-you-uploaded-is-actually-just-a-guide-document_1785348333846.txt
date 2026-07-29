@@ -1,0 +1,24 @@
+The file you uploaded is actually just a guide document — the actual TypeScript code files weren't included. It references copying content from a "PilotHouse" project but never shows that content. Before anything can be built, let me also look at what's already in place for hardware in this POS.
+
+
+5 actions
+Here's a thorough breakdown of every issue I found:
+
+1. The actual code was never included The uploaded file is a guide document, not code. It says "copy the full content from this project at that exact path" referring to a separate "PilotHouse" project, but none of the three TypeScript files (deviceDatabase.ts, HardwareWizard.tsx, useHardwareDevices.ts) are actually in the document. There's nothing to implement without the real source.
+
+2. iOS/WKWebView kills Web Serial entirely The POS app runs inside a WKWebView wrapper on iOS (per the store's App Store app). The Web Serial API is completely unavailable in WKWebView, Safari, and Firefox — it's Chrome/Edge desktop-only. If any staff use the POS from the iPad or iPhone app, zero hardware will connect. The guide does mention graceful fallback for unsupported browsers, but "gracefully showing an error" on a device that's supposed to run the register isn't a real solution.
+
+3. The Dejavoo terminal doesn't speak raw serial The Dejavoo (Electronic Payments) terminal is a networked payment device. It communicates via TCP/IP or Electronic Payments' own EPX API — not over a USB-serial port. Web Serial would only reach it if there's a USB cable AND a serial-mode bridge configured on the terminal, which is not how Dejavoo is set up out of the box. The payment flow to that terminal needs to go through EP's SDK or the terminal's network address, not a browser serial port picker.
+
+4. Baud rates are all wrong defaults The guide instructs you to set every device type — terminal, printer, label printer — to 9600. That's wrong for most modern hardware:
+
+Receipt printers (ESC/POS, like Epson TM series) typically run at 38400 or 115200
+Label printers (Zebra ZPL) typically run at 9600 ✓ — but this one is correct by accident
+The Dejavoo terminal doesn't use baud rate at all (it's network-based, as above)
+Connecting at the wrong baud rate produces garbled output or no response.
+
+5. QZ Tray conflict Per the existing setup notes, the receipt printer and cash drawer are pending a QZ Tray install. QZ Tray is a separate local middleware specifically built to handle receipt printers, cash drawers, label printers, and serial ports from a browser — and it works on Chrome, Firefox, and Safari. This guide proposes Web Serial instead, which is an entirely different and more limited approach. Choosing one forecloses the other; they shouldn't both be wired in.
+
+6. Cash drawer not addressed Cash drawers are almost always triggered by a kick pulse sent through the receipt printer port (a specific ESC/POS byte sequence), not as their own serial device. The guide lists terminal, printer, and labelPrinter device types but no cash drawer type — meaning the cash drawer open command has to be handled separately through the printer channel, which isn't shown anywhere.
+
+Bottom line: Even if the actual code files were provided, the approach has a fundamental mismatch with the Dejavoo terminal (which needs a network/API integration, not serial), will silently break on iOS, and conflicts with the QZ Tray path that was already planned for the printer and cash drawer. Before writing any code, the right question to settle is: will staff run the POS on a desktop Chrome browser, or on the iOS app? That answer determines whether Web Serial is viable at all, and whether QZ Tray or a network-based Dejavoo integration is the right next step.
