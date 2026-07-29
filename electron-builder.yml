@@ -50,13 +50,13 @@ extraMetadata:
 #   PILOTHOUSE_SERVER_URL: https://your-domain.com
 
 # ── Auto-update — GitHub Releases ────────────────────────────────────────────
-# Create a GitHub release with the installer files; electron-updater will
-# pick up new versions automatically on app launch.
-# Uncomment and fill in your owner/repo before distributing:
-# publish:
-#   - provider: github
-#     owner: your-github-org
-#     repo:  pilothouse-pos
+# electron-updater checks this provider on launch and prompts staff to update
+# whenever a newer release tag exists on GitHub.
+# owner/repo are auto-detected from GITHUB_REPOSITORY in CI; set them
+# explicitly here if you build locally with `GH_TOKEN` configured.
+publish:
+  - provider: github
+    releaseType: release
 
 # ── macOS DMG ─────────────────────────────────────────────────────────────────
 mac:
