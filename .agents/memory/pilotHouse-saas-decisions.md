@@ -94,6 +94,27 @@ All limiters use `express-rate-limit` with in-memory store (per-process):
 
 ---
 
+## Electron desktop app — local-first architecture
+
+**Rule:** The packaged Electron app runs a local HTTP server (`http://localhost:{random port}`) that serves the bundled React frontend from `dist/public/` and proxies `/api/*` to the remote server. Zero internet required to start.
+
+**Local store** (`electron/local-store.ts`) — plain JSON files in `app.getPath('userData')`:
+- `pilothouse-cache/{sha256 of path}.json` — cached GET API responses
+- `pilothouse-mutations.json` — ordered queue of failed POST/PUT/PATCH mutations
+
+**Offline behaviour:**
+- GET request fails → serve from local cache (or 503 if no cache)
+- Mutation fails → queue to local store, return 202 with `{ queued: true }`, push `store:mutation-queued` IPC event
+- Background health-check every 15s; on down→up transition → drain mutation queue in FIFO order, push `store:mutations-synced` IPC
+
+**Excluded from mutation queue:** `/api/stripe/*`, `/api/auth/*`, `/api/pos/offline-sync`
+
+**IPC channels added:** `store:pending-mutation-count` (invoke), `store:mutation-queued` (push), `store:mutations-synced` (push)
+
+**Why:** Mirrors Exatouch thick-client model — app and data live locally, internet only for card payments and initial data sync. `dist/public/**/*` must be in `electron-builder.yml` files list for the bundle to include the frontend.
+
+---
+
 ## Public route allowlist
 
 Routes that must work without a tenant slug go in `UNAUTHENTICATED_NO_SLUG_ALLOWLIST` in `server/tenantMiddleware.ts`:
