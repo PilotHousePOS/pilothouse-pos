@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/select';
 import {
   Printer, Tag, CreditCard, CheckCircle2, AlertCircle,
-  Loader2, Search, ChevronDown, AlertTriangle,
+  Loader2, Search, ChevronDown, AlertTriangle, SmartphoneNfc,
 } from 'lucide-react';
 import {
   lookupDevice, probeDevice,
@@ -47,6 +47,34 @@ type WizardStep =
   | { step: 'error'; message: string; busyPort?: any };
 
 const INITIAL: WizardStep = { step: 'pick' };
+
+// ── Browser support detection ─────────────────────────────────────────────────
+// Web Serial is Chrome 89+, Edge 89+, Android Chrome 89+.
+// It is NOT supported on: iOS Safari, iOS Chrome (WKWebView), Firefox (any OS),
+// desktop Safari, or any other browser engine.
+//
+// We detect the specific situation so we can give targeted advice rather than
+// a generic "not supported" message.
+
+type UnsupportedReason = 'ios' | 'firefox' | 'safari' | 'other';
+
+function detectUnsupportedReason(): UnsupportedReason | null {
+  if (typeof navigator === 'undefined') return 'other';
+  if ('serial' in navigator) return null; // supported — no message needed
+
+  const ua = navigator.userAgent;
+  const isIOS = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (isIOS) return 'ios';
+
+  const isFirefox = /firefox\//i.test(ua);
+  if (isFirefox) return 'firefox';
+
+  // Desktop Safari: has "Safari" but no "Chrome"
+  const isSafari = /safari\//i.test(ua) && !/chrome\//i.test(ua);
+  if (isSafari) return 'safari';
+
+  return 'other';
+}
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -328,7 +356,7 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
         </DialogHeader>
 
         <div className="pt-2">
-          {state.step === 'pick'      && <StepPick onScan={handleScan} />}
+          {state.step === 'pick'      && <StepPick onScan={handleScan} supported={hw.hardwareSupported} />}
           {state.step === 'probing'   && <StepProbing />}
           {state.step === 'recognized' && (
             <StepRecognized
@@ -368,7 +396,46 @@ export function HardwareWizard({ open, onClose, hw, onSuccess }: HardwareWizardP
 
 // ── Step components ───────────────────────────────────────────────────────────
 
-function StepPick({ onScan }: { onScan: () => void }) {
+function StepPick({ onScan, supported }: { onScan: () => void; supported: boolean }) {
+  // Show a targeted unsupported message immediately rather than letting the
+  // user click Scan and then hit an error step.
+  if (!supported) {
+    const reason = detectUnsupportedReason();
+
+    const messages: Record<UnsupportedReason, { title: string; body: string }> = {
+      ios: {
+        title: 'USB hardware not available on iOS',
+        body: 'iPhone and iPad do not support USB serial connections from a browser. Use Chrome or Edge on a Windows/Mac/Android device to add hardware.',
+      },
+      firefox: {
+        title: 'Firefox doesn\'t support USB hardware',
+        body: 'Web Serial is not available in Firefox. Open this page in Chrome or Edge to connect receipt printers, card terminals, and label printers.',
+      },
+      safari: {
+        title: 'Safari doesn\'t support USB hardware',
+        body: 'Web Serial is not available in Safari. Open this page in Chrome or Edge to connect hardware.',
+      },
+      other: {
+        title: 'USB hardware not supported in this browser',
+        body: 'Use Chrome 89+ or Edge 89+ on Windows, Mac, or Android to connect POS hardware.',
+      },
+    };
+
+    const { title, body } = messages[reason ?? 'other'];
+
+    return (
+      <div className="flex flex-col items-center gap-4 py-4">
+        <div className="w-14 h-14 rounded-full bg-amber-900/40 flex items-center justify-center">
+          <SmartphoneNfc className="h-7 w-7 text-amber-400" />
+        </div>
+        <div className="text-center space-y-1.5 px-4">
+          <p className="text-sm font-semibold text-amber-300">{title}</p>
+          <p className="text-xs text-gray-400 leading-relaxed">{body}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center gap-5 py-4">
       <div className="w-16 h-16 rounded-full bg-blue-900/40 flex items-center justify-center">
