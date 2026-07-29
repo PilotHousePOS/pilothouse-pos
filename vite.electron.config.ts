@@ -22,6 +22,12 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      // qz-tray is a CJS-only module loaded via dynamic import at runtime.
+      // Rollup cannot bundle it in production; Electron resolves it from
+      // node_modules when the dynamic import fires at launch.
+      external: ["qz-tray"],
+    },
   },
   optimizeDeps: {
     include: [
