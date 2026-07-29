@@ -6,7 +6,7 @@
 // The interface this exposes must match the ElectronAPI type in
 // client/src/electron.d.ts.
 
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 const electronAPI = {
   // ── Serial port operations ───────────────────────────────────────────────
@@ -43,7 +43,7 @@ const electronAPI = {
    * Returns an unsubscribe function — call it to stop listening.
    */
   onPortData(callback: (portPath: string, data: number[]) => void): () => void {
-    const listener = (_event: Electron.IpcRendererEvent, portPath: string, data: number[]) => {
+    const listener = (_event: IpcRendererEvent, portPath: string, data: number[]) => {
       callback(portPath, data);
     };
     ipcRenderer.on('serial:data', listener);
@@ -75,7 +75,7 @@ const electronAPI = {
 
   /** Register a callback for update-check failures (missing token, private release, etc.). */
   onUpdateError(callback: (message: string) => void): () => void {
-    const listener = (_event: Electron.IpcRendererEvent, message: string) => callback(message);
+    const listener = (_event: IpcRendererEvent, message: string) => callback(message);
     ipcRenderer.on('app:update-error', listener);
     return () => ipcRenderer.removeListener('app:update-error', listener);
   },
@@ -100,7 +100,7 @@ const electronAPI = {
    * `pendingCount` is the total queue length after the addition.
    */
   onMutationQueued(callback: (pendingCount: number) => void): () => void {
-    const listener = (_: Electron.IpcRendererEvent, count: number) => callback(count);
+    const listener = (_: IpcRendererEvent, count: number) => callback(count);
     ipcRenderer.on('store:mutation-queued', listener);
     return () => ipcRenderer.removeListener('store:mutation-queued', listener);
   },

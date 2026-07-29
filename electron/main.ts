@@ -679,11 +679,11 @@ ipcMain.handle('serial:write', async (_event: IpcMainInvokeEvent, portPath: stri
   });
 
   await new Promise<void>((resolve, reject) => {
-    port.drain((err) => (err ? reject(err) : resolve()));
+    port.drain((err: Error | null) => (err ? reject(err) : resolve()));
   });
 });
 
-ipcMain.handle('serial:close', async (_event, portPath: string) => {
+ipcMain.handle('serial:close', async (_event: IpcMainInvokeEvent, portPath: string) => {
   const port = openPorts.get(portPath);
   if (!port) return;
   await closePort(portPath, port);
