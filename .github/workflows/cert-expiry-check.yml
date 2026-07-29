@@ -1,0 +1,101 @@
+# ─── PilotHouse POS — Apple Certificate Expiry Monitor ───────────────────────
+#
+# Runs on the 1st of every month and warns the team when the Developer ID
+# Application certificate is within 30 days of expiry.
+#
+# The check mirrors the pre-build guard in build-electron.yml so the team
+# receives advance notice rather than discovering the problem mid-release.
+#
+# Required GitHub Actions secrets (same as the build workflow):
+#   APPLE_CERTIFICATE            — base64-encoded Developer ID Application .p12
+#   APPLE_CERTIFICATE_PASSWORD   — password used when exporting the .p12
+#
+# If either secret is missing the job fails immediately so the absence itself
+# is surfaced rather than silently ignored.
+
+name: Apple Certificate Expiry Check
+
+on:
+  # Run on the 1st of every month at 09:00 UTC
+  schedule:
+    - cron: '0 9 1 * *'
+
+  # Allow a manual trigger so the check can be run on demand
+  workflow_dispatch:
+
+jobs:
+  check-cert-expiry:
+    name: Check Apple Developer ID certificate expiry
+    runs-on: macos-latest
+
+    steps:
+      - name: Verify certificate is present and not within 30 days of expiry
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          # ── 1. Ensure the secret is populated ─────────────────────────────
+          if [ -z "$APPLE_CERTIFICATE" ]; then
+            echo "ERROR: APPLE_CERTIFICATE secret is not set." >&2
+            echo "  → Add a base64-encoded Developer ID Application .p12 to GitHub Secrets." >&2
+            echo "  → Run: openssl base64 -in cert.p12 | pbcopy" >&2
+            exit 1
+          fi
+
+          # ── 2. Decode the p12 ─────────────────────────────────────────────
+          echo "$APPLE_CERTIFICATE" | base64 -D > /tmp/cert_check.p12
+
+          # ── 3. Extract the leaf certificate (PEM) ─────────────────────────
+          if ! openssl pkcs12 \
+                -in /tmp/cert_check.p12 \
+                -nokeys \
+                -passin pass:"${APPLE_CERTIFICATE_PASSWORD}" \
+                -out /tmp/cert_check.pem 2>/dev/null; then
+            openssl pkcs12 -legacy \
+              -in /tmp/cert_check.p12 \
+              -nokeys \
+              -passin pass:"${APPLE_CERTIFICATE_PASSWORD}" \
+              -out /tmp/cert_check.pem
+          fi
+
+          rm -f /tmp/cert_check.p12
+
+          # ── 4. Read the expiry date ────────────────────────────────────────
+          EXPIRY_RAW=$(openssl x509 -in /tmp/cert_check.pem -noout -enddate \
+                         | cut -d= -f2)
+          SUBJECT=$(openssl x509 -in /tmp/cert_check.pem -noout -subject \
+                      | sed 's/subject= *//')
+          rm -f /tmp/cert_check.pem
+
+          # BSD date (macOS runners): "Nov 10 12:00:00 2025 GMT"
+          EXPIRY_EPOCH=$(date -j -f "%b %d %H:%M:%S %Y %Z" "$EXPIRY_RAW" +%s)
+          NOW_EPOCH=$(date +%s)
+          DAYS_LEFT=$(( (EXPIRY_EPOCH - NOW_EPOCH) / 86400 ))
+
+          echo "Certificate : $SUBJECT"
+          echo "Expires     : $EXPIRY_RAW"
+          echo "Days left   : $DAYS_LEFT"
+
+          # ── 5. Gate on expiry ──────────────────────────────────────────────
+          if [ "$DAYS_LEFT" -le 0 ]; then
+            echo "" >&2
+            echo "══════════════════════════════════════════════════════════" >&2
+            echo "  CERT EXPIRED — macOS builds will ship unsigned!"          >&2
+            echo "  Renew the certificate and update APPLE_CERTIFICATE now."  >&2
+            echo "══════════════════════════════════════════════════════════" >&2
+            exit 1
+          fi
+
+          if [ "$DAYS_LEFT" -le 30 ]; then
+            echo "" >&2
+            echo "══════════════════════════════════════════════════════════" >&2
+            echo "  CERT EXPIRES IN ${DAYS_LEFT} DAY(S) — action required!"  >&2
+            echo "  Renew before it expires or the next macOS release will"   >&2
+            echo "  fail to sign and will be blocked by Gatekeeper."          >&2
+            echo "  Update APPLE_CERTIFICATE in GitHub Secrets after renewal.">&2
+            echo "══════════════════════════════════════════════════════════" >&2
+            exit 1
+          fi
+
+          echo ""
+          echo "✓ Certificate is valid for ${DAYS_LEFT} more day(s). No action needed."

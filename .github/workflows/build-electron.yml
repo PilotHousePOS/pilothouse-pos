@@ -102,6 +102,69 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # ── Pre-build certificate guard ──────────────────────────────────────────
+      # Fail fast if the signing certificate is missing or within 30 days of
+      # expiry so CI never silently ships a Gatekeeper-blocked unsigned DMG.
+      - name: Verify code-signing certificate is present and not near expiry
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          # ── 1. Ensure the secret is populated ───────────────────────────────
+          if [ -z "$APPLE_CERTIFICATE" ]; then
+            echo "ERROR: APPLE_CERTIFICATE secret is not set." >&2
+            echo "  → Add a base64-encoded Developer ID Application .p12 to GitHub Secrets." >&2
+            echo "  → Run: openssl base64 -in cert.p12 | pbcopy" >&2
+            exit 1
+          fi
+
+          # ── 2. Decode the p12 ───────────────────────────────────────────────
+          echo "$APPLE_CERTIFICATE" | base64 -D > /tmp/ci_check_cert.p12
+
+          # ── 3. Extract the leaf certificate (PEM) ───────────────────────────
+          # Try modern openssl first, then fall back to legacy for older p12 exports
+          if ! openssl pkcs12 \
+                -in /tmp/ci_check_cert.p12 \
+                -nokeys \
+                -passin pass:"${APPLE_CERTIFICATE_PASSWORD}" \
+                -out /tmp/ci_check_cert.pem 2>/dev/null; then
+            openssl pkcs12 -legacy \
+              -in /tmp/ci_check_cert.p12 \
+              -nokeys \
+              -passin pass:"${APPLE_CERTIFICATE_PASSWORD}" \
+              -out /tmp/ci_check_cert.pem
+          fi
+
+          rm -f /tmp/ci_check_cert.p12
+
+          # ── 4. Read the expiry date ─────────────────────────────────────────
+          # openssl prints:  notAfter=Nov 10 12:00:00 2025 GMT
+          EXPIRY_RAW=$(openssl x509 -in /tmp/ci_check_cert.pem -noout -enddate \
+                         | cut -d= -f2)
+          rm -f /tmp/ci_check_cert.pem
+
+          # BSD date (macOS runners) format string for "Nov 10 12:00:00 2025 GMT"
+          EXPIRY_EPOCH=$(date -j -f "%b %d %H:%M:%S %Y %Z" "$EXPIRY_RAW" +%s)
+          NOW_EPOCH=$(date +%s)
+          DAYS_LEFT=$(( (EXPIRY_EPOCH - NOW_EPOCH) / 86400 ))
+
+          # ── 5. Gate on expiry ───────────────────────────────────────────────
+          if [ "$DAYS_LEFT" -le 0 ]; then
+            echo "ERROR: Developer ID Application certificate has EXPIRED." >&2
+            echo "  Expiry : $EXPIRY_RAW" >&2
+            echo "  Renew the certificate and update the APPLE_CERTIFICATE secret." >&2
+            exit 1
+          fi
+
+          if [ "$DAYS_LEFT" -le 30 ]; then
+            echo "ERROR: Developer ID Application certificate expires in ${DAYS_LEFT} day(s) ($EXPIRY_RAW)." >&2
+            echo "  Builds will start failing when the cert expires." >&2
+            echo "  Renew the certificate and update the APPLE_CERTIFICATE secret now." >&2
+            exit 1
+          fi
+
+          echo "✓ Certificate valid for ${DAYS_LEFT} more day(s) (expires ${EXPIRY_RAW})"
+
       # Import the Developer ID Application certificate into a temporary
       # keychain so electron-builder can find it by name during code-signing.
       - name: Import code-signing certificate

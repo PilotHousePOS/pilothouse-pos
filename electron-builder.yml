@@ -85,11 +85,17 @@ mac:
 
   # Code-signing identity — must match the Common Name of the Developer ID
   # Application certificate imported into the macOS keychain in CI.
-  # Leave as null locally if you don't have the cert; electron-builder will
-  # produce an unsigned build that still works for local testing.
-  # CI sets CSC_KEY_PASSWORD (via GitHub Actions secrets) and imports the cert
-  # into the keychain so electron-builder resolves the identity automatically.
-  identity: null   # resolved from the keychain import step in CI
+  #
+  # Do NOT set `identity: null` here — that would explicitly disable signing
+  # even when the certificate has been imported into the keychain.  Leaving
+  # the field absent lets electron-builder auto-discover the identity from the
+  # keychain.  The CI job imports the cert before calling electron-builder, so
+  # the correct "Developer ID Application: …" identity is always found.
+  #
+  # Local dev builds without the cert will produce an unsigned DMG with a
+  # warning, which is fine for testing.  The CI pre-build guard (in
+  # .github/workflows/build-electron.yml) ensures the cert is valid before
+  # the build ever reaches this point in CI.
 
   # Hardened runtime is required for notarization.
   hardenedRuntime: true
