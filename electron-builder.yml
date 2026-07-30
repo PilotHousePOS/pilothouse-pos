@@ -36,8 +36,11 @@ files:
   - node_modules/@serialport/**/*
   - node_modules/node-addon-api/**/*
 
-# Native modules must be rebuilt against Electron's Node.js ABI
-nativeRebuilder: sequential
+# Use pre-built native binaries (downloaded by pnpm install) as-is.
+# Rebuilding against Electron's ABI requires VS on Windows and Xcode on macOS,
+# and bcrypt (server-only) would fail. Pre-built binaries for serialport and
+# bcrypt are compatible enough for the packaged app.
+npmRebuild: false
 buildDependenciesFromSource: false
 
 # ── Environment variables baked into the app at build time ───────────────────

@@ -58,12 +58,11 @@ jobs:
       - name: Install dependencies
         # pnpm avoids the npm 10.8.2 / Windows crash (Exit handler never called!)
         # that left random packages missing from node_modules.
-        # --ignore-scripts skips native-addon compilation (serialport/electron
-        # binary download); electron-builder rebuilds native modules for the
-        # correct Electron ABI at package time via nativeRebuilder: sequential.
+        # Running WITH scripts lets electron, serialport, bcrypt, etc. download
+        # their pre-built platform binaries (no VS compile needed).
         # --shamefully-hoist gives a flat node_modules layout identical to npm so
         # all node_modules/... direct invocations in the build scripts work.
-        run: pnpm install --ignore-scripts --shamefully-hoist --no-frozen-lockfile
+        run: pnpm install --shamefully-hoist --no-frozen-lockfile
 
       - name: Compile Electron main process (TypeScript → JS)
         run: node scripts/write-electron-env.js && node node_modules/typescript/bin/tsc -p electron/tsconfig.json --noCheck
