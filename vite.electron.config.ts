@@ -16,10 +16,10 @@ export default defineConfig({
       "@": path.resolve(import.meta.dirname, "client", "src"),
       "@shared": path.resolve(import.meta.dirname, "shared"),
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
-      // Explicit file-level aliases for legacy CJS packages that lack an
-      // `exports` field. Without these, Rollup's ESM resolver on Node 24 cannot
-      // locate them via the `main` field and fails the build.
-      "jsbarcode": path.resolve(import.meta.dirname, "node_modules/jsbarcode/bin/JsBarcode.js"),
+      // jsbarcode is vendored at client/src/vendor/jsbarcode.js because npm 12
+      // on Node 24 runners non-atomically writes node_modules and sometimes
+      // drops jsbarcode/bin/JsBarcode.js. The vendored copy is always in git.
+      "jsbarcode": path.resolve(import.meta.dirname, "client/src/vendor/jsbarcode.js"),
     },
     conditions: ["browser", "module", "import", "require", "default"],
     mainFields: ["browser", "module", "main", "jsnext:main", "jsnext"],
