@@ -48,27 +48,30 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
-      - name: Disable Windows Defender real-time monitoring
-        # Windows Defender scans files as npm extracts them, locking files
-        # mid-write and causing random ENOENT gaps in node_modules.
-        shell: pwsh
-        run: Set-MpPreference -DisableRealtimeMonitoring $true
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
 
       - name: Install dependencies
+        # pnpm avoids the npm 10.8.2 / Windows crash (Exit handler never called!)
+        # that left random packages missing from node_modules.
         # --ignore-scripts skips native-addon compilation (serialport/electron
-        # binary download) that can crash the npm process on Windows runners.
-        # electron-builder rebuilds native modules for the correct Electron ABI.
-        run: npm ci --ignore-scripts
+        # binary download); electron-builder rebuilds native modules for the
+        # correct Electron ABI at package time via nativeRebuilder: sequential.
+        # --shamefully-hoist gives a flat node_modules layout identical to npm so
+        # all node_modules/... direct invocations in the build scripts work.
+        run: pnpm install --ignore-scripts --shamefully-hoist --no-frozen-lockfile
 
       - name: Compile Electron main process (TypeScript → JS)
-        run: npm run build:electron:main
+        run: node scripts/write-electron-env.js && node node_modules/typescript/bin/tsc -p electron/tsconfig.json --noCheck
         env:
           PILOTHOUSE_SERVER_URL: ${{ secrets.PILOTHOUSE_SERVER_URL }}
 
       - name: Build React frontend
-        run: npm run build:electron:frontend
+        run: node node_modules/vite/bin/vite.js build --config vite.electron.config.ts
         env:
           PILOTHOUSE_SERVER_URL: ${{ secrets.PILOTHOUSE_SERVER_URL }}
 
@@ -94,15 +97,7 @@ jobs:
           Write-Host "✓ SERVER_URL verified in dist/electron/env-constants.js: $url"
 
       - name: Package and publish Windows installer
-        shell: pwsh
-        run: |
-          # electron-builder/cli.js can be absent after npm ci on Windows even with
-          # Defender disabled.  Re-install only that package if the file is missing.
-          if (-not (Test-Path "node_modules/electron-builder/cli.js")) {
-            Write-Host "electron-builder missing — reinstalling..."
-            npm install electron-builder@25.1.8 --no-save --ignore-scripts
-          }
-          node node_modules/electron-builder/cli.js --win --publish always
+        run: node node_modules/electron-builder/cli.js --win --publish always
         env:
           PILOTHOUSE_SERVER_URL: ${{ secrets.PILOTHOUSE_SERVER_URL }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
