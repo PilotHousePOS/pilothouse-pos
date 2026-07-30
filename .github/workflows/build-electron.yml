@@ -51,26 +51,13 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        # npm 12 (bundled with Node 24) emits "Exit handler never called!" at the
-        # end of npm ci but still exits 0 and writes all packages to disk. The
-        # error is a benign npm 12 regression; a single run is sufficient.
-        # --ignore-scripts skips native-addon compilation (serialport/electron
-        # binary download) that can crash the npm process on Node 24 runners;
+        # npm on Windows partially extracts packages when native-addon postinstall
+        # scripts crash the process.  Strategy:
+        #   1. npm ci --ignore-scripts  → clean install from lock, no scripts run
+        #   2. npm install --ignore-scripts --prefer-offline  → fills any gaps
+        #      left by the first crash without wiping node_modules again
         # electron-builder rebuilds native modules for the correct Electron ABI.
-        run: npm ci --ignore-scripts
-
-      - name: Ensure electron-builder CLI is present
-        # npm 12 non-atomically extracts packages; electron-builder/cli.js can be
-        # absent even after a successful npm ci.  Re-install just that package if
-        # the file is missing, suppressing scripts so nothing crashes.
-        shell: pwsh
-        run: |
-          if (-not (Test-Path "node_modules/electron-builder/cli.js")) {
-            Write-Host "electron-builder/cli.js missing — reinstalling..."
-            npm install electron-builder@$(node -e "const p=require('./package.json');const v=p.devDependencies['electron-builder']||p.dependencies['electron-builder'];console.log(v.replace(/[\^~]/,''))") --no-save --ignore-scripts
-          } else {
-            Write-Host "electron-builder/cli.js present"
-          }
+        run: npm ci --ignore-scripts; npm install --ignore-scripts --prefer-offline
 
       - name: Compile Electron main process (TypeScript → JS)
         run: npm run build:electron:main
@@ -125,17 +112,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --ignore-scripts
-
-      - name: Ensure electron-builder CLI is present
-        run: |
-          if [ ! -f "node_modules/electron-builder/cli.js" ]; then
-            echo "electron-builder/cli.js missing — reinstalling..."
-            EB_VER=$(node -e "const p=require('./package.json');const v=p.devDependencies['electron-builder']||p.dependencies['electron-builder'];console.log(v.replace(/[\^~]/,''))")
-            npm install electron-builder@${EB_VER} --no-save --ignore-scripts
-          else
-            echo "electron-builder/cli.js present"
-          fi
+        run: npm ci --ignore-scripts; npm install --ignore-scripts --prefer-offline
 
       # ── Pre-build certificate guard ──────────────────────────────────────────
       # Fail fast if the signing certificate is missing or within 30 days of
