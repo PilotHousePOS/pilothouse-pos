@@ -94,7 +94,15 @@ jobs:
           Write-Host "✓ SERVER_URL verified in dist/electron/env-constants.js: $url"
 
       - name: Package and publish Windows installer
-        run: node node_modules/electron-builder/cli.js --win --publish always
+        shell: pwsh
+        run: |
+          # electron-builder/cli.js can be absent after npm ci on Windows even with
+          # Defender disabled.  Re-install only that package if the file is missing.
+          if (-not (Test-Path "node_modules/electron-builder/cli.js")) {
+            Write-Host "electron-builder missing — reinstalling..."
+            npm install electron-builder@25.1.8 --no-save --ignore-scripts
+          }
+          node node_modules/electron-builder/cli.js --win --publish always
         env:
           PILOTHOUSE_SERVER_URL: ${{ secrets.PILOTHOUSE_SERVER_URL }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
