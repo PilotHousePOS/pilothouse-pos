@@ -69,7 +69,7 @@ extraMetadata:
 # is code-signed.  Our script zips the app, submits it to Apple via
 # `xcrun notarytool --wait`, then staples the ticket.
 # It is a no-op on non-macOS builds or when APPLE_ID is not set.
-afterSign: electron/notarize.js
+afterSign: electron/notarize.cjs
 
 publish:
   - provider: github
