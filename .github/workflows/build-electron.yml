@@ -6,7 +6,7 @@
 #
 # Required GitHub Actions secrets:
 #   PILOTHOUSE_SERVER_URL        — production URL the packaged app should
-#                                  connect to (e.g. https://pilothouse.replit.app)
+#                                  connect to (e.g. https://pilothouse.app)
 #
 # Required GitHub Actions secrets for macOS code-signing + notarization:
 #   APPLE_CERTIFICATE            — base64-encoded Developer ID Application .p12
@@ -83,10 +83,10 @@ jobs:
         shell: pwsh
         run: |
           $url = "${{ secrets.PILOTHOUSE_SERVER_URL }}"
-          if (-not $url) { $url = "https://pilothouse.replit.app" }
+          if (-not $url) { $url = "https://pilothouse.app" }
           $content = Get-Content dist/electron/env-constants.js -Raw
           # Match the exact CommonJS export assignment tsc emits, e.g.:
-          #   exports.BAKED_SERVER_URL = 'https://pilothouse.replit.app';
+          #   exports.BAKED_SERVER_URL = 'https://pilothouse.app';
           $pattern = "exports\.BAKED_SERVER_URL\s*=\s*['""]" + [regex]::Escape($url) + "['""]"
           if ($content -notmatch $pattern) {
             Write-Error "exports.BAKED_SERVER_URL = '$url' not found in dist/electron/env-constants.js"
@@ -235,11 +235,13 @@ jobs:
       - name: Verify SERVER_URL is baked into compiled env-constants.js
         run: |
           URL="${{ secrets.PILOTHOUSE_SERVER_URL }}"
-          if [ -z "$URL" ]; then URL="https://pilothouse.replit.app"; fi
-          # Match the exact CommonJS export tsc emits, e.g.:
-          #   exports.BAKED_SERVER_URL = 'https://pilothouse.replit.app';
-          if ! grep -qE "exports\.BAKED_SERVER_URL\s*=\s*['\"]${URL}['\"]" dist/electron/env-constants.js; then
-            echo "ERROR: exports.BAKED_SERVER_URL = '$URL' not found in dist/electron/env-constants.js" >&2
+          if [ -z "$URL" ]; then URL="https://pilothouse.app"; fi
+          # Match BAKED_SERVER_URL assigned to the expected URL.
+          # esbuild emits:  const BAKED_SERVER_URL = "https://pilothouse.app";
+          # tsc emits:      exports.BAKED_SERVER_URL = 'https://pilothouse.app';
+          # The pattern below matches both forms.
+          if ! grep -qE "BAKED_SERVER_URL\s*=\s*['\"]${URL}['\"]" dist/electron/env-constants.js; then
+            echo "ERROR: BAKED_SERVER_URL = '$URL' not found in dist/electron/env-constants.js" >&2
             echo "--- actual content ---" >&2
             cat dist/electron/env-constants.js >&2
             exit 1
