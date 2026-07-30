@@ -16,9 +16,6 @@
 appId: com.pilothouse.pos
 productName: PilotHouse POS
 
-# The compiled Electron main process entry point
-main: dist/electron/main.js
-
 directories:
   buildResources: electron/assets
   output: dist/installers
