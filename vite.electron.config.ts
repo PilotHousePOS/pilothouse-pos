@@ -16,11 +16,11 @@ export default defineConfig({
       "@": path.resolve(import.meta.dirname, "client", "src"),
       "@shared": path.resolve(import.meta.dirname, "shared"),
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
+      // Explicit file-level aliases for legacy CJS packages that lack an
+      // `exports` field. Without these, Rollup's ESM resolver on Node 24 cannot
+      // locate them via the `main` field and fails the build.
+      "jsbarcode": path.resolve(import.meta.dirname, "node_modules/jsbarcode/bin/JsBarcode.js"),
     },
-    // Electron renderer targets Node-compatible resolution so that legacy CJS
-    // packages (no `exports` field, only `main`) are found by Rollup on Node 24.
-    // The ESM resolver introduced in Node 22+ drops the `main`-field fallback
-    // for packages without `exports`, breaking packages like jsbarcode.
     conditions: ["browser", "module", "import", "require", "default"],
     mainFields: ["browser", "module", "main", "jsnext:main", "jsnext"],
   },
