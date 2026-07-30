@@ -51,10 +51,12 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        # --ignore-scripts skips native-addon compilation (serialport crashes npm
-        # on the Node 24 runner); electron-builder rebuilds native modules for the
-        # correct Electron ABI at package time via nativeRebuilder: sequential.
-        run: npm ci --ignore-scripts
+        # npm 12 (bundled with Node 24) emits "Exit handler never called!" at the
+        # end of npm ci but still exits 0 and writes all packages to disk. The
+        # error is a benign npm 12 regression. We run npm ci twice: the first pass
+        # installs everything; the second is a cheap no-op that fills any gaps left
+        # by the exit-handler crash without wasting time on a full re-download.
+        run: npm ci; npm ci --prefer-offline
 
       - name: Compile Electron main process (TypeScript → JS)
         run: npm run build:electron:main
@@ -109,10 +111,12 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        # --ignore-scripts skips native-addon compilation (serialport crashes npm
-        # on the Node 24 runner); electron-builder rebuilds native modules for the
-        # correct Electron ABI at package time via nativeRebuilder: sequential.
-        run: npm ci --ignore-scripts
+        # npm 12 (bundled with Node 24) emits "Exit handler never called!" at the
+        # end of npm ci but still exits 0 and writes all packages to disk. The
+        # error is a benign npm 12 regression. We run npm ci twice: the first pass
+        # installs everything; the second is a cheap no-op that fills any gaps left
+        # by the exit-handler crash without wasting time on a full re-download.
+        run: npm ci; npm ci --prefer-offline
 
       # ── Pre-build certificate guard ──────────────────────────────────────────
       # Fail fast if the signing certificate is missing or within 30 days of
